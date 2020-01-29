@@ -13,19 +13,32 @@ Supported commands:
 ## Example 
 ### syslog input
 
-    ... mongod: {...}
+    2020-01-26T10:47:41.225272-05:00 qa-db51 mongod: { 'atype' : 'authCheck', 'ts' : { '$date' : '2020-01-26T10:47:41.225-0500' }, 'local' : { 'ip' : '(NONE)', 'port' : 0 }, 'remote' : { 'ip' : '(NONE)', 'port' : 0 }, 'users' : [], 'roles' : [], 'param' : { 'command' : 'listIndexes', 'ns' : 'config.system.sessions', 'args' : { 'listIndexes' : 'system.sessions', 'cursor' : {}, '$db' : 'config' } }, 'result' : 0 }
 
-## filtered output
-Filtered output adds field "Construct" to the event: 
+## filter result 
+Filter tweaks the event by adding a new "Construct" field with a JSON string: 
 
-    ...
+    {
+        \"sentences\": [ { 
+            \"verb\": \"listIndexes\",
+            \"objects\": [ 
+                { \"name\": \"system.sessions\", \"type\": \"collection\", \"fields\": [], \"schema\": \"\" } 
+                ],     
+            \"descendants\": [],      
+            \"fields\": [] 
+        } ], 
+        \"full_sql\": null, 
+        \"original_sql\": null
+    }
 
 This transformed event is then passed to a Mongo-Guardium Output plugin, which is responsible to send it to a Guardium machine.  
 
 ## Install
 To install this plugin, clone or download, and run from your logstash installation. Replace "?" with this plugin version:
     
-    $ bin/logstash-plugin install --no-verify --local /path/to/logstash-filter-mongo2guardium-?.?.?.gem
+    $ logstash-plugin install --no-verify --local ./logstash-filter-mongo-guardium-?.?.?.gem
+
+Note: logstash-plugin may not handle relative paths well, so stick to calling it from the folder your gem is located, as in the example, above. 
 
 ## Contribute
 
@@ -43,9 +56,10 @@ To build & create an updated gem, which can be installed onto logstash:
 
 To test installation on your development logstash
 1. Install logstash (using Brew, for example)
+2. Install the filter plugin (see above)
 2. Run 
 
-    ```$ logstash -f ./logstash-filter-java-mongodb-guardium/java-filter.conf```
+    ```$ logstash -f ./filter-test.conf --config.reload.automatic```
 
 
 ## TODO
