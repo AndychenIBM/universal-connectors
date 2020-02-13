@@ -77,8 +77,8 @@ public class JavaOutputToGuardium implements Output {
                 System.out.println("Exception ######### Failed to handle event "+ex.getMessage()+logEvent(event));
                 log.error("Failed to handle event "+logEvent(event), ex);
             }
-            System.out.println("#########done");
-            log.info("######### Finished one event, total events size is " + events.size());
+            System.out.println("==========Done");
+            log.info("==========Finished one event, total events size is " + events.size());
         }
     }
 

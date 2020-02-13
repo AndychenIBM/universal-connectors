@@ -19,7 +19,7 @@ public class JsonFromEventBuilder {
     public Record buildRecord(Event event) throws ParseException {
         Record record = new Record();
 
-        record.setDbName(getStringField(event, "schema", "schema"));
+        record.setDbName(getStringField(event, "dbName", "schema"));
         record.setAppUserName(getStringField(event, "app_user_name", "no_app_user"));
         record.setSessionId(getStringField(event, "session_id", "sessionId123456789"));
         record.setTime(getTimeInSec(event));
@@ -43,7 +43,7 @@ public class JsonFromEventBuilder {
         session.setClientIpv6(getStringField(event, "client_ip_v6", ""));
         session.setClientPort(getIntField(event, "client_port", 0));
         session.setIpv6(false);
-        session.setServerIp(getStringField(event, "server_ip", "127.0.0.1"));
+        session.setServerIp(getStringField(event, "server_ip", "9.70.147.59"));
         session.setServerIpv6(getStringField(event, "server_ip_v6", ""));
         session.setServerPort(getIntField(event, "server_port", 0));
         return session;
@@ -52,14 +52,14 @@ public class JsonFromEventBuilder {
     public Accessor buildAccessor(Event event){
         Accessor accessor = new Accessor();
         accessor.setClient_mac(getStringField(event, "mac_address", "00:00:00:a1:2b:cc"));
-        accessor.setClientHostName(getStringField(event, "client_host_name", "thisIsClientHostName"));
+        accessor.setClientHostName(getStringField(event, "client_host_name", "localhost"));
         accessor.setClientOs(getStringField(event, "os", "os_not_found"));
         accessor.setCommProtocol(getStringField(event, "communication_protocol", "shell"));
         accessor.setDbProtocol(getStringField(event, "db_protocol", "MONGODB"));
         accessor.setDbProtocolVersion(getStringField(event, "protocol_version", "0"));
         accessor.setDbUser(getStringField(event, "db_user", "not_found"));
         accessor.setLanguage(getStringField(event, "language", "MONGODB" ));
-        accessor.setOsUser(getStringField(event, "os_uset", "root"));
+        accessor.setOsUser(getStringField(event, "os_user", "root"));
         accessor.setServerType(getStringField(event, "server_type", "IDIDNOTFOUNDIT"));
         accessor.setServerDescription(getStringField(event, "server_desc", "NA"));
         accessor.setServerOs(getStringField(event, "server_os", "noserverod"));
