@@ -1,0 +1,55 @@
+{
+  "sessionId": "{\"id\":{\"$type\":\"04\",\"$binary\":\"x9TSJiiQRvqVuupi3W/eCA==\"}}",
+  "dbName": "test.inventory",
+  "appUserName": "",
+  "time": 123456789,
+
+  "sessionLocator": {
+    "clientIp": "127.0.0.1",
+    "clientPort":61126,
+    "serverIp": "127.0.0.1",
+    "serverPort":27017,
+    "isIpv6": false,
+    "clientIpv6":"",
+    "serverIpv6":""
+  },
+
+  "accessor": {
+    "dbUser": "BILL",
+    "serverType": "MONGODB",
+    "serverOs": "",
+    "clientOs": "",
+    "clientHostName": "",
+    "serverHostName": "qa-db51",
+    "commProtocol": "" ,
+    "dbProtocol": "MONGODB WIRE PROTOCOL",
+    "dbProtocolVersion": "",
+    "osUser": "",
+    "sourceProgram": "",
+    "client_mac": "",
+    "serverDescription": "",
+    "serviceName": "",
+    "language": "DB2"
+  },
+
+  "data": {
+    "construct": {
+      "sentences": [
+        {
+          "verb": "find",
+          "objects": [
+            {"name": "inventory","type": "collection","fields": [],"schema": ""}
+          ],
+          "descendants": [],
+          "fields": []
+        }
+      ],
+      "full_sql": "",
+      "original_sql": ""
+    },
+    "timestamp": 123456789,
+    "originalSqlCommand": "",
+    "useConstruct": "true"
+  }
+
+}

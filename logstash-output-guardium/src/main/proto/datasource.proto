@@ -1,0 +1,1030 @@
+syntax = "proto2";
+package guard.datasource;
+
+//option java_package = "com.ibm.guardium.datasource";
+//option java_package = "com.guardium.proto.datasource";
+option java_package = "com.ibm.guardium.proto.datasource";
+
+
+// Time stamp, with optionl milisecs and time zone info.
+// Example:
+// unix_time - get from time() system call
+// usec - if you have it - you can add a number 0-999,999
+// tz_min - For example, GMT+2 is 120. optional field.
+// tz_dst - for example, if the message is sent while DST is in effect,
+//          it can be 60.
+// Don't get confused -- unix_time is always what the system returns:
+// "the  time  since  the  Epoch (00:00:00 UTC, January 1, 1970),
+// measured in seconds."  POSIX.1-2001. Filling this value is usually
+// enough.
+//
+// For windows, to get the values see
+// http://msdn.microsoft.com/en-us/library/system.timezone.getutcoffset.aspx
+//
+
+message Timestamp {
+    required fixed32 unix_time = 1; // UNIX style Time (in secs since 1970)
+    optional fixed32 usec = 2;    // microseconds since second started
+
+    // tz_min helps knowing what was the local time when the event happen.
+    // tz_dst helps knowing if DST was in effect then or not.  Not sure is THAT
+    // is ever helpful. Those field do not currently change any data shown
+    // in our reports.
+
+    optional sfixed32 tz_min = 3;  // minutes west of Greenwich
+    optional sfixed32 tz_dst = 4;  // minutes of DST
+}
+
+
+
+// For Doberman and Canaan,  (7.x to 9.x) a session in the SQLGuard server
+// is uniquely defined by IP/IP/port/port set. When sending an event that
+// is related to a specific session, this message is used to locate the
+// specific session. This is used, for example, to show the users on the GUI
+// All the events that happened during a specific session.
+// The addresses and port number should be in network order.
+
+message Session_locator {
+    optional fixed32 client_ip = 1 ;	// DB client IP
+    optional fixed32 client_port = 2 ; // DB Client port
+    optional fixed32 server_ip = 3 ;	// DB server IP
+    optional fixed32 server_port = 4 ;  // DB server port
+    optional bool is_ipv6 = 5;
+    optional string client_ipv6 = 6 ; // DB client IP (IPv6)
+    optional string server_ipv6 = 7 ; // DB server IP (IPv6)
+
+}
+
+
+// Describe data sent by or to a DB server. For example, some packet sent
+// to Oracle server, or data sent by MS SQL server to Query Analyzer.
+
+message Application_data {
+
+    // Are we sending raw packets (in TNS/TDS/DRDA/et.c) or clear SQL text or
+    // SQL server reply?
+    enum Data_type {
+        TEXT = 1;
+        RAW = 2;
+        CONSTRUCT = 3;
+    }
+
+    // What variant of SQL Language is used?
+    enum Language_type {
+        FREE_TEXT    = 0x00000004 ;
+        MSSQL        = 0x00000008 ;
+        SYB          = 0x00000010 ;
+        ORACLE       = 0x00000020 ;
+        DB2          = 0x00000040 ;
+        INFX         = 0x00000400 ;
+        MYSQL        = 0x00002000 ;
+        TRD          = 0x00004000 ;
+        HADOOP       = 0x00008000 ;
+        PGRS         = 0x00080000 ;
+        MSSP         = 0x00400000 ;
+        OPTIM_AUDIT  = 0x00800000 ;
+        OPTIM_REDACT = 0x00000800 ;
+        BIG_INSIGHTS = 0x01000000 ;
+        MONGO        = 0x00000028 ;
+        CASS         = 0x00000058 ;
+        ASTER        = 0x00000078 ;
+        GPLUM        = 0x00000088 ;
+        COUCH        = 0x00000098 ;
+        MARIADB      = 0x000000b8 ;
+        FSM          = 0x000000c8 ;
+        MAGEN        = 0x000000d8 ;
+        HIVE         = 0x000000e8 ;
+        ACCUMULO     = 0x000000f8 ;
+        IMPALA       = 0x00000118 ;
+        VRTC         = 0x00000168 ;
+        MEMSQL       = 0x00000178 ;
+        MYSQL_X      = 0x00000188 ;
+        COUCHB       = 0x00000198 ;
+    }
+
+    enum Datasource_type {
+        RDS = 1;
+        UNI_CON = 2;
+    }
+
+    optional Language_type language = 1 ; // SQL Variant
+    required Data_type type = 2 ; // Data type (see above)
+    optional string text = 3; // In case of clear text, the text;
+    optional bytes packet = 4; // In case of raw packet, the raw data
+    optional GDM_construct construct = 5; // In case of post-parsed SQL
+    required Timestamp timestamp  = 6; // time the data was sent
+    optional string application_user = 7;
+    optional Session_locator session_locator = 8; // required for doberman and canaan. In elkhound and on, you can use the session id
+    optional string	variables_values = 9; //e.g. bind variables
+    optional Datasource_type datasource_type = 10;
+    optional HTTP_reply http_reply = 20; // large value here to prevent collisions with version 9.x
+}
+
+message HTTP_reply {
+    message Header_field {
+        optional string name = 1;
+        optional string value = 2;
+    }
+    optional uint32 status_code = 1;
+    repeated Header_field header_field = 2;
+    optional string content_type = 3;
+    optional string content_encoding = 4;
+    optional string redirect = 5; // from Location: header
+    optional string set_cookie = 6;
+    optional bytes body = 7;
+}
+
+// Tell the server we're here - ready to send events to the server.
+
+message Handshake {
+    required Timestamp timestamp = 1;
+    required string client_identifier = 2; // Uniquely identify this client
+    required string current_master = 3;
+    required fixed32 current_master_ip = 4;
+    optional string vendor = 5;
+    optional string product = 6;
+    optional string version = 7;
+    optional bool firewall = 8;
+    optional bool transient = 9; //connections will be transient: frequent disconnect/reconnect
+    repeated Forwarding_configuration forwarding = 13;
+    optional bool sink = 10 [default=false] ; // Client would like to see all trafic we see
+    optional bool policy_push= 12; // Does the client need to know our policy?
+    optional bool quarantine_push= 14; // Does the client need to know our quarantine?
+    optional string client_type = 15;
+    optional bool is_ipv6 = 16  [default=false] ; //is current master ipv6?
+    optional string current_master_ipv6 = 17 ;
+    optional bool force_log_limited = 18 [default=false];
+}
+
+
+// Some clients would like to see a copy of all protobuf messaging
+// we get for a specific vendor, or would like to filter them before we handle
+// them.
+
+message Forwarding_configuration {
+    optional fixed32 vendor_id = 1;
+    repeated string  forward_messages = 2;
+    repeated string  filter_messages = 3;
+}
+
+
+// Tell the server we're still around. Send this once a minute to be sure that
+// the GUI displays the client as connected.
+
+message Ping {
+    required Timestamp timestamp = 1; // The time now at the client
+    required string client_identifier = 2; // Uniquely identify the client, must be the same value as in the handshake.
+    required string current_master = 3;
+    required fixed32 current_master_ip = 4;
+    optional bool is_ipv6 = 5  [default=false] ; //is current master ipv6?
+    optional string current_master_ipv6 = 6 ;
+}
+
+// Send some message from the GDI client to be logged. Those messages
+// can be viewed on the GUI. For example, "ACME Event manager started"
+// To be used for events that happen to the client (e.g. STap), not the entity
+// which the client is monitoring (e.g. the DB server process)
+
+message Error_msg {
+
+    enum Error_level {
+        INFO = 0;
+        WARNING = 1;
+        ERROR = 2;
+        FATAL = 3;
+        DIAG = 4;
+    }
+
+    required string msg =1;
+    required Error_level level =2;
+    required Timestamp timestamp = 3; // When did the error/warning/evemt happen?
+}
+
+// Describe a certain  way to access a DB instance.
+
+message Accessor {
+    required string db_user = 1 ;
+    required string server_type = 2 ;
+    optional string server_os = 3 ;
+    optional string client_os = 4 ;
+    optional string client_hostname = 5 ;
+    optional string server_hostname = 6;
+    optional string comm_protocol = 7 ;
+    optional string db_protocol = 8 ;
+    optional string db_protocol_version = 9 ;
+    optional string os_user = 10 ;
+    optional string source_program = 11 ;
+    optional string client_mac = 12 ;
+    optional string server_description = 13 ;
+    optional string service_name = 14 ;
+    optional Application_data.Language_type language = 15 ;
+    optional Application_data.Data_type type = 16 [default = TEXT];
+    optional Application_data.Datasource_type datasource_type = 17;
+}
+
+
+// Describe a user logging into a DB. (e.g. when a user runs sqlplus, and enters
+// a username and passwords correctly)
+
+message Session_start {
+    optional int64 session_id = 1;
+    optional Session_locator session_locator = 2 ;
+    optional Timestamp timestamp = 3;
+    optional Accessor accessor = 4;
+    optional string uid_chain = 5;
+    optional int64 prev_session_id = 6;
+    optional string process_id = 7;
+    optional string terminal_id = 8;
+    optional string db_name = 9;
+    optional string app_user_name = 10 ;
+}
+
+
+// Describes the fact that a DB session has ended (e.g. a user has logged out
+// of sqlplus)
+
+message Session_end {
+    required int64 session_id = 1;
+    required Timestamp timestamp  = 2;
+    optional Session_locator session_locator = 3; // required for doberman and canaan
+}
+
+
+message Bind_variable {
+    optional int32 type = 1;
+    optional string value = 2;
+}
+
+message Bind_info {
+    repeated Bind_variable vars = 1;
+};
+
+// Describe a DB client request (e.g. "SELECT SALARY FROM EMPLOYEES");
+message Client_request {
+    required int64 session_id = 1;
+    optional int64 request_id = 2;
+    required Application_data data=3;
+    optional Bind_info bind_info = 4;
+    optional uint32 rule_id = 5;  //for FAM stap to send the triggered rule_id for the request_id.
+    optional uint32 fam_action = 6;  //FAM action bitmask (see FAM_Action_type)
+
+    enum FAM_Action_op {
+        ACTION_OP_NONE = 0;  // default for non-FAM request
+        ACTION_OP_OPEN = 1;
+        ACTION_OP_READ = 2;
+        ACTION_OP_WRITE = 3;
+        ACTION_OP_EXECUTE = 4;
+        ACTION_OP_DELETE = 5;
+        ACTION_OP_FILEOP = 6;
+        ACTION_OP_ADD_TO_GROUP = 7; // Sharepoint actions
+        ACTION_OP_AUDIT_MASK_CHANGE = 8;
+        ACTION_OP_CHANGE_PERMISSION = 9;
+        ACTION_OP_CHANGE_ROLE = 10;
+        ACTION_OP_CHECK_IN = 11;
+        ACTION_OP_CHECK_OUT = 12;
+        ACTION_OP_CHILD_DELETE = 13;
+        ACTION_OP_CHILD_MOVE = 14;
+        ACTION_OP_COPY = 15;
+        ACTION_OP_CREATE_ROLE = 16;
+        ACTION_OP_CREATE_USER_GROUP = 17;
+        ACTION_OP_CUSTOM = 18;
+        ACTION_OP_DELETE_DOC = 19;
+        ACTION_OP_DELETE_AUDITED = 20;
+        ACTION_OP_DELETE_FROM_GROUP = 21;
+        ACTION_OP_DELETE_GROUP = 22;
+        ACTION_OP_FILE_FRAGMENT_WRITE = 23;
+        ACTION_OP_GRANT_PERMISSION = 24;
+        ACTION_OP_MOVE = 25;
+        ACTION_OP_PROFILE_CHANGE = 26;
+        ACTION_OP_REMOVE_ROLE = 27;
+        ACTION_OP_REVOKE_PERMISSION = 28;
+        ACTION_OP_SCHEMA_CHANGE = 29;
+        ACTION_OP_SEARCH = 30;
+        ACTION_OP_TURNOFF_ROLE = 31;
+        ACTION_OP_TURNOFF_SECURITY = 32;
+        ACTION_OP_TURNON_SECURITY = 33;
+        ACTION_OP_UNDELETE = 34;
+        ACTION_OP_UPDATE = 35;
+        ACTION_OP_VIEW = 36;
+        ACTION_OP_WORKFLOW = 37;
+        ACTION_OP_ADD_DIR = 38; // NAS actions
+        ACTION_OP_ADD_FILE = 39;
+        ACTION_OP_DELETE_DIR = 40;
+        ACTION_OP_DELETE_FILE = 41;
+        ACTION_OP_CHANGE_DIR_PERM = 42;
+        ACTION_OP_CHANGE_FILE_PERM = 43;
+        ACTION_OP_READ_FILE = 44;
+        ACTION_OP_UPDATE_FILE = 45;
+        ACTION_OP_RENAME_FILE = 46;
+        ACTION_OP_RENAME_DIR = 47;
+    }
+
+    optional FAM_Action_op fam_action_op = 7;  // the FAM operation that triggered the rule
+    optional string extra_info = 8;
+    optional int64 return_code = 9;
+    optional uint32 rule_position = 10;  //for FAM stap to send the triggered rule_position for the request_id.
+};
+
+
+// Describe a DB server reply. (e.g. " 5 rows deleted")
+
+message Server_reply {
+    required int64 session_id = 1;
+
+    optional int64 request_id = 2;
+    optional int64 reply_seq = 3;
+
+    required Application_data data=4;
+
+    optional uint32 request_failed = 5;
+    optional uint32 records_affected = 6;
+    optional uint32 execution_time = 7;
+    optional uint32 request_acknowledged_time = 8;
+    optional uint32 rule_id = 9; //for FAM stap to send the triggered rule_id for the request_id.
+    optional uint32 rule_position = 10; //for FAM stap to send the triggered rule_position for the request_id.
+
+
+};
+
+
+
+// A group of values, and the SQLguard ID for that group.
+// The reason for this message as a separate entity is that we need to
+// keep the SQLGuard group ID. So we can't just save a list of group members.
+message Value_group {
+    required uint32 value_group_id=1;
+    repeated string member=2;
+}
+
+// for one attribute of an event, specify if a rule should be triggred or not.
+
+message Policy_rule_item {
+    required string field_name=1;
+    optional string value=2;
+    optional Value_group value_group=3;
+    optional bool inverted=4;
+}
+
+
+// An action that will be triggered when a rule matches.
+
+message Policy_rule_action {
+    optional uint32 sequence  = 1;
+    optional uint32 type = 2;
+};
+
+
+// One rule in the policy.
+
+message Policy_rule {
+
+    enum Rule_type {
+        ACCESS_RULE = 0;
+        EXCEPTION_RULE = 1;
+        EXTRUSION_RULE = 2;
+        DB2_COLLECTION_PROFILE=10;
+        VSAM_COLLECTION_PROFILE=11;
+        IMS_ARTIFACT=12;
+    }
+
+    required uint32 position = 1;
+    optional string replacement_char = 2 ;
+    optional uint32 records_affected_threshold = 3;
+    optional uint32 matched_returned_data_threshold = 4 ;
+    optional uint32 quarantine_minutes = 5 ;
+    repeated Policy_rule_item item = 6 ;
+    required uint32 type = 7;
+    repeated Policy_rule_action action = 8;
+    optional bool continue_to_next_rule = 9 ;
+    optional uint32 severity = 10;
+    optional string name = 11;
+    optional string policy_name = 12;
+}
+
+
+// A policy is a collection of rules that may be triggred.
+message Interception_policy {
+    repeated Policy_rule policy_rule = 1 ;
+    optional string name = 2;
+}
+
+
+// A collection of sessions and some opaque data about them that the server
+// sends.
+message Opaque_session_data {
+
+    enum Blob_type {
+        FAILOVER_BLOB = 81;
+    }
+
+    required Blob_type blob_type = 1;
+    repeated Session_blob session_blob =2;
+}
+
+// A session and the blob associated with it. The blob cannot be
+// used by the client, but it might be neccessary to send it to the
+// server at some point.
+message Session_blob {
+    required Session_locator  session = 2;
+    optional bytes blob = 3;
+}
+
+// A collection of sessions and their ignore status, scrub status, etc.
+
+message Monitor_session {
+    repeated Session_flags session_flags=1;
+    repeated Scrub scrub =3;
+}
+
+message Scrub {
+    required fixed32 ktap_session_id = 1 ;
+    required string pattern = 2 ;
+    optional string filler = 3;
+}
+
+// The ignore status per session.
+message Session_flags {
+    required Session_locator  session = 1;
+    optional fixed32 flags =2;
+}
+
+message Exception {
+    optional string EXCEPTION_TYPE_ID = 1;
+    optional Session_locator session = 2;
+    optional string SESSION_ID   = 3;
+    optional string DB_PROTOCOL = 4;
+    optional string DESCRIPTION = 5;
+    optional string SQL_STRING  = 6;
+    optional string DB_USER  = 7;
+    optional string DB_PASSWORD_HASH  = 8;
+    optional string ERROR_CAUSE  = 9;
+    optional string APP_USER_NAME = 10;
+    optional int32 count           = 11;
+    optional Timestamp  timestamp = 12;
+}
+
+
+message Positional_string {
+    optional uint32 start = 1;
+    optional uint32 end = 2;
+}
+
+
+message GDM_field {
+    required string name=1;
+
+    enum Origin {
+        CLAUSE_WHERE = 1;
+        CLAUSE_ORDER_BY = 2;
+        CLAUSE_HAVING = 3;
+        CLAUSE_GROUP_BY = 4;
+        CLAUSE_LIST = 5;
+        CLAUSE_ON = 6;
+    }
+
+    repeated Origin origins = 2;
+    optional bytes value = 3;
+
+    optional Positional_string position = 4;
+
+    optional bytes before_value = 5;
+}
+
+message GDM_object {
+    required string name=1;
+    optional string schema=2;
+    optional string type=3;
+    repeated GDM_field  fields = 4; // Fields belonging this object
+
+    optional Positional_string position = 5;
+}
+
+
+message GDM_sentence {
+    required string verb = 1 ;
+    repeated GDM_sentence descendants = 2;
+    repeated GDM_object  objects = 3;
+    repeated GDM_field  fields = 4; // Fields used in this sentence, object unknown
+
+    optional Positional_string position = 5;
+}
+
+message GDM_construct {
+    repeated GDM_sentence sentences =1 ;
+    optional string original_sql =2;
+    optional string full_sql=3;
+
+    optional bool is_valid=4 [default = true];
+    optional int32 statement_type=5;
+}
+
+message ICAP {
+    /// Three possible types to ICAP requests
+    enum Type {
+        OPTIONS = 1;
+        REQMOD  = 2;
+        RESPMOD = 4;
+    }
+    optional Type     type = 1;
+    /// The body of the request/response. Namely the HTML code
+    optional bytes  body = 2;
+    /// if eof is false, more data required for this request
+    optional bool   eof = 3;
+    /// request/response headers
+    repeated string req_header = 4;
+    repeated string resp_header = 5;
+    /// The client IP and username (if we have some info on that)
+    optional string client_ip = 6;
+    optional string client_username = 7;
+    optional string server_ip = 8;
+    optional string user_agent = 9;
+    optional string server_hostname = 10;
+    optional string url = 11;
+    optional string content_type = 12;
+    optional string referer = 13;
+}
+
+
+message Name_value_pair {
+    optional string name = 1; // No spaces allowed
+    optional string value = 2; // No spaces allowed
+}
+
+
+// One section of the agent config information
+message Agent_config_section {
+    optional string section_name =1; // No spaces allowed
+    repeated Name_value_pair parameters = 2;
+}
+
+// STap (or other agent) config information (e.g. guard_tap.ini )
+message Agent_config {
+    optional string client_identifier = 1;  // Same as in the handshake and ping
+    repeated Agent_config_section sections = 2;
+    optional bool for_update = 3 [default = true];
+}
+
+message PI_position {
+    required uint32 start = 1;
+    required uint32 end =2;
+    optional uint32 byte_start = 3;
+    optional uint32 byte_end = 4;
+};
+
+message PI_Field {
+    optional string field_name = 1;
+    optional PI_position field_pos = 2;
+    repeated GDM_field.Origin origins = 3;
+    optional PI_position unaliased_name = 4;
+};
+
+message PI_Object {
+    optional string object_name = 1;
+    optional PI_position object_pos = 2;
+
+    repeated PI_Field fields = 3; // Fields on this object
+    optional PI_position unaliased_name = 4;
+};
+
+message PI_Expression {
+    optional PI_position left_side_pos = 1;
+    optional PI_position right_side_pos = 2;
+}
+
+message PI_Sentence {
+    repeated string verbs = 1;
+    repeated PI_position verbs_pos = 2;
+
+    repeated PI_Field fields = 3; // Fields with no known objects
+    repeated PI_Object objects = 4; // known Objects (eg tables)
+    repeated PI_Sentence subsentences = 5;
+    repeated PI_Expression expressions = 7;
+
+    optional PI_position sentence_pos = 8;
+    optional PI_position join_pos = 9;
+    optional PI_position where_pos = 6;
+}
+
+message PI_Construct {
+    repeated PI_Sentence sentences = 1;
+    repeated PI_position constants = 2;
+    repeated PI_position passwords = 3;
+}
+
+
+message Parser_result
+{
+    repeated PI_Construct constructs = 1;
+    optional string original_sql = 2;
+    optional int32 parse_request_id = 3;
+    optional string error = 4;
+}
+
+// Send this request to snif, and you will get back
+// in "sql_elements" the parser results.
+
+message Parser_request  {
+    optional string original_sql = 1;
+    optional int32 parse_request_id = 2 [default=1] ; // In case you send several request at once
+    optional Application_data.Language_type language = 3 ;
+    optional Parser_result sql_elements = 4;
+}
+
+// protocol for QRW_Preview
+message QueryRewrite_preview_request {
+    optional Application_data.Language_type language = 1 ;
+    repeated string sample_sqls = 2;
+    repeated int64 qr_definition_ids = 3;
+}
+
+message QueryRewrite_preview_reply {
+    // one set of QR_result for one sample sql
+    message QR_result {
+        optional string rewritten_sql = 1;
+
+        enum QR_Status {
+            QR_NO_CHANGE = 0;
+            QR_CHANGE = 1;
+            QR_ERROR = 2;
+        };
+        optional QR_Status qrStatus = 2;
+
+        optional string qr_log_info = 3;
+        //a set of qr_definition_ids that applied to the request sample sql to get the rewritten sql
+        // ie. the qr condition in the qr_definition matched the sample sql even though the final
+        // result may not actually changed
+        message Applied_QR_Definition_IDs {
+            repeated int64 qr_definition_ids = 1;
+        };
+        optional Applied_QR_Definition_IDs applied_qr_definition_ids = 4;
+    };
+
+    // a list of QR_results corresponding to the order of sample sqls
+    repeated QR_result qr_results = 1;
+}
+
+
+message FAM_rules
+{
+    repeated FAM_rule fam_rule = 1;
+}
+
+message FAM_rule
+{
+    required uint32 rule_id = 1;
+    optional uint32 rule_position = 2;
+    repeated string os_users = 3;
+    optional bool os_user_not_flag = 4;
+    repeated string unix_groups = 5;
+    optional bool unix_group_not_flag =     6;
+    repeated string file_paths = 7;
+    optional bool file_path_not_flag = 8;
+    optional bool include_subdirectories = 11;
+    optional bool monitor_removable_media = 12;
+
+    enum FAM_Action_type {
+        ACTION_NONE     = 0 ;
+        ACTION_AUDIT    = 1 ;
+        ACTION_POLICY_VIOLATION  = 2;
+        ACTION_BLOCK       = 4;
+        ACTION_EXCEPTION   = 8;
+        ACTION_ALERT       = 16;
+    }
+
+    optional uint32 open_action = 21 [default = 0];
+    optional uint32 read_action = 22 [default = 0];
+    optional uint32 write_action = 23 [default = 0] ;
+    optional uint32 execute_action = 24 [default = 0];
+    optional uint32 delete_action = 25 [default = 0];
+    optional uint32 fileop_action = 26 [default = 0];
+}
+
+
+message FAM_SHAREPOINT_rules
+{
+    repeated FAM_SHAREPOINT_rule fam_sharepoint_rule = 1;
+    // Xml carrying the full policy. Only used by sharepoint so far
+    repeated string rule_condition_policy = 2;
+}
+
+message FAM_SHAREPOINT_rule
+{
+    required uint32 rule_id = 1;
+    optional uint32 rule_position = 2;
+    repeated string os_users = 3;
+    optional bool os_user_not_flag = 4;
+    repeated string unix_groups = 5;
+    optional bool unix_group_not_flag = 6;
+    repeated string file_paths = 7;
+    optional bool file_path_not_flag = 8;
+
+    enum FAM_Action_type {
+        ACTION_NONE     = 0 ;
+        ACTION_AUDIT    = 1 ;
+        ACTION_POLICY_VIOLATION  = 2;
+        ACTION_BLOCK       = 4;
+        ACTION_EXCEPTION   = 8;
+        ACTION_ALERT       = 16;
+    }
+
+    optional uint32 AddToGroup_action = 21 [default = 0];
+    optional uint32 AuditMaskChange_action = 22 [default = 0];
+    optional uint32 ChangePermission_action = 23 [default = 0];
+    optional uint32 ChangeRole_action = 24 [default = 0];
+    optional uint32 CheckIn_action = 25 [default = 0];
+    optional uint32 CheckOut_action = 26 [default = 0];
+    optional uint32 ChildDelete_action = 27 [default = 0];
+    optional uint32 ChildMove_action = 28 [default = 0];
+    optional uint32 Copy_action = 29 [default = 0];
+    optional uint32 CreateRole_action = 30 [default = 0];
+    optional uint32 CreateUserGroup_action = 31 [default = 0];
+    optional uint32 Custom_action = 32 [default = 0];
+    optional uint32 Delete_action = 33 [default = 0];
+    optional uint32 DeleteAudited_action = 34 [default = 0];
+    optional uint32 DeleteFromGroup_action = 35 [default = 0];
+    optional uint32 DeleteGroup_action = 36 [default = 0];
+    optional uint32 FileFragmentWrite_action = 37 [default = 0];
+    optional uint32 GrantPermission_action = 38 [default = 0];
+    optional uint32 Move_action = 39 [default = 0];
+    optional uint32 ProfileChange_action =40 [default = 0];
+    optional uint32 RemoveRole_action = 41 [default = 0];
+    optional uint32 RevokePermission_action = 42 [default = 0];
+    optional uint32 SchemaChange_action = 43 [default = 0];
+    optional uint32 Search_action = 44 [default = 0];
+    optional uint32 TurnOffRole_action = 45 [default = 0];
+    optional uint32 TurnOffSecurity_action = 46 [default = 0];
+    optional uint32 TurnOnSecurity_action = 47 [default = 0];
+    optional uint32 Undelete_action = 48 [default = 0];
+    optional uint32 Update_action = 49 [default = 0];
+    optional uint32 View_action = 50 [default = 0];
+    optional uint32 Workflow_action = 51 [default = 0];
+}
+
+
+message FAM_NAS_rules
+{
+    repeated FAM_NAS_rule fam_nas_rule = 1;
+}
+message FAM_NAS_rule
+{
+    required uint32 rule_id = 1;
+    optional uint32 rule_position = 2;
+    repeated string os_users = 3;
+    optional bool os_user_not_flag = 4;
+    repeated string unix_groups = 5;
+    optional bool unix_group_not_flag =	6;
+    repeated string file_paths = 7;
+    optional bool file_path_not_flag = 8;
+    optional bool include_subdirectories = 11; // For NAS, this is to suppress subsequent Read operation in the same folder
+    optional bool monitor_removable_media = 12; // For NAS, this is to suppress Microsfot Office operations on temperorary files
+    repeated string extension = 13;
+    optional uint32 extension_group_id = 14;
+    optional bool extension_not_flag = 15;
+    repeated string exclude_file_paths = 16;
+    optional uint32 exclude_file_path_group_id = 17;
+    optional bool exclude_file_path_not_flag = 18;
+
+    enum FAM_Action_type {
+        ACTION_NONE     = 0 ;
+        ACTION_AUDIT    = 1 ;
+        ACTION_POLICY_VIOLATION  = 2;
+        ACTION_BLOCK       = 4;
+        ACTION_EXCEPTION   = 8;
+        ACTION_ALERT       = 16;
+    }
+
+    optional uint32 AddDir_action = 21 [default = 0];
+    optional uint32 AddFile_action = 22 [default = 0];
+    optional uint32 DeleteDir_action = 23 [default = 0];
+    optional uint32 DeleteFile_action = 24 [default = 0];
+    optional uint32 DirPermChg_action = 25 [default = 0];
+    optional uint32 FilePermChg_action = 26 [default = 0];
+    optional uint32 ReadFile_action = 27 [default = 0];
+    optional uint32 UpdateFile_action = 28 [default = 0];
+    optional uint32 RenameFile_action = 29 [default = 0];
+    optional uint32 RenameDir_action = 30 [default = 0];
+}
+
+
+
+message FSM_AlertFileOpen
+{
+    required uint32 id = 1; // this is the id to identify the protobuf messages
+    optional string machine_name = 2;
+    optional string file_specification = 3;
+    optional Timestamp modification = 4;
+    optional uint32 pid = 5;
+    optional string image_name = 6;
+    optional string user_name = 7;
+    optional uint64 bytes_read = 8;
+    optional uint64 bytes_written = 9;
+    optional uint32 client_ip = 10;
+    optional string client_host_name = 11;
+    optional uint32 rule_id = 12; // the triggered FAM rule unique identifier
+    optional uint32 rule_position = 13; // the triggered FAM rule position
+}
+
+message FSM_AlertFileData
+{
+    required uint32 id = 1;
+    optional bytes data = 2;
+}
+
+message FSM_AlertFileClose
+{
+    required uint32 id = 1;
+    optional bool discard = 2;
+}
+
+message Collector_feature{
+    optional bool ims_time_conversion = 1;
+    optional bool support_itap = 2;
+    optional int32 support_itap_chunk = 3 [default = 0];
+    optional bool support_force_log_limited = 4 [default = false];
+}
+
+message System_i_raw{
+    required bytes data = 1;
+    optional fixed64 sequence = 2;
+}
+
+message Gdm_app_data {
+    optional string apps_code = 1;
+    optional string app_type = 2;
+    optional string app_user = 3;
+    optional string operation_type = 4;
+    optional Timestamp change_date = 5;
+    optional string item_name = 6;
+    optional string transaction_code = 7;
+    optional string system_id = 8;
+    optional string record_detail_1 = 9;
+    optional string record_detail_2 = 10;
+    optional string record_detail_3 = 11;
+    optional string record_detail_4 = 12;
+    optional string vbkey = 13;
+    optional string original_timezone = 14;
+}
+
+
+message Unit_Identifier{
+    enum Type {
+        STAP_UNIT  = 1;
+        COLLECTOR=2;
+    }
+    required Type type=1;
+    optional string id = 2;
+    optional string ip = 3;
+}
+
+message Name_bin_value_pair {
+    enum Format {
+        STCK = 1;
+        INTEGER = 2;
+        HEX = 3;
+        EBCIDIC = 4;
+    }
+    optional string name = 1; // eg context
+    optional bytes value = 2;
+    optional Format format =3;
+}
+
+message One_Record{
+    repeated Name_bin_value_pair values = 1;
+}
+
+message Data_Status{
+    required string entity = 1; //eg "ims_checkpoint"
+    repeated One_Record records = 2;
+}
+
+message Unit_Debug{
+    optional bool debug_on = 1;
+    optional int32 debug_level=2;
+    optional int32 debug_duration_sec=5;
+}
+
+message Console_Command{
+    enum Type {
+        UNIT_DEBUG= 1;
+        MUST_GATHER=2;
+        DATA_STATUS=3;
+        UNREGISTER=4;
+        GET_STATUS=5;
+    }
+    required Type type = 1;
+    required Unit_Identifier destination = 2;
+    optional Unit_Debug unit_debug = 3;
+    repeated Data_Status data_status = 4;
+    repeated string stap_identifier = 5;
+    optional string message_text=6;
+}
+
+message ConnectionQuarantine {
+    optional string server_ip =1 ; //db2z: mvsSystemName
+    optional string service_name = 2; //db2z: ssid
+    optional string db_user = 3; //db2z: authorization ID+SQLID+WorkStation User from ame message
+    optional Timestamp timestamp = 4; //UTC time quarantine starts
+    optional Timestamp quarantine_until = 5; //UTC time quarantine until
+    optional Timestamp allow_until = 6; //UTC time allow until
+    optional bool deleted = 7; //if true, this item is deleted, default false
+    optional string ims_id = 8;
+}
+
+message QuarantineList{
+    repeated ConnectionQuarantine quarantineItem = 1;
+    optional Timestamp timestamp = 2; //UTC time this message is created
+    optional bool incremental = 3; // if true, it is an incremental list, default false
+    optional int64 ack_num = 4; // the nth snapshot of quarantine list
+    optional bool list_omitted = 5;
+}
+
+message STAP_Policy_Response {
+    enum Type {
+        STAP_TERMINATE = 1;
+        QUARANTINE = 2;
+        QUARANTINE_CHANGED=3;
+    }
+    optional Type   type = 1;
+    optional uint32 thread_token = 2;
+    optional string mvsSystemName = 3;
+    optional string db2SubsystemId = 4;
+    optional Unit_Identifier destination = 5;
+    optional QuarantineList quarantineList = 6;
+    optional Timestamp current_time = 7; //UTC time this message is created
+}
+
+message Guard_ds_message {
+    enum Type {
+        HANDSHAKE = 1;
+        PING = 2;
+        ERROR_MSG =3 ;
+        SESSION_START = 4 ;
+        SESSION_END  = 5;
+        CLIENT_REQUEST = 6 ;
+        SERVER_REPLY = 7;
+        POLICY_RULES = 8;
+        SESSION_DATA = 9;
+        MONITOR_SESSION = 10;
+        EXCEPTION = 11;
+        ICAP = 12;
+        CONFIG = 13;
+        PARSE = 14;
+        COLLECTOR_FEATURE = 15;
+        SYSTEM_I_RAW = 16;
+        GDM_APP_DATA = 17;
+        QUERYREWRITE_PREVIEW = 18;
+        FSM_TEMPLATES = 19;
+        FSM_ALERT_FILE_OPEN = 20;
+        FSM_ALERT_FILE_DATA = 21;
+        FSM_ALERT_FILE_CLOSE = 22;
+        STAP_POLICY_RESPONSE = 23;
+        CONSOLE_COMMAND = 24;
+        //	POLICY_VIOLATION = 25;   // no need, skip value 25.
+        FAM_RULES = 26;
+        FAM_SHAREPOINT_RULES = 27;
+        FAM_NAS_RULES = 28;
+    }
+
+
+    // Which fields is used - what message is that?
+    required Type type = 1;
+
+    optional Handshake handshake  = 2;
+    optional Ping ping = 3;
+    optional Session_start session_start = 4 ;
+    optional Session_end session_end = 5;
+    optional Client_request client_request = 6 ;
+    optional Server_reply server_reply = 7;
+    optional Error_msg error_msg =8 ;
+    optional Interception_policy interception_policy  =9 ;
+    optional Opaque_session_data opaque_session_data  = 10 ;
+    optional Monitor_session monitor_session = 11 ;
+    optional Exception exception = 12;
+    optional ICAP icap = 13;
+    optional Agent_config config = 14;
+    optional uint32 sequence = 15;
+    optional bool more = 16;
+    optional Parser_request parse = 17;
+    optional Collector_feature collector_feature = 18 ;
+    optional System_i_raw system_i_raw = 19 ;
+    optional Gdm_app_data gdm_app_data = 20;
+    optional QueryRewrite_preview_request qrw_preview_request = 21;
+    optional QueryRewrite_preview_reply qrw_preview_result = 22;
+    optional FSM_AlertFileOpen fsm_open = 24;
+    optional FSM_AlertFileData fsm_data = 25;
+    optional FSM_AlertFileClose fsm_close = 26;
+    // The following entry is for ame 9x patch
+    optional STAP_Policy_Response stap_policy_response = 27;
+    optional Console_Command console_command = 28;
+    optional uint32 instance_id = 29 [default=0];
+
+    // for the new FAM rules to STAP
+    optional FAM_rules fam_rules = 31;
+    optional FAM_SHAREPOINT_rules fam_sharepoint_rules = 32;
+    optional FAM_NAS_rules fam_nas_rules = 33;
+}
+
+
+message Event {
+    optional Guard_ds_message msg = 1;
+}
