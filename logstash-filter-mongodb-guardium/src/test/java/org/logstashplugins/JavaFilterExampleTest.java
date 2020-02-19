@@ -33,8 +33,8 @@ public class JavaFilterExampleTest {
     } */
 
     @Test
-    public void testParseSyslog() {
-        String mongodString = "ssdf jkd f mongod: { \"atype\" : \"authCheck\", \"ts\" : { \"$date\" : \"2020-01-16T05:41:30.783-0500\" }, \"local\" : { \"ip\" : \"(NONE)\", \"port\" : 0 }, \"remote\" : { \"ip\" : \"(NONE)\", \"port\" : 0 }, \"users\" : [], \"roles\" : [], \"param\" : { \"command\" : \"find\", \"ns\" : \"config.transactions\", \"args\" : { \"find\" : \"transactions\", \"filter\" : { \"lastWriteDate\" : { \"$lt\" : { \"$date\" : \"2020-01-16T05:11:30.782-0500\" } } }, \"projection\" : { \"_id\" : 1 }, \"sort\" : { \"_id\" : 1 }, \"$db\" : \"config\" } }, \"result\" : 0 }";
+    public void testParseMongoSyslog() {
+        String mongodString = "<14>Feb 18 08:53:31 qa-db51 mongod: { \"atype\" : \"authCheck\", \"ts\" : { \"$date\" : \"2020-01-16T05:41:30.783-0500\" }, \"local\" : { \"ip\" : \"(NONE)\", \"port\" : 0 }, \"remote\" : { \"ip\" : \"(NONE)\", \"port\" : 0 }, \"users\" : [], \"roles\" : [], \"param\" : { \"command\" : \"find\", \"ns\" : \"config.transactions\", \"args\" : { \"find\" : \"transactions\", \"filter\" : { \"lastWriteDate\" : { \"$lt\" : { \"$date\" : \"2020-01-16T05:11:30.782-0500\" } } }, \"projection\" : { \"_id\" : 1 }, \"sort\" : { \"_id\" : 1 }, \"$db\" : \"config\" } }, \"result\" : 0 }";
         Context context = new ContextImpl(null, null);
         JavaFilterExample filter = new JavaFilterExample("test-id", null, context);
 
@@ -47,6 +47,30 @@ public class JavaFilterExampleTest {
         Assert.assertEquals(1, results.size());
         Assert.assertNotNull(e.getField("Construct"));
         Assert.assertEquals(1, matchListener.getMatchCount());
+    }
+
+    @Test 
+    public void testParseOtherSyslog() {
+        String syslogString = "<7>Feb 18 08:55:14 qa-db51 kernel: IPv6 addrconf: prefix with wrong length 96";
+        Context context = new ContextImpl(null, null);
+        JavaFilterExample filter = new JavaFilterExample("test-id", null, context);
+
+        Event e = new org.logstash.Event();
+        TestMatchListener matchListener = new TestMatchListener();
+        
+        e.setField("message", syslogString);
+        Collection<Event> results = filter.filter(Collections.singletonList(e), matchListener);
+
+        Assert.assertEquals(1, results.size());
+        Assert.assertEquals(true,
+            e.getField("tags").toString().contains("_mongoguardium_skip"));
+        //Assert.assertNull(e.getField("Construct"));
+        Assert.assertEquals(0, matchListener.getMatchCount());
+    }
+
+    @Test 
+    public void testTagParseError() {
+        Assert.assertFalse(true);
     }
 }
 

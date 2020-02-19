@@ -8,7 +8,6 @@ This is a filter plugin for [Logstash](https://github.com/elastic/logstash). It 
 Supported commands:
 * find, insert, delete, update, ...  
 * aggregate with $lookup(s) or $graphLookup(s)
-* ...
 
 ## Example 
 ### syslog input
@@ -67,10 +66,13 @@ To test installation on your development logstash
 2. Complex query: 
     1. ~~Support multiple $lookup stages in pipeline~~
     2. ~~Support graphLookup~~ 
+    3. (?) DBREFs? (convention to ref to another db/collection)?
 3. Integrate meta-data into .conf 
+    1. (?) Filter to parse meta-data? 
 2. ~~Introduce testing (assert commands/*)~~
-3. Reconstruct original mongo query? 
-4. Mask sensitive (leaf-values)
+3. Complete output:  
+    1. Original query
+    2. Masked original query (leaf-values)
 5. ~~Encapsulate into logstash plugin~~ 
 
 ### Not supported/Future

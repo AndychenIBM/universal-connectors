@@ -2,11 +2,19 @@ package com.ibm.guardium;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.ibm.guardium.connector.structures.Accessor;
+import com.ibm.guardium.connector.structures.Record;
+import com.ibm.guardium.connector.structures.SessionLocator;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 public class ParserTest {
+
+    Parser parser = new Parser();
+    final String mongoString = "{ 'atype': 'authCheck', 'ts': { '$date': '2020-01-26T09:58:44.547-0500' }, 'local': { 'ip': '127.0.0.1', 'port': 27017 }, 'remote': { 'ip': '127.0.0.1', 'port': 56984 }, 'users': [], 'roles': [], 'param': { 'command': 'aggregate', 'ns': 'test.travelers', 'args': { 'aggregate': 'travelers', 'pipeline': [ { '$graphLookup': { 'from': 'airports', 'startWith': '$nearestAirport', 'connectFromField': 'connects', 'connectToField': 'airport', 'maxDepth': 2, 'depthField': 'numConnections', 'as': 'destinations' } } ], 'cursor': {}, 'lsid': { 'id': { '$binary': '2WoIDPhSTcKHrdJW4azoow==', '$type': '04' } }, '$db': 'test' } }, 'result': 0 }";
+    final JsonObject mongoJson = JsonParser.parseString(mongoString).getAsJsonObject();
+
 
     @Test
     public void testParseAsConstruct_Find() {
@@ -97,5 +105,52 @@ public class ParserTest {
         Assert.assertEquals("travelers", sentence.objects.get(0).name);
         Assert.assertEquals("airports", sentence.objects.get(1).name);
     }
-    
+
+    @Test
+    public void testParseRecord() {
+        Record record = parser.parseRecord(mongoJson);
+        Assert.assertEquals("2WoIDPhSTcKHrdJW4azoow==", record.getSessionId());
+        Assert.assertEquals("test", record.getDbName());
+        Assert.assertEquals(Parser.UNKOWN_STRING, record.getAppUserName());
+        //TODO convert dateString to timestamp int
+
+        Assert.assertNotNull(record.getSessionLocator());
+    }
+
+    @Test 
+    public void testParseSessionLocator() {
+        Record record = parser.parseRecord(mongoJson);
+        SessionLocator actual = record.getSessionLocator();
+        
+        Assert.assertEquals("127.0.0.1", actual.getServerIp());
+        Assert.assertEquals(56984, actual.getServerPort());
+    }
+
+    @Test 
+    public void testParseAccessor() {
+        Record record = parser.parseRecord(mongoJson);
+        Accessor actual = record.getAccessor();
+        Assert.assertEquals(Parser.DATA_PROTOCOL_STRING, actual.getDbProtocol());
+        Assert.assertEquals("", actual.getDbUser());
+
+    }
+
+    @Test
+    public void testParseAccessor_nUsers() {
+        final String testString = "{ 'atype': 'authCheck', 'ts': { '$date': '2020-01-26T09:58:44.547-0500' }, 'local': { 'ip': '127.0.0.1', 'port': 27017 }, 'remote': { 'ip': '127.0.0.1', 'port': 56984 }, 'users': [{'user': 'tal', 'db': 'test'}, {'user': 'talb', 'db': 'bios'}], 'roles': [], 'param': { 'command': 'aggregate', 'ns': 'test.travelers', 'args': { 'aggregate': 'travelers', 'pipeline': [ { '$graphLookup': { 'from': 'airports', 'startWith': '$nearestAirport', 'connectFromField': 'connects', 'connectToField': 'airport', 'maxDepth': 2, 'depthField': 'numConnections', 'as': 'destinations' } } ], 'cursor': {}, 'lsid': { 'id': { '$binary': '2WoIDPhSTcKHrdJW4azoow==', '$type': '04' } }, '$db': 'test' } }, 'result': 0 }";
+        final JsonObject testJson = JsonParser.parseString(testString).getAsJsonObject();
+        Accessor actual = parser.parseAccessor(testJson);
+
+        Assert.assertEquals(Parser.DATA_PROTOCOL_STRING, actual.getDbProtocol());
+        Assert.assertEquals("tal talb ", actual.getDbUser());
+    }
+
+    @Test
+    public void testParseTimestamp() {
+        String date = parser.parseTimestamp(mongoJson);
+        Assert.assertEquals("2020-01-26T09:58:44.547-0500", date);
+    }
+
+
+
 }

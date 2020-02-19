@@ -10,6 +10,7 @@ import co.elastic.logstash.api.PluginConfigSpec;
 import com.google.gson.*;
 import com.google.gson.JsonParser;
 import com.ibm.guardium.Parser;
+import com.ibm.guardium.connector.structures.Record;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -39,6 +40,7 @@ public class JavaFilterExample implements Filter {
             // from config, use Object f = e.getField(sourceField);
             if (e.getField("message") instanceof String) {
                 String messageString = e.getField("message").toString();
+                //TODO abandon finding "mongod:"; use syslog_message
                 int mongodIndex = messageString.indexOf(MONGOAUDIT_START_SIGNAL);
                 if (mongodIndex != -1) {
                     String input = messageString.substring(mongodIndex + MONGOAUDIT_START_SIGNAL.length());
@@ -51,10 +53,53 @@ public class JavaFilterExample implements Filter {
                         // TODO: start parsing in another class
                         e.setField("Construct", constructString); 
 
+                        Parser parser = new Parser();
+                        Record record = parser.parseRecord(inputJSON);
+
+                        // server_hostname
+                        if (e.getField("server_hostname") instanceof String) {
+                            String serverHost = e.getField("server_hostname").toString();
+                            if (serverHost != null) record.getAccessor().setServerHostName(serverHost);
+                        }
+                        if (e.getField("source_program") instanceof String) {
+                            String sourceProgram = e.getField("source_program").toString();
+                            if (sourceProgram != null) record.getAccessor().setSourceProgram(sourceProgram);
+                        }
+
+                        if (e.getField("host") instanceof String) {
+                            String serverIP = e.getField("host").toString();
+                            if (serverIP != null) record.getSessionLocator().setServerIp(serverIP);
+                        }
+                        
+                        // TODO: Remove flat variables after Record is used.
+                        e.setField("db_protocol", record.getAccessor().getDbProtocol());
+                        e.setField("server_type", "MONGODB");
+                        e.setField("session_id", record.getSessionId());
+                        
+                        e.setField("database", record.getDbName());
+                        e.setField("timestamp", parser.parseTimestamp(inputJSON));
+                        
+                        e.setField("server_ip", record.getSessionLocator().getServerIp());
+                        e.setField("server_port", record.getSessionLocator().getServerPort());
+                        
+                        
+                        e.setField("db_user", record.getAccessor().getDbUser());
+                        
+                        final GsonBuilder builder = new GsonBuilder();
+                        builder.serializeNulls();
+                        final Gson gson = builder.create();
+                        e.setField("Record", gson.toJson(record));
+
                     } catch (Exception exception) {
                         // FIXME: Throw? as not proper json or syntax error
                         // don't let event pass filter
+                        // TODO log event removed? 
+                        //events.remove(e);
+                        e.tag("_mongoguardium_json_parse_error");
                     }
+                } else {
+                    //events.remove(e);
+                    e.tag("_mongoguardium_skip");
                 }
             }
         }
