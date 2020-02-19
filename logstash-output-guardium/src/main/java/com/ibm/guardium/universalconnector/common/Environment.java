@@ -9,11 +9,11 @@ import java.util.Properties;
 
 public class Environment {
     private static Log log = LogFactory.getLog(Environment.class);
-    public static final String UDS_ETC = get("UDS_ETC", /*"/var/IBM/Guardium/collector/datastreams/etc"*/"C:\\Guard\\Git\\Guardium\\apps\\UniversalConnector\\logstash-output-java_output_example\\src\\resources\\");
+    public static final String UDS_ETC = get("UDS_ETC", "/tmp/logstash_plugin/"/*"/var/IBM/Guardium/collector/datastreams/etc"*//*"C:\\Guard\\Git\\Guardium\\apps\\UniversalConnector\\logstash-output-java_output_example\\src\\resources\\"*/);
     public static final Properties properties = loadProperties();
     public static final String MINI_SNIF_SSL_ENABLED = get("MINI_SNIF_SSL_ENABLED", "false");
     public static final String MINI_SNIF_PORT = get("MINI_SNIF_PORT", "16022");
-    public static final String MINI_SNIF_HOSTNAME = get("MINI_SNIF_HOSTNAME", /*"9.70.156.216"*/"9.70.145.107"/*"9.32.128.106"*/);
+    public static final String MINI_SNIF_HOSTNAME = get("MINI_SNIF_HOSTNAME", "9.70.157.70"/*"9.70.156.216"*//*"9.70.145.107"*//*"9.32.128.106"*/);
 
     public static final String CONNECTOR_ID_PROP = "connector.id";
     public static final String CONNECTOR_IP_PROP = "connector.ip";

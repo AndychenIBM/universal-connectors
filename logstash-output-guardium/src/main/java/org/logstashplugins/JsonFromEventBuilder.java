@@ -17,18 +17,20 @@ public class JsonFromEventBuilder {
     private static SimpleDateFormat dateFormattter = new SimpleDateFormat(DATE_FORMAT);
 
     public Record buildRecord(Event event) throws ParseException {
-        Record record = new Record();
-
-        record.setDbName(getStringField(event, "dbName", "schema"));
-        record.setAppUserName(getStringField(event, "app_user_name", "no_app_user"));
-        record.setSessionId(getStringField(event, "session_id", "sessionId123456789"));
+        String recordString = event.getField("Record").toString();
+        Record record = (new Gson()).fromJson(recordString, Record.class);
+        // Record record = new Record();
+        
         record.setTime(getTimeInSec(event));
+        // record.setDbName(getStringField(event, "dbName", "schema"));
+        // record.setAppUserName(getStringField(event, "app_user_name", "no_app_user"));
+        // record.setSessionId(getStringField(event, "session_id", "sessionId123456789"));
 
-        SessionLocator session = buildSession(event);
-        record.setSessionLocator(session);
+        // SessionLocator session = buildSession(event);
+        // record.setSessionLocator(session);
 
-        Accessor accessor = buildAccessor(event);
-        record.setAccessor(accessor);
+        // Accessor accessor = buildAccessor(event);
+        // record.setAccessor(accessor);
 
         Data data = buildData(event);
         record.setData(data);
@@ -37,6 +39,7 @@ public class JsonFromEventBuilder {
     }
 
 
+    // TODO remove buildSession, after verify filter "n/a" as default for every optional field is OK.
     public SessionLocator buildSession(Event event){
         SessionLocator session = new SessionLocator();
         session.setClientIp(getStringField(event, "client_ip", "127.0.0.1"));
@@ -49,6 +52,8 @@ public class JsonFromEventBuilder {
         return session;
     }
 
+    
+    // TODO remove buildAccessor, after verify filter "n/a" as default for every optional field is OK.
     public Accessor buildAccessor(Event event){
         Accessor accessor = new Accessor();
         accessor.setClient_mac(getStringField(event, "mac_address", "00:00:00:a1:2b:cc"));
@@ -70,7 +75,7 @@ public class JsonFromEventBuilder {
         return accessor;
     }
 
-
+    // TODO remove when Record is complete (Tal to add Data in)
     public Data buildData(Event e) {
         Data data = new Data();
         data.setOriginalSqlCommand(getStringField(e, "original_sql", "nosql"));
