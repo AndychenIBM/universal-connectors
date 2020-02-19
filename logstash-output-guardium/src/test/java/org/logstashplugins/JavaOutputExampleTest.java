@@ -32,6 +32,7 @@ public class JavaOutputExampleTest {
         }*/
         //add mongoDB syslog event
         Event e = new org.logstash.Event();
+        // test based on mongo-guardium filter v0.0.2, which currently sends Event like this: 
 /*
         {
             "database" => "config",
@@ -55,27 +56,29 @@ public class JavaOutputExampleTest {
          "server_type" => "MONGODB",
                 "type" => "syslog"
 }*/
-        e.setField("Record", "{\"sessionId\":\"n/a\",\"dbName\":\"config\",\"appUserName\":\"n/a\",\"time\":0,\"sessionLocator\":{\"clientIp\":\"n/a\",\"clientPort\":0,\"serverIp\":\"9.70.147.59\",\"serverPort\":0,\"isIpv6\":false,\"clientIpv6\":\"n/a\",\"serverIpv6\":\"n/a\"},\"accessor\":{\"dbUser\":\"\",\"serverType\":\"n/a\",\"serverOs\":\"n/a\",\"clientOs\":\"n/a\",\"clientHostName\":\"n/a\",\"serverHostName\":\"qa-db51\",\"commProtocol\":\"n/a\",\"dbProtocol\":\"MONGODB\",\"dbProtocolVersion\":\"n/a\",\"osUser\":\"n/a\",\"sourceProgram\":\"mongod\",\"client_mac\":\"n/a\",\"serverDescription\":\"n/a\",\"serviceName\":\"n/a\",\"language\":\"FREE_TEXT\",\"type\":\"CONSTRUCT\"},\"data\":null}")
+        e.setField("timestamp", "2020-02-19T05:09:06.149-0500");
+        e.setField("Record", "{\"sessionId\":\"n/a\",\"dbName\":\"config\",\"appUserName\":\"n/a\",\"time\":0,\"sessionLocator\":{\"clientIp\":\"n/a\",\"clientPort\":0,\"serverIp\":\"9.70.147.59\",\"serverPort\":0,\"isIpv6\":false,\"clientIpv6\":\"n/a\",\"serverIpv6\":\"n/a\"},\"accessor\":{\"dbUser\":\"\",\"serverType\":\"n/a\",\"serverOs\":\"n/a\",\"clientOs\":\"n/a\",\"clientHostName\":\"n/a\",\"serverHostName\":\"qa-db51\",\"commProtocol\":\"n/a\",\"dbProtocol\":\"MONGODB\",\"dbProtocolVersion\":\"n/a\",\"osUser\":\"n/a\",\"sourceProgram\":\"mongod\",\"client_mac\":\"n/a\",\"serverDescription\":\"n/a\",\"serviceName\":\"n/a\",\"language\":\"FREE_TEXT\",\"type\":\"CONSTRUCT\"},\"data\":null}");
+        e.setField("Construct", "{\n  \"sentences\": [\n    {\n      \"verb\": \"find\",\n      \"objects\": [\n        {\n          \"name\": \"transactions\",\n          \"type\": \"collection\",\n          \"fields\": [],\n          \"schema\": \"\"\n        }\n      ],\n      \"descendants\": [],\n      \"fields\": []\n    }\n  ],\n  \"full_sql\": null,\n  \"original_sql\": null\n}");
         e.setField("server_type", "MONGODB");
+        e.setField("server_hostname", "qa-db51");
+        //e.setField("source_program", "mongod");
+        //e.setField("session_id", "n/a");
+        //e.setField("db_protocol", "MONGODB");
+        //e.setField("db_user", ""); // sometimes no user is noted in mongo audit
         
-        e.setField("db_protocol", "MONGO PROTOCOL");
-        e.setField("db_user_name", "Ofer");
-        e.setField("app_user_name", "");
-        e.setField("timestamp", "2019-11-20T10:30:25.092-0500");
-        e.setField("operation", "find");
-        e.setField("database", "test");
-        e.setField("resource_type", "collection");
-        e.setField("resource_name", "people");
-        e.setField("client_ip", "127.0.0.1");
-        e.setField("client_port", "57610");
-        e.setField("client_hostname", null);
-        e.setField("server_ip", "127.0.0.1");
-        e.setField("server_port", "27017");
-        e.setField("source_program", "qa_db51");
-        e.setField("client_os", null);
-        e.setField("server_os", null);
-        e.setField("server_hostname", null);
-        e.setField("session_id", "id12345678901111");
+        //e.setField("app_user_name", ""); // in record
+        //e.setField("database", "config");
+        //e.setField("operation", "find"); // removed in filter
+        //e.setField("resource_name", "transactions");
+        //e.setField("resource_type", "collection"); // removed in filter
+        //e.setField("client_ip", "127.0.0.1");
+        // e.setField("client_port", "57610");
+        // e.setField("client_hostname", null);
+        // e.setField("server_ip", "9.70.147.59");
+        // e.setField("server_port", "27017");
+        // e.setField("client_os", null);
+        // e.setField("server_os", null);
+        
         events.add(e);
 
 
