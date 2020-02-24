@@ -10,8 +10,9 @@ import com.ibm.guardium.connector.structures.Record;
 import com.ibm.guardium.connector.structures.SessionLocator;
 
 public class Parser {
-    public static final String DATA_PROTOCOL_STRING = "MONGODB";
+    public static final String DATA_PROTOCOL_STRING = "Logstash";
     public static final String UNKOWN_STRING = "n/a";
+    public static final String SERVER_TYPE_STRING = "MONGODB";
     
     /**
      * Parses a MongoDB native audit sent over syslog. Format looks as the database.profiler. 
@@ -133,6 +134,8 @@ public class Parser {
         Accessor accessor = new Accessor();
         
         accessor.setDbProtocol(Parser.DATA_PROTOCOL_STRING);
+        accessor.setServerType(Parser.SERVER_TYPE_STRING);
+        
         
         String dbUsers = Parser.UNKOWN_STRING;
         if (data.has("users")) {
@@ -157,7 +160,6 @@ public class Parser {
         accessor.setCommProtocol(Parser.UNKOWN_STRING);
         accessor.setDbProtocolVersion(Parser.UNKOWN_STRING);
         accessor.setOsUser(Parser.UNKOWN_STRING);
-        accessor.setServerType(Parser.UNKOWN_STRING);
         accessor.setServerDescription(Parser.UNKOWN_STRING);
         accessor.setServerOs(Parser.UNKOWN_STRING);
         accessor.setServiceName(Parser.UNKOWN_STRING);

@@ -131,6 +131,8 @@ public class ParserTest {
         Record record = parser.parseRecord(mongoJson);
         Accessor actual = record.getAccessor();
         Assert.assertEquals(Parser.DATA_PROTOCOL_STRING, actual.getDbProtocol());
+        Assert.assertEquals(Parser.SERVER_TYPE_STRING, actual.getServerType());
+        
         Assert.assertEquals("", actual.getDbUser());
 
     }
@@ -141,7 +143,6 @@ public class ParserTest {
         final JsonObject testJson = JsonParser.parseString(testString).getAsJsonObject();
         Accessor actual = parser.parseAccessor(testJson);
 
-        Assert.assertEquals(Parser.DATA_PROTOCOL_STRING, actual.getDbProtocol());
         Assert.assertEquals("tal talb ", actual.getDbUser());
     }
 
