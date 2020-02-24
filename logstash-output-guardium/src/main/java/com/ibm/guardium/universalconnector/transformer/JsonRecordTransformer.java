@@ -240,7 +240,7 @@ public class JsonRecordTransformer implements RecordTransformer {
 
     public static int convert_ipstr_to_int(String ip){
         int ret = 0;
-        String[] segs = ip.split(".");
+        String[] segs = ip.split("\\.");
 
         if (segs!=null && segs.length>0){
 
