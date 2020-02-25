@@ -207,7 +207,7 @@ public class JsonRecordTransformer implements RecordTransformer {
     public Datasource.Accessor buildAccessor(Record record) {
         Accessor ra = record.getAccessor();
         Datasource.Application_data.Data_type dataType = getDataType(record);
-        Datasource.Application_data.Language_type languageType = getLanguageType(/*ra.getLanguage()*/"FREE_TEXT");
+        Datasource.Application_data.Language_type languageType = getLanguageType(ra.getLanguage());
         Datasource.Accessor accessor = Datasource.Accessor.newBuilder()
                 .setDbUser(ra.getDbUser())
                 .setServerType(ra.getServerType())
@@ -227,8 +227,8 @@ public class JsonRecordTransformer implements RecordTransformer {
 
     public Datasource.Session_locator buildSessionLocator(Record record){
         SessionLocator rsl = record.getSessionLocator();
-        String clientIp = rsl.isIpv6() ? rsl.getClientIp() : rsl.getClientIpv6();
-        String serverIp = rsl.isIpv6() ? rsl.getServerIp() : rsl.getServerIpv6();
+        String clientIp = rsl.isIpv6() ? rsl.getClientIpv6() : rsl.getClientIp();
+        String serverIp = rsl.isIpv6() ? rsl.getServerIpv6() : rsl.getServerIp();
         Datasource.Session_locator sessionLocator = Datasource.Session_locator.newBuilder()
                 .setClientIp(convert_ipstr_to_int(clientIp))
                 .setClientPort(rsl.getClientPort())
@@ -250,11 +250,14 @@ public class JsonRecordTransformer implements RecordTransformer {
                     value = Integer.valueOf(segs[i]);
                     value = value << 8*i;
                 }catch (java.lang.Exception e){
-
+                    log.error("Failed to translate string IP to number, IP is "+ip, e);
                 }
                 ret += value ;
             }
         }
+
+        log.debug("Translated string IP "+ip+" to number "+ret);
+
         return ret;
     }
 
