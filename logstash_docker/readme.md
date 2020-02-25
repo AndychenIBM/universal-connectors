@@ -1,9 +1,7 @@
-working directory:
-	~/logstash_docker
+*before installation need to be logged in to redhat
  
 installation:
   docker-compose up
-  
   
 Project Content:
 1. config directory:
