@@ -135,7 +135,10 @@ public class ParserTest {
         SessionLocator actual = record.getSessionLocator();
         
         Assert.assertEquals("127.0.0.1", actual.getServerIp());
-        Assert.assertEquals(56984, actual.getServerPort());
+        Assert.assertEquals(27017, actual.getServerPort());
+        Assert.assertEquals("127.0.0.1", actual.getClientIp());
+        Assert.assertEquals(56984, actual.getClientPort());
+        
     }
 
     @Test 

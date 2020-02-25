@@ -11,6 +11,7 @@ import com.google.gson.*;
 import com.google.gson.JsonParser;
 import com.ibm.guardium.Parser;
 import com.ibm.guardium.connector.structures.Record;
+import com.ibm.guardium.connector.structures.SessionLocator;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -59,16 +60,26 @@ public class JavaFilterExample implements Filter {
                         // server_hostname
                         if (e.getField("server_hostname") instanceof String) {
                             String serverHost = e.getField("server_hostname").toString();
-                            if (serverHost != null) record.getAccessor().setServerHostName(serverHost);
+                            if (serverHost != null)
+                                record.getAccessor().setServerHostName(serverHost);
                         }
                         if (e.getField("source_program") instanceof String) {
                             String sourceProgram = e.getField("source_program").toString();
-                            if (sourceProgram != null) record.getAccessor().setSourceProgram(sourceProgram);
+                            if (sourceProgram != null)
+                                record.getAccessor().setSourceProgram(sourceProgram);
                         }
 
-                        if (e.getField("host") instanceof String) {
-                            String serverIP = e.getField("host").toString();
-                            if (serverIP != null) record.getSessionLocator().setServerIp(serverIP);
+                        // override client/server IP, if 127.0.0.1 or "(None)"
+                        SessionLocator sessionLocator = record.getSessionLocator();
+                        if (sessionLocator.getServerIp().equalsIgnoreCase(sessionLocator.getClientIp())
+                                && e.getField("host") instanceof String) {
+
+                            String host = e.getField("host").toString();
+
+                            if (host != null) {
+                                sessionLocator.setServerIp(host);
+                                sessionLocator.setClientIp(host);
+                            }
                         }
                         
                         // TODO: Remove flat variables after Record is used.

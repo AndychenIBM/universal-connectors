@@ -9,28 +9,34 @@ Supported commands:
 * find, insert, delete, update, ...  
 * aggregate with $lookup(s) or $graphLookup(s)
 
+## Parser Notes
+* server hostname is extracted from the syslog message, 2nd field.
+* source program is extracted from the syslog message, 3rd field.
+* mongo "remote" is mapped to Client IP
+* mongo "local" is mapped to Server IP
+* If the parsed Client IP and Server IP are equal (like "(NONE)" or "127.0.0.1") they will be overriden using logstash Event "host" field.
+
 ## Example 
 ### syslog input
 
     2020-01-26T10:47:41.225272-05:00 qa-db51 mongod: { 'atype' : 'authCheck', 'ts' : { '$date' : '2020-01-26T10:47:41.225-0500' }, 'local' : { 'ip' : '(NONE)', 'port' : 0 }, 'remote' : { 'ip' : '(NONE)', 'port' : 0 }, 'users' : [], 'roles' : [], 'param' : { 'command' : 'listIndexes', 'ns' : 'config.system.sessions', 'args' : { 'listIndexes' : 'system.sessions', 'cursor' : {}, '$db' : 'config' } }, 'result' : 0 }
 
-## filter result 
-Filter tweaks the event by adding a new "Construct" field with a JSON string: 
-
+## Filter result 
+Filter tweaks the event by passing a Record object to the logstash Output plugin (as JSON string), which contains a "Construct" object with the parsed query: 
     {
-        \"sentences\": [ { 
-            \"verb\": \"listIndexes\",
-            \"objects\": [ 
-                { \"name\": \"system.sessions\", \"type\": \"collection\", \"fields\": [], \"schema\": \"\" } 
-                ],     
-            \"descendants\": [],      
-            \"fields\": [] 
-        } ], 
-        \"full_sql\": null, 
-        \"original_sql\": null
+
+      "sequence" => 0,
+        "Record" => "{"sessionId":"n/a", "dbName":"config", "appUserName":"n/a", "time":0,"sessionLocator":{"clientIp":"tals-mbp-2.haifa.ibm.com", "clientPort":0,"serverIp":"tals-mbp-2.haifa.ibm.com", "serverPort":0,"isIpv6":false,"clientIpv6":"n/a", "serverIpv6":"n/a"},"accessor":{"dbUser":"", "serverType":"MONGODB", "serverOs":"n/a", "clientOs":"n/a", "clientHostName":"n/a", "serverHostName":"qa-db51", "commProtocol":"n/a", "dbProtocol":"Logstash", "dbProtocolVersion":"n/a", "osUser":"n/a", "sourceProgram":"mongod", "client_mac":"n/a", "serverDescription":"n/a", "serviceName":"n/a", "language":"FREE_TEXT", "type":"CONSTRUCT"},"data":{"construct":{"sentences":[{"verb":"listIndexes", "objects":[{"name":"system.sessions", "type":"collection", "fields":[],"schema":""}],"descendants":[],"fields":[]}],"full_sql":"{\"atype\":\"authCheck\",\"ts\":{\"$date\":\"2020-01-26T10:47:41.225-0500\"},\"local\":{\"ip\":\"(NONE)\",\"port\":0},\"remote\":{\"ip\":\"(NONE)\",\"port\":0},\"users\":[],\"roles\":[],\"param\":{\"command\":\"listIndexes\",\"ns\":\"config.system.sessions\",\"args\":{\"listIndexes\":\"system.sessions\",\"cursor\":{},\"$db\":\"config\"}},\"result\":0}", "original_sql":"n/a"},"timestamp":0,"originalSqlCommand":"n/a", "useConstruct":true}}",
+        "@version" => "1",
+        "@timestamp" => 2020-02-25T12:32:16.314Z,
+          "type" => "syslog",
+        "timestamp" => "2020-01-26T10:47:41.225-0500",
+        "Construct" => "{\n  "sentences": [\n    {\n      "verb": "listIndexes",\n      "objects": [\n        {\n          "name": "system.sessions",\n          "type": "collection",\n          "fields": [],\n          "schema": ""\n        }\n      ],\n      "descendants": [],\n      "fields": []\n    }\n  ],\n  "full_sql": "{\"atype\":\"authCheck\",\"ts\":{\"$date\":\"2020-01-26T10:47:41.225-0500\"},\"local\":{\"ip\":\"(NONE)\",\"port\":0},\"remote\":{\"ip\":\"(NONE)\",\"port\":0},\"users\":[],\"roles\":[],\"param\":{\"command\":\"listIndexes\",\"ns\":\"config.system.sessions\",\"args\":{\"listIndexes\":\"system.sessions\",\"cursor\":{},\"$db\":\"config\"}},\"result\":0}",\n  "original_sql": null\n}"
     }
 
-This transformed event is then passed to a Mongo-Guardium Output plugin, which is responsible to send it to a Guardium machine.  
+This transformed event is then passed to a Mongo-Guardium Output plugin, which is responsible to send it to a Guardium machine. 
+
+If parsing fails, a tag is added ("_mongoguardium_skip" or [unlikely] "_mongoguardium_json_parse_error"), which is used in logstash configuration file to pass only events that passed the filter succesffuly. 
 
 ## Install
 To install this plugin, clone or download, and run from your logstash installation. Replace "?" with this plugin version:
@@ -78,3 +84,8 @@ To test installation on your development logstash
 ### Not supported/Future
 1. Support fields (preferably link to objects)
 2. embedded documents as inner objects(?)
+
+
+
+
+

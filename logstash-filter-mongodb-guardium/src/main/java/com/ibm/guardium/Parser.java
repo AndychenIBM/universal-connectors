@@ -181,10 +181,15 @@ public class Parser {
 
         if (data.has("remote")) {
             JsonObject remote = data.getAsJsonObject("remote");
-            sessionLocator.setServerIp(remote.get("ip").getAsString()); // FIXME overridden by syslog host
-            sessionLocator.setServerPort(remote.get("port").getAsInt());
+            sessionLocator.setClientIp(remote.get("ip").getAsString()); // may be overridden by syslog "host", if 127.0.0.1
+            sessionLocator.setClientPort(remote.get("port").getAsInt());
+            sessionLocator.setClientIpv6(Parser.UNKOWN_STRING);
+        }
+        if (data.has("local")) {
+            JsonObject local = data.getAsJsonObject("local");
+            sessionLocator.setServerIp(local.get("ip").getAsString()); // may be overridden by syslog "host", if 127.0.0.1
+            sessionLocator.setServerPort(local.get("port").getAsInt());
             sessionLocator.setServerIpv6(Parser.UNKOWN_STRING);
-            return sessionLocator;
         }
         return sessionLocator;
     }
