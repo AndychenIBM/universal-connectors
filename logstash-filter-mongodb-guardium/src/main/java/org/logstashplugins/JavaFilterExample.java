@@ -72,18 +72,18 @@ public class JavaFilterExample implements Filter {
                         }
                         
                         // TODO: Remove flat variables after Record is used.
-                        e.setField("db_protocol", record.getAccessor().getDbProtocol());
-                        e.setField("server_type", "MONGODB");
-                        e.setField("session_id", record.getSessionId());
+                        //e.setField("db_protocol", record.getAccessor().getDbProtocol());
+                        //e.setField("server_type", "MONGODB");
+                        //e.setField("session_id", record.getSessionId());
                         
-                        e.setField("database", record.getDbName());
+                        //e.setField("database", record.getDbName());
                         e.setField("timestamp", parser.parseTimestamp(inputJSON));
                         
-                        e.setField("server_ip", record.getSessionLocator().getServerIp());
-                        e.setField("server_port", record.getSessionLocator().getServerPort());
+                        //e.setField("server_ip", record.getSessionLocator().getServerIp());
+                        //e.setField("server_port", record.getSessionLocator().getServerPort());
                         
                         
-                        e.setField("db_user", record.getAccessor().getDbUser());
+                        //e.setField("db_user", record.getAccessor().getDbUser());
                         
                         final GsonBuilder builder = new GsonBuilder();
                         builder.serializeNulls();

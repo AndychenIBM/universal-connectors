@@ -3,6 +3,7 @@ package com.ibm.guardium;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.ibm.guardium.connector.structures.Accessor;
+import com.ibm.guardium.connector.structures.Data;
 import com.ibm.guardium.connector.structures.Record;
 import com.ibm.guardium.connector.structures.SessionLocator;
 
@@ -12,7 +13,7 @@ import org.junit.Test;
 public class ParserTest {
 
     Parser parser = new Parser();
-    final String mongoString = "{ 'atype': 'authCheck', 'ts': { '$date': '2020-01-26T09:58:44.547-0500' }, 'local': { 'ip': '127.0.0.1', 'port': 27017 }, 'remote': { 'ip': '127.0.0.1', 'port': 56984 }, 'users': [], 'roles': [], 'param': { 'command': 'aggregate', 'ns': 'test.travelers', 'args': { 'aggregate': 'travelers', 'pipeline': [ { '$graphLookup': { 'from': 'airports', 'startWith': '$nearestAirport', 'connectFromField': 'connects', 'connectToField': 'airport', 'maxDepth': 2, 'depthField': 'numConnections', 'as': 'destinations' } } ], 'cursor': {}, 'lsid': { 'id': { '$binary': '2WoIDPhSTcKHrdJW4azoow==', '$type': '04' } }, '$db': 'test' } }, 'result': 0 }";
+    final String mongoString = "{ \"atype\": \"authCheck\", \"ts\": { \"$date\": \"2020-01-26T09:58:44.547-0500\" }, \"local\": { \"ip\": \"127.0.0.1\", \"port\": 27017 }, \"remote\": { \"ip\": \"127.0.0.1\", \"port\": 56984 }, \"users\": [], \"roles\": [], \"param\": { \"command\": \"aggregate\", \"ns\": \"test.travelers\", \"args\": { \"aggregate\": \"travelers\", \"pipeline\": [ { \"$graphLookup\": { \"from\": \"airports\", \"startWith\": \"$nearestAirport\", \"connectFromField\": \"connects\", \"connectToField\": \"airport\", \"maxDepth\": 2, \"depthField\": \"numConnections\", \"as\": \"destinations\" } } ], \"cursor\": {}, \"lsid\": { \"id\": { \"$binary\": \"2WoIDPhSTcKHrdJW4azoow==\", \"$type\": \"04\" } }, \"$db\": \"test\" } }, \"result\": 0 }";
     final JsonObject mongoJson = JsonParser.parseString(mongoString).getAsJsonObject();
 
 
@@ -116,6 +117,17 @@ public class ParserTest {
 
         Assert.assertNotNull(record.getSessionLocator());
     }
+
+    
+    @Test 
+    public void testParseData() {
+        Data data = parser.parseData(mongoJson);
+        Construct construct = data.getConstruct();
+        Assert.assertNotNull(data);
+        Assert.assertEquals("aggregate", construct.sentences.get(0).verb);
+        Assert.assertEquals(mongoString.replace(" ", ""), construct.getFull_sql()); 
+    }
+
 
     @Test 
     public void testParseSessionLocator() {

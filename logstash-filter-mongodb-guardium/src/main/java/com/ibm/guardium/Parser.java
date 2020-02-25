@@ -6,6 +6,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.ibm.guardium.connector.structures.Accessor;
+import com.ibm.guardium.connector.structures.Data;
 import com.ibm.guardium.connector.structures.Record;
 import com.ibm.guardium.connector.structures.SessionLocator;
 
@@ -92,6 +93,8 @@ public class Parser {
 
             final Construct construct = new Construct();
             construct.sentences.add(sentence);
+            construct.setFull_sql(data.toString());
+            // TODO construct.setOriginal_sql(...);
             return construct;
         } catch (final Exception e) {
             throw e;
@@ -121,11 +124,9 @@ public class Parser {
         // TODO record.setTime();
         record.setAppUserName(Parser.UNKOWN_STRING);
 
-        SessionLocator sessionLocator = this.parseSessionLocator(data);
-        record.setSessionLocator(sessionLocator);
-
-        Accessor accessor = this.parseAccessor(data);
-        record.setAccessor(accessor);
+        record.setSessionLocator(this.parseSessionLocator(data));
+        record.setAccessor(this.parseAccessor(data));
+        record.setData(this.parseData(data));
 
         return record;
     }
@@ -151,6 +152,7 @@ public class Parser {
         
         accessor.setServerHostName(Parser.UNKOWN_STRING); // populated from Event, later
         accessor.setSourceProgram(Parser.UNKOWN_STRING); // populated from Event, later
+        
         accessor.setLanguage(Accessor.LANGUAGE_FREE_TEXT_STRING);
         accessor.setType(Accessor.TYPE_CONSTRUCT_STRING);
 
@@ -186,6 +188,31 @@ public class Parser {
         }
         return sessionLocator;
     }
+
+    public Data parseData(JsonObject inputJSON) {
+        Data data = new Data();
+        data.setOriginalSqlCommand(Parser.UNKOWN_STRING);
+        try {
+            Construct construct = ParseAsConstruct(inputJSON);
+            // TODO: data.setTimestamp(getTimeInSec(e));
+            if (construct !=null) {
+                data.setConstruct(construct);
+                data.setUseConstruct(true);
+                
+                //todo: remove once Tal updates filter
+                if (construct.getFull_sql()==null){
+                    construct.setFull_sql(Parser.UNKOWN_STRING);
+                }
+                if (construct.getOriginal_sql()==null){
+                    construct.setOriginal_sql(Parser.UNKOWN_STRING);
+                }
+            }
+        } catch (Exception e){
+           throw e;
+        }
+        return data;
+    }
+
 
     public String parseTimestamp(final JsonObject data) {
         String dateString = Parser.UNKOWN_STRING;
