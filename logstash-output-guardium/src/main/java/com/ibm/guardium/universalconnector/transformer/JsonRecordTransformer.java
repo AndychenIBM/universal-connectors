@@ -217,6 +217,7 @@ public class JsonRecordTransformer implements RecordTransformer {
                 .setClientHostname(ra.getClientHostName())
                 .setServerHostname(ra.getServerHostName())
                 .setCommProtocol(ra.getCommProtocol())
+                .setDbProtocol(ra.getDbProtocol())
                 .setDbProtocolVersion(ra.getDbProtocolVersion())
                 .setSourceProgram(ra.getSourceProgram())
                 .setServerDescription(ra.getServerDescription())
