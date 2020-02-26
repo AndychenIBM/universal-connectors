@@ -224,6 +224,7 @@ public class JsonRecordTransformer implements RecordTransformer {
                 .setServiceName(ra.getServiceName())
                 .setLanguage(languageType)
                 .setType(dataType)
+                .setDatasourceType(Datasource.Application_data.Datasource_type.UNI_CON)
                 .build();
         return accessor;
     }
