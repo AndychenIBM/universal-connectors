@@ -123,6 +123,8 @@ public class JsonRecordTransformer implements RecordTransformer {
                 .setAccessor(accessor)
                 .setProcessId(record.getSessionId())
                 .setSessionId(record.getSessionId().hashCode())//todo: check with Tim session id issue
+                .setDbName(record.getDbName())
+                .setAppUserName(record.getAppUserName())
                 .build();
 
         return sessionStart;
