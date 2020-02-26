@@ -1,13 +1,38 @@
 package com.ibm.guardium.universalconnector.transformer;
 
 
+import org.junit.Assert;
 import org.junit.Test;
 
 public class JsonRecordTransformerTest {
+    public static int convert_ipstr_to_int(String ip){
+        int ret = 0;
+        String[] segs = ip.split("\\.");
+
+        if (segs!=null && segs.length>0){
+
+            for (int i = segs.length; i > 0; i--){
+                int value = 0;
+                try{
+                    value = Integer.valueOf(segs[i]);
+                    value = value << 8*i;
+                }catch (java.lang.Exception e){
+
+                }
+                ret += value ;
+            }
+        }
+        return ret;
+    }
 
     @Test
     public void testSessionLocatorCreation(){
 
+        String ipStr = "9.70.147.59";
+        JsonRecordTransformer transformer = new JsonRecordTransformer();
+        int val = transformer.convert_ipstr_to_int(ipStr);
+
+        Assert.assertEquals(val,999507465);
         System.out.println(1);
         //JsonRecordTransformer transformer = new JsonRecordTransformer();
         System.out.println(2);

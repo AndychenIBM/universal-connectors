@@ -244,13 +244,13 @@ public class JsonRecordTransformer implements RecordTransformer {
 
         if (segs!=null && segs.length>0){
 
-            for (int i = segs.length; i > 0; i--){
+            for (int i = segs.length-1; i >= 0; i--){
                 int value = 0;
                 try{
                     value = Integer.valueOf(segs[i]);
                     value = value << 8*i;
                 }catch (java.lang.Exception e){
-                    log.error("Failed to translate string IP to number, IP is "+ip, e);
+                    log.error("Failed to translate string IP to number, IP is "+ip+" section is "+segs[i], e);
                 }
                 ret += value ;
             }
