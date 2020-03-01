@@ -1,4 +1,5 @@
-*before installation need to be logged in to redhat
+working directory:
+	~/logstash_docker
  
 installation:
   docker-compose up
