@@ -129,17 +129,19 @@ public class Parser {
         }
         record.setSessionId(sessionId);
 
+        
+        record.setAppUserName(Parser.UNKOWN_STRING);
+        
+        record.setSessionLocator(this.parseSessionLocator(data));
+        record.setAccessor(this.parseAccessor(data));
+        record.setData(this.parseData(data));
+        
         String dbName = Parser.UNKOWN_STRING;
         if (args.has("$db")) {
             dbName = args.get("$db").getAsString();
         }
-        record.setDbName(dbName);
-
-        record.setAppUserName(Parser.UNKOWN_STRING);
-
-        record.setSessionLocator(this.parseSessionLocator(data));
-        record.setAccessor(this.parseAccessor(data));
-        record.setData(this.parseData(data));
+        record.setDbName(dbName); // TODO decide which should be sent
+        record.getAccessor().setServiceName(dbName + " //SN");
 
         // set timestamp
         String dateString = this.parseTimestamp(data);
