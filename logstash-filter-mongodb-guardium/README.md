@@ -9,19 +9,19 @@ Supported commands:
 * find, insert, delete, update, ...  
 * aggregate with $lookup(s) or $graphLookup(s)
 
-## Parser Notes
-* server hostname is extracted from the syslog message, 2nd field.
-* source program is extracted from the syslog message, 3rd field.
-* mongo "remote" is mapped to Client IP
-* mongo "local" is mapped to Server IP
-* If the parsed Client IP and Server IP are equal (like "(NONE)" or "127.0.0.1") they will be overriden using logstash Event "host" field.
+## Filter notes
+* The filter supports events sent thru Syslog, which indicate "mongod:" in their message.
+* Server hostname is extracted from the syslog message, 2nd field.
+* Source program is not available in syslog messages sent by MongoDB. Instead, it's  always sent as "mongod". 
+* If the parsed Client IP ("remote") and Server IP ("local") are equal (like "(NONE)" or "127.0.0.1") they will be overriden with logstash "host" field.
+* Events into the filter are not removed, but tagged if not parsed (see [Filter result](#filter-result), below).
 
 ## Example 
 ### syslog input
 
     2020-01-26T10:47:41.225272-05:00 qa-db51 mongod: { 'atype' : 'authCheck', 'ts' : { '$date' : '2020-01-26T10:47:41.225-0500' }, 'local' : { 'ip' : '(NONE)', 'port' : 0 }, 'remote' : { 'ip' : '(NONE)', 'port' : 0 }, 'users' : [], 'roles' : [], 'param' : { 'command' : 'listIndexes', 'ns' : 'config.system.sessions', 'args' : { 'listIndexes' : 'system.sessions', 'cursor' : {}, '$db' : 'config' } }, 'result' : 0 }
 
-## Filter result 
+## Filter result
 Filter tweaks the event by passing a Record object to the logstash Output plugin (as JSON string), which contains a "Construct" object with the parsed query: 
     {
 
@@ -30,8 +30,7 @@ Filter tweaks the event by passing a Record object to the logstash Output plugin
         "@version" => "1",
         "@timestamp" => 2020-02-25T12:32:16.314Z,
           "type" => "syslog",
-        "timestamp" => "2020-01-26T10:47:41.225-0500",
-        "Construct" => "{\n  "sentences": [\n    {\n      "verb": "listIndexes",\n      "objects": [\n        {\n          "name": "system.sessions",\n          "type": "collection",\n          "fields": [],\n          "schema": ""\n        }\n      ],\n      "descendants": [],\n      "fields": []\n    }\n  ],\n  "full_sql": "{\"atype\":\"authCheck\",\"ts\":{\"$date\":\"2020-01-26T10:47:41.225-0500\"},\"local\":{\"ip\":\"(NONE)\",\"port\":0},\"remote\":{\"ip\":\"(NONE)\",\"port\":0},\"users\":[],\"roles\":[],\"param\":{\"command\":\"listIndexes\",\"ns\":\"config.system.sessions\",\"args\":{\"listIndexes\":\"system.sessions\",\"cursor\":{},\"$db\":\"config\"}},\"result\":0}",\n  "original_sql": null\n}"
+        "timestamp" => "2020-01-26T10:47:41.225-0500"
     }
 
 This transformed event is then passed to a Mongo-Guardium Output plugin, which is responsible to send it to a Guardium machine. 
