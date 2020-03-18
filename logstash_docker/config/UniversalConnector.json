@@ -1,0 +1,7 @@
+{
+"connectorId":"ConnectorFromLionsRH8",
+"connectorIp":"127.0.0.1",
+"configurationFetchType":"file",
+"configurationFetchFileName":"SniffersConfig.json",
+"statusWriterType":"LOG"
+}
