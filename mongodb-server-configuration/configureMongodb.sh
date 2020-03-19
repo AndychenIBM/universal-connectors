@@ -41,14 +41,13 @@ echo "Mongodb pid file path is : $mongo_pid_path"
 if grep -lq  '^auditLog' $mongod_conf
 	then
 		echo "AuditLog will be set to syslog in mongod.conf"
-		#startRange=$(awk '/auditLog/{ print NR; exit }' $mongod_conf)
-		#echo $startRange
-		#endRange=$((startRange+10))
-		#echo $endRange
-		#todo- limit the sed -i to specific lines ($startRange,$startRange+10), ignore spaces 
-		sed -i "s/   destination:.*/   destination: $dest/g" $mongod_conf
-		sed -i "s/   format:.*/   format: $format/g" $mongod_conf
-		sed -i "s/   path:.*/   path: $path/g" $mongod_conf
+		startRange=$(awk '/auditLog/{ print NR; exit }' $mongod_conf)
+		endRange=$((startRange+10))
+		sed -i "$startRange,$endRange{s/destination:.*/destination: $dest/g}" $mongod_conf
+		sed -i "$startRange,$endRange{s/format:.*/format: $format/g}" $mongod_conf
+		sed -i "$startRange,$endRange{s/path:.*/path: $path/g}" $mongod_conf
+
+		#todo- fix filter
 		#sed -i "s/   #filter:.*/   filter: $filter/g" $mongod_conf
 		#sed -i "s/   ^filter:.*/   filter: $filter/g" $mongod_conf
 		sed -i "s/#setParameter: {auditAuthorizationSuccess: true}/setParameter: {auditAuthorizationSuccess: true}/g" $mongod_conf
