@@ -43,13 +43,11 @@ if grep -lq  '^auditLog' $mongod_conf
 		echo "AuditLog will be set to syslog in mongod.conf"
 		startRange=$(awk '/auditLog/{ print NR; exit }' $mongod_conf)
 		endRange=$((startRange+10))
+		#Todo- deal with commentted lines
 		sed -i "$startRange,$endRange{s/destination:.*/destination: $dest/g}" $mongod_conf
 		sed -i "$startRange,$endRange{s/format:.*/format: $format/g}" $mongod_conf
 		sed -i "$startRange,$endRange{s/path:.*/path: $path/g}" $mongod_conf
-
-		#todo- fix filter
-		#sed -i "s/   #filter:.*/   filter: $filter/g" $mongod_conf
-		#sed -i "s/   ^filter:.*/   filter: $filter/g" $mongod_conf
+		sed -i "$startRange,$endRange{s/filter:.*/filter: $filter/g}" $mongod_conf
 		sed -i "s/#setParameter: {auditAuthorizationSuccess: true}/setParameter: {auditAuthorizationSuccess: true}/g" $mongod_conf
 	else
 		echo "AuditLog section will be added to mongod.conf"
