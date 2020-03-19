@@ -9,8 +9,7 @@ path=$(grep "path" $configfile | cut -d ':' -f 2)
 filter=$(grep "filter" $configfile | cut -d ':' -f2-)
 protocol=$(grep "protocol" $configfile | cut -d ':' -f 2)
 protocol=${protocol^^}
-address=$(grep "address" $configfile | cut -d ':' -f2-) #todo- replace address with 2 variables-ip,port
-#printf "DEST=%s\nFORMAT=%s\nPATH=%s\nFILTER=%s\nADDRESS=%s\nPROTOCOL=%s\n\n" "$dest" "$format" "$path" "$filter" "$address" "$protocol"
+#printf "DEST=%s\nFORMAT=%s\nPATH=%s\nFILTER=%s\n\n" "$dest" "$format" "$path" "$filter" 
 
 #Find mongod status
 service mongod status | tr '\t' ',' > mon_status.txt
@@ -46,7 +45,7 @@ if grep -lq  '^auditLog' $mongod_conf
 		#echo $startRange
 		#endRange=$((startRange+10))
 		#echo $endRange
-		#todo- limit the sed -i to specific lines ($startRange,$startRange+10), ignore spaces
+		#todo- limit the sed -i to specific lines ($startRange,$startRange+10), ignore spaces 
 		sed -i "s/   destination:.*/   destination: $dest/g" $mongod_conf
 		sed -i "s/   format:.*/   format: $format/g" $mongod_conf
 		sed -i "s/   path:.*/   path: $path/g" $mongod_conf
@@ -67,24 +66,3 @@ service mongod start
 rm -f mon_status.txt mon_pid_path.txt monconf_path.txt
 #sleep 6
 #mongod --auth --port 27017
-
-#Find rsyslog configuration file path
-rsyslog_conf=$( readlink  -f /*/rsyslog.conf )
-echo "rsyslog configuration file path is : $rsyslog_conf"
-
-#Insert new address
-if grep -qF "$address" $rsyslog_conf;then
-   echo "address is already located in rsyslog configuration. Please check $rsyslog_conf"
-else
-	last_programname_appearance=$(cat -n $rsyslog_conf | grep "programname" | tail -1 |  cut -f 1)
-	last_programname_appearance=$((last_programname_appearance+1))
-	last_programname_appearance+="i"
-	echo "last program name appearance: $last_programname_appearance"
-	new_line=":programname, isequal, \"mongod\" @$address" #todo- add TCP support
-	echo $new_line  
-	sed -i "$last_programname_appearance$new_line" $rsyslog_conf
-	service rsyslog restart
-fi
-
-#tcp- starts with "@@", udp- starts with "@"
-
