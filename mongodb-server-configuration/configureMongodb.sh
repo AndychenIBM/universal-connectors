@@ -7,9 +7,7 @@ dest=$(grep "destination" $configfile | cut -d ':' -f 2)
 format=$(grep "format" $configfile | cut -d ':' -f 2)
 path=$(grep "path" $configfile | cut -d ':' -f 2)
 filter=$(grep "filter" $configfile | cut -d ':' -f2-)
-protocol=$(grep "protocol" $configfile | cut -d ':' -f 2)
-protocol=${protocol^^}
-#printf "DEST=%s\nFORMAT=%s\nPATH=%s\nFILTER=%s\n\n" "$dest" "$format" "$path" "$filter" 
+#printf "DEST=%s\nFORMAT=%s\nPATH=%s\nFILTER=%s\n\n" "$dest" "$format" "$path" "$filter"
 
 #Find mongod status
 service mongod status | tr '\t' ',' > mon_status.txt
@@ -27,6 +25,11 @@ ps -ef | grep $mon_pid | tr '\t' ',' > monconf_path.txt
 mongod_conf=$( readlink  -f /*/mongod.conf )
 echo "Mongodb configuration file path is : $mongod_conf"
 
+#Backup configuration file
+#current_time=$(date "+%Y%m%d-%H%M%S")
+#cp $mongod_conf $mongod_conf.$current_time
+#echo "created $mongod_conf.$current_time as a backup configuration file"
+
 #Find mongod pid file path configuration
 sed -n /'mongod.pid'/p $mongod_conf > mon_pid_path.txt
 sed -i 's/ pidFilePath: //g' mon_pid_path.txt
@@ -43,11 +46,9 @@ if grep -lq  '^auditLog' $mongod_conf
 		echo "AuditLog will be set to syslog in mongod.conf"
 		startRange=$(awk '/auditLog/{ print NR; exit }' $mongod_conf)
 		endRange=$((startRange+10))
-		#Todo- deal with commented lines
-		sed -i "$startRange,$endRange{s/destination:.*/destination: $dest/g}" $mongod_conf
-		sed -i "$startRange,$endRange{s/format:.*/format: $format/g}" $mongod_conf
-		sed -i "$startRange,$endRange{s/path:.*/path: $path/g}" $mongod_conf
-		sed -i "$startRange,$endRange{s/filter:.*/filter: $filter/g}" $mongod_conf
+		sed -i -r "$startRange,$endRange{h;s/[^#]*//1;x;s/#.*//;s/destination:.*/destination: $dest/g;G;s/(.*)\n/\1/}" $mongod_conf
+		sed -i -r "$startRange,$endRange{h;s/[^#]*//1;x;s/#.*//;s/format:.*/format: $format/g;G;s/(.*)\n/\1/}" $mongod_conf
+		sed -i -r "$startRange,$endRange{h;s/[^#]*//1;x;s/#.*//;s/filter:.*/filter: $filter/g;G;s/(.*)\n/\1/}" $mongod_conf
 		sed -i "s/#setParameter: {auditAuthorizationSuccess: true}/setParameter: {auditAuthorizationSuccess: true}/g" $mongod_conf
 	else
 		echo "AuditLog section will be added to mongod.conf"
