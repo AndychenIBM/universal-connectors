@@ -15,3 +15,4 @@ Project Content:
 	2.1. *.conf file that will be used as the configuration for logstash (including input,filter and output)
 3. docker-compose.yml- includes configurations for the docker itself (for example- ports needed to be exposed)
 4. Dockerfile- import and install logstash, remove old version of the container, pass relevant files to the container, install plugins.
+5. logstash.repo- needed in order to install the docker inside ubi

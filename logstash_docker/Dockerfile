@@ -1,25 +1,4 @@
-# (C) Copyright IBM Corporation 2016, 2020
-#
-# ------------------------------------------------------------------------------
-#               NOTE: THIS DOCKERFILE IS GENERATED VIA "update.sh"
-#
-#                       PLEASE DO NOT EDIT IT DIRECTLY.
-# ------------------------------------------------------------------------------
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#      http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
-
-FROM registry.connect.redhat.com/ibm/ibmjava8
+FROM sec-guardium-next-gen-docker-local.artifactory.swg-devops.com/ibmjava-ubi-minimal:latest
 
 LABEL maintainer="IBM Security" \
     #build_date=
@@ -35,19 +14,19 @@ ENV LOGSTASH_DIR=/usr/share/logstash
 
 USER root
 
+COPY logstash.repo /etc/yum.repos.d/logstash.repo
+
 RUN \
-  #rpm --rebuilddb && yum clean all && \
-  mkdir -p ${LOGSTASH_DIR} && \
-  cd ${LOGSTASH_DIR} && \
-  curl -O https://artifacts.elastic.co/downloads/logstash/logstash-${LOGSTASH_VERSION}.tar.gz && \
-  tar zxvf logstash-${LOGSTASH_VERSION}.tar.gz -C ${LOGSTASH_DIR} --strip-components=1 && \
-  rm -f logstash-${LOGSTASH_VERSION}.tar.gz && \
-  yum clean all -y
-  
+	microdnf install -y vim-enhanced && \
+	microdnf install -y util-linux-ng && \
+	rpm --import https://artifacts.elastic.co/GPG-KEY-elasticsearch && \
+	microdnf install shadow-utils.x86_64 -y && \
+	microdnf install logstash
+
 COPY pipeline/ ${LOGSTASH_DIR}/pipeline
 COPY config/ ${LOGSTASH_DIR}/config
 RUN chown -R 1001:1001 ${LOGSTASH_DIR}
 USER 1001
-RUN .${LOGSTASH_DIR}/bin/logstash-plugin install ${LOGSTASH_DIR}/config/logstash-filter-java_filter_example-0.0.3.gem
+RUN .${LOGSTASH_DIR}/bin/logstash-plugin install ${LOGSTASH_DIR}/config/logstash-filter-java_filter_example-0.0.33.gem
 RUN .${LOGSTASH_DIR}/bin/logstash-plugin install ${LOGSTASH_DIR}/config/logstash-output-java_output_to_guardium-1.0.2.gem
 ENV UDS_ETC=${LOGSTASH_DIR}/config/
