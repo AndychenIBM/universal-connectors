@@ -1,22 +1,18 @@
 #!/bin/bash
 
 #Load params from configuration file
-configfile='configureServer.conf'
-protocol=$(grep "protocol" $configfile | cut -d ':' -f 2)
-protocol=${protocol^^}
-address=$(grep "address" $configfile | cut -d ':' -f2-)
-#printf "PROTOCOL=%s\nADDRESS=%s\n\n" "$protocol" "$address"
+protocol=$1
+address=$2
+logfile=$3
+#printf "%s: Params passed to syslog script:\n\tPROTOCOL=%s\n\tADDRESS=%s\n\tLOG=%s\n" $(date +"%Y-%m-%dT%H:%M:%SZ") $protocol $address $logfile|& tee -a $logfile
 
 #Find rsyslog configuration file path
 rsyslog_conf=$( readlink  -f /*/rsyslog.conf )
-echo "rsyslog configuration file path is : $rsyslog_conf"
-
-#Update rsyslog_conf and restart
-sed -i 's/^M//g' $rsyslog_conf
-
+printf "%s: rsyslog configuration file path is: %s\n" $(date +"%Y-%m-%dT%H:%M:%SZ") $rsyslog_conf|& tee -a $logfile
 
 if grep -qF "$address" $rsyslog_conf;then
-	echo "address is already located in rsyslog configuration. Please check $rsyslog_conf"
+	printf "%s: Address is already located in rsyslog configuration. Please check %s\n" $(date +"%Y-%m-%dT%H:%M:%SZ") $rsyslog_conf|& tee -a $logfile
+
 else
     last_programname_appearance=$(cat -n $rsyslog_conf | grep "programname" | tail -1 |  cut -f 1)
 	if [ -z "$last_programname_appearance" ];then
@@ -30,9 +26,10 @@ else
 	else #default- UDP
 		new_line=":programname, isequal, \"mongod\" @$address"
 	fi
-	
+
 	sed -i "$last_programname_appearance$new_line" $rsyslog_conf
-	echo "Inserted new line to rsyslog configuration file: $new_line"
+	printf "%s: Inserted new line to rsyslog configuration file:%s\n" $(date +"%Y-%m-%dT%H:%M:%SZ") $new_line|& tee -a $logfile
 
 	service rsyslog restart
+	printf "%s: Restarted rsyslog.\n" $(date +"%Y-%m-%dT%H:%M:%SZ") |& tee -a $logfile
 fi
