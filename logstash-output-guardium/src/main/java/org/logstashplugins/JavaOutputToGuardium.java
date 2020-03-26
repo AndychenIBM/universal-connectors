@@ -59,28 +59,28 @@ public class JavaOutputToGuardium implements Output {
             event = z.next();
             Record record = null;
             try {
-                System.out.println("==========Event " + logEvent(event));
-                log.info("==========Event " + logEvent(event));
+                //System.out.println("==========Event " + logEvent(event));
+                log.debug("==========Event " + logEvent(event));
 
                 String recordString = event.getField("Record").toString();
 
                 record = (new Gson()).fromJson(recordString, Record.class);
 
-                System.out.println("==========Record " + gson.toJson(record));
-                log.info("==========Record " + gson.toJson(record));
+                //System.out.println("==========Record " + gson.toJson(record));
+                log.debug("==========Record " + gson.toJson(record));
 
                 connector.sendRecord(gson.toJson(record));
 
             } catch (GuardUCException ex) {
-                System.out.println("Exception ######### Error sending data to guardium in output "+ex.getMessage());
+                //System.out.println("Exception ######### Error sending data to guardium in output "+ex.getMessage());
                 log.error("Error sending data to guardium in output", ex);
 
             } catch (Exception ex){
-                System.out.println("Exception ######### Failed to handle event "+ex.getMessage()+logEvent(event));
+                //System.out.println("Exception ######### Failed to handle event "+ex.getMessage()+logEvent(event));
                 log.error("Failed to handle event "+logEvent(event), ex);
             }
-            System.out.println("==========Done");
-            log.info("==========Finished one event, total events size is " + events.size());
+            //System.out.println("==========Done");
+            log.debug("==========Finished one event, total events size is " + events.size());
         }
     }
 

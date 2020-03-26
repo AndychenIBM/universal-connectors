@@ -101,9 +101,10 @@ public class UniversalConnector {
             barDone.append(icon);
         }
         String barRemain = bar.substring(remainPct, bar.length());
-        System.out.print("\r" + barDone + barRemain + " " + remainPct + "%");
+        log.debug("\r" + barDone + barRemain + " " + remainPct + "%");
         if (done == total) {
-            System.out.print("\n");
+            //System.out.print("\n");
+            log.debug("\n");
         }
     }
 
@@ -149,10 +150,7 @@ public class UniversalConnector {
             int lineNumber = 0;
             int numeberOfLinesInFile = getNumberOfLinesInFile(recordsFileName);
             String line;
-            System.out.println("Sending records");
-            log.info("Sending records");
-            //SolidDbDataTransformer transformer = new SolidDbDataTransformer();
-            //JsonRecordTransformer transformer = new JsonRecordTransformer();
+            log.debug("Sending records");
             while ((line = bufferedReader.readLine()) != null) {
                 lineNumber++;
                 List<com.ibm.guardium.proto.datasource.Datasource.Guard_ds_message> messages = transformer.transform(line);
@@ -174,8 +172,7 @@ public class UniversalConnector {
             }
             progressPercentage(numeberOfLinesInFile, numeberOfLinesInFile);
             getRecordDispatcher().stopAllAgents();
-            System.out.println("Done sending.");
-            log.info("Done sending.");
+            log.debug("Done sending.");
         } catch (IOException e) {
             log.error(e);
         }
