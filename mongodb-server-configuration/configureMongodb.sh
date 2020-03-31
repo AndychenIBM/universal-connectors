@@ -2,67 +2,55 @@
 #Author:Ora Shapiro
 
 #Load params from configuration file
-configfile='configureServer.conf'
-dest=$(grep "destination" $configfile | cut -d ':' -f 2)
-format=$(grep "format" $configfile | cut -d ':' -f 2)
-path=$(grep "path" $configfile | cut -d ':' -f 2)
-filter=$(grep "filter" $configfile | cut -d ':' -f2-)
-protocol=$(grep "protocol" $configfile | cut -d ':' -f 2)
-protocol=${protocol^^}
-#printf "DEST=%s\nFORMAT=%s\nPATH=%s\nFILTER=%s\n\n" "$dest" "$format" "$path" "$filter" 
-
-#Find mongod status
-service mongod status | tr '\t' ',' > mon_status.txt
-cat mon_status.txt
-sed -i 's/mongod (pid //g' mon_status.txt
-sed -i 's/) is running...//g' mon_status.txt
-sed -i 's/\s*$//g' mon_status.txt
+dest=$1
+format=$2
+path=$3
+filter=$4
+logfile=$5
+#printf "%s: Params passed to mongod script:\nDESTINATION=%s\n\tFORMAT=%s\n\tPATH=%s\n\tFILTER=%s\n\tLOG=%s\n" $(date +"%Y-%m-%dT%H:%M:%SZ") $dest $format $path "$filter" $logfile|& tee -a $logfile
 
 #Find mongod pid if exists
-mon_pid=$( cat mon_status.txt )
-echo " Mongodb  pid/status $mon_pid"
-ps -ef | grep $mon_pid | tr '\t' ',' > monconf_path.txt
+mon_pid=$(service mongod status|grep -Eo '[0-9]+')
+printf "%s: Mongod pid: %s.\n" $(date +"%Y-%m-%dT%H:%M:%SZ") $mon_pid|& tee -a $logfile
 
 #Find mongod configuration file path
 mongod_conf=$( readlink  -f /*/mongod.conf )
-echo "Mongodb configuration file path is : $mongod_conf"
+printf "%s: Mongod configuration file path is: %s.\n" $(date +"%Y-%m-%dT%H:%M:%SZ") $mongod_conf|& tee -a $logfile
+
+#Backup configuration file
+#current_time=$(date "+%Y%m%d-%H%M%S")
+#cp $mongod_conf $mongod_conf.$current_time
+#echo "created $mongod_conf.$current_time as a backup configuration file" |& tee -a $logfile
 
 #Find mongod pid file path configuration
-sed -n /'mongod.pid'/p $mongod_conf > mon_pid_path.txt
-sed -i 's/ pidFilePath: //g' mon_pid_path.txt
-sed -i 's/ # location of pidfile//g' mon_pid_path.txt
-sed -i 's/\s*$//g' mon_status.txt
-mongo_pid_path=$(cat mon_pid_path.txt)
-echo "Mongodb pid file path is : $mongo_pid_path"
-#read -p "Press [Enter] key to continue..."
+printf "%s: Mongod pid file path is:%s.\n" $(date +"%Y-%m-%dT%H:%M:%SZ") $(grep -o 'pidFilePath[^#]*' $mongod_conf | cut -d ':' -f 2)|& tee -a $logfile
 
 #Find if audit section exists and set in mongod.conf
 #If audit section exists , update audit destination to syslog and update filters, if it does not exist, add the audit section to mongod.conf"
 if grep -lq  '^auditLog' $mongod_conf
 	then
-		echo "AuditLog will be set to syslog in mongod.conf"
-		#startRange=$(awk '/auditLog/{ print NR; exit }' $mongod_conf)
-		#echo $startRange
-		#endRange=$((startRange+10))
-		#echo $endRange
-		#todo- limit the sed -i to specific lines ($startRange,$startRange+10), ignore spaces 
-		sed -i "s/   destination:.*/   destination: $dest/g" $mongod_conf
-		sed -i "s/   format:.*/   format: $format/g" $mongod_conf
-		sed -i "s/   path:.*/   path: $path/g" $mongod_conf
-		#sed -i "s/   #filter:.*/   filter: $filter/g" $mongod_conf
-		#sed -i "s/   ^filter:.*/   filter: $filter/g" $mongod_conf
+		printf "%s: AuditLog will be set to syslog in mongod.conf\n" $(date +"%Y-%m-%dT%H:%M:%SZ") |& tee -a $logfile
+		startRange=$(awk '/auditLog/{ print NR; exit }' $mongod_conf)
+		endRange=$((startRange+10))
+		ignoreCommentsString="[^#]*//1;x;s/#.*//"
+		sed -i -r "$startRange,$endRange{h;s/$ignoreCommentsString;s/destination:.*/destination: $dest/g;G;s/(.*)\n/\1/}" $mongod_conf
+		sed -i -r "$startRange,$endRange{h;s/$ignoreCommentsString;s/format:.*/format: $format/g;G;s/(.*)\n/\1/}" $mongod_conf
+		sed -i -r "$startRange,$endRange{h;s/$ignoreCommentsString;s/filter:.*/filter: $filter/g;G;s/(.*)\n/\1/}" $mongod_conf
 		sed -i "s/#setParameter: {auditAuthorizationSuccess: true}/setParameter: {auditAuthorizationSuccess: true}/g" $mongod_conf
 	else
-		echo "AuditLog section will be added to mongod.conf"
-		printf "\nauditLog:\n$dest\n$filter\n""setParameter: {auditAuthorizationSuccess: true}  ">> $mongod_conf
+		printf "%s: AuditLog section will be added to mongod.conf\n" $(date +"%Y-%m-%dT%H:%M:%SZ") |& tee -a $logfile
+		printf "\nauditLog:\n  destination: $dest\n  filter: $filter\nsetParameter: {auditAuthorizationSuccess: true}  ">> $mongod_conf
 fi
 
 #Restart mongod service after configuration change
 service mongod stop
-rm -f $mongo_pid_path
 rm -f /tmp/mongodb-27017.sock
 sleep 2
-service mongod start
-rm -f mon_status.txt mon_pid_path.txt monconf_path.txt
-#sleep 6
+if service mongod status|grep -q "stopped";
+then
+	service mongod start
+	printf "%s: Restarted mongod.\n" $(date +"%Y-%m-%dT%H:%M:%SZ") |& tee -a $logfile
+else
+	printf "%s: Failed to stop mongodb.\n" $(date +"%Y-%m-%dT%H:%M:%SZ") |& tee -a $logfile
+fi
 #mongod --auth --port 27017

@@ -3,7 +3,7 @@ services:
   logstash:
     build: .
     image: "logstash:alpine"
-    command: ./usr/share/logstash/bin/logstash 
+    command: /usr/share/logstash/bin/logstash
     ports:
       - "5141:5141/udp"
 
