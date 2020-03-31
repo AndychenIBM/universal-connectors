@@ -76,6 +76,7 @@ clean {
 }
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
+    //options.compilerArgs += ["--release", "8"]
 }
 
 task vendor(dependsOn: shadowJar) {
