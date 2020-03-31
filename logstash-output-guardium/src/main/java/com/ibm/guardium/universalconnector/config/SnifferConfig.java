@@ -35,4 +35,13 @@ public class SnifferConfig {
     public void setSSL(boolean SSL) {
         isSSL = SSL;
     }
+
+    @Override
+    public String toString() {
+        return "SnifferConfig{" +
+                "ip='" + ip + '\'' +
+                ", port=" + port +
+                ", isSSL=" + isSSL +
+                '}';
+    }
 }

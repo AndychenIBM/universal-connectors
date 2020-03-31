@@ -60,14 +60,17 @@ public class JavaOutputToGuardium implements Output {
             Record record = null;
             try {
                 //System.out.println("==========Event " + logEvent(event));
-                log.debug("==========Event " + logEvent(event));
+                if (log.isDebugEnabled()) {
+                    log.debug("==========Event " + logEvent(event));
+                }
 
                 String recordString = event.getField("Record").toString();
 
                 record = (new Gson()).fromJson(recordString, Record.class);
 
-                //System.out.println("==========Record " + gson.toJson(record));
-                log.debug("==========Record " + gson.toJson(record));
+                if (log.isDebugEnabled()) {
+                    log.debug("==========Record " + recordString);
+                }
 
                 connector.sendRecord(gson.toJson(record));
 

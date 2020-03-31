@@ -119,9 +119,9 @@ public class UniversalConnector {
     public void sendRecord(String record)throws GuardUCException {
         try {
             //getAgentInstance().send(record.getBytes());
-            log.info("Message to be dispatched to agent " + record);
+            if (log.isDebugEnabled()) { log.debug("Message to be dispatched to agent " + record); }
             getRecordDispatcher().dispatch(transformer.transform(record));
-            log.info("Message was dispatched to agent");
+            if (log.isDebugEnabled()) { log.debug("Message was dispatched to agent");}
         } catch (Exception e){
             log.error("Failed to sendRecord from universal connector", e);
             throw new GuardUCException("Failed to sendRecord from universal connector", e);
