@@ -2,13 +2,17 @@ package com.ibm.guardium;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.ibm.guardium.connector.structures.Accessor;
 import com.ibm.guardium.connector.structures.Data;
 import com.ibm.guardium.connector.structures.Record;
@@ -18,6 +22,7 @@ public class Parser {
     public static final String DATA_PROTOCOL_STRING = "Logstash";
     public static final String UNKOWN_STRING = "n/a";
     public static final String SERVER_TYPE_STRING = "MONGODB";
+    private static final String MASK_STRING = "?";
 
     private static String DATE_FORMAT_ISO = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
     private static SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat(DATE_FORMAT_ISO);
@@ -107,15 +112,19 @@ public class Parser {
 
             final Construct construct = new Construct();
             construct.sentences.add(sentence);
+            
             construct.setFull_sql(data.toString());
-            // TODO construct.setOriginal_sql(...);
+
+            Parser.RedactWithExceptions(data); // Warning: overwrites data.param.args
+
+            construct.setOriginal_sql(data.toString());
             return construct;
         } catch (final Exception e) {
             throw e;
         }
     }
 
-    public Record parseRecord(final JsonObject data) throws ParseException {
+    public static Record parseRecord(final JsonObject data) throws ParseException {
         // TODO get param.args.lsid, or fabricate
         Record record = new Record();
 
@@ -130,29 +139,30 @@ public class Parser {
         record.setSessionId(sessionId);
 
         
-        record.setAppUserName(Parser.UNKOWN_STRING);
-        
-        record.setSessionLocator(this.parseSessionLocator(data));
-        record.setAccessor(this.parseAccessor(data));
-        record.setData(this.parseData(data));
-        
         String dbName = Parser.UNKOWN_STRING;
         if (args.has("$db")) {
             dbName = args.get("$db").getAsString();
         }
         record.setDbName(dbName); // TODO decide which should be sent
-        record.getAccessor().setServiceName(dbName + " //SN");
-
+        record.setAppUserName(Parser.UNKOWN_STRING);
+        
+        record.setSessionLocator(Parser.parseSessionLocator(data));
+        record.setAccessor(Parser.parseAccessor(data));
+        record.setData(Parser.parseData(data));
+        
+        // post populate fields: 
+        record.getAccessor().setServiceName(dbName); // FIXME/Notice: exists also in Record.dbName
+        
         // set timestamp
-        String dateString = this.parseTimestamp(data);
-        int unixTime = this.getTimeSeconds(dateString);
+        String dateString = Parser.parseTimestamp(data);
+        int unixTime = Parser.getTimeSeconds(dateString);
         record.setTime(unixTime);
         record.getData().setTimestamp(unixTime);
-        
+
         return record;
     }
 
-    public Accessor parseAccessor(JsonObject data) {
+    public static Accessor parseAccessor(JsonObject data) {
         Accessor accessor = new Accessor();
 
         accessor.setDbProtocol(Parser.DATA_PROTOCOL_STRING);
@@ -189,7 +199,7 @@ public class Parser {
         return accessor;
     }
 
-    private SessionLocator parseSessionLocator(JsonObject data) {
+    private static SessionLocator parseSessionLocator(JsonObject data) {
         SessionLocator sessionLocator = new SessionLocator();
         sessionLocator.setIpv6(false);
 
@@ -215,14 +225,15 @@ public class Parser {
     }
 
     /**
-     * Parses the query and returns a Data instance. 
-     * Note: Setting timestamp deferred, to be set by Parser.parseRecord().
+     * Parses the query and returns a Data instance. Note: Setting timestamp
+     * deferred, to be set by Parser.parseRecord().
+     * 
      * @param inputJSON
      * @return
      * 
      * @see Data
      */
-    public Data parseData(JsonObject inputJSON) {
+    public static Data parseData(JsonObject inputJSON) {
         Data data = new Data();
         data.setOriginalSqlCommand(Parser.UNKOWN_STRING); // TODO: remove if not used
         try {
@@ -231,7 +242,6 @@ public class Parser {
                 data.setConstruct(construct);
                 data.setUseConstruct(true);
 
-                // todo: remove once Tal updates filter
                 if (construct.getFull_sql() == null) {
                     construct.setFull_sql(Parser.UNKOWN_STRING);
                 }
@@ -245,7 +255,7 @@ public class Parser {
         return data;
     }
 
-    public String parseTimestamp(final JsonObject data) {
+    public static String parseTimestamp(final JsonObject data) {
         String dateString = null;
         if (data.has("ts")) {
             dateString = data.getAsJsonObject("ts").get("$date").getAsString();
@@ -253,9 +263,73 @@ public class Parser {
         return dateString;
     }
 
-    public int getTimeSeconds(String dateString) throws ParseException {
+    public static int getTimeSeconds(String dateString) throws ParseException {
         Date date = DATE_FORMATTER.parse(dateString);
         int timeSeconds = (int)(date.getTime() / 1000); 
         return timeSeconds;
+    }
+
+    /**
+     * Redact except values of objects and verbs
+     */
+    static JsonElement RedactWithExceptions(JsonObject data) {
+
+        final JsonObject param = data.get("param").getAsJsonObject();
+        final String command = param.get("command").getAsString();
+        final JsonObject args = param.getAsJsonObject("args");
+        
+        final JsonElement originalCollection = args.get(command);
+        final JsonElement originalDB = args.get("$db");
+        
+        final JsonElement redactedArgs = Parser.Redact(args);
+        
+        // restore common field values not to redact
+        args.remove(command);
+        args.add(command, originalCollection);
+        args.remove("$db");
+        args.add("$db", originalDB);
+
+        return redactedArgs;
+    }
+
+    /**
+     * Redact/Sanitize sensitive information. For example all field values.
+     * The result can be seen in reports like "Hourly access details" or "Long running queries". 
+     * Note: data is transformed/changed, so use only after you don't need the data anymore, 
+     * for example, after populating as String in full_sql.
+     * @param data
+     * @return
+     */
+    static JsonElement Redact(JsonElement data) {
+        // if final-leaf value (string, number) return "?"
+        // else {
+            // if reserved word: Redact valueRedact 
+            // }
+            if (data.isJsonPrimitive()) {
+                return new JsonPrimitive(Parser.MASK_STRING);
+            }
+
+            else if (data.isJsonArray()) { 
+                JsonArray array = data.getAsJsonArray(); 
+                    for (int i=0; i<array.size(); i++) {
+                        JsonElement redactedElement = Parser.Redact(array.get(i));
+                        array.set(i, redactedElement);
+                    }
+            } 
+            else if (data.isJsonObject()) {
+                JsonObject object = data.getAsJsonObject();
+                final Set<String> keys = object.keySet();
+                final Set<String> keysCopy = new HashSet<>(); // make a copy, as keys changes on every remove/add, below  
+                for (String key : keys) {
+                    keysCopy.add(key);
+                }
+                for (String key : keysCopy) { 
+                    JsonElement redactedValue = Redact(object.get(key));
+                    object.remove(key);
+                    object.add(key, redactedValue); 
+                }
+            }
+
+            return /* changed */ data;
     }
 }

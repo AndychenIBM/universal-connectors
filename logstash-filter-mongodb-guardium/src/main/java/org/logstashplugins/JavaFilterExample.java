@@ -49,13 +49,9 @@ public class JavaFilterExample implements Filter {
                         JsonObject inputJSON = (JsonObject) JsonParser.parseString(input);
                         // FIXME move filterMatched later?
                         matchListener.filterMatched(e); // Flag OK for filter input/parsing/out
-                        String constructString = Parser.Parse(inputJSON);
                         
-                        // TODO: start parsing in another class
-                        e.setField("Construct", constructString); 
 
-                        Parser parser = new Parser();
-                        Record record = parser.parseRecord(inputJSON);
+                        Record record = Parser.parseRecord(inputJSON);
 
                         // server_hostname
                         if (e.getField("server_hostname") instanceof String) {
@@ -83,7 +79,7 @@ public class JavaFilterExample implements Filter {
                         }
                         
                         // TODO: Remove flat variables after Record is used.
-                        e.setField("timestamp", parser.parseTimestamp(inputJSON));
+                        e.setField("timestamp", Parser.parseTimestamp(inputJSON));
                         
                         final GsonBuilder builder = new GsonBuilder();
                         builder.serializeNulls();

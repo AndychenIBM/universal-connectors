@@ -3,6 +3,7 @@ package com.ibm.guardium;
 import java.sql.Date;
 import java.text.ParseException;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.ibm.guardium.connector.structures.Accessor;
@@ -114,9 +115,61 @@ public class ParserTest {
         Assert.assertEquals("airports", sentence.objects.get(1).name);
     }
 
+    @Test 
+    public void testLogFile() {
+        // TODO: read from file stream
+        final String mongoString = "{ \"atype\" : \"authCheck\", \"ts\" : { \"$date\" : \"2020-02-16T03:36:53.800-0500\" }, \"local\" : { \"ip\" : \"(NONE)\", \"port\" : 0 }, \"remote\" : { \"ip\" : \"(NONE)\", \"port\" : 0 }, \"users\" : [], \"roles\" : [], \"param\" : { \"command\" : \"listIndexes\", \"ns\" : \"config.system.sessions\", \"args\" : { \"listIndexes\" : \"system.sessions\", \"cursor\" : {}, \"$db\" : \"config\" } }, \"result\" : 0 }";
+
+        final JsonObject mongoJson = JsonParser.parseString(mongoString).getAsJsonObject();
+        // final String actualResult = Parser.Parse(mongoJson);
+        final Construct result = Parser.ParseAsConstruct(mongoJson);
+
+        final Sentence sentence = result.sentences.get(0);
+        Assert.assertEquals("listIndexes", sentence.verb);
+        Assert.assertEquals("system.sessions", sentence.objects.get(0).name);
+    }
+
+    @Test 
+    public void testRedactData() {
+        final String mongoString = "{ \"atype\": \"authCheck\", \"ts\": { \"$date\": \"2020-01-21T04:37:30.174-0500\" }, \"local\": { \"ip\": \"127.0.0.1\", \"port\": 27017 }, \"remote\": { \"ip\": \"127.0.0.1\", \"port\": 47638 }, \"users\": [ { \"user\": \"BILL\", \"db\": \"admin\" } ], \"roles\": [ { \"role\": \"readWrite\", \"db\": \"admin\" } ], \"param\": { \"command\": \"insert\", \"ns\": \"test.Myuser\", \"args\": { \"insert\": \"Myuser\", \"ordered\": true, \"lsid\": { \"id\": { \"$binary\": \"ql5vZfbGTgWXrBSZOU6l5w==\", \"$type\": \"04\" } }, \"$db\": \"test\", \"documents\": [ { \"_id\": { \"$oid\": \"58842568c706f50f5c1de663\" }, \"userId\": \"123456\", \"user_name\": \"Eli\", \"interestedTags\": [ \"music\", \"cricket\", \"hiking\", \"F1\", \"Mobile\", \"racing\" ], \"listFriends\": [ \"111111\", \"222222\", \"333333\" ] } ] } }, \"result\": 0 }";
+        final String mongoRedactedString = "{ \"atype\": \"authCheck\", \"ts\": { \"$date\": \"2020-01-21T04:37:30.174-0500\" }, \"local\": { \"ip\": \"127.0.0.1\", \"port\": 27017 }, \"remote\": { \"ip\": \"127.0.0.1\", \"port\": 47638 }, \"users\": [ { \"user\": \"BILL\", \"db\": \"admin\" } ], \"roles\": [ { \"role\": \"readWrite\", \"db\": \"admin\" } ], \"param\": { \"command\": \"insert\", \"ns\": \"test.Myuser\", \"args\": { \"insert\": \"Myuser\", \"ordered\": \"?\", \"lsid\": { \"id\": { \"$binary\": \"?\", \"$type\": \"?\" } }, \"$db\": \"test\", \"documents\": [ { \"_id\": { \"$oid\": \"?\" }, \"userId\": \"?\", \"user_name\": \"?\", \"interestedTags\": [ \"?\", \"?\", \"?\", \"?\", \"?\", \"?\" ], \"listFriends\": [ \"?\", \"?\", \"?\" ] } ] } }, \"result\": 0 }";
+        final JsonObject mongoRedactedJsonObject = JsonParser.parseString(mongoRedactedString).getAsJsonObject();
+        final JsonObject mongoJson = JsonParser.parseString(mongoString).getAsJsonObject();
+        final JsonObject args = mongoJson.get("param").getAsJsonObject().get("args").getAsJsonObject();
+        
+        Parser.RedactWithExceptions(mongoJson); // overrides args in-place
+        
+        final JsonArray array6redacted = new JsonArray(6);
+        for (int i=0; i<6; i++) {
+            array6redacted.add("?"); 
+        }
+
+        Assert.assertEquals("Collection name should not be redacted", args.get("$db").getAsString(), "test");
+        Assert.assertEquals("Object should not be redacted", args.get("insert").getAsString(), "Myuser"); 
+        Assert.assertEquals(args.get("documents").getAsJsonArray()
+            .get(0).getAsJsonObject().get("interestedTags").getAsJsonArray(), array6redacted);
+        Assert.assertEquals(mongoRedactedJsonObject, mongoJson);
+    }
+
+    @Test 
+    public void testRedactData_aggregate() {
+        final String mongoString = "{ \"atype\": \"authCheck\", \"ts\": { \"$date\": \"2020-01-16T06:07:21.122-0500\" }, \"local\": { \"ip\": \"127.0.0.1\", \"port\": 27017 }, \"remote\": { \"ip\": \"127.0.0.1\", \"port\": 43600 }, \"users\": [], \"roles\": [], \"param\": { \"command\": \"aggregate\", \"ns\": \"test.users\", \"args\": { \"aggregate\": \"users\", \"pipeline\": [ { \"$match\": { \"admin\": 1 } }, { \"$lookup\": { \"from\": \"posts\", \"localField\": \"_id\", \"foreignField\": \"owner_id\", \"as\": \"posts\" } }, { \"$project\": { \"posts\": { \"$filter\": { \"input\": \"$posts\", \"as\": \"post\", \"cond\": { \"$eq\": [ \"$$post.via\", \"facebook\" ] } } }, \"admin\": 1 } } ], \"cursor\": {}, \"lsid\": { \"id\": { \"$binary\": \"9IxV+mBmQfa73jbV9n4CSQ==\", \"$type\": \"04\" } }, \"$db\": \"test\" } }, \"result\": 0 }";
+        final String mongoRedactedString = "{ \"atype\": \"authCheck\", \"ts\": { \"$date\": \"2020-01-16T06:07:21.122-0500\" }, \"local\": { \"ip\": \"127.0.0.1\", \"port\": 27017 }, \"remote\": { \"ip\": \"127.0.0.1\", \"port\": 43600 }, \"users\": [], \"roles\": [], \"param\": { \"command\": \"aggregate\", \"ns\": \"test.users\", \"args\": { \"aggregate\": \"users\", \"pipeline\": [ { \"$match\": { \"admin\": \"?\" } }, { \"$lookup\": { \"from\": \"?\", \"localField\": \"?\", \"foreignField\": \"?\", \"as\": \"?\" } }, { \"$project\": { \"posts\": { \"$filter\": { \"input\": \"?\", \"as\": \"?\", \"cond\": { \"$eq\": [ \"?\", \"?\" ] } } }, \"admin\": \"?\" } } ], \"cursor\": {}, \"lsid\": { \"id\": { \"$binary\": \"?\", \"$type\": \"?\" } }, \"$db\": \"test\" } }, \"result\": 0 }";
+        final JsonObject mongoRedactedJsonObject = JsonParser.parseString(mongoRedactedString).getAsJsonObject();
+        final JsonObject mongoJson = JsonParser.parseString(mongoString).getAsJsonObject();
+        final JsonObject args = mongoJson.get("param").getAsJsonObject().get("args").getAsJsonObject();
+        
+        Parser.RedactWithExceptions(mongoJson); // overrides args in-place
+        
+        Assert.assertEquals("Collection name should not be redacted", args.get("$db").getAsString(), "test");
+        Assert.assertEquals("Object should not be redacted", args.get("aggregate").getAsString(), "users"); 
+        
+        Assert.assertEquals(mongoRedactedJsonObject, mongoJson);
+    }
+
     @Test
     public void testParseRecord() throws ParseException {
-        Record record = parser.parseRecord(mongoJson);
+        Record record = Parser.parseRecord(mongoJson);
         Assert.assertEquals("2WoIDPhSTcKHrdJW4azoow==", record.getSessionId());
         Assert.assertEquals("test", record.getDbName());
         Assert.assertEquals(Parser.UNKOWN_STRING, record.getAppUserName());
@@ -136,7 +189,7 @@ public class ParserTest {
 
     @Test
     public void testParseSessionLocator() throws ParseException {
-        Record record = parser.parseRecord(mongoJson);
+        Record record = Parser.parseRecord(mongoJson);
         SessionLocator actual = record.getSessionLocator();
 
         Assert.assertEquals("127.0.0.1", actual.getServerIp());
@@ -148,7 +201,7 @@ public class ParserTest {
 
     @Test
     public void testParseAccessor() throws ParseException {
-        Record record = parser.parseRecord(mongoJson);
+        Record record = Parser.parseRecord(mongoJson);
         Accessor actual = record.getAccessor();
         Assert.assertEquals(Parser.DATA_PROTOCOL_STRING, actual.getDbProtocol());
         Assert.assertEquals(Parser.SERVER_TYPE_STRING, actual.getServerType());

@@ -51,7 +51,7 @@ public class JavaFilterExampleTest {
         Collection<Event> results = filter.filter(Collections.singletonList(e), matchListener);
 
         Assert.assertEquals(1, results.size());
-        Assert.assertNotNull(e.getField("Construct"));
+        Assert.assertNotNull(e.getField("Record"));
         Assert.assertEquals(1, matchListener.getMatchCount());
     }
     

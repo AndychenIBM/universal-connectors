@@ -15,6 +15,7 @@ Supported commands:
 * Source program is not available in syslog messages sent by MongoDB. Instead, it's  always sent as "mongod". 
 * If the parsed Client IP ("remote") and Server IP ("local") are equal (like "(NONE)" or "127.0.0.1") they will be overriden with logstash "host" field.
 * Events into the filter are not removed, but tagged if not parsed (see [Filter result](#filter-result), below).
+* The event is redacted, so most field values are replaced with "?". Note that currently this is a naïve process, so some fields are redacted where future filter release should not redact them, like from within $lookup/$graphlookup, 1st element in $filter.cond.$eq[], etc.
 
 ## Example 
 ### syslog input
