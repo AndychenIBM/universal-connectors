@@ -1,7 +1,6 @@
 #!/bin/bash
-#Author:Ora Shapiro
 
-#Load params from configuration file
+#save arguments
 dest=$1
 format=$2
 path=$3

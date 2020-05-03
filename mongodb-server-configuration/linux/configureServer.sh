@@ -73,7 +73,6 @@ while test $# -gt 0; do
       ;;
   esac
 done
-echo "done"
 
 printf "%s: mongod params:\n\tDEST=%s\n\tFORMAT=%s\n\tPATH=%s\n\tFILTER=%s\n" $(date +"%Y-%m-%dT%H:%M:%SZ") $dest $format $path "$filter" |& tee -a $logfile
 printf "%s: rsyslog params:\n\tPROTOCOL=%s\n\tADDRESS=%s\n" $(date +"%Y-%m-%dT%H:%M:%SZ") $protocol $address |& tee -a $logfile
@@ -86,3 +85,4 @@ fi
 printf "%s: Configuring syslog...\n" $(date +"%Y-%m-%dT%H:%M:%SZ") |& tee -a $logfile
 bash configureSyslog.sh "$protocol" "$address" "$logfile"
 printf "%s: Done configuring Server.\n" $(date +"%Y-%m-%dT%H:%M:%SZ") |& tee -a $logfile
+echo "%s: Done configuring Server.\n" $(date +"%Y-%m-%dT%H:%M:%SZ")
