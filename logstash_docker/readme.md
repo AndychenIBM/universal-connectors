@@ -14,7 +14,7 @@ installation and configuration:
     docker login  https://sec-guardium-next-gen-docker-local.artifactory.swg-devops.com/v2/ibmjava-ubi-minimal/manifests/latest
     user name: <ibm_email_addres>
     password: <artifactory_key> 
-3. enter logstash_docker directory and type: docker-compose up
+5. enter logstash_docker directory and type: docker-compose up
 
   
 
