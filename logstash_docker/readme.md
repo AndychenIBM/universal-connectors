@@ -10,6 +10,10 @@ installation and configuration:
 3. configure agent in logstash_docker/config:
     3.1. change ip address in SnifferConfig.json to the sniffer machine's address
     3.2. optional- change connectorId UniversalConnector.json file
+4. login to artifactory:
+    docker login  https://sec-guardium-next-gen-docker-local.artifactory.swg-devops.com/v2/ibmjava-ubi-minimal/manifests/latest
+    user name: <ibm_email_addres>
+    password: <artifactory_key> 
 3. enter logstash_docker directory and type: docker-compose up
 
   
