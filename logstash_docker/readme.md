@@ -1,9 +1,26 @@
-working directory:
-	~/logstash_docker
- 
-installation:
-  docker-compose up
+Prerequisites:
+1. docker (already installed in gmachines)
+2. docker-compose (installation instructions: https://docs.docker.com/compose/install)
+
+
+
+installation and configuration:
+1. copy logstash_docker directory in the machine
+2. optional- make any adjustments needed in logstash's *.conf file placed in logstash_docker/pipeline/
+3. configure agent in logstash_docker/config:
+    3.1. change ip address in SnifferConfig.json to the sniffer machine's address
+    3.2. optional- change connectorId UniversalConnector.json file
+3. enter logstash_docker directory and type: docker-compose up
+
   
+
+install a new plugin:
+1. enter the new .gem file to logstash_docker/config
+2. edit/add the installation to Dockerfile:
+    RUN .${LOGSTASH_DIR}/bin/logstash-plugin install ${LOGSTASH_DIR}/config/<plugin_name>
+3. rebuild docker: docker-compose up --build
+
+
 Project Content:
 1. config directory:
 	1.1. pipelines.yml- defines where to read the logstash config files from (according to the selected pipeline)
