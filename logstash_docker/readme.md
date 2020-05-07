@@ -22,7 +22,8 @@ install a new plugin:
 1. enter the new .gem file to logstash_docker/config
 2. edit/add the installation to Dockerfile:
     RUN .${LOGSTASH_DIR}/bin/logstash-plugin install ${LOGSTASH_DIR}/config/<plugin_name>
-3. rebuild docker: docker-compose up --build
+3. make sure docker is up: service docker start
+4. rebuild docker: docker-compose up --build
 
 
 Project Content:
