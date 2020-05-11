@@ -15,13 +15,16 @@ address=$(grep "address" $configfile | cut -d ':' -f2-)
 while test $# -gt 0; do
   case "$1" in
     -h|--help)
-      echo "options:"
-      echo "-h, --help                show brief help"
-      echo "-d, --destination         specify a destination for mongodb: syslog or file"
-      echo "-f, --filter	          specify a filter for mongodb auditLog"
-	  echo "-a, --address       	  specify an address to send data <ip_address>:<port>"
-	  echo "-p, --protocol       	  specify the sent protocol: tcp or udp"
-	  echo "--syslog-only       	  update only syslog configuration file, without changing mongodb"
+      echo "This script has 2 purposes:"
+      echo "1. Configure Mongodb to send audit logs to Syslog"
+      echo "2. Configure Syslog to send logs to Guardium Universal Connector"
+      echo "Optional flags:"
+      echo "-h, --help                Show brief help"
+      echo "-d, --destination         Specify a destination for mongodb: syslog or file"
+      echo "-f, --filter	          Specify a filter for mongodb auditLog"
+	  echo "-a, --address       	  Specify an address to send data <ip_address>:<port>"
+	  echo "-p, --protocol       	  Specify the protocol for communication with Guardium Universal Connector: TCP or UDP"
+	  echo "--syslog-only       	  Update only syslog configuration file. No mongo DB changes, no DB restart required."
       exit 0
       ;;
     -d|--destination)
