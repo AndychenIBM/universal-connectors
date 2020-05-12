@@ -94,22 +94,32 @@ public class JsonRecordTransformer implements RecordTransformer {
 
         messages.add(startMsg);
 
-        // build client request - the one that contains actual sql data
-        Datasource.Application_data  appData = buildAppplicationData(record, sessionLocator);
+        if(record.isException()){
+            Datasource.Exception exception = buildExceptionData(record, sessionLocator);
+            Datasource.Guard_ds_message exceptionMsg = Datasource.Guard_ds_message.newBuilder()
+                    .setType(Datasource.Guard_ds_message.Type.EXCEPTION)
+                    .setException(exception)
+                    .build();
 
-        Datasource.Client_request clientRequest = Datasource.Client_request.newBuilder()
-                .setSessionId(record.getSessionId().hashCode())//todo: check with Tim Session id issue
-                .setRequestId(record.getSessionId().hashCode())//todo: check with Tim Request id issue
-                .setData(appData)
-                .build();
+            messages.add(exceptionMsg);
+        }else {
+            // build client request - the one that contains actual sql data
+            Datasource.Application_data appData = buildAppplicationData(record, sessionLocator);
 
-        Datasource.Guard_ds_message sqlMsg = Datasource.Guard_ds_message.newBuilder()
-                .setType(Datasource.Guard_ds_message.Type.CLIENT_REQUEST)
-                .setClientRequest(clientRequest)
-                .build();
+            Datasource.Client_request clientRequest = Datasource.Client_request.newBuilder()
+                    .setSessionId(record.getSessionId().hashCode())//todo: check with Tim Session id issue
+                    .setRequestId(record.getSessionId().hashCode())//todo: check with Tim Request id issue
+                    .setData(appData)
+                    .build();
 
-        messages.add(sqlMsg);
+            Datasource.Guard_ds_message sqlMsg = Datasource.Guard_ds_message.newBuilder()
+                    .setType(Datasource.Guard_ds_message.Type.CLIENT_REQUEST)
+                    .setClientRequest(clientRequest)
+                    .build();
 
+
+            messages.add(sqlMsg);
+        }
         return messages;
     }
 
@@ -129,8 +139,64 @@ public class JsonRecordTransformer implements RecordTransformer {
 
         return sessionStart;
     }
+    static public long getUnixTime() {
+        return getUnixTime(new Date());
+    }
 
-    public Datasource.Application_data buildAppplicationData(Record record, Datasource.Session_locator sessionLocator) {
+    /**
+     * Unix time is in seconds, Java is is in milliseconds. Simply divide by 1000.
+     * @param date Optional
+     * @return Java time divide by 1000
+     */
+    static public long getUnixTime(Date date) {
+        return date.getTime() / 1000;
+    }
+
+    static public Datasource.Timestamp getTimestamp() {
+        return Datasource.Timestamp.newBuilder().setUnixTime((int) getUnixTime()).build();
+    }
+    /**
+     *
+     * This method will send an exception message based on the
+     * error code which is returned from the database server
+     * An example would be "table not found" exception.
+     *
+     * @param session_ID
+     * @param client_IP
+     * @param client_Port
+     * @param server_IP
+     * @param server_Port
+     */
+    public static Datasource.Exception buildExceptionData(Record record,Datasource.Session_locator sessionLocator)  {
+        // Build the session locator information to be put into the exception message
+        // message. This must match the open session message
+
+        //Use the builder to create the structure
+        Datasource.Exception.Builder exceptionMsg = Datasource.Exception.newBuilder();
+
+        ExceptionRecord recordException = record.getException();
+        //Add Required fields
+        exceptionMsg.setSession(sessionLocator);
+        exceptionMsg.setTimestamp(getTimestamp());
+        Accessor accessor = record.getAccessor();
+        //Add Optional fields
+//        exceptionMsg.setAPPUSERNAME("AppUserNameFromException");
+//        exceptionMsg.setCount(25);
+//        exceptionMsg.setDBPASSWORDHASH("PasswordHashString");
+        exceptionMsg.setDBPROTOCOL((accessor != null)?accessor.getServerType():null);
+
+        exceptionMsg.setDBUSER((accessor != null)?accessor.getDbUser():null);
+        exceptionMsg.setDESCRIPTION(recordException.getDescription());
+//        exceptionMsg.setERRORCAUSE("ErrorCauseString");
+        exceptionMsg.setEXCEPTIONTYPEID(recordException.getExceptionTypeId());
+
+        exceptionMsg.setSQLSTRING(recordException.getSqlString());
+        exceptionMsg.setSESSIONID(record.getSessionId());
+
+        return exceptionMsg.build();
+    }
+
+        public Datasource.Application_data buildAppplicationData(Record record, Datasource.Session_locator sessionLocator) {
         Data rd = record.getData();
         Datasource.Timestamp timestamp = getTimeStamp(record);
         Datasource.Application_data.Data_type dataType = getDataType(record);
@@ -142,19 +208,25 @@ public class JsonRecordTransformer implements RecordTransformer {
                 .setDatasourceType(Datasource.Application_data.Datasource_type.UNI_CON)
                 .setApplicationUser(record.getAppUserName())
                 .setTimestamp(timestamp);
-
-        if (rd.isUseConstruct()){
-            Datasource.GDM_construct gdmConstruct = buildConstruct(rd);
-            builder.setConstruct(gdmConstruct);
-            builder.setType(Datasource.Application_data.Data_type.CONSTRUCT);
-        } else {
-            builder.setText(rd.getOriginalSqlCommand());
-        }
+if(rd != null) {
+    if (rd.isUseConstruct()) {
+        Datasource.GDM_construct gdmConstruct = buildConstruct(rd);
+        builder.setConstruct(gdmConstruct);
+        builder.setType(Datasource.Application_data.Data_type.CONSTRUCT);
+    } else {
+        builder.setText(rd.getOriginalSqlCommand());
+    }
+}
         return builder.build();
     }
 
     public Datasource.Timestamp getTimeStamp(Record record) {
-        return Datasource.Timestamp.newBuilder().setUnixTime(record.getData().getTimestamp()).build();
+        Data data = record.getData();
+        int timestamp = 0;
+        if(data != null){
+            timestamp = data.getTimestamp();
+        }
+        return Datasource.Timestamp.newBuilder().setUnixTime(timestamp).build();
     }
 
     public Datasource.GDM_construct buildConstruct(Data recordData) {
