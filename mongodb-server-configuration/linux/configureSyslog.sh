@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#Load params from configuration file
+#Save arguments
 protocol=$1
 address=$2
 logfile=$3

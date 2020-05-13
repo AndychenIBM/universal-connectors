@@ -1,5 +1,5 @@
 {
-"connectorId":"ConnectorFromLionsRH8",
+"connectorId":"UBIConnector",
 "connectorIp":"127.0.0.1",
 "configurationFetchType":"file",
 "configurationFetchFileName":"SniffersConfig.json",
