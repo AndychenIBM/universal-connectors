@@ -28,5 +28,5 @@ COPY config/ ${LOGSTASH_DIR}/config
 RUN chown -R 1001:1001 ${LOGSTASH_DIR}
 USER 1001
 RUN .${LOGSTASH_DIR}/bin/logstash-plugin install ${LOGSTASH_DIR}/config/logstash-filter-java_filter_example-0.0.33.gem
-RUN .${LOGSTASH_DIR}/bin/logstash-plugin install ${LOGSTASH_DIR}/config/logstash-output-java_output_to_guardium-1.0.2.gem
+RUN .${LOGSTASH_DIR}/bin/logstash-plugin install ${LOGSTASH_DIR}/config/logstash-output-java_output_to_guardium-1.0.3.gem
 ENV UDS_ETC=${LOGSTASH_DIR}/config/
