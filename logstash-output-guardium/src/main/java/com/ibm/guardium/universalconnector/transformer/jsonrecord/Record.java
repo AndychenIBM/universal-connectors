@@ -10,7 +10,11 @@ public class Record {
     private SessionLocator  sessionLocator;
     private Accessor        accessor;
     private Data            data;
+    private ExceptionRecord exception;
 
+    public boolean isException(){
+        return  (this.exception != null);
+    }
     public int getTime() {
         return time;
     }
@@ -65,5 +69,13 @@ public class Record {
 
     public void setData(Data data) {
         this.data = data;
+    }
+
+    public ExceptionRecord getException() {
+        return exception;
+    }
+
+    public void setException(ExceptionRecord exception) {
+        this.exception = exception;
     }
 }
