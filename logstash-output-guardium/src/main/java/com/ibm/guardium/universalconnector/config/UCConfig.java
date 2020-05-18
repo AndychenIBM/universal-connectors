@@ -7,10 +7,22 @@ public class UCConfig {
     private String configurationFetchType;
     private String configurationFetchFileName;
     private String statusWriterType;
+    private Integer snifferConnectionsLimit;
 
     public UCConfig(){
     }
 
+    public String getId(){
+        return connectorId;
+    }
+
+    public Integer getSnifferConnectionsLimit() {
+        return snifferConnectionsLimit;
+    }
+
+    public void setSnifferConnectionsLimit(Integer snifferConnectionsLimit) {
+        this.snifferConnectionsLimit = snifferConnectionsLimit;
+    }
 
     public String getVersion() {
         return version;
@@ -57,5 +69,18 @@ public class UCConfig {
 
     public void setConnectorIp(String connectorIp) {
         this.connectorIp = connectorIp;
+    }
+
+    @Override
+    public String toString() {
+        return "UCConfig{" +
+                "version='" + version + '\'' +
+                ", connectorId='" + connectorId + '\'' +
+                ", connectorIp='" + connectorIp + '\'' +
+                ", configurationFetchType='" + configurationFetchType + '\'' +
+                ", configurationFetchFileName='" + configurationFetchFileName + '\'' +
+                ", statusWriterType='" + statusWriterType + '\'' +
+                ", snifferConnectionsLimit =" + snifferConnectionsLimit +
+                '}';
     }
 }

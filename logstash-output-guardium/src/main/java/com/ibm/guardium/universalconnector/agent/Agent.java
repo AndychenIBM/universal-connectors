@@ -2,8 +2,7 @@ package com.ibm.guardium.universalconnector.agent;
 
 
 import com.google.protobuf.Message;
-import com.ibm.guardium.universalconnector.config.SnifferConfig;
-import com.ibm.guardium.universalconnector.config.UCConfig;
+import com.ibm.guardium.universalconnector.config.ConnectionConfig;
 import com.ibm.guardium.universalconnector.exceptions.GuardUCException;
 import com.ibm.guardium.universalconnector.status.AgentStatus;
 import com.ibm.guardium.universalconnector.status.AgentStatusGenerator;
@@ -24,8 +23,9 @@ public class Agent {
     private static Log log = LogFactory.getLog(Agent.class);
 
     private AgentState state = AgentState.STOPPED;
-    private UCConfig ucConfig;
-    private SnifferConfig snifferConfig;
+    //private UCConfig ucConfig;
+    //private SnifferConfig snifferConfig;
+    private ConnectionConfig config;
     private boolean isStopStart = false;
     private boolean isMarkedForRemoval = false;
     private BlockingQueue<QueuedMessage> messageQueue;
@@ -41,9 +41,8 @@ public class Agent {
     private int CONNECTION_RETRIES = 10;
 
 
-    public Agent(UCConfig ucConfig, SnifferConfig snifferConfig ) {
-        this.ucConfig = ucConfig;
-        this.snifferConfig = snifferConfig;
+    public Agent(ConnectionConfig config ) {
+        this.config = config;
         messageQueue = new ArrayBlockingQueue<>(CONSUMER_Q_SIZE);
         transmitterStatsCollector = new TransmitterStatsCollector();
         currentStats = transmitterStatsCollector.getCurrent();
@@ -52,17 +51,14 @@ public class Agent {
 
     class StatsTimer extends TimerTask {
         public void run() {
-            Thread.currentThread().setName(ucConfig.getConnectorId() + "-StatsTimer");
+            Thread.currentThread().setName(config.getId() + "-StatsTimer");
             currentStats.setRecordsInQ(messageQueue.size());
             transmitterStatsCollector.runCollectorTasks();
         }
     }
 
-    public UCConfig getUcConfig() {
-        return ucConfig;
-    }
-    public SnifferConfig getSnifferConfig() {
-        return snifferConfig;
+    public String getId() {
+        return config.getId();
     }
 
     public boolean isStopStart() {
@@ -93,7 +89,7 @@ public class Agent {
         int waitTime = 0;
         while (!messageQueue.isEmpty()){
             if (waitTime > 15){
-                log.warn("messageQueue still contains records");
+                log.warn("messageQueue still contains records "+config.getId());
                 return false;
             }
             waitTime += 1;
@@ -103,23 +99,23 @@ public class Agent {
     }
 
     public void start() throws Exception{
-        recordTransmitter.setup(ucConfig, snifferConfig);
-        log.debug("ready to create connection to snif");
+        recordTransmitter.setup(config);
+        log.debug("ready to create connection to snif "+config.getId());
         connThread = new Thread(recordTransmitter);
-        connThread.setName(ucConfig.getConnectorId() + "-recordTransmitter");
+        connThread.setName(config.getId() + "-recordTransmitter");
         connThread.start();
-        log.info("waiting for connection to snif to open");
+        log.info("waiting for connection to snif to open"+config.getId());
         int retries = CONNECTION_RETRIES;
         while(!recordTransmitter.isStatusOpen() && retries>0){
             Thread.sleep(1000);
             retries--;
         }
         if (retries==0 && !recordTransmitter.isStatusOpen()){
-            throw new Exception("Failed to connecto to sniffer "+snifferConfig);
+            throw new Exception("Failed to connecto to sniffer "+config);
         }
-        log.debug("Starting stats timer.");
+        log.debug("Starting stats timer."+config.getId());
         timer = new Timer();
-        StatusWriter statusWriter = getStatusWriter(ucConfig);
+        StatusWriter statusWriter = getStatusWriter(config);
         statusWriter.init();
         this.agentStatusGenerator = new AgentStatusGenerator(CONSUMER_Q_SIZE);
         statsTimer = new StatsTimer();
@@ -127,10 +123,10 @@ public class Agent {
         state = AgentState.STARTED;
     }
 
-    private StatusWriter getStatusWriter(UCConfig ucConfig) throws Exception{
+    private StatusWriter getStatusWriter(ConnectionConfig config) throws Exception{
         StatusWriterFactory statusWriterFactory = new StatusWriterFactory();
 
-        return statusWriterFactory.Build(ucConfig);
+        return statusWriterFactory.Build(config);
     }
 
 //    private StatsWriter getStatsWriters(Properties properties) {
@@ -142,25 +138,25 @@ public class Agent {
     private void waitForMessageQueue() throws InterruptedException{
         if (messageQueue.remainingCapacity() > 0)
             return;
-        log.debug("messageQueue is full, waiting.");
+        log.debug("messageQueue is full, waiting. "+config.getId());
         while(messageQueue.remainingCapacity() == 0)
             Thread.sleep(1);
     }
 
-    public void postFailedStatus(UCConfig ucConfig) throws Exception{
+    public void postFailedStatus(ConnectionConfig config) throws Exception{
         AgentStatus status = agentStatusGenerator.getFailedStatusStatus();
-        StatusWriter sw = getStatusWriter(ucConfig);
+        StatusWriter sw = getStatusWriter(config);
         sw.updateStatus(status.getStatus(), status.getComment());
     }
     public void send(Message msg) {
         if (isStopStart) {
-            log.trace("Agent is stop/start, and not accepting records");
+            log.trace("Agent is stop/start, and not accepting records "+config.getId());
             return;
         }
         try {
             waitForMessageQueue();
             messageQueue.put(new QueuedMessage(msg));
-            log.debug("Agent queue size (proto message was added): " + messageQueue.size());
+            log.debug("Agent queue size (proto message was added): " + messageQueue.size()+" "+config.getId());
         } catch (Exception e) {
             log.error(e);
         }
@@ -169,19 +165,19 @@ public class Agent {
     public void send(byte[] msg) {
         String errMsg;
         if (isStopStart) {
-            log.trace("Agent is stop/start, and not accepting records");
+            log.trace("Agent is stop/start, and not accepting records "+config.getId());
             return;
         }
         if (msg.length >= GuardConnection.INIT_BUF_LEN){
-            errMsg = "msg length:" + msg.length + " is more then max length: " + GuardConnection.INIT_BUF_LEN;
+            errMsg = "msg length:" + msg.length + " is more then max length: " + GuardConnection.INIT_BUF_LEN+" "+config.getId();
             throw new GuardUCException(errMsg);
         }
         try {
             waitForMessageQueue();
             messageQueue.put(new QueuedMessage(msg));
-            log.debug("Agent queue size (byte[] message was added): " + messageQueue.size());
+            log.debug("Agent queue size (byte[] message was added): " + messageQueue.size()+" "+config.getId());
         } catch (Exception e) {
-            log.error(e);
+            log.error("Error sending message for "+config.getId(),e);
         }
     }
 
@@ -189,20 +185,20 @@ public class Agent {
         try {
             stopTimer();
             stopConnection();
-            log.debug("Agent:" + ucConfig.getConnectorId() + " stopped");
+            log.debug("Agent:" + config.getId() + " stopped");
         } catch (InterruptedException e) { //don't think there will be this exception
             log.error(e);
         }
     }
 
     private void stopConnection() throws InterruptedException {
-        log.debug("stopping conn and waiting to join");
+        log.debug("stopping conn and waiting to join "+config.getId());
         connThread.interrupt();
         connThread.join();
     }
 
     private void stopTimer() {
-        log.debug("Stopping timers.");
+        log.debug("Stopping timers."+config.getId());
         timer.cancel();
     }
 

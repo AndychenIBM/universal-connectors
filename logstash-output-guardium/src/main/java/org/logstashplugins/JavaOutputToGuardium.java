@@ -57,32 +57,25 @@ public class JavaOutputToGuardium implements Output {
         Event event;
         while (z.hasNext() && !stopped) {
             event = z.next();
-            Record record = null;
             try {
-                //System.out.println("==========Event " + logEvent(event));
                 if (log.isDebugEnabled()) {
                     log.debug("==========Event " + logEvent(event));
                 }
 
                 String recordString = event.getField("Record").toString();
 
-                record = (new Gson()).fromJson(recordString, Record.class);
-
                 if (log.isDebugEnabled()) {
                     log.debug("==========Record " + recordString);
                 }
 
-                connector.sendRecord(gson.toJson(record));
+                connector.sendRecord(recordString);
 
             } catch (GuardUCException ex) {
-                //System.out.println("Exception ######### Error sending data to guardium in output "+ex.getMessage());
                 log.error("Error sending data to guardium in output", ex);
 
             } catch (Exception ex){
-                //System.out.println("Exception ######### Failed to handle event "+ex.getMessage()+logEvent(event));
                 log.error("Failed to handle event "+logEvent(event), ex);
             }
-            //System.out.println("==========Done");
             log.debug("==========Finished one event, total events size is " + events.size());
         }
     }

@@ -12,6 +12,10 @@ public class SnifferConfig {
         this.isSSL = isSSL;
     }
 
+    public String getId(){
+        return ip;
+    }
+
     public String getIp() {
         return ip;
     }

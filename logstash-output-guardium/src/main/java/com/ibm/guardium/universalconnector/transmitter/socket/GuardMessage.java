@@ -3,8 +3,8 @@ package com.ibm.guardium.universalconnector.transmitter.socket;
 import com.ibm.guardium.proto.datasource.Datasource;
 import com.ibm.guardium.proto.datasource.Datasource.Guard_ds_message;
 import com.ibm.guardium.proto.datasource.Datasource.Guard_ds_message.Type;
+import com.ibm.guardium.universalconnector.config.ConnectionConfig;
 import com.ibm.guardium.universalconnector.config.DBProtocol;
-import com.ibm.guardium.universalconnector.config.UCConfig;
 
 import java.nio.ByteBuffer;
 
@@ -18,7 +18,7 @@ public class GuardMessage {
     private ByteBuffer header;
     private ByteBuffer dsMsgHeader;
 
-    public GuardMessage(UCConfig config) {
+    public GuardMessage(ConnectionConfig config) {
         header = ByteBuffer.allocate(20);
         header.putLong(4);
         header.putInt(0); //packetid
@@ -112,41 +112,41 @@ public class GuardMessage {
 
 
     //todo: remove once uc message type is ready
-    public static byte[] prepareAgentConfig(UCConfig config, String clientId)
-    {
-        Datasource.Agent_config_section section = Datasource.Agent_config_section
-                .newBuilder()
-                .addParameters(Datasource.Name_value_pair
-                        .newBuilder()
-                        .setName("DBType")
-                        .setValue(DBProtocol.MONGO.name()).build())
-                .addParameters(Datasource.Name_value_pair
-                        .newBuilder()
-                        .setName("DBServerDNSName")
-                        .setValue("this.server.com").build())
-                .addParameters(Datasource.Name_value_pair
-                        .newBuilder()
-                        .setName("DBServerPort")
-                        .setValue("123").build())
-                .addParameters(Datasource.Name_value_pair
-                        .newBuilder()
-                        .setName("StreamName")
-                        .setValue("blabla").build())
-                .addParameters(Datasource.Name_value_pair
-                        .newBuilder()
-                        .setName("TAP_TYPE")
-                        .setValue("AWS_KINESIS").build())
-                .addParameters(Datasource.Name_value_pair
-                        .newBuilder()
-                        .setName("Region")
-                        .setValue("Abc").build())
-                .build();
-        Datasource.Agent_config agentConfig = Datasource.Agent_config
-                .newBuilder()
-                .setClientIdentifier(clientId)
-                .addSections(section).build();
-
-        return Guard_ds_message.newBuilder().setType(Type.CONFIG).setConfig(agentConfig).build().toByteArray();
-    }
+//    public static byte[] prepareAgentConfig(ConnectionConfig config)
+//    {
+//        Datasource.Agent_config_section section = Datasource.Agent_config_section
+//                .newBuilder()
+//                .addParameters(Datasource.Name_value_pair
+//                        .newBuilder()
+//                        .setName("DBType")
+//                        .setValue(DBProtocol.MONGO.name()).build())
+//                .addParameters(Datasource.Name_value_pair
+//                        .newBuilder()
+//                        .setName("DBServerDNSName")
+//                        .setValue("this.server.com").build())
+//                .addParameters(Datasource.Name_value_pair
+//                        .newBuilder()
+//                        .setName("DBServerPort")
+//                        .setValue("123").build())
+//                .addParameters(Datasource.Name_value_pair
+//                        .newBuilder()
+//                        .setName("StreamName")
+//                        .setValue("blabla").build())
+//                .addParameters(Datasource.Name_value_pair
+//                        .newBuilder()
+//                        .setName("TAP_TYPE")
+//                        .setValue("AWS_KINESIS").build())
+//                .addParameters(Datasource.Name_value_pair
+//                        .newBuilder()
+//                        .setName("Region")
+//                        .setValue("Abc").build())
+//                .build();
+//        Datasource.Agent_config agentConfig = Datasource.Agent_config
+//                .newBuilder()
+//                .setClientIdentifier(clientId)
+//                .addSections(section).build();
+//
+//        return Guard_ds_message.newBuilder().setType(Type.CONFIG).setConfig(agentConfig).build().toByteArray();
+//    }
 
 }

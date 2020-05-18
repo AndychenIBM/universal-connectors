@@ -37,6 +37,7 @@ public class UniversalConnector {
     public UniversalConnector(){
         initConnector();
         log.info("UniversalConnector was initialized");
+        log.debug("The Thread name is " + Thread.currentThread().getId() + "__" +Thread.currentThread().getName());
 
     }
 
@@ -120,8 +121,11 @@ public class UniversalConnector {
         try {
             //getAgentInstance().send(record.getBytes());
             if (log.isDebugEnabled()) { log.debug("Message to be dispatched to agent " + record); }
+
             getRecordDispatcher().dispatch(transformer.transform(record));
+
             if (log.isDebugEnabled()) { log.debug("Message was dispatched to agent");}
+
         } catch (Exception e){
             log.error("Failed to sendRecord from universal connector", e);
             throw new GuardUCException("Failed to sendRecord from universal connector", e);

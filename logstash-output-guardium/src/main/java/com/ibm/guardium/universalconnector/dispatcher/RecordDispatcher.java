@@ -1,26 +1,29 @@
 package com.ibm.guardium.universalconnector.dispatcher;
 
-import com.google.protobuf.Message;
 import com.ibm.guardium.proto.datasource.*;
 import com.ibm.guardium.universalconnector.UniversalConnector;
 import com.ibm.guardium.universalconnector.agent.Agent;
+import com.ibm.guardium.universalconnector.config.ConnectionConfig;
+import com.ibm.guardium.universalconnector.config.DatabaseDetails;
 import com.ibm.guardium.universalconnector.config.SnifferConfig;
 import com.ibm.guardium.universalconnector.config.UCConfig;
 import com.ibm.guardium.universalconnector.exceptions.GuardUCException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.stream.Collectors;
 
 public class RecordDispatcher {
     private static Log log = LogFactory.getLog(UniversalConnector.class);
 
     private UCConfig ucConfig;
     private List<SnifferConfig> snifferConfigs;
-    private List<Agent> allAgents = new ArrayList<>();
-    private final AtomicInteger atomicInteger = new AtomicInteger(-1);
+    private ConcurrentMap<String, Agent> agentsMap = new ConcurrentHashMap<>(); // id -> Agent instance
 
     public RecordDispatcher(UCConfig ucConfig, List<SnifferConfig> snifferConfigs) {
         this.ucConfig = ucConfig;
@@ -47,80 +50,105 @@ public class RecordDispatcher {
 //    }
 //
 
-    public void dispatch(String record){
-        Agent agent = getNextAgent();
-        agent.incIncomingRecordsCount();
-        agent.send(record.getBytes());
-    }
-
-    public void dispatch(Message msg){
-        Agent agent = getNextAgent();
-        agent.incIncomingRecordsCount();
-        agent.send(msg);
-    }
     /*
-    * Make sure all messages go via same agent
+    * Make sure all specific db messages go via same agent
     * */
     public void dispatch(List<Datasource.Guard_ds_message> messages){
-        Agent agent = getNextAgent();
-        for (Datasource.Guard_ds_message message : messages) {
-            try{
+        Agent agent = getAgent(messages);
+        try{
+            for (Datasource.Guard_ds_message message : messages) {
                 agent.incIncomingRecordsCount();
                 agent.send(message);
+            }
+        } catch (Exception e){
+            log.error("Error sending message via agent "+agent.getId(), e);
+            throw new GuardUCException("Error sending message via agent "+agent.getId(), e);
+        }
+    }
+    public static String map2string(Map<?,?> map){
+        try{
+            if (map==null){
+                return "null";
+            }
+            if (map.entrySet()==null || map.entrySet().isEmpty()){
+                return "map is empty";
+            }
+            return map.entrySet()
+                    .stream()
+                    .map(entry -> entry.getKey() + " - " + entry.getValue())
+                    .collect(Collectors.joining(", "));
+
+        } catch (Exception e){
+            log.error("Error translating map to strng");
+            return "Falied to log map";
+        }
+    }
+    private Agent getAgent(List<Datasource.Guard_ds_message> messages){
+        Datasource.Session_start sessionStart = messages.get(0).getSessionStart();
+        DatabaseDetails dbDetails = DatabaseDetails.buildFromMessage(sessionStart);
+        String dbId = dbDetails.getId();
+        Agent agent = agentsMap.get(dbId);
+
+        //log.debug("The Thread name is " + Thread.currentThread().getId() + "__" +Thread.currentThread().getName());
+        if (agent==null) {
+
+            if (log.isDebugEnabled()){log.debug("AgentMap values are "+map2string(agentsMap));}
+
+            if (ucConfig.getSnifferConnectionsLimit()!=null && ucConfig.getSnifferConnectionsLimit()<agentsMap.size()){
+                log.error("Limit of existing connections to guardium has exceeded, limit is "+ucConfig.getSnifferConnectionsLimit());
+                throw new GuardUCException("Exceeded number of connections to guardium");
+            }
+            try {
+                if (log.isDebugEnabled()){ log.debug("Creating agent for "+dbId); }
+                ConnectionConfig cc = new ConnectionConfig(ucConfig, snifferConfigs.get(0), dbDetails);
+                agent = new Agent(cc);
+                agent.start();
+                agentsMap.put(dbId, agent);
+                if (log.isDebugEnabled()){ log.debug("Finished creating agent for "+dbId); }
             } catch (Exception e){
-                log.error("Error sending message via agent "+agent.getSnifferConfig(), e);
+                log.error("Failed to creating/starting agent for sniffer configuration "+snifferConfigs.get(0)+" and dbDetails "+dbDetails, e);
+                System.err.print(e);
             }
         }
+        return agent;
     }
 
     public void waitForAllQToEmpty(){
-        for (Agent agent : allAgents) { //todo: handle threads
+        for (Agent agent : agentsMap.values()) { //todo: handle threads
             try {
                 agent.waitForQToEmpty();
             } catch (InterruptedException e){
-                log.warn("Interrupted while waiting for messages to be sent agent "+agent.getSnifferConfig());
+                log.warn("Interrupted while waiting for messages to be sent agent "+agent.getId());
             }
         }
     }
 
     public void stopAllAgents(){
-        for (Agent agent : allAgents) { //todo: handle threads
+        for (Agent agent : agentsMap.values()) { //todo: handle threads
             try {
                 agent.stop();
             } catch (Exception e){
-                log.warn("Error while stopping agent "+agent.getSnifferConfig());
+                log.warn("Error while stopping agent "+agent.getId());
             }
         }
-    }
-
-    public Agent getNextAgent(){
-        int currentIndex;
-        int nextIndex;
-        do {
-            currentIndex = atomicInteger.get();
-            nextIndex = currentIndex< Integer.MAX_VALUE ? currentIndex+1: 0;
-        } while (!atomicInteger.compareAndSet(currentIndex, nextIndex));
-
-        int nextAgentIndex = nextIndex % allAgents.size();
-        log.info("Next agent index is "+nextAgentIndex);
-        return allAgents.get(nextAgentIndex);
     }
 
     private void initAgents(){
-        for (SnifferConfig snifferConfig : snifferConfigs) {
-            try {
-                Agent agent = new Agent(ucConfig, snifferConfig);
-                agent.start();
-                allAgents.add(agent);
-            } catch (Exception e){
-                log.error("Failed to creating/starting agent for sniffer configuration "+snifferConfig, e);
-                System.err.print(e);
-            }
-        }
-        if (allAgents.size()==0){
-            log.error("No agent is available");
-            throw new GuardUCException("No agent is available based on current settings");
-        }
+//        for (SnifferConfig snifferConfig : snifferConfigs) {
+//            try {
+//                ConnectionConfig cc = new ConnectionConfig(ucConfig, snifferConfig, null);
+//                Agent agent = new Agent(cc);
+//                agent.start();
+//                allAgents.add(agent);
+//            } catch (Exception e){
+//                log.error("Failed to creating/starting agent for sniffer configuration "+snifferConfig, e);
+//                System.err.print(e);
+//            }
+//        }
+//        if (allAgents.size()==0){
+//            log.error("No agent is available");
+//            throw new GuardUCException("No agent is available based on current settings");
+//        }
     }
 
 

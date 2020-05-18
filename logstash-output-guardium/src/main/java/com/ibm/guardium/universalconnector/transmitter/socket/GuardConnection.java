@@ -1,11 +1,7 @@
 package com.ibm.guardium.universalconnector.transmitter.socket;
 
 import com.google.protobuf.Message;
-import com.ibm.guardium.universalconnector.config.SnifferConfig;
-import com.ibm.guardium.universalconnector.config.UCConfig;
-import com.ibm.guardium.universalconnector.transmitter.QueuedMessage;
-import com.ibm.guardium.universalconnector.transmitter.RecordTransmitter;
-import com.ibm.guardium.universalconnector.transmitter.TransmitterStats;
+import com.ibm.guardium.universalconnector.config.ConnectionConfig;
 import com.ibm.guardium.universalconnector.transmitter.QueuedMessage;
 import com.ibm.guardium.universalconnector.transmitter.RecordTransmitter;
 import com.ibm.guardium.universalconnector.transmitter.TransmitterStats;
@@ -27,13 +23,14 @@ import java.util.concurrent.locks.ReentrantLock;
 
 
 public class GuardConnection implements RecordTransmitter {
+    enum Status { CLOSE, OPEN, IN_PROGRESS, ERROR }
+    public static final int INIT_BUF_LEN = 2048*1024;
+
     private TransmitterStats transmitterStats;
     private final Lock lock = new ReentrantLock();
     public final Condition connected  = lock.newCondition();
-    public static final int INIT_BUF_LEN = 2048*1024;
-    private SnifferConfig snifferConfig;
 
-    enum Status { CLOSE, OPEN, IN_PROGRESS, ERROR }
+
     private Status status = Status.CLOSE;
     private static final short SERVICE_ID_HANDSHAKE = 1;
     private static final short SERVICE_ID_DS_MESSAGE = 4;
@@ -51,12 +48,12 @@ public class GuardConnection implements RecordTransmitter {
     private PingMessageHeader pingMsgHeader;
     private GuardMessage msgHeader;
     private GuardAbstractConnection commHandler = null;
-    private UCConfig config;
+    private ConnectionConfig config;
 
     class ConnTimer extends TimerTask {
         private int index = 0;
         public void run() {
-            Thread.currentThread().setName(config.getConnectorId() + "-ConnTimer");
+            Thread.currentThread().setName(config.getId() + "-ConnTimer");
             if (index % 55 == 0) {// put ping to snif only every 5 sec
                 try {
                     messageQueue.put(new QueuedMessage());
@@ -77,7 +74,7 @@ public class GuardConnection implements RecordTransmitter {
         return status == Status.OPEN;
     }
 
-    private void prepareMsgHeaders(UCConfig config){
+    private void prepareMsgHeaders(ConnectionConfig config){
         pingMsgHeader = new PingMessageHeader();
         msgHeader = new GuardMessage(config);
     }
@@ -98,7 +95,7 @@ public class GuardConnection implements RecordTransmitter {
 
 
     private void setMasterIP() throws UnknownHostException{
-        InetAddress serverIPAddress = InetAddress.getByName(snifferConfig.getIp());
+        InetAddress serverIPAddress = InetAddress.getByName(config.getSnifferConfig().getIp());
         snifferMasterip = 0;
         byte[] masterBytes = serverIPAddress.getAddress();
         int shift = 0;
@@ -113,15 +110,15 @@ public class GuardConnection implements RecordTransmitter {
         }
     }
 
-    public void setup(UCConfig config, SnifferConfig snifferConfig) throws UnknownHostException {
+    public void setup(ConnectionConfig config) throws UnknownHostException {
         this.config = config;
-        this.snifferConfig = snifferConfig;
-        log.info("Snif address is set to "+ snifferConfig.getIp() + ":" + snifferConfig.getPort() + " connecting with SSL=" + snifferConfig.isSSL());
+        log.info("Connection configuration "+config.toString());
+        log.info("Snif address is set to "+ config.getSnifferConfig().getIp() + ":" + config.getSnifferConfig().getPort() + " connecting with SSL=" + config.getSnifferConfig().isSSL());
         prepareMsgHeaders(config);
         setMasterIP();
-        pingBytes = GuardMessage.preparePing(snifferMasterip, snifferConfig.getIp(), config.getConnectorId());
-        configBytes = GuardMessage.prepareAgentConfig(config, "999");
-        handshakeBytes = GuardMessage.prepareHandshake(snifferMasterip, snifferConfig.getIp(), config.getConnectorId(), config.getVersion());
+        pingBytes = GuardMessage.preparePing(snifferMasterip, config.getSnifferConfig().getIp(), config.getId());
+        //configBytes = GuardMessage.prepareAgentConfig(config, "999");
+        handshakeBytes = GuardMessage.prepareHandshake(snifferMasterip, config.getSnifferConfig().getIp(), config.getId(), config.getUcConfig().getVersion());
     }
 
 
@@ -148,12 +145,12 @@ public class GuardConnection implements RecordTransmitter {
 
     private void createNewConnection() throws Exception {
         long timeOut = 10000; //10 seconds
-        if (snifferConfig.isSSL()) {
-            commHandler = new GuardSecuredConnection(snifferConfig.getIp(), snifferConfig.getPort());
+        if (config.getSnifferConfig().isSSL()) {
+            commHandler = new GuardSecuredConnection(config.getSnifferConfig().getIp(), config.getSnifferConfig().getPort());
         } else {
-            commHandler = new GuardNonSecuredConnection(snifferConfig.getIp(), snifferConfig.getPort());
+            commHandler = new GuardNonSecuredConnection(config.getSnifferConfig().getIp(), config.getSnifferConfig().getPort());
         }
-        log.debug("Connecting to: " + snifferConfig.getIp() + ":" + snifferConfig.getPort());
+        log.debug("Connecting to: " + config.getSnifferConfig().getIp() + ":" + config.getSnifferConfig().getPort());
         boolean connectResult = false;
         try {
             connectResult = commHandler.connect();
@@ -410,12 +407,12 @@ public class GuardConnection implements RecordTransmitter {
 
     @Override
     public void stopRun() {
-        log.debug("Stop connection was called.");
+        if (log.isDebugEnabled()){ log.debug("Stop connection was called.");};
     }
 
     @Override
     public void run() {
-        log.debug("Starting connection to Snif");
+        if (log.isDebugEnabled()){ log.debug("Starting connection to Snif");};
         runLoop();
     }
 }

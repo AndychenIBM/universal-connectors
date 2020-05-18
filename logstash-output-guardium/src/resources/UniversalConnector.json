@@ -1,7 +1,8 @@
 {
-"connectorId":"ConnectorNumber3",
-"connectorIp":"127.0.0.1",
-"configurationFetchType":"file",
-"configurationFetchFileName":"SniffersConfig.json",
-"statusWriterType":"LOG"
+  "connectorId":"3",
+  "connectorIp":"127.0.0.1",
+  "configurationFetchType":"file",
+  "configurationFetchFileName":"SniffersConfig.json",
+  "statusWriterType":"LOG",
+  "snifferConnectionsLimit": 20
 }
