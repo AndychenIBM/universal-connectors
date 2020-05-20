@@ -24,6 +24,8 @@ public class RecordDispatcher {
     private UCConfig ucConfig;
     private List<SnifferConfig> snifferConfigs;
     private ConcurrentMap<String, Agent> agentsMap = new ConcurrentHashMap<>(); // id -> Agent instance
+    // session_start and client_request must be put in the queue together one after another in order for sniffer to process it correctly
+    private static Object must_put_2_messages_per_record_flag = new Object();
 
     public RecordDispatcher(UCConfig ucConfig, List<SnifferConfig> snifferConfigs) {
         this.ucConfig = ucConfig;
@@ -56,9 +58,11 @@ public class RecordDispatcher {
     public void dispatch(List<Datasource.Guard_ds_message> messages){
         Agent agent = getAgent(messages);
         try{
-            for (Datasource.Guard_ds_message message : messages) {
-                agent.incIncomingRecordsCount();
-                agent.send(message);
+            synchronized (must_put_2_messages_per_record_flag) {
+                for (Datasource.Guard_ds_message message : messages) {
+                    agent.incIncomingRecordsCount();
+                    agent.send(message);
+                }
             }
         } catch (Exception e){
             log.error("Error sending message via agent "+agent.getId(), e);

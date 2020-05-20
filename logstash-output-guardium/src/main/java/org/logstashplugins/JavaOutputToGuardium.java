@@ -62,13 +62,19 @@ public class JavaOutputToGuardium implements Output {
                     log.debug("==========Event " + logEvent(event));
                 }
 
-                String recordString = event.getField("Record").toString();
+                if (event.getField("Record")!=null) {
 
-                if (log.isDebugEnabled()) {
-                    log.debug("==========Record " + recordString);
+                    String recordString = event.getField("Record").toString();
+
+                    if (log.isDebugEnabled()) {
+                        log.debug("==========Record " + recordString);
+                    }
+
+                    connector.sendRecord(recordString);
+
+                } else {
+                    log.warn("No record was found in event, please check parser logs");
                 }
-
-                connector.sendRecord(recordString);
 
             } catch (GuardUCException ex) {
                 log.error("Error sending data to guardium in output", ex);
