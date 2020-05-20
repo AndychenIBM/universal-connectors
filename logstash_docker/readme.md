@@ -13,15 +13,14 @@ installation and configuration:
     user name: <ibm_email_addres>
     password: <artifactory_key> 
 5. build the image: docker build -t universal-connector .
-6. run the container: docker run -p 5000:5000 -p 5141:5141/udp -it universal-connector
+6. run the container: docker run -d -p --network="host" -it universal-connector
 
 
 install a new plugin:
 1. enter the new .gem file to logstash_docker/config
 2. edit/add the installation to Dockerfile:
     RUN .${LOGSTASH_DIR}/bin/logstash-plugin install ${LOGSTASH_DIR}/config/<plugin_name>
-3. make sure docker is up: service docker start
-4. rebuild docker: docker-compose up --build
+3. rebuild
 
 
 Project Content:

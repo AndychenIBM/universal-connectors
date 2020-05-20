@@ -31,7 +31,6 @@ RUN .${LOGSTASH_DIR}/bin/logstash-plugin install ${LOGSTASH_DIR}/config/logstash
 RUN .${LOGSTASH_DIR}/bin/logstash-plugin install ${LOGSTASH_DIR}/config/logstash-output-java_output_to_guardium-1.0.3.gem
 #RUN .${LOGSTASH_DIR}/bin/logstash-plugin install ${LOGSTASH_DIR}/config/logstash-input-cloudwatch_logs-1.0.3.gem
 ENV UDS_ETC=${LOGSTASH_DIR}/config/
-EXPOSE 5141
 
 #for tests:
 #COPY test/ /test
