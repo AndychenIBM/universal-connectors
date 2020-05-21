@@ -1,6 +1,6 @@
-# Logstash Java Plugin
+# MongoDB-Guardium Logstash Filter plugin
 
-This is a filter plugin for [Logstash](https://github.com/elastic/logstash). It parses a mongo DB syslog event and adds a standard "Construct" field (JSON) that can be fed into Guardium. This construct details the main verb and the objects involved.  
+This is a filter plugin for [Logstash](https://github.com/elastic/logstash). It parses a mongo DB syslog event into a Record instance, which standardizes the event into several parts before it is sent over to Guardium. Its parts are Accessor (who tried to access the data), Session, Data or Exception. If there was no error, the Data contains details about the query "Construct", which details the main action (verb) and collections (objects) involved.  
 
 ??It is fully free and fully open-source. The license is Apache 2.0, meaning you are free to use it however you want??
 
@@ -8,6 +8,8 @@ This is a filter plugin for [Logstash](https://github.com/elastic/logstash). It 
 Supported commands:
 * find, insert, delete, update, ...  
 * aggregate with $lookup(s) or $graphLookup(s)
+
+The filter plugin also supports the Authentication and Authorization errors. MongoDB Access control must be configured, to catch these events.
 
 ## Filter notes
 * The filter supports events sent thru Syslog, which indicate "mongod:" in their message.

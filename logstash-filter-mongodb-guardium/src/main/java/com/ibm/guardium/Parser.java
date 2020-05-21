@@ -15,6 +15,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.ibm.guardium.connector.structures.Accessor;
 import com.ibm.guardium.connector.structures.Data;
+import com.ibm.guardium.connector.structures.ExceptionRecord;
 import com.ibm.guardium.connector.structures.Record;
 import com.ibm.guardium.connector.structures.SessionLocator;
 
@@ -23,6 +24,9 @@ public class Parser {
     public static final String UNKOWN_STRING = "n/a";
     public static final String SERVER_TYPE_STRING = "MONGODB";
     private static final String MASK_STRING = "?";
+    public static final String EXCEPTION_TYPE_AUTHORIZATION_STRING = "SQL_ERROR";
+    public static final String EXCEPTION_TYPE_AUTHENTICATION_STRING = "LOGIN_FAILED";
+
 
     private static String DATE_FORMAT_ISO = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
     private static SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat(DATE_FORMAT_ISO);
@@ -112,7 +116,7 @@ public class Parser {
 
             final Construct construct = new Construct();
             construct.sentences.add(sentence);
-            
+
             construct.setFull_sql(data.toString());
 
             Parser.RedactWithExceptions(data); // Warning: overwrites data.param.args
@@ -130,36 +134,74 @@ public class Parser {
 
         final JsonObject param = data.get("param").getAsJsonObject();
         final JsonObject args = param.getAsJsonObject("args");
+        final String result = data.get("result").getAsString(); // 0 success; 13/18 errors
 
         String sessionId = Parser.UNKOWN_STRING;
-        if (args.has("lsid")) {
+        if (args != null && args.has("lsid")) {
             final JsonObject lsid = args.getAsJsonObject("lsid");
             sessionId = lsid.getAsJsonObject("id").get("$binary").getAsString();
         }
         record.setSessionId(sessionId);
 
-        
         String dbName = Parser.UNKOWN_STRING;
-        if (args.has("$db")) {
+        if (args != null && args.has("$db")) {
             dbName = args.get("$db").getAsString();
+        } else if (param != null && param.has("db")) { // in "authenticate" error message 
+            dbName = param.get("db").getAsString();
         }
-        record.setDbName(dbName); // TODO decide which should be sent
+        record.setDbName(dbName);
         record.setAppUserName(Parser.UNKOWN_STRING);
-        
+
         record.setSessionLocator(Parser.parseSessionLocator(data));
         record.setAccessor(Parser.parseAccessor(data));
-        record.setData(Parser.parseData(data));
-        
-        // post populate fields: 
+
+        if (result.equals("0")) {
+            record.setData(Parser.parseData(data));
+        } else { // 13, 18
+            record.setException(Parser.ParseException(data, result));
+        }
+
+        // post populate fields:
         record.getAccessor().setServiceName(dbName); // FIXME/Notice: exists also in Record.dbName
-        
+
         // set timestamp
         String dateString = Parser.parseTimestamp(data);
         int unixTime = Parser.getTimeSeconds(dateString);
         record.setTime(unixTime);
-        record.getData().setTimestamp(unixTime);
+        if (record.getData() != null) {
+            record.getData().setTimestamp(unixTime);
+        } // (else it's an exception)
+        if (record.isException()) {
+            record.getException().setTimestamp(String.valueOf(unixTime));
+        }
 
         return record;
+    }
+
+    /**
+     * Creates an ExceptionRecord to be used in Record, instead of Data.
+     * @param data
+     * @param resultCode
+     * @return
+     */
+    private static ExceptionRecord ParseException(JsonObject data, String resultCode) {
+        ExceptionRecord exceptionRecord = new ExceptionRecord();
+        if (resultCode.equals("13")) {
+            exceptionRecord.setExceptionTypeId(Parser.EXCEPTION_TYPE_AUTHORIZATION_STRING);
+            exceptionRecord.setDescription("Unauthorized to perform the operation (13)");
+            //  exceptionRecord.setSqlString(); DEFER
+
+        } else if (resultCode.equals("18")) {
+            exceptionRecord.setExceptionTypeId(Parser.EXCEPTION_TYPE_AUTHENTICATION_STRING);
+            exceptionRecord.setDescription("Authentication Failed (18)");
+        } else { // prep for unknown error code
+            exceptionRecord.setExceptionTypeId(Parser.EXCEPTION_TYPE_AUTHORIZATION_STRING);
+            exceptionRecord.setDescription("Error (" + resultCode + ")"); // let Guardium handle, if you'd like
+        }
+
+        exceptionRecord.setSqlString(data.toString()); // NOTE: no redaction
+        // exceptionRecord.setTimestamp() is called later, as optimization
+        return exceptionRecord;
     }
 
     public static Accessor parseAccessor(JsonObject data) {
@@ -176,8 +218,14 @@ public class Parser {
                 for (JsonElement user : users) {
                     dbUsers += user.getAsJsonObject().get("user").getAsString() + " ";
                 }
+            } else if (data.has("param")) { // users array is empty in "authenticate" exception; fetch from param.user:
+                final JsonObject param = data.get("param").getAsJsonObject();
+                if (param.has("user")) { // in authenticate event
+                    dbUsers = param.get("user").getAsString();
+                }
             }
-        }
+        } 
+        
         accessor.setDbUser(dbUsers);
 
         accessor.setServerHostName(Parser.UNKOWN_STRING); // populated from Event, later
