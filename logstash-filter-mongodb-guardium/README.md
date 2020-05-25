@@ -5,11 +5,21 @@ This is a filter plugin for [Logstash](https://github.com/elastic/logstash). It 
 ??It is fully free and fully open-source. The license is Apache 2.0, meaning you are free to use it however you want??
 
 ## Documentation
-Supported commands:
+### Supported commands:
 * find, insert, delete, update, ...  
 * aggregate with $lookup(s) or $graphLookup(s)
 
-The filter plugin also supports the Authentication and Authorization errors. MongoDB Access control must be configured, to catch these events.
+### Supported errors:  
+
+* Authentication error (18) – A failed login error.
+* Authorization error (13) - To see the "Unauthorized ..." description properly in Guardium, you'll need to extend the report and add the "Exception description" field. 
+
+The filter plugin also supports sending errors as well, though MongoDB Access control must be configured before these events will be logged.  For example, edit _/etc/mongod.conf_ to contain:
+
+    security:  
+        authorization: enabled
+
+
 
 ## Filter notes
 * The filter supports events sent thru Syslog, which indicate "mongod:" in their message.
