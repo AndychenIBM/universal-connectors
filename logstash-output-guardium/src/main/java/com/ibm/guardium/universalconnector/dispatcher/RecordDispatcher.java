@@ -19,13 +19,14 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 
 public class RecordDispatcher {
-    private static Log log = LogFactory.getLog(UniversalConnector.class);
+    private static Log log = LogFactory.getLog(RecordDispatcher.class);
 
     private UCConfig ucConfig;
     private List<SnifferConfig> snifferConfigs;
     private ConcurrentMap<String, Agent> agentsMap = new ConcurrentHashMap<>(); // id -> Agent instance
     // session_start and client_request must be put in the queue together one after another in order for sniffer to process it correctly
     private static Object must_put_2_messages_per_record_flag = new Object();
+    private static Object agent_map_on_agent_create_flag = new Object();
 
     public RecordDispatcher(UCConfig ucConfig, List<SnifferConfig> snifferConfigs) {
         this.ucConfig = ucConfig;
@@ -91,30 +92,37 @@ public class RecordDispatcher {
         Datasource.Session_start sessionStart = messages.get(0).getSessionStart();
         DatabaseDetails dbDetails = DatabaseDetails.buildFromMessage(sessionStart);
         String dbId = dbDetails.getId();
-        Agent agent = agentsMap.get(dbId);
 
         //log.debug("The Thread name is " + Thread.currentThread().getId() + "__" +Thread.currentThread().getName());
-        if (agent==null) {
+        if (agentsMap.get(dbId)==null) {
 
-            if (log.isDebugEnabled()){log.debug("AgentMap values are "+map2string(agentsMap));}
+            synchronized (agent_map_on_agent_create_flag) {
 
-            if (ucConfig.getSnifferConnectionsLimit()!=null && ucConfig.getSnifferConnectionsLimit()<agentsMap.size()){
-                log.error("Limit of existing connections to guardium has exceeded, limit is "+ucConfig.getSnifferConnectionsLimit());
-                throw new GuardUCException("Exceeded number of connections to guardium");
-            }
-            try {
-                if (log.isDebugEnabled()){ log.debug("Creating agent for "+dbId); }
-                ConnectionConfig cc = new ConnectionConfig(ucConfig, snifferConfigs.get(0), dbDetails);
-                agent = new Agent(cc);
-                agent.start();
-                agentsMap.put(dbId, agent);
-                if (log.isDebugEnabled()){ log.debug("Finished creating agent for "+dbId); }
-            } catch (Exception e){
-                log.error("Failed to creating/starting agent for sniffer configuration "+snifferConfigs.get(0)+" and dbDetails "+dbDetails, e);
-                System.err.print(e);
+                if (agentsMap.get(dbId)==null) {
+
+                    if (log.isDebugEnabled()) { log.debug("AgentMap values are " + map2string(agentsMap)); }
+
+                    if (ucConfig.getSnifferConnectionsLimit() != null && ucConfig.getSnifferConnectionsLimit() < agentsMap.size()) {
+                        log.error("Limit of existing connections to guardium has exceeded, limit is " + ucConfig.getSnifferConnectionsLimit());
+                        throw new GuardUCException("Exceeded number of connections to guardium");
+                    }
+                    try {
+                        if (log.isDebugEnabled()) { log.debug("Creating agent for " + dbId); }
+
+                        ConnectionConfig cc = new ConnectionConfig(ucConfig, snifferConfigs.get(0), dbDetails);
+                        Agent agent = new Agent(cc);
+                        agent.start();
+                        agentsMap.put(dbId, agent);
+
+                        if (log.isDebugEnabled()) { log.debug("Finished creating agent for " + dbId);  }
+                    } catch (Exception e) {
+                        log.error("Failed to creating/starting agent for sniffer configuration " + snifferConfigs.get(0) + " and dbDetails " + dbDetails, e);
+                        System.err.print(e);
+                    }
+                }
             }
         }
-        return agent;
+        return agentsMap.get(dbId);
     }
 
     public void waitForAllQToEmpty(){
