@@ -54,7 +54,7 @@ public class GuardConnection implements RecordTransmitter {
         private int index = 0;
         public void run() {
             Thread.currentThread().setName(config.getId() + "-ConnTimer");
-            if (index % 55 == 0) {// put ping to snif only every 5 sec
+            if (index % 5 == 0) {// put ping to snif only every 5 sec
                 try {
                     messageQueue.put(new QueuedMessage());
                 } catch (InterruptedException e) {

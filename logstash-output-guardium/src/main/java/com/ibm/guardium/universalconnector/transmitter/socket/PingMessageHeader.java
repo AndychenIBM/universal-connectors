@@ -4,7 +4,7 @@ import java.nio.ByteBuffer;
 
 public class PingMessageHeader {
     private static final short GUARDIUM_VENDOR_ID = 0;//4001;
-    private static final short SERVICE_ID_DS_MESSAGE = 4;
+    private static final short SERVICE_ID_DS_MESSAGE = 3;
     private ByteBuffer header;
 
     public PingMessageHeader() {

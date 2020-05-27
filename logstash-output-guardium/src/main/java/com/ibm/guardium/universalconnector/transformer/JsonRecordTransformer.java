@@ -332,8 +332,6 @@ if(rd != null) {
             }
         }
 
-        log.debug("Translated string IP "+ip+" to number "+ret);
-
         return ret;
     }
 
