@@ -1,5 +1,7 @@
 package com.ibm.guardium;
 
+import static org.junit.Assert.assertEquals;
+
 import java.sql.Date;
 import java.text.ParseException;
 
@@ -8,6 +10,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.ibm.guardium.connector.structures.Accessor;
 import com.ibm.guardium.connector.structures.Data;
+import com.ibm.guardium.connector.structures.ExceptionRecord;
 import com.ibm.guardium.connector.structures.Record;
 import com.ibm.guardium.connector.structures.SessionLocator;
 
@@ -84,7 +87,7 @@ public class ParserTest {
 
     @Test
     public void testParseAsConstruct_Aggregate_nLookups() {
-        // TODO
+        Assert.assertFalse(true); // TODO
         /*
          * final String mongoString =
          * "{ \"atype\": \"authCheck\", \"ts\": { \"$date\": \"2020-01-16T06:07:21.122-0500\" }, \"local\": { \"ip\": \"127.0.0.1\", \"port\": 27017 }, \"remote\": { \"ip\": \"127.0.0.1\", \"port\": 43600 }, \"users\": [], \"roles\": [], \"param\": { \"command\": \"aggregate\", \"ns\": \"test.users\", \"args\": { \"aggregate\": \"users\", \"pipeline\": [ { \"$match\": { \"admin\": 1 } }, { \"$lookup\": { \"from\": \"posts\", \"localField\": \"_id\", \"foreignField\": \"owner_id\", \"as\": \"posts\" } }, { \"$project\": { \"posts\": { \"$filter\": { \"input\": \"$posts\", \"as\": \"post\", \"cond\": { \"$eq\": [ \"$$post.via\", \"facebook\" ] } } }, \"admin\": 1 } } ], \"cursor\": {}, \"lsid\": { \"id\": { \"$binary\": \"9IxV+mBmQfa73jbV9n4CSQ==\", \"$type\": \"04\" } }, \"$db\": \"test\" } }, \"result\": 0 }"
@@ -113,6 +116,55 @@ public class ParserTest {
         Assert.assertEquals("aggregate", sentence.verb);
         Assert.assertEquals("travelers", sentence.objects.get(0).name);
         Assert.assertEquals("airports", sentence.objects.get(1).name);
+    }
+
+    /**
+     * NOT USED: Test authorization error messsage can be parsed as usual (query is needed later)
+     */
+    // @Test 
+    // public void testParseAsConstruct_AuthorizationError() {
+    //     final String mongoString = "{ \"atype\" : \"authCheck\", \"ts\" : { \"$date\" : \"2020-05-17T11:29:02.773-0400\" }, \"local\" : { \"ip\" : \"127.0.0.1\", \"port\" : 27017 }, \"remote\" : { \"ip\" : \"127.0.0.1\", \"port\" : 29360 }, \"users\" : [ { \"user\" : \"readerUser\", \"db\" : \"admin\" } ], \"roles\" : [ { \"role\" : \"read\", \"db\" : \"admin\" } ], \"param\" : { \"command\" : \"insert\", \"ns\" : \"admin.USERS\", \"args\" : { \"insert\" : \"USERS\", \"ordered\" : true, \"lsid\" : { \"id\" : { \"$binary\" : \"EQSjmxPcSxyNN6Vw7Wy1pQ==\", \"$type\" : \"04\" } }, \"$db\" : \"admin\", \"documents\" : [ { \"_id\" : { \"$oid\" : \"5ec1583e3a55d1ed961be47e\" }, \"uid\" : 2, \"name\" : \"Tal\" } ] } }, \"result\" : 13 }";
+    //     final JsonObject mongoJson = JsonParser.parseString(mongoString).getAsJsonObject();
+    //     // final String actualResult = Parser.Parse(mongoJson);
+    //     final Construct result = Parser.ParseAsConstruct(mongoJson);
+
+    //     final Sentence sentence = result.sentences.get(0);
+    //     Assert.assertEquals("insert", sentence.verb);
+    //     Assert.assertEquals("USERS", sentence.objects.get(0).name);
+    // }
+    @Test 
+    public void testParseRecord_AuthorizationError() throws ParseException {
+        final String mongoString = "{ \"atype\" : \"authCheck\", \"ts\" : { \"$date\" : \"2020-05-17T11:29:02.773-0400\" }, \"local\" : { \"ip\" : \"127.0.0.1\", \"port\" : 27017 }, \"remote\" : { \"ip\" : \"127.0.0.1\", \"port\" : 29360 }, \"users\" : [ { \"user\" : \"readerUser\", \"db\" : \"admin\" } ], \"roles\" : [ { \"role\" : \"read\", \"db\" : \"admin\" } ], \"param\" : { \"command\" : \"insert\", \"ns\" : \"admin.USERS\", \"args\" : { \"insert\" : \"USERS\", \"ordered\" : true, \"lsid\" : { \"id\" : { \"$binary\" : \"EQSjmxPcSxyNN6Vw7Wy1pQ==\", \"$type\" : \"04\" } }, \"$db\" : \"admin\", \"documents\" : [ { \"_id\" : { \"$oid\" : \"5ec1583e3a55d1ed961be47e\" }, \"uid\" : 2, \"name\" : \"Tal\" } ] } }, \"result\" : 13 }";
+        final JsonObject mongoJson = JsonParser.parseString(mongoString).getAsJsonObject();
+        
+        final Record record = Parser.parseRecord(mongoJson);
+        
+        Assert.assertEquals(
+            Parser.EXCEPTION_TYPE_AUTHORIZATION_STRING,
+            record.getException().getExceptionTypeId()
+            );
+
+        Assert.assertEquals(mongoString.replace(" ", ""), record.getException().getSqlString());
+        Assert.assertEquals("readerUser", record.getAccessor().getDbUser().trim());
+        Assert.assertEquals(Parser.SERVER_TYPE_STRING, record.getAccessor().getServerType());
+    }
+
+
+    @Test
+    public void testParseRecord_AuthenticationError() throws ParseException {
+        final String mongoString = "{ \"atype\" : \"authenticate\", \"ts\" : { \"$date\" : \"2020-05-17T11:37:30.421-0400\" }, \"local\" : { \"ip\" : \"127.0.0.1\", \"port\" : 27017 }, \"remote\" : { \"ip\" : \"127.0.0.1\", \"port\" : 29398 }, \"users\" : [], \"roles\" : [], \"param\" : { \"user\" : \"readerUser\", \"db\" : \"admin\", \"mechanism\" : \"SCRAM-SHA-256\" }, \"result\" : 18 }";
+        final JsonObject mongoJson = JsonParser.parseString(mongoString).getAsJsonObject();
+        // final String actualResult = Parser.Parse(mongoJson);
+        final Record record = Parser.parseRecord(mongoJson);
+
+        Assert.assertEquals("readerUser", record.getAccessor().getDbUser().trim());
+        
+        ExceptionRecord exceptionRecord = record.getException();
+        Assert.assertEquals(
+            "exception type id should be known to Guardium and match error", 
+            Parser.EXCEPTION_TYPE_AUTHENTICATION_STRING, 
+            exceptionRecord.getExceptionTypeId());
+        Assert.assertEquals(mongoString.replace(" ", ""), exceptionRecord.getSqlString());
     }
 
     @Test 
