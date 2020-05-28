@@ -65,19 +65,19 @@ public class JavaFilterExample implements Filter {
                                 record.getAccessor().setSourceProgram(sourceProgram);
                         }
 
-                        // override client/server IP, if 127.0.0.1 or "(None)"
-                        SessionLocator sessionLocator = record.getSessionLocator();
-                        if (sessionLocator.getServerIp().equalsIgnoreCase(sessionLocator.getClientIp())
-                                && e.getField("host") instanceof String) {
-
-                            String host = e.getField("host").toString();
-
-                            if (host != null) {
-                                sessionLocator.setServerIp(host);
-                                sessionLocator.setClientIp(host);
-                            }
-                        }
+                        // Override "(NONE)" IP, if not filterd, as it's internal command by MongoDB.
+                        // Note: IP needs to be in ipv4/ipv6 format
                         
+                        SessionLocator sessionLocator = record.getSessionLocator();
+                        if (sessionLocator.getServerIp().equalsIgnoreCase("(NONE)")) {
+                            // TODO: make ipv6 ready 
+                            sessionLocator.setServerIp("0.0.0.0");
+                        }
+                        if (sessionLocator.getClientIp().equalsIgnoreCase("(NONE)")) {
+                            // TODO: make ipv6 ready 
+                            sessionLocator.setClientIp("0.0.0.0");
+                        }
+
                         // TODO: Remove flat variables after Record is used.
                         e.setField("timestamp", Parser.parseTimestamp(inputJSON));
                         

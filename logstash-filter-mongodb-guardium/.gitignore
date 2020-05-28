@@ -16,7 +16,7 @@ out/
 *.class
 *.ipr
 *.iws
-*.gem
+#*.gem mv to ../logstash_docker/config
 *.gemspec
 Gemfile*
 settings.gradle

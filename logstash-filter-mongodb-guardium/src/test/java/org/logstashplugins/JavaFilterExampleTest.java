@@ -76,14 +76,13 @@ public class JavaFilterExampleTest {
     }
 
     @Test
-    public void testParseMongoSyslog_injectHost() {
-        final String hostString = "9.9.9.9";
+    public void testParseMongoSyslog_IPs() {
+        final String expectedIP = "0.0.0.0";
 
         Event e = new org.logstash.Event();
         TestMatchListener matchListener = new TestMatchListener();
         
-        e.setField("message", mongodString);
-        e.setField("host", hostString);
+        e.setField("message", mongodString); // with "(NONE)" local/remote IPs
 
         Collection<Event> results = filter.filter(Collections.singletonList(e), matchListener);
 
@@ -93,11 +92,11 @@ public class JavaFilterExampleTest {
         Assert.assertNotNull(record);
 
         Assert.assertEquals(
-                "host should be used to override client IP when native audit shows same ip for local & remote",
-                hostString, record.getSessionLocator().getClientIp());
+                "0.0.0.0 client IP mongo audit message passes with '(NONE)' remote IP",
+                expectedIP, record.getSessionLocator().getClientIp());
         Assert.assertEquals(
-                "host should be used to override server IP when native audit shows same ip for local & remote",
-                hostString, record.getSessionLocator().getServerIp());
+                "0.0.0.0 client IP mongo audit message passes with '(NONE)' local IP",
+                expectedIP, record.getSessionLocator().getServerIp());
     }
 
     @Test

@@ -257,15 +257,13 @@ public class Parser {
 
         if (data.has("remote")) {
             JsonObject remote = data.getAsJsonObject("remote");
-            sessionLocator.setClientIp(remote.get("ip").getAsString()); // may be overridden by syslog "host", if
-                                                                        // 127.0.0.1
+            sessionLocator.setClientIp(remote.get("ip").getAsString());
             sessionLocator.setClientPort(remote.get("port").getAsInt());
             sessionLocator.setClientIpv6(Parser.UNKOWN_STRING);
         }
         if (data.has("local")) {
             JsonObject local = data.getAsJsonObject("local");
-            sessionLocator.setServerIp(local.get("ip").getAsString()); // may be overridden by syslog "host", if
-                                                                       // 127.0.0.1
+            sessionLocator.setServerIp(local.get("ip").getAsString());
             sessionLocator.setServerPort(local.get("port").getAsInt());
             sessionLocator.setServerIpv6(Parser.UNKOWN_STRING);
         }
