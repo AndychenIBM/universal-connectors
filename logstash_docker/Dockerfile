@@ -21,8 +21,7 @@ RUN wget https://artifacts.elastic.co/downloads/logstash/logstash-${LOGSTASH_VER
 	rm *.tar.gz
 
 #Download basic libraries
-RUN microdnf -y install vim procps findutils &&\
-    microdnf clean all
+RUN microdnf -y install vim procps findutils && microdnf clean all
 
 #Copy necessary files
 COPY pipeline/ ${LOGSTASH_DIR}/pipeline
@@ -40,7 +39,12 @@ RUN .${LOGSTASH_DIR}/bin/logstash-plugin install ${LOGSTASH_DIR}/config/logstash
 ENV UDS_ETC=${LOGSTASH_DIR}/config/
 ENV PATH ${LOGSTASH_DIR}/bin:$PATH
 
-#for tests:
-#COPY test/ /test
+#Clear cache and unnecessary heavy plugins
+RUN rm -rf $LOGSTASH_DIR/vendor/cache/*.gem $LOGSTASH_DIR/vendor/bundle/jruby/2.5.0/cache/*.gem && \
+    cd $LOGSTASH_DIR/vendor/bundle/jruby/2.5.0/gems && \
+    rm -rf logstash-filter-geoip-6.0.3-java logstash-input-snmp-1.2.1 aws-sdk-* \
+    logstash-input-azure-* logstash-integration-kafka-* logstash-input-http-* nokogiri-1.10.7-java \
+    sequel-5.27.0 backports-3.15.0 tzinfo-data-1.2019.3 snappy-0.0.12-java \
+    mail-2.6.6 logstash-input-azure_event_hubs-1.1.2 logstash-filter-jdbc_static-1.0.7 snmp-1.3.2
 
 CMD ["logstash"]
