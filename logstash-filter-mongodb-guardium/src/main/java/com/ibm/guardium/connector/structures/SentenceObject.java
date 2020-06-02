@@ -1,4 +1,4 @@
-package com.ibm.guardium;
+package com.ibm.guardium.connector.structures;
 
 public class SentenceObject {
     public String name; 
@@ -6,7 +6,7 @@ public class SentenceObject {
     public String[] fields = new String[]{};
     public String schema = "";
 
-    SentenceObject(String name) {
+    public SentenceObject(String name) {
         this.name = name;
     }
 }

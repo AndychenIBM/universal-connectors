@@ -70,11 +70,9 @@ public class JavaFilterExample implements Filter {
                         
                         SessionLocator sessionLocator = record.getSessionLocator();
                         if (sessionLocator.getServerIp().equalsIgnoreCase("(NONE)")) {
-                            // TODO: make ipv6 ready 
                             sessionLocator.setServerIp("0.0.0.0");
                         }
                         if (sessionLocator.getClientIp().equalsIgnoreCase("(NONE)")) {
-                            // TODO: make ipv6 ready 
                             sessionLocator.setClientIp("0.0.0.0");
                         }
 

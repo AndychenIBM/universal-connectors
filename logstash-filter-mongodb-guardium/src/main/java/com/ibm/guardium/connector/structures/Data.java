@@ -1,7 +1,5 @@
 package com.ibm.guardium.connector.structures;
 
-import com.ibm.guardium.Construct;
-
 public class Data {
     private Construct construct;
     private int timestamp; // limit warning: use new Date((long) unixTime * 1000), to revert to Date, otherwise, int max will be reached.

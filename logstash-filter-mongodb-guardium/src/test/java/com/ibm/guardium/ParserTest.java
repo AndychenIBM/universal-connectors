@@ -9,9 +9,11 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.ibm.guardium.connector.structures.Accessor;
+import com.ibm.guardium.connector.structures.Construct;
 import com.ibm.guardium.connector.structures.Data;
 import com.ibm.guardium.connector.structures.ExceptionRecord;
 import com.ibm.guardium.connector.structures.Record;
+import com.ibm.guardium.connector.structures.Sentence;
 import com.ibm.guardium.connector.structures.SessionLocator;
 
 import org.junit.Assert;
@@ -247,6 +249,22 @@ public class ParserTest {
         Assert.assertEquals("127.0.0.1", actual.getServerIp());
         Assert.assertEquals(27017, actual.getServerPort());
         Assert.assertEquals("127.0.0.1", actual.getClientIp());
+        Assert.assertEquals(56984, actual.getClientPort());
+
+    }
+
+    @Test
+    public void testParseSessionLocator_IPv6() throws ParseException {
+        final String mongoIPv6String = "{ \"atype\": \"authCheck\", \"ts\": { \"$date\": \"2020-01-26T09:58:44.547-0500\" }, \"local\": { \"ip\": \"2001:0db8:85a3:0000:0000:8a2e:0370:7334\", \"port\": 27017 }, \"remote\": { \"ip\": \"2001:0db8:85a3:0000:0000:8a2e:0370:7334\", \"port\": 56984 }, \"users\": [], \"roles\": [], \"param\": { \"command\": \"aggregate\", \"ns\": \"test.travelers\", \"args\": { \"aggregate\": \"travelers\", \"pipeline\": [ { \"$graphLookup\": { \"from\": \"airports\", \"startWith\": \"$nearestAirport\", \"connectFromField\": \"connects\", \"connectToField\": \"airport\", \"maxDepth\": 2, \"depthField\": \"numConnections\", \"as\": \"destinations\" } } ], \"cursor\": {}, \"lsid\": { \"id\": { \"$binary\": \"2WoIDPhSTcKHrdJW4azoow==\", \"$type\": \"04\" } }, \"$db\": \"test\" } }, \"result\": 0 }";
+        final JsonObject mongoJson = JsonParser.parseString(mongoIPv6String).getAsJsonObject();
+
+        Record record = Parser.parseRecord(mongoJson);
+        SessionLocator actual = record.getSessionLocator();
+
+        Assert.assertTrue("sessionLocator should mark that IPs are in IPv6", actual.isIpv6());
+        Assert.assertEquals("2001:0db8:85a3:0000:0000:8a2e:0370:7334", actual.getServerIpv6());
+        Assert.assertEquals(27017, actual.getServerPort());
+        Assert.assertEquals("2001:0db8:85a3:0000:0000:8a2e:0370:7334", actual.getClientIpv6());
         Assert.assertEquals(56984, actual.getClientPort());
 
     }
