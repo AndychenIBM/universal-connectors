@@ -19,15 +19,16 @@ The filter plugin also supports sending errors as well, though MongoDB Access co
     security:  
         authorization: enabled
 
-
+*IPv6* addresses can be supported by MongoDB & Filter plugin, but not tested yet and need further support by Guardium pipeline. 
 
 ## Filter notes
-* The filter supports events sent thru Syslog, which indicate "mongod:" in their message.
-* Server hostname is extracted from the syslog message, 2nd field.
-* Source program is not available in syslog messages sent by MongoDB. Instead, it's  always sent as "mongod". 
+* Required fields: 
+    * The filter supports events sent thru Syslog, which indicate "mongod:" in their message.
+    * server_hostname - Server hostname is expected (extracted from syslog message, 2nd field).
+    * Source program is not available in syslog messages sent by MongoDB. Instead, it's  always sent as "mongod". 
 * If events with "(NONE)" local/remote IP are not filtered, this filter will convert IP to "0.0.0.0", as valid IPv4 format is needed.
 * Events into the filter are not removed, but tagged if not parsed (see [Filter result](#filter-result), below).
-* The event is redacted, so most field values are replaced with "?". Note that currently this is a naïve process, so some fields are redacted where future filter release should not redact them, like from within $lookup/$graphlookup, 1st element in $filter.cond.$eq[], etc.
+* The event is also sent in a redacted version, so most field values are replaced with "?". Note that currently this is a naïve process, so some fields are redacted where future filter release should not redact them, like from within $lookup/$graphlookup, 1st element in $filter.cond.$eq[], etc.
 
 ## Example 
 ### syslog input

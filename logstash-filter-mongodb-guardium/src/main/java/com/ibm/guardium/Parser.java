@@ -2,7 +2,6 @@ package com.ibm.guardium;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -13,10 +12,14 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.ibm.guardium.connector.Util;
 import com.ibm.guardium.connector.structures.Accessor;
+import com.ibm.guardium.connector.structures.Construct;
 import com.ibm.guardium.connector.structures.Data;
 import com.ibm.guardium.connector.structures.ExceptionRecord;
 import com.ibm.guardium.connector.structures.Record;
+import com.ibm.guardium.connector.structures.Sentence;
+import com.ibm.guardium.connector.structures.SentenceObject;
 import com.ibm.guardium.connector.structures.SessionLocator;
 
 public class Parser {
@@ -257,15 +260,32 @@ public class Parser {
 
         if (data.has("remote")) {
             JsonObject remote = data.getAsJsonObject("remote");
-            sessionLocator.setClientIp(remote.get("ip").getAsString());
-            sessionLocator.setClientPort(remote.get("port").getAsInt());
-            sessionLocator.setClientIpv6(Parser.UNKOWN_STRING);
+            String address = remote.get("ip").getAsString();
+            int port = remote.get("port").getAsInt();
+            if (Util.isIPv6(address)) {
+                sessionLocator.setIpv6(true);
+                sessionLocator.setClientIpv6(address);
+                sessionLocator.setClientPort(port);
+                sessionLocator.setClientIp(Parser.UNKOWN_STRING);
+            } else { // ipv4 
+                sessionLocator.setClientIp(address);
+                sessionLocator.setClientPort(port);
+                sessionLocator.setClientIpv6(Parser.UNKOWN_STRING);
+            }
         }
         if (data.has("local")) {
             JsonObject local = data.getAsJsonObject("local");
-            sessionLocator.setServerIp(local.get("ip").getAsString());
-            sessionLocator.setServerPort(local.get("port").getAsInt());
-            sessionLocator.setServerIpv6(Parser.UNKOWN_STRING);
+            String address = local.get("ip").getAsString();
+            int port = local.get("port").getAsInt();
+            if (Util.isIPv6(address)) {
+                sessionLocator.setServerIpv6(address);
+                sessionLocator.setServerPort(port);
+                sessionLocator.setServerIp(Parser.UNKOWN_STRING);
+            } else { // IPv4
+                sessionLocator.setServerIp(address);
+                sessionLocator.setServerPort(port);
+                sessionLocator.setServerIpv6(Parser.UNKOWN_STRING);
+            }
         }
         return sessionLocator;
     }
