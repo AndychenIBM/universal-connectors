@@ -120,6 +120,33 @@ public class ParserTest {
         Assert.assertEquals("airports", sentence.objects.get(1).name);
     }
 
+    @Test 
+    public void testParseRecord_createIndex() throws ParseException {
+        final String mongoString = "{ \"atype\" : \"authCheck\", \"ts\" : { \"$date\" : \"2020-06-03T07:48:55.762-0400\" }, \"local\" : { \"ip\" : \"127.0.0.1\", \"port\" : 27017 }, \"remote\" : { \"ip\" : \"127.0.0.1\", \"port\" : 41112 }, \"users\" : [ { \"user\" : \"realAdmin\", \"db\" : \"admin\" } ], \"roles\" : [ { \"role\" : \"readWriteAnyDatabase\", \"db\" : \"admin\" }, { \"role\" : \"userAdminAnyDatabase\", \"db\" : \"admin\" } ], \"param\" : { \"command\" : \"createIndexes\", \"ns\" : \"newDB01.newCollecti\", \"args\" : { \"createIndexes\" : \"newCollecti\", \"indexes\" : [ { \"key\" : { \"category\" : 1 }, \"name\" : \"testIDX1\" } ], \"lsid\" : { \"id\" : { \"$binary\" : \"T52tf2+yRbu31sZ5kq9R7Q==\", \"$type\" : \"04\" } }, \"$db\" : \"newDB01\" } }, \"result\" : 0 }";
+        final JsonObject mongoJson = JsonParser.parseString(mongoString).getAsJsonObject();
+        Record record = Parser.parseRecord(mongoJson);
+        final Construct construct = record.getData().getConstruct();
+        final Sentence sentence = construct.sentences.get(0);
+        
+        Assert.assertEquals("createIndexes", sentence.verb);
+        Assert.assertEquals("newCollecti", sentence.objects.get(0).name);
+        Assert.assertEquals("newDB01", record.getDbName());
+    }
+
+    @Test
+    public void testParseRecord_createCollection() throws ParseException {
+        // skipping dedicated log messages "{ \"atype\" : \"createCollection\", \"ts\" : { \"$date\" : \"2020-05-11T06:24:38.168-0400\" } , \"local\" : { \"ip\" : \"127.0.0.1\", \"port\" : 27017 } , \"remote\" : { \"ip\" : \"127.0.0.1\", \"port\" : 48458 } , \"users\" : [], \"roles\" : [], \"param\" : { \"ns\" : \"test.collection3\" } , \"result\" : 0 }";
+        final String mongoString = "{ \"atype\" : \"authCheck\", \"ts\" : { \"$date\" : \"2020-06-03T03:40:30.888-0400\" }, \"local\" : { \"ip\" : \"127.0.0.1\", \"port\" : 27017 }, \"remote\" : { \"ip\" : \"127.0.0.1\", \"port\" : 40426 }, \"users\" : [ { \"user\" : \"realAdmin\", \"db\" : \"admin\" } ], \"roles\" : [ { \"role\" : \"readWriteAnyDatabase\", \"db\" : \"admin\" }, { \"role\" : \"userAdminAnyDatabase\", \"db\" : \"admin\" } ], \"param\" : { \"command\" : \"create\", \"ns\" : \"newDB01.newCollection01\", \"args\" : { \"create\" : \"newCollection01\", \"lsid\" : { \"id\" : { \"$binary\" : \"CsTWBZwaQnOweCDDbiJWng==\", \"$type\" : \"04\" } }, \"$db\" : \"newDB01\" } }, \"result\" : 0 }";
+        final JsonObject mongoJson = JsonParser.parseString(mongoString).getAsJsonObject();
+        Record record = Parser.parseRecord(mongoJson);
+        final Construct construct = record.getData().getConstruct();
+        final Sentence sentence = construct.sentences.get(0);
+        
+        Assert.assertEquals("create", sentence.verb);
+        Assert.assertEquals("newCollection01", sentence.objects.get(0).name);
+        Assert.assertEquals("newDB01", record.getDbName());
+    }
+
     /**
      * NOT USED: Test authorization error messsage can be parsed as usual (query is needed later)
      */

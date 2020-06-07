@@ -13,6 +13,7 @@ import com.ibm.guardium.Parser;
 import com.ibm.guardium.connector.structures.Record;
 import com.ibm.guardium.connector.structures.SessionLocator;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -22,6 +23,11 @@ public class JavaFilterExample implements Filter {
 
     public static final PluginConfigSpec<String> SOURCE_CONFIG =
             PluginConfigSpec.stringSetting("source", "message");
+    public static final String LOGSTASH_TAG_SKIP_NOT_MONGODB = "_mongoguardium_skip_not_mongodb"; // skip messages that do not contain "mongod:"
+    /* skipping non-mongo syslog messages, and non-relevant log events 
+        like "createUser", "createCollection", ... as these are already parsed in prior authCheck messages. */ 
+    public static final String LOGSTASH_TAG_SKIP = "_mongoguardium_skip"; 
+    public static final String LOGSTASH_TAG_JSON_PARSE_ERROR = "_mongoguardium_json_parse_error";
 
     private String id;
     private String sourceField; 
@@ -37,18 +43,27 @@ public class JavaFilterExample implements Filter {
 
     @Override
     public Collection<Event> filter(Collection<Event> events, FilterMatchListener matchListener) {
+        ArrayList<Event> skippedEvents = new ArrayList<>();
         for (Event e : events) {
             // from config, use Object f = e.getField(sourceField);
             if (e.getField("message") instanceof String) {
                 String messageString = e.getField("message").toString();
-                //TODO abandon finding "mongod:"; use syslog_message
+                // finding "mongod:" to be general (syslog, filebeat)
+                // alternatively, throw JSON audit part into a specific field
                 int mongodIndex = messageString.indexOf(MONGOAUDIT_START_SIGNAL);
                 if (mongodIndex != -1) {
                     String input = messageString.substring(mongodIndex + MONGOAUDIT_START_SIGNAL.length());
                     try {
                         JsonObject inputJSON = (JsonObject) JsonParser.parseString(input);
-                        // FIXME move filterMatched later?
-                        matchListener.filterMatched(e); // Flag OK for filter input/parsing/out
+                        
+                        // filter events
+                        final String atype = inputJSON.get("atype").getAsString();
+                        if ((!atype.equals("authCheck") && !atype.equals("authenticate")) 
+                            || (atype.equals("authenticate") && inputJSON.get("result").getAsString().equals("0"))) {
+                            e.tag(LOGSTASH_TAG_SKIP);
+							skippedEvents.add(e);
+                            continue;
+                        }
                         
 
                         Record record = Parser.parseRecord(inputJSON);
@@ -84,19 +99,24 @@ public class JavaFilterExample implements Filter {
                         final Gson gson = builder.create();
                         e.setField("Record", gson.toJson(record));
 
+                        matchListener.filterMatched(e); // Flag OK for filter input/parsing/out
+                        
                     } catch (Exception exception) {
                         // FIXME: Throw? as not proper json or syntax error
                         // don't let event pass filter
                         // TODO log event removed? 
                         //events.remove(e);
-                        e.tag("_mongoguardium_json_parse_error");
+                        e.tag(LOGSTASH_TAG_JSON_PARSE_ERROR);
                     }
                 } else {
-                    //events.remove(e);
-                    e.tag("_mongoguardium_skip");
+                    e.tag(LOGSTASH_TAG_SKIP_NOT_MONGODB);
                 }
             }
         }
+
+        // Remove skipped mongodb events from reaching output
+        // FIXME log which events skipped
+        events.removeAll(skippedEvents);
         return events;
     }
 
