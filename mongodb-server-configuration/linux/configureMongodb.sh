@@ -28,28 +28,35 @@ printf "%s: Mongod pid file path is:%s.\n" $(date +"%Y-%m-%dT%H:%M:%SZ") $(grep 
 #If audit section exists , update audit destination to syslog and update filters, if it does not exist, add the audit section to mongod.conf"
 if grep -lq  '^auditLog' $mongod_conf
 	then
-		printf "%s: AuditLog will be set to syslog in mongod.conf\n" $(date +"%Y-%m-%dT%H:%M:%SZ") |& tee -a $logfile
+		printf "%s: AuditLog will be set to $dest in mongod.conf\n" $(date +"%Y-%m-%dT%H:%M:%SZ") |& tee -a $logfile
 		startRange=$(awk '/auditLog/{ print NR; exit }' $mongod_conf)
 		endRange=$((startRange+10))
 		ignoreCommentsString="[^#]*//1;x;s/#.*//"
 		sed -i -r "$startRange,$endRange{h;s/$ignoreCommentsString;s/destination:.*/destination: $dest/g;G;s/(.*)\n/\1/}" $mongod_conf
-		sed -i -r "$startRange,$endRange{h;s/$ignoreCommentsString;s/format:.*/format: $format/g;G;s/(.*)\n/\1/}" $mongod_conf
 		sed -i -r "$startRange,$endRange{h;s/$ignoreCommentsString;s/filter:.*/filter: $filter/g;G;s/(.*)\n/\1/}" $mongod_conf
-		sed -i "s/#setParameter: {auditAuthorizationSuccess: true}/setParameter: {auditAuthorizationSuccess: true}/g" $mongod_conf
+        sed -i "s/#setParameter: {auditAuthorizationSuccess: true}/setParameter: {auditAuthorizationSuccess: true}/g" $mongod_conf
+		if [ "$dest" = "file" ];
+        then
+            sed -i -r "$startRange,$endRange{h;s/$ignoreCommentsString;s/format:.*/format: $format/g;G;s/(.*)\n/\1/}" $mongod_conf
+            sed -i -r "$startRange,$endRange{h;s/$ignoreCommentsString;s/path:.*/path: $path/g;G;s/(.*)\n/\1/}" $mongod_conf
+        else
+            #make sure format,path are commented when using syslog
+            sed -i -r "$startRange,$endRange{h;s/$ignoreCommentsString;s/format:/#format:/g;G;s/(.*)\n/\1/}" $mongod_conf
+            sed -i -r "$startRange,$endRange{h;s/$ignoreCommentsString;s/path:/#path:/g;G;s/(.*)\n/\1/}" $mongod_conf
+        fi
 	else
 		printf "%s: AuditLog section will be added to mongod.conf\n" $(date +"%Y-%m-%dT%H:%M:%SZ") |& tee -a $logfile
-		printf "\nauditLog:\n  destination: $dest\n  filter: $filter\nsetParameter: {auditAuthorizationSuccess: true}  ">> $mongod_conf
+        printf "\nauditLog:\n  destination: $dest\n">> $mongod_conf
+		if [ "$dest" = "file" ];
+        then
+            printf "  format: $format \n  path: $path\n">> $mongod_conf
+        fi
+        printf "  filter: $filter\nsetParameter: {auditAuthorizationSuccess: true}  ">> $mongod_conf
 fi
 
 #Restart mongod service after configuration change
 service mongod stop
 rm -f /tmp/mongodb-27017.sock
 sleep 2
-if service mongod status|grep -q "stopped";
-then
-	service mongod start
-	printf "%s: Restarted mongod.\n" $(date +"%Y-%m-%dT%H:%M:%SZ") |& tee -a $logfile
-else
-	printf "%s: Failed to stop mongodb.\n" $(date +"%Y-%m-%dT%H:%M:%SZ") |& tee -a $logfile
-fi
-#mongod --auth --port 27017
+service mongod start
+printf "%s: Restarted mongod.\n" $(date +"%Y-%m-%dT%H:%M:%SZ") |& tee -a $logfile
