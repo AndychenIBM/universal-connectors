@@ -9,4 +9,9 @@ public class SentenceObject {
     public SentenceObject(String name) {
         this.name = name;
     }
+
+    public SentenceObject(String name, String schema) {
+        this.name = name;
+        this.schema = schema;
+    }
 }

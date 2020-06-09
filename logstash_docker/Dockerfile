@@ -32,7 +32,7 @@ COPY --chown=1001 start_logstash.sh /start_logstash.sh
 USER 1001
 
 #Install plugins
-RUN	.${LOGSTASH_DIR}/bin/logstash-plugin install ${LOGSTASH_DIR}/config/logstash-filter-java_filter_example-0.3.0.gem && \
+RUN	.${LOGSTASH_DIR}/bin/logstash-plugin install ${LOGSTASH_DIR}/config/logstash-filter-java_filter_example-0.3.1.gem && \
     .${LOGSTASH_DIR}/bin/logstash-plugin install ${LOGSTASH_DIR}/config/logstash-output-java_output_to_guardium-1.0.5.gem && \
 #    .${LOGSTASH_DIR}/bin/logstash-plugin install ${LOGSTASH_DIR}/config/logstash-input-cloudwatch_logs-1.0.3.gem && \
 #Clear cache and unnecessary heavy plugins:

@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.logstash.plugins.ConfigurationImpl;
 import org.logstash.plugins.ContextImpl;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -73,6 +74,83 @@ public class JavaFilterExampleTest {
             e.getField("tags").toString().contains("_mongoguardium_skip"));
         //Assert.assertNull(e.getField("Construct"));
         Assert.assertEquals(0, matchListener.getMatchCount());
+    }
+
+    /**
+     * Tests that messages are skipped & removed if atype != "authCheck"
+     */
+    @Test 
+    public void testParseMongo_skip_remove_atype_createCollection() {
+        String messageString = "<14>Feb 18 08:53:31 qa-db51 mongod: { \"atype\" : \"createCollection\", \"ts\" : { \"$date\" : \"2020-06-03T03:40:30.888-0400\" }, \"local\" : { \"ip\" : \"127.0.0.1\", \"port\" : 27017 }, \"remote\" : { \"ip\" : \"127.0.0.1\", \"port\" : 40426 }, \"users\" : [ { \"user\" : \"realAdmin\", \"db\" : \"admin\" } ], \"roles\" : [ { \"role\" : \"readWriteAnyDatabase\", \"db\" : \"admin\" }, { \"role\" : \"userAdminAnyDatabase\", \"db\" : \"admin\" } ], \"param\" : { \"ns\" : \"newDB01.newCollection01\" }, \"result\" : 0 }";
+        Context context = new ContextImpl(null, null);
+        JavaFilterExample filter = new JavaFilterExample("test-id", null, context);
+
+        Event e = new org.logstash.Event();
+        TestMatchListener matchListener = new TestMatchListener();
+        ArrayList<Event> events = new ArrayList<>();
+        e.setField("message", messageString);
+        events.add(e);
+        
+        Collection<Event> results = filter.filter(events, matchListener);
+
+        Assert.assertEquals(0, results.size());
+        Assert.assertEquals(0, matchListener.getMatchCount());
+    }
+
+    /**
+     * Tests that atype="authenticate" messages are skipped & removed.
+     * 
+     * Unsuccessful messages are handled as reported as Exception (Failed login in Guardium).
+     */
+    @Test 
+    public void testParseMongo_skip_remove_atype_authenticate_successful() {
+        String messageString = "<14>Feb 18 08:53:31 qa-db51 mongod: { \"atype\" : \"authenticate\", \"ts\" : { \"$date\" : \"2020-06-09T08:34:12.424-0400\" }, \"local\" : { \"ip\" : \"9.70.147.59\", \"port\" : 27017 }, \"remote\" : { \"ip\" : \"9.148.206.148\", \"port\" : 49712 }, \"users\" : [ { \"user\" : \"realAdmin\", \"db\" : \"admin\" } ], \"roles\" : [ { \"role\" : \"readWriteAnyDatabase\", \"db\" : \"admin\" }, { \"role\" : \"userAdminAnyDatabase\", \"db\" : \"admin\" } ], \"param\" : { \"user\" : \"realAdmin\", \"db\" : \"admin\", \"mechanism\" : \"SCRAM-SHA-256\" }, \"result\" : 0 }";
+        Context context = new ContextImpl(null, null);
+        JavaFilterExample filter = new JavaFilterExample("test-id", null, context);
+
+        Event e = new org.logstash.Event();
+        TestMatchListener matchListener = new TestMatchListener();
+        ArrayList<Event> events = new ArrayList<>();
+        e.setField("message", messageString);
+        events.add(e);
+        
+        Collection<Event> results = filter.filter(events, matchListener);
+
+        Assert.assertEquals(0, results.size());
+        Assert.assertEquals(0, matchListener.getMatchCount());
+    }
+
+    /**
+     * Test integrity of events collection, after skipped events were removed from it.
+     * 
+     * Tests also that authentication failure is handled and not removed.
+     */
+    @Test 
+    public void testParseMongo_eventsCollectionIntegrity() {
+        String messageStringOK = "<14>Feb 18 08:53:31 qa-db51 mongod: { \"atype\" : \"authCheck\", \"ts\" : { \"$date\" : \"2020-01-16T05:41:30.783-0500\" }, \"local\" : { \"ip\" : \"(NONE)\", \"port\" : 0 }, \"remote\" : { \"ip\" : \"(NONE)\", \"port\" : 0 }, \"users\" : [], \"roles\" : [], \"param\" : { \"command\" : \"find\", \"ns\" : \"config.transactions\", \"args\" : { \"find\" : \"transactions\", \"filter\" : { \"lastWriteDate\" : { \"$lt\" : { \"$date\" : \"2020-01-16T05:11:30.782-0500\" } } }, \"projection\" : { \"_id\" : 1 }, \"sort\" : { \"_id\" : 1 }, \"$db\" : \"config\" } }, \"result\" : 0 }";
+        String messageStringSkip = "<14>Feb 18 08:53:32 qa-db51 mongod: { \"atype\" : \"createCollection\", \"ts\" : { \"$date\" : \"2020-06-03T03:40:30.888-0400\" }, \"local\" : { \"ip\" : \"127.0.0.1\", \"port\" : 27017 }, \"remote\" : { \"ip\" : \"127.0.0.1\", \"port\" : 40426 }, \"users\" : [ { \"user\" : \"realAdmin\", \"db\" : \"admin\" } ], \"roles\" : [ { \"role\" : \"readWriteAnyDatabase\", \"db\" : \"admin\" }, { \"role\" : \"userAdminAnyDatabase\", \"db\" : \"admin\" } ], \"param\" : { \"ns\" : \"newDB01.newCollection01\" }, \"result\" : 0 }";
+        String messageStringAuthOK = "<14>Feb 18 08:53:33 qa-db51 mongod: { \"atype\" : \"authenticate\", \"ts\" : { \"$date\" : \"2020-05-17T11:37:30.421-0400\" }, \"local\" : { \"ip\" : \"127.0.0.1\", \"port\" : 27017 }, \"remote\" : { \"ip\" : \"127.0.0.1\", \"port\" : 29398 }, \"users\" : [], \"roles\" : [], \"param\" : { \"user\" : \"readerUser\", \"db\" : \"admin\", \"mechanism\" : \"SCRAM-SHA-256\" }, \"result\" : 18 }";
+        Context context = new ContextImpl(null, null);
+        JavaFilterExample filter = new JavaFilterExample("test-id", null, context);
+
+        TestMatchListener matchListener = new TestMatchListener();
+        ArrayList<Event> inputEvents = new ArrayList<>();
+        Event e = new org.logstash.Event();
+        e.setField("message", messageStringOK);
+        Event eSkip = new org.logstash.Event();
+        eSkip.setField("message", messageStringSkip);
+        Event eAuth = new org.logstash.Event();
+        eAuth.setField("message", messageStringAuthOK);
+        inputEvents.add(e);
+        inputEvents.add(eSkip);
+        inputEvents.add(eAuth);
+        
+        Collection<Event> results = filter.filter(inputEvents, matchListener);
+
+        Assert.assertEquals(2, results.size());
+        Assert.assertEquals(true, e.getField("tags") == null );
+        Assert.assertEquals(true, eAuth.getField("tags") == null);
+        Assert.assertEquals(2, matchListener.getMatchCount());
     }
 
     @Test

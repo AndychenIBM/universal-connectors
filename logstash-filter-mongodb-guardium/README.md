@@ -5,9 +5,13 @@ This is a filter plugin for [Logstash](https://github.com/elastic/logstash). It 
 ??It is fully free and fully open-source. The license is Apache 2.0, meaning you are free to use it however you want??
 
 ## Documentation
-### Supported commands:
-* find, insert, delete, update, ...  
-* aggregate with $lookup(s) or $graphLookup(s)
+### Supported audit messages & commands:
+* authCheck: 
+    * find, insert, delete, update, ...
+    * aggregate with $lookup(s) or $graphLookup(s)
+* authenticate  
+
+Other MongoDB events/messages are removed from pipeline; if the event is not related to MongoDB, it is skipped.
 
 ### Supported errors:  
 
@@ -28,7 +32,7 @@ The filter plugin also supports sending errors as well, though MongoDB Access co
     * Source program is not available in syslog messages sent by MongoDB. Instead, it's  always sent as "mongod". 
 * If events with "(NONE)" local/remote IP are not filtered, this filter will convert IP to "0.0.0.0", as valid IPv4 format is needed.
 * Events into the filter are not removed, but tagged if not parsed (see [Filter result](#filter-result), below).
-* The event is also sent in a redacted version, so most field values are replaced with "?". Note that currently this is a naïve process, so some fields are redacted where future filter release should not redact them, like from within $lookup/$graphlookup, 1st element in $filter.cond.$eq[], etc.
+* MongoDB authCheck audit messages are also sent in a redacted version, where most field values are replaced with "?". Note that currently this is a naïve process, so some fields are redacted where future filter release should not redact them, like from within $lookup/$graphlookup, 1st element in $filter.cond.$eq[], etc.
 
 ## Example 
 ### syslog input
@@ -49,7 +53,7 @@ Filter tweaks the event by passing a Record object to the logstash Output plugin
 
 This transformed event is then passed to a Mongo-Guardium Output plugin, which is responsible to send it to a Guardium machine. 
 
-If parsing fails, a tag is added ("_mongoguardium_skip" or [unlikely] "_mongoguardium_json_parse_error"), which is used in logstash configuration file to pass only events that passed the filter succesffuly. 
+If event message is not related to MongoDB, the event is tagged with  "_mongoguardium_skip_not_mongodb" (not removed from pipeline). If it's an event from MongoDB but JSON parsing fails, the event is tagged with "_mongoguardium_json_parse_error" (this may happen if syslog message is too long and was truncated). These tags are used in a logstash configuration file to pass only events that passed the filter succesfully. 
 
 ## Install
 To install this plugin, clone or download, and run from your logstash installation. Replace "?" with this plugin version:

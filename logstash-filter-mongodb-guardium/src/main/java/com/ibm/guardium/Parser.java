@@ -75,60 +75,89 @@ public class Parser {
      */
     public static Construct ParseAsConstruct(final JsonObject data) {
         try {
-            // mongo statics
-            final JsonObject param = data.get("param").getAsJsonObject();
-            final String command = param.get("command").getAsString();
-            final JsonObject args = param.getAsJsonObject("args");
-
-            // + main object
-            final Sentence sentence = new Sentence(command);
-            if (args.has(command)) {
-                final SentenceObject sentenceObject = new SentenceObject(args.get(command).getAsString());
-                sentence.objects.add(sentenceObject);
-            }
-
-            switch (command) {
-                case "aggregate":
-                    /*
-                     * Assumes no inner-lookups; only sequential stages in pipeline.
-                     */
-                    final JsonArray pipeline = args.getAsJsonArray("pipeline");
-                    if (pipeline != null && pipeline.size() > 0) {
-                        for (final JsonElement stage : pipeline) {
-                            // handle * lookups
-                            // + object if stage has $lookup or $graphLookup: { from: obj2 }
-                            JsonObject lookupStage = null;
-
-                            if (stage.getAsJsonObject().has("$lookup")) {
-                                lookupStage = stage.getAsJsonObject().getAsJsonObject("$lookup");
-                            } else if (stage.getAsJsonObject().has("$graphLookup")) {
-                                lookupStage = stage.getAsJsonObject().getAsJsonObject("$graphLookup");
-                            }
-
-                            if (lookupStage != null && lookupStage.has("from")) {
-                                final SentenceObject lookupStageObject = new SentenceObject(
-                                        lookupStage.get("from").getAsString());
-                                // + object
-                                sentence.objects.add(lookupStageObject);
-                            }
-                        }
-                    }
-                default: // find, insert, delete, update, ...
-                    break;
-            }
-
+            final Sentence sentence = Parser.parseSentence(data);
+            
             final Construct construct = new Construct();
             construct.sentences.add(sentence);
-
+            
             construct.setFull_sql(data.toString());
-
-            Parser.RedactWithExceptions(data); // Warning: overwrites data.param.args
-
+            
+            if (data.get("atype").getAsString().equals("authCheck")) {
+                // redact, though docs state args may be already redacted.
+                Parser.RedactWithExceptions(data); // Warning: overwrites data.param.args
+            }
+            
             construct.setOriginal_sql(data.toString());
             return construct;
         } catch (final Exception e) {
             throw e;
         }
+    }
+    
+    protected static Sentence parseSentence(final JsonObject data) {
+        
+        Sentence sentence = null;
+        
+        final String atype = data.get("atype").getAsString();
+        final JsonObject param = data.get("param").getAsJsonObject();
+        
+        switch (atype) {
+            case "authCheck":
+                final String command = param.get("command").getAsString();
+                final JsonObject args = param.getAsJsonObject("args");
+
+                // + main object
+                sentence = new Sentence(command);
+                if (args.has(command)) {
+                    final SentenceObject sentenceObject = new SentenceObject(args.get(command).getAsString());
+                    sentence.objects.add(sentenceObject);
+                }
+
+                switch (command) {
+                    case "aggregate":
+                        /*
+                         * Assumes no inner-lookups; only sequential stages in pipeline.
+                         */
+                        final JsonArray pipeline = args.getAsJsonArray("pipeline");
+                        if (pipeline != null && pipeline.size() > 0) {
+                            for (final JsonElement stage : pipeline) {
+                                // handle * lookups
+                                // + object if stage has $lookup or $graphLookup: { from: obj2 }
+                                JsonObject lookupStage = null;
+
+                                if (stage.getAsJsonObject().has("$lookup")) {
+                                    lookupStage = stage.getAsJsonObject().getAsJsonObject("$lookup");
+                                } else if (stage.getAsJsonObject().has("$graphLookup")) {
+                                    lookupStage = stage.getAsJsonObject().getAsJsonObject("$graphLookup");
+                                }
+
+                                if (lookupStage != null && lookupStage.has("from")) {
+                                    final SentenceObject lookupStageObject = new SentenceObject(
+                                            lookupStage.get("from").getAsString());
+                                    // + object
+                                    sentence.objects.add(lookupStageObject);
+                                }
+                            }
+                        }
+                    default: // find, insert, delete, update, ...
+                        break; // already done before switch
+                }
+                break;
+            /* case "createCollection":
+            case "dropCollection":
+                final String ns = param.get("ns").getAsString();
+                final String[] nsArray = ns.split("\\.");
+                final String db = nsArray[0];
+                final String collection = nsArray[1];
+                sentence = new Sentence(atype); // atype is command
+                final SentenceObject sentenceObject = new SentenceObject(collection, db);
+                    sentence.objects.add(sentenceObject);
+                break; */
+            default:
+                return null; // NOTE: not parsed
+        }
+
+        return sentence;
     }
 
     public static Record parseRecord(final JsonObject data) throws ParseException {
@@ -151,6 +180,9 @@ public class Parser {
             dbName = args.get("$db").getAsString();
         } else if (param != null && param.has("db")) { // in "authenticate" error message 
             dbName = param.get("db").getAsString();
+        } else if (param != null && param.has("ns")) {
+            final String ns = param.get("ns").getAsString(); 
+            dbName = ns.split("\\.")[0]; // sometimes contains "."; fallback OK.
         }
         record.setDbName(dbName);
         record.setAppUserName(Parser.UNKOWN_STRING);
