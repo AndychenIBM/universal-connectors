@@ -34,4 +34,4 @@ Project Content:
 2. pipeline directory:
 	2.1. *.conf files that will be used as the configuration for logstash (including input,filter and output)
 3. Dockerfile- import and install logstash, remove old version of the container, pass relevant files to the container, install plugins.
-5. logstash.repo- needed in order to install the docker inside ubi
+4. start_logstash.sh- this script starts logstash when "docker run..." command is executed
