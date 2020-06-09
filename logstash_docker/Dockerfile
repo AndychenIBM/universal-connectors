@@ -27,6 +27,7 @@ RUN apk add --no-cache bash && \
 #Copy necessary files
 COPY --chown=1001 pipeline/ ${LOGSTASH_DIR}/pipeline
 COPY --chown=1001 config/ ${LOGSTASH_DIR}/config
+COPY --chown=1001 start_logstash.sh /start_logstash.sh
 
 USER 1001
 
@@ -45,4 +46,4 @@ RUN	.${LOGSTASH_DIR}/bin/logstash-plugin install ${LOGSTASH_DIR}/config/logstash
 ENV UDS_ETC=${LOGSTASH_DIR}/config/
 ENV PATH ${LOGSTASH_DIR}/bin:$PATH
 
-CMD ["logstash"]
+CMD /start_logstash.sh

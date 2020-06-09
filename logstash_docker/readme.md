@@ -12,8 +12,10 @@ installation and configuration:
     user name: <ibm_email_addres>
     password: <artifactory_key> 
 5. build the image: docker build -t universal-connector .
-6. run the container: docker run -d --network="host" -it universal-connector
+6. run the container: docker run -d --name="Klaus" --network="host" -it universal-connector
 
+*Logstash is set to ERROR level. in order to set another level you can set it as an env variable. for example:
+ docker run -d --name="Klaus" --network="host" -e UC_LOG_LEVEL="DEBUG" -it universal-connector
 
 install a new plugin:
 1. enter the new .gem file to logstash_docker/config
