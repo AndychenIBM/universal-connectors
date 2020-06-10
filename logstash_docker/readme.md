@@ -3,25 +3,32 @@ Prerequisites:
 
 
 installation and configuration:
-1. copy logstash_docker directory to the machine
-2. optional- make any adjustments needed in logstash's *.conf file placed in logstash_docker/pipeline/
-3. configure agent in logstash_docker/config:
-    3.1. optional- change connectorId UniversalConnector.json file
+1. checkout Universal-Connector branch from https://github.ibm.com/Guardium/universal-connector
+2. build the 2 .gem plugins based on - logstash-filter-mongodb-guardium and logstash-output-guardium using gradle
+3. copy the .gem plugins into universal-connector/logstash_docker/config
 4. login to artifactory:
     docker login  https://sec-guardium-next-gen-docker-local.artifactory.swg-devops.com/v2/ibmjava-ubi-minimal/manifests/latest
     user name: <ibm_email_addres>
     password: <artifactory_key> 
-5. build the image: docker build -t universal-connector .
-6. run the container: docker run -d --name="Klaus" --network="host" -it universal-connector
+5. from logstash_docker directory, build the GUC image using the following command : docker build -t universal-connector .
+    *need to make sure that the docker file contains the correct plugins' path
+6. save the image on /var/IBM/Guardium/imagedata/:
+    docker save universal-connector:latest | gzip > /var/IBM/Guardium/imagedata/uc.tgz
 
+
+running a container- this can be done by one of the following:
+1. use grdapi:
+    grdapi run_local_universal_connnector debug=3
+2. direct run using:
+    docker run -d --name="Klaus" --network="host" -it universal-connector
+    
 *Logstash is set to ERROR level. in order to set another level you can set it as an env variable. for example:
  docker run -d --name="Klaus" --network="host" -e UC_LOG_LEVEL="DEBUG" -it universal-connector
+ 
+*In order to change connectorId, use -e CONNECTOR_ID=<new_connectorId_name>. for example:
+docker run -d --name="Klaus" --network="host" -e CONNECTOR_ID="123" -it universal-connector  
 
-install a new plugin:
-1. enter the new .gem file to logstash_docker/config
-2. edit/add the installation to Dockerfile:
-    RUN .${LOGSTASH_DIR}/bin/logstash-plugin install ${LOGSTASH_DIR}/config/<plugin_name>
-3. rebuild
+
 
 
 Project Content:
