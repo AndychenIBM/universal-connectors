@@ -1,5 +1,9 @@
 FROM ibmjava:8-jre-alpine
-#TODO- consider using ibmjava:sfj-alpine as a base image, if no ScriptEngine for JavaScript is needed
+#1. consider using ibmjava:sfj-alpine as a base image, if no ScriptEngine for JavaScript is needed
+#2. for GI base imaege:
+#   1. use the following base image: sec-guardium-next-gen-docker-local.artifactory.swg-devops.com/ibmjava-ubi-minimal:latest
+#   2. remove 'apk add --no-cache bash' from RUN command
+#   3. add basic libraries support for ubi: 'microdnf -y install vim procps findutils && microdnf clean all'
 
 LABEL maintainer="IBM Security" \
     #build_date=
@@ -15,24 +19,18 @@ ENV LOGSTASH_DIR=/usr/share/logstash
 
 USER root
 
+#Copy necessary files
+COPY pipeline/ ${LOGSTASH_DIR}/pipeline
+COPY config/ ${LOGSTASH_DIR}/config
+
 #Download and extract logstash
 RUN apk add --no-cache bash && \
 	wget -q https://artifacts.elastic.co/downloads/logstash/logstash-${LOGSTASH_VERSION}.tar.gz && \
-	mkdir -p ${LOGSTASH_DIR} && \
+	#mkdir -p ${LOGSTASH_DIR} && \
 	tar -xzf logstash*.tar.gz  -C ${LOGSTASH_DIR} --strip-components=1 && \
 	rm *.tar.gz && \
-#change owner
-	chown -R 1001:1001 ${LOGSTASH_DIR}
-
-#Copy necessary files
-COPY --chown=1001 pipeline/ ${LOGSTASH_DIR}/pipeline
-COPY --chown=1001 config/ ${LOGSTASH_DIR}/config
-COPY --chown=1001 start_logstash.sh /start_logstash.sh
-
-USER 1001
-
 #Install plugins
-RUN	.${LOGSTASH_DIR}/bin/logstash-plugin install ${LOGSTASH_DIR}/config/logstash-filter-java_filter_example-0.3.1.gem && \
+	.${LOGSTASH_DIR}/bin/logstash-plugin install ${LOGSTASH_DIR}/config/logstash-filter-java_filter_example-0.3.1.gem && \
     .${LOGSTASH_DIR}/bin/logstash-plugin install ${LOGSTASH_DIR}/config/logstash-output-java_output_to_guardium-1.0.5.gem && \
 #    .${LOGSTASH_DIR}/bin/logstash-plugin install ${LOGSTASH_DIR}/config/logstash-input-cloudwatch_logs-1.0.3.gem && \
 #Clear cache and unnecessary heavy plugins:
@@ -41,7 +39,14 @@ RUN	.${LOGSTASH_DIR}/bin/logstash-plugin install ${LOGSTASH_DIR}/config/logstash
     rm -rf logstash-filter-geoip-6.0.3-java logstash-input-snmp-1.2.1 aws-sdk-* \
     logstash-input-azure-* logstash-integration-kafka-* logstash-input-http-* nokogiri-1.10.7-java \
     sequel-5.27.0 backports-3.15.0 tzinfo-data-1.2019.3 snappy-0.0.12-java \
-    mail-2.6.6 logstash-input-azure_event_hubs-1.1.2 logstash-filter-jdbc_static-1.0.7 snmp-1.3.2
+    mail-2.6.6 logstash-input-azure_event_hubs-1.1.2 logstash-filter-jdbc_static-1.0.7 snmp-1.3.2 && \
+#change owner
+    chown -R 1001:1001 ${LOGSTASH_DIR}
+
+USER 1001
+
+COPY --chown=1001 config/pipelines.yml ${LOGSTASH_DIR}/config/pipelines.yml
+COPY --chown=1001 start_logstash.sh /start_logstash.sh
 
 ENV UDS_ETC=${LOGSTASH_DIR}/config/
 ENV PATH ${LOGSTASH_DIR}/bin:$PATH
