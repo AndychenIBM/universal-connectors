@@ -4,13 +4,14 @@ import com.ibm.guardium.proto.datasource.Datasource;
 
 public class DatabaseDetails {
 
-    public static final String DELIMITER = "_";
+    public static final String DELIMITER = ":";
     private String dbName;
     private String dbHost;
     private int    dbPort;
+    private String dbType;
 
     public String getId(){
-        String id = /*dbName+DELIMITER+ */dbHost +DELIMITER+dbPort;
+        String id = dbHost +DELIMITER+dbPort;
         return id;
     }
 
@@ -38,12 +39,20 @@ public class DatabaseDetails {
         this.dbPort = dbPort;
     }
 
+    public String getDbType() {
+        return dbType;
+    }
+
+    public void setDbType(String dbType) {
+        this.dbType = dbType;
+    }
+
     public static DatabaseDetails buildFromMessage(Datasource.Session_start ss){
-        //String serverIp = sl.getIsIpv6() ? sl.getServerIpv6() : ""+sl.getServerIp();
         DatabaseDetails dd = new DatabaseDetails();
         dd.setDbName(ss.getDbName());
         dd.setDbPort(ss.getSessionLocator().getServerPort());
         dd.setDbHost(ss.getAccessor().getServerHostname());
+        dd.setDbType(ss.getAccessor().getServerType());
         return dd;
     }
 
@@ -53,6 +62,7 @@ public class DatabaseDetails {
                 "dbName='" + dbName + '\'' +
                 ", dbHost='" + dbHost + '\'' +
                 ", dbPort=" + dbPort +
+                ", dbType=" + dbType +
                 '}';
     }
 }

@@ -118,7 +118,7 @@ public class GuardConnection implements RecordTransmitter {
         setMasterIP();
         pingBytes = GuardMessage.preparePing(snifferMasterip, config.getSnifferConfig().getIp(), config.getId());
         //configBytes = GuardMessage.prepareAgentConfig(config, "999");
-        handshakeBytes = GuardMessage.prepareHandshake(snifferMasterip, config.getSnifferConfig().getIp(), config.getId(), config.getUcConfig().getVersion());
+        handshakeBytes = GuardMessage.prepareHandshake(snifferMasterip, config.getSnifferConfig().getIp(), config.getId(), config.getDatabaseDetails().getDbType(), config.getUcConfig().getVersion());
     }
 
 

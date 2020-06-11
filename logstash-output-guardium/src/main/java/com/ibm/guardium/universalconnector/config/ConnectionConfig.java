@@ -2,8 +2,8 @@ package com.ibm.guardium.universalconnector.config;
 
 public class ConnectionConfig {
 
-    public static final String ID_DELIMITER="_";
-    public static final String PREFIX = "UC";
+    public static final String ID_DELIMITER=":";
+    public static final String UC_STR = "UC";
     private UCConfig ucConfig;
     private SnifferConfig snifferConfig;
     private DatabaseDetails databaseDetails;
@@ -16,24 +16,12 @@ public class ConnectionConfig {
 
     public String getId(){
         StringBuffer sb = new StringBuffer();
-        sb.append(PREFIX);
-
-        if (ucConfig!=null){
-            sb.append(ucConfig.getId());
-        }
-//        if (snifferConfig!=null){
-//            if (sb.length()>0){
-//                sb.append(ID_DELIMITER).append(snifferConfig.getId());
-//            } else {
-//                sb.append(snifferConfig.getId());
-//            }
-//        }
         if (databaseDetails !=null){
-            if (sb.length()>0){
-                sb.append(ID_DELIMITER).append(databaseDetails.getId());
-            } else {
-                sb.append(databaseDetails.getId());
-            }
+            sb.append(databaseDetails.getId());
+        }
+        if (ucConfig!=null){
+            //sb.append(" ").append("(").append(databaseDetails.getDbType()).append(ID_DELIMITER).append(UC_STR).append(")");
+            sb.append(ID_DELIMITER).append(UC_STR).append(ucConfig.getId());
         }
         return sb.toString();
     }

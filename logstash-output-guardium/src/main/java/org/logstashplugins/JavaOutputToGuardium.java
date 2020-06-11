@@ -76,9 +76,6 @@ public class JavaOutputToGuardium implements Output {
                     log.warn("No record was found in event, please check parser logs");
                 }
 
-            } catch (GuardUCException ex) {
-                log.error("Error sending data to guardium in output", ex);
-
             } catch (Exception ex){
                 log.error("Failed to handle event "+logEvent(event), ex);
             }
