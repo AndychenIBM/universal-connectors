@@ -11,7 +11,7 @@ if [ -z "$CONNECTOR_ID" ]
 then
     echo "no connectorId was entered as an environment variable"
 else
-    sed -i -r "s/\"connectorId\":.*/\"connectorId\":\"$CONNECTOR_ID\"/g" $UDS_ETC/UniversalConnector.json
+    sed -i -r "s/\"connectorId\":.*/\"connectorId\":\"$CONNECTOR_ID\",/g" $UDS_ETC/UniversalConnector.json
     echo "CONNECTOR_ID was set to $CONNECTOR_ID"
 fi
 

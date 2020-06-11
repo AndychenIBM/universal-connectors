@@ -31,7 +31,7 @@ RUN apk add --no-cache bash && \
 	rm *.tar.gz && \
 #Install plugins
 	.${LOGSTASH_DIR}/bin/logstash-plugin install ${LOGSTASH_DIR}/config/logstash-filter-java_filter_example-0.3.1.gem && \
-    .${LOGSTASH_DIR}/bin/logstash-plugin install ${LOGSTASH_DIR}/config/logstash-output-java_output_to_guardium-1.0.5.gem && \
+    .${LOGSTASH_DIR}/bin/logstash-plugin install ${LOGSTASH_DIR}/config/logstash-output-java_output_to_guardium-1.0.6.gem && \
 #    .${LOGSTASH_DIR}/bin/logstash-plugin install ${LOGSTASH_DIR}/config/logstash-input-cloudwatch_logs-1.0.3.gem && \
 #Clear cache and unnecessary heavy plugins:
     rm -rf $LOGSTASH_DIR/vendor/cache/*.gem $LOGSTASH_DIR/vendor/bundle/jruby/2.5.0/cache/*.gem && \
@@ -47,6 +47,7 @@ USER 1001
 
 COPY --chown=1001 config/pipelines.yml ${LOGSTASH_DIR}/config/pipelines.yml
 COPY --chown=1001 start_logstash.sh /start_logstash.sh
+RUN chmod 777 /start_logstash.sh
 
 ENV UDS_ETC=${LOGSTASH_DIR}/config/
 ENV PATH ${LOGSTASH_DIR}/bin:$PATH
