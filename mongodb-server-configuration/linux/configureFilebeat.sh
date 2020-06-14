@@ -19,7 +19,7 @@ sed -i -r "$startRange,$endRange{h;s/enabled: false.*/enabled: true/g}" $filebea
 if grep -qF "$path" $filebeat_conf;then
 	printf "%s: path is already located in filebeat configuration. Please check %s\n" $(date +"%Y-%m-%dT%H:%M:%SZ") $filebeat_conf|& tee -a $logfile
 else
-    sed -i -r "$startRange,$endRange{h;s/paths:.*/paths:\n    - $path/g}" $filebeat_conf
+    sed -i -r "$startRange,$endRange{h;s/paths:.*/paths:\n    - ${path//\//\\/}/g}" $filebeat_conf
 fi
 
 #Configure Filebeat output:
