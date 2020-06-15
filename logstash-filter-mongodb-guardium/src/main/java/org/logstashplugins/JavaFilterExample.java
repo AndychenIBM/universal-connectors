@@ -8,7 +8,6 @@ import co.elastic.logstash.api.FilterMatchListener;
 import co.elastic.logstash.api.LogstashPlugin;
 import co.elastic.logstash.api.PluginConfigSpec;
 import com.google.gson.*;
-import com.google.gson.JsonParser;
 import com.ibm.guardium.Parser;
 import com.ibm.guardium.connector.structures.Record;
 import com.ibm.guardium.connector.structures.SessionLocator;
@@ -56,10 +55,12 @@ public class JavaFilterExample implements Filter {
                     try {
                         JsonObject inputJSON = (JsonObject) JsonParser.parseString(input);
                         
-                        // filter events
+                        // filter internal and not parsed events
                         final String atype = inputJSON.get("atype").getAsString();
-                        if ((!atype.equals("authCheck") && !atype.equals("authenticate")) 
-                            || (atype.equals("authenticate") && inputJSON.get("result").getAsString().equals("0"))) {
+                        final JsonArray users = inputJSON.getAsJsonArray("users");
+                        if ((!atype.equals("authCheck") && !atype.equals("authenticate")) // filter handles only authCheck message template & authentication error,
+                            || (atype.equals("authenticate") && inputJSON.get("result").getAsString().equals("0")) // not auth success,
+                            || (users.size() == 0 && !atype.equals("authenticate")) )  { // nor messages with empty users array, as it's an internal command (except authenticate, which states in param.user)
                             e.tag(LOGSTASH_TAG_SKIP);
 							skippedEvents.add(e);
                             continue;

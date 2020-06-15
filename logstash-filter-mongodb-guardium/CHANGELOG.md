@@ -3,6 +3,10 @@
 Notable changes will be documented in this file.
 
 ## [Unreleased]
+## [0.3.2]
+### Changed
+- Removed mongoDB messages with empty users[], as they are either internal or occur during authentication.
+
 ## [0.3.1]
 ### Added 
 - Filter tags messages that are not related to MongoDB as "_mongoguardium_skip_not_mongodb" (not removed from pipeline).
