@@ -38,7 +38,7 @@ then
     if [ "$dest" = "file" ];
     then
         sed -i -r "$startRange,$endRange{h;s/$ignoreCommentsString;s/format:.*/format: $format/g;G;s/(.*)\n/\1/}" $mongod_conf
-        sed -i -r "$startRange,$endRange{h;s/$ignoreCommentsString;s/path:.*/path: $path/g;G;s/(.*)\n/\1/}" $mongod_conf
+        sed -i -r "$startRange,$endRange{h;s/$ignoreCommentsString;s/path:.*/path: ${path//\//\\/}/g;G;s/(.*)\n/\1/}" $mongod_conf
     else
         #make sure format,path are commented when using syslog
         sed -i -r "$startRange,$endRange{h;s/$ignoreCommentsString;s/format:/#format:/g;G;s/(.*)\n/\1/}" $mongod_conf
