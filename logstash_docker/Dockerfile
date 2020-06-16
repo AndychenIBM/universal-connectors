@@ -43,11 +43,12 @@ RUN apk add --no-cache bash && \
 #change owner
     chown -R 1001:1001 ${LOGSTASH_DIR}
 
-USER 1001
+COPY config/pipelines.yml ${LOGSTASH_DIR}/config/pipelines.yml
+COPY start_logstash.sh /start_logstash.sh
 
-COPY --chown=1001 config/pipelines.yml ${LOGSTASH_DIR}/config/pipelines.yml
-COPY --chown=1001 start_logstash.sh /start_logstash.sh
-RUN chmod 777 /start_logstash.sh
+RUN chown 1001 ${LOGSTASH_DIR}/config/pipelines.yml /start_logstash.sh
+
+USER 1001
 
 ENV UDS_ETC=${LOGSTASH_DIR}/config/
 ENV PATH ${LOGSTASH_DIR}/bin:$PATH
