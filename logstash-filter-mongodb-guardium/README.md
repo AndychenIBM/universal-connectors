@@ -5,13 +5,16 @@ This is a filter plugin for [Logstash](https://github.com/elastic/logstash). It 
 ??It is fully free and fully open-source. The license is Apache 2.0, meaning you are free to use it however you want??
 
 ## Documentation
-### Supported audit messages & commands:
+### Supported audit messages & commands: 
 * authCheck: 
     * find, insert, delete, update, ...
     * aggregate with $lookup(s) or $graphLookup(s)
-* authenticate  
+* authenticate (with error only) 
 
-Other MongoDB events/messages are removed from pipeline; if the event is not related to MongoDB, it is skipped.
+Notes: 
+* For these events to be handled propertly, MongoDB access control must be set, as messages without users are removed. 
+* Other MongoDB events/messages are removed from pipeline.
+* Non-MongoDB events are skipped, but not removed.
 
 ### Supported errors:  
 
