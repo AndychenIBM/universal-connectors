@@ -48,6 +48,8 @@ COPY start_logstash.sh /start_logstash.sh
 
 RUN chown 1001 ${LOGSTASH_DIR}/config/pipelines.yml /start_logstash.sh
 
+RUN sed -i -e 's/\r$//' /start_logstash.sh
+
 USER 1001
 
 ENV UDS_ETC=${LOGSTASH_DIR}/config/
