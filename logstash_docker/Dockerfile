@@ -46,7 +46,7 @@ RUN apk add --no-cache bash && \
 COPY config/pipelines.yml ${LOGSTASH_DIR}/config/pipelines.yml
 COPY start_logstash.sh /start_logstash.sh
 
-RUN chown 1001 ${LOGSTASH_DIR}/config/pipelines.yml /start_logstash.sh
+RUN chown 1001:1001 ${LOGSTASH_DIR}/config/pipelines.yml /start_logstash.sh
 
 RUN sed -i -e 's/\r$//' /start_logstash.sh
 
