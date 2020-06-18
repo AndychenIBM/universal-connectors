@@ -14,7 +14,7 @@ LABEL maintainer="IBM Security" \
     description="This image contains logstash with IBM jre installed based on alpine environment. For more information on this image please see documentation files" \
     vendor="IBM Corp."
 
-ENV LOGSTASH_VERSION=7.5.1
+ENV LOGSTASH_VERSION=7.5.0
 ENV LOGSTASH_DIR=/usr/share/logstash
 
 USER root
