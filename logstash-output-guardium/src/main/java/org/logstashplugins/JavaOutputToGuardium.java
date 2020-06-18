@@ -72,14 +72,15 @@ public class JavaOutputToGuardium implements Output {
 
                     connector.sendRecord(recordString);
 
-                } else {
-                    log.warn("No record was found in event, please check parser logs");
                 }
+                /*else {
+                    log.warn("No record was found in event, please check parser logs");
+                }*/
 
             } catch (Exception ex){
                 log.error("Failed to handle event "+logEvent(event), ex);
             }
-            log.debug("==========Finished one event, total events size is " + events.size());
+            if (log.isDebugEnabled()) {log.debug("==========Finished one event, total events size is " + events.size());}
         }
     }
 
