@@ -21,16 +21,15 @@ while test $# -gt 0; do
       echo "2. Configure Syslog/Filebeat to send logs to Guardium Universal Connector"
       echo "Mandatory arguments:"
       echo "syslog/file"
-      echo "Optional flags:"
+      echo "Mandatory flags:"
       echo "-h, --help                Show brief help"
       echo "-f, --filter	          Specify a filter for mongodb auditLog"
 	  echo "-a, --address       	  Specify an address to send data <ip_address>:<port>"
 	  echo "-p, --protocol       	  Specify the protocol for communication with Guardium Universal Connector: TCP or UDP"
-	  echo "--syslog-only       	  Update only syslog configuration file. No mongo DB changes, no DB restart required."
-	  echo "--filebeat-only       	  Update only filebeat configuration file. No mongo DB changes, no DB restart required."
+	  echo "--restart-mongodb      	  Changes MongoDB configuration file, DB restart will be performed."
       exit 0
       ;;
-     syslog|file    )
+     syslog|file)
         dest=$1
       shift
       ;;
@@ -64,12 +63,8 @@ while test $# -gt 0; do
       fi
       shift
       ;;
-	--syslog-only)
-      syslog_only='true';
-      shift
-      ;;
-    --filebeat-only)
-      filebeat_only='true';
+    --restart-mongodb)
+      restart_mongodb='true';
       shift
       ;;
     *)
@@ -86,7 +81,7 @@ fi
 
 printf "%s: mongod params:\n\tDEST=%s\n\tFORMAT=%s\n\tPATH=%s\n\tFILTER=%s\n" $(date +"%Y-%m-%dT%H:%M:%SZ") $dest $format "$path" "$filter" |& tee -a $logfile
 
-if [[ -z $syslog_only && -z $filebeat_only ]];
+if [ $restart_mongodb ];
 then
 	echo "Configuring MongoDB auditLog..."
 	bash $home_dir/linux/configureMongodb.sh $dest $format $path "$filter" $logfile
