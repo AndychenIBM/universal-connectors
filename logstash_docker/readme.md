@@ -18,7 +18,7 @@ installation and configuration:
 
 running a container- this can be done by one of the following:
 1. use grdapi:
-    grdapi run_local_universal_connnector debug=3
+    grdapi run_local_universal_connector debug=3
 2. direct run using:
     docker run -d --name="Klaus" --network="host" -it universal-connector
     
