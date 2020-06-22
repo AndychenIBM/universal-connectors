@@ -12,6 +12,11 @@ logfile="${home_dir}/configureServer.log"
 #protocol=${protocol^^}
 #address=$(grep "address" $configfile | cut -d ':' -f2-)
 
+format="-"
+path="-"
+protocol="-"
+restart_mongodb=false
+
 #Load flags
 while test $# -gt 0; do
   case "$1" in
@@ -76,7 +81,7 @@ while test $# -gt 0; do
     --format)
       shift
       if test $# -gt 0; then
-        path=$1
+        format=$1
       else
         echo "no path specified"
         exit 1
@@ -84,7 +89,7 @@ while test $# -gt 0; do
       shift
       ;;
     --restart-mongodb)
-      restart_mongodb='true';
+      restart_mongodb=true;
       shift
       ;;
     *)
@@ -99,13 +104,10 @@ then
 	exit 1
 fi
 
-printf "%s: mongod params:\n\tDEST=%s\n\tFORMAT=%s\n\tPATH=%s\n\tFILTER=%s\n" $(date +"%Y-%m-%dT%H:%M:%SZ") $dest $format "$path" "$filter" |& tee -a $logfile
+printf "%s: mongod params:\n\tDEST=%s\n\tFORMAT=%s\n\tPATH=%s\n\tFILTER=%s\n\tRESTART_MONGODB=%s\n" $(date +"%Y-%m-%dT%H:%M:%SZ") $dest $format "$path" "$filter" $restart_mongodb|& tee -a $logfile
 
-if [ $restart_mongodb ];
-then
-	printf "Configuring MongoDB auditLog...\n" |& tee -a $logfile
-	bash $home_dir/linux/configureMongodb.sh $dest $format $path "$filter" $logfile
-fi
+printf "Configuring MongoDB auditLog...\n" |& tee -a $logfile
+bash $home_dir/linux/configureMongodb.sh $dest $format $path "$filter" $restart_mongodb $logfile
 
 if [ "$dest" = "syslog" ];
 then
