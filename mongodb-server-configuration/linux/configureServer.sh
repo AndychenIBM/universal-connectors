@@ -1,16 +1,21 @@
 #!/bin/bash
 
-home_dir="/root/mongodb-server-configuration"
+home_dir="/usr/local/IBM/modules/GIM_UC/current/files/mongodb-server-configuration"
 logfile="${home_dir}/configureServer.log"
 #Load params from configuration file
-configfile="${home_dir}/configureServer.conf"
-#dest=$(grep "destination" $configfile | cut -d ':' -f 2)
-format=$(grep "format" $configfile | cut -d ':' -f 2)
-path=$(grep "path" $configfile | cut -d ':' -f 2)
-filter=$(grep "filter" $configfile | cut -d ':' -f2-)
-protocol=$(grep "protocol" $configfile | cut -d ':' -f 2)
-protocol=${protocol^^}
-address=$(grep "address" $configfile | cut -d ':' -f2-)
+#configfile="${home_dir}/configureServer.conf"
+##dest=$(grep "destination" $configfile | cut -d ':' -f 2)
+#format=$(grep "format" $configfile | cut -d ':' -f 2)
+#path=$(grep "path" $configfile | cut -d ':' -f 2)
+#filter=$(grep "filter" $configfile | cut -d ':' -f2-)
+#protocol=$(grep "protocol" $configfile | cut -d ':' -f 2)
+#protocol=${protocol^^}
+#address=$(grep "address" $configfile | cut -d ':' -f2-)
+
+format="-"
+path="-"
+protocol="-"
+restart_mongodb=false
 
 #Load flags
 while test $# -gt 0; do
@@ -63,8 +68,28 @@ while test $# -gt 0; do
       fi
       shift
       ;;
+    --path)
+      shift
+      if test $# -gt 0; then
+        path=$1
+      else
+        echo "no path specified"
+        exit 1
+      fi
+      shift
+      ;;
+    --format)
+      shift
+      if test $# -gt 0; then
+        format=$1
+      else
+        echo "no path specified"
+        exit 1
+      fi
+      shift
+      ;;
     --restart-mongodb)
-      restart_mongodb='true';
+      restart_mongodb=true;
       shift
       ;;
     *)
@@ -79,13 +104,10 @@ then
 	exit 1
 fi
 
-printf "%s: mongod params:\n\tDEST=%s\n\tFORMAT=%s\n\tPATH=%s\n\tFILTER=%s\n" $(date +"%Y-%m-%dT%H:%M:%SZ") $dest $format "$path" "$filter" |& tee -a $logfile
+printf "%s: mongod params:\n\tDEST=%s\n\tFORMAT=%s\n\tPATH=%s\n\tFILTER=%s\n\tRESTART_MONGODB=%s\n" $(date +"%Y-%m-%dT%H:%M:%SZ") $dest $format "$path" "$filter" $restart_mongodb|& tee -a $logfile
 
-if [ $restart_mongodb ];
-then
-	echo "Configuring MongoDB auditLog..."
-	bash $home_dir/linux/configureMongodb.sh $dest $format $path "$filter" $logfile
-fi
+printf "Configuring MongoDB auditLog...\n" |& tee -a $logfile
+bash $home_dir/linux/configureMongodb.sh $dest $format $path "$filter" $restart_mongodb $logfile
 
 if [ "$dest" = "syslog" ];
 then
