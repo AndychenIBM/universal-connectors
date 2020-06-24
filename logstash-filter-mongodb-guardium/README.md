@@ -7,14 +7,16 @@ This is a filter plugin for [Logstash](https://github.com/elastic/logstash). It 
 ## Documentation
 ### Supported audit messages & commands: 
 * authCheck: 
-    * find, insert, delete, update, ...
+    * find, insert, delete, update, create, drop, ... 
     * aggregate with $lookup(s) or $graphLookup(s)
 * authenticate (with error only) 
 
 Notes: 
-* For these events to be handled propertly, MongoDB access control must be set, as messages without users are removed. 
-* Other MongoDB events/messages are removed from pipeline.
-* Non-MongoDB events are skipped, but not removed.
+* For these events to be handled propertly, few conditions must occur: 
+    * MongoDB access control must be set, as messages without users are removed. 
+    * authCheck and authenticate events should not be filtered-out from the MongoDB audit log messages.
+* Other MongoDB events/messages are removed from pipeline, as their data is already parsed in authcheck message.
+* Non-MongoDB events are skipped, but not removed (left for other filters).
 
 ### Supported errors:  
 
@@ -30,7 +32,7 @@ The filter plugin also supports sending errors as well, though MongoDB Access co
 
 ## Filter notes
 * Required fields: 
-    * The filter supports events sent thru Syslog, which indicate "mongod:" in their message.
+    * The filter supports events sent thru Syslog or Filebeat, which indicate "mongod:" in their message.
     * server_hostname - Server hostname is expected (extracted from syslog message, 2nd field).
     * Source program is not available in syslog messages sent by MongoDB. Instead, it's  always sent as "mongod". 
 * If events with "(NONE)" local/remote IP are not filtered, this filter will convert IP to "0.0.0.0", as valid IPv4 format is needed.
