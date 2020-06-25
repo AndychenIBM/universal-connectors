@@ -3,6 +3,8 @@ package com.ibm.guardium.universalconnector.transformer;
 import com.google.gson.Gson;
 import com.google.protobuf.ByteString;
 import com.ibm.guardium.proto.datasource.Datasource;
+import com.ibm.guardium.universalconnector.common.Util;
+import com.ibm.guardium.universalconnector.transformer.RecordTransformer;
 import com.ibm.guardium.universalconnector.transformer.jsonrecord.*;
 import com.ibm.guardium.universalconnector.transformer.jsonrecord.Record;
 import org.apache.commons.logging.Log;
@@ -125,8 +127,7 @@ public class JsonRecordTransformer implements RecordTransformer {
 
     public Datasource.Session_start buildSessionStart(Record record, Datasource.Session_locator sessionLocator, Datasource.Accessor accessor){
 
-        Datasource.Timestamp sessionStartTimestamp = getTimestamp(record.getTimeInMs());
-
+        Datasource.Timestamp sessionStartTimestamp = Util.getTimestamp(record.getTime());
         Datasource.Session_start sessionStart = Datasource.Session_start.newBuilder()
                 .setSessionLocator(sessionLocator)
                 .setTimestamp(sessionStartTimestamp)
@@ -138,17 +139,6 @@ public class JsonRecordTransformer implements RecordTransformer {
                 .build();
 
         return sessionStart;
-    }
-
-    static public Datasource.Timestamp getCurrentTimestamp() {
-        return getTimestamp(System.currentTimeMillis());
-    }
-
-    static public Datasource.Timestamp getTimestamp(long timeInMs) {
-        int timeInSec = (int)(timeInMs / 1000);
-        int micorsecOnly = (int)(timeInMs % 1000)*1000;
-
-        return Datasource.Timestamp.newBuilder().setUnixTime(timeInSec).setUsec(micorsecOnly).build();
     }
 
     /**
@@ -168,15 +158,7 @@ public class JsonRecordTransformer implements RecordTransformer {
         ExceptionRecord recordException = record.getException();
         //Add Required fields
         exceptionMsg.setSession(sessionLocator);
-
-        // handle exception time
-        try{
-            exceptionMsg.setTimestamp(getTimestamp(recordException.getTimestamp()));
-        } catch (Exception e){
-            log.warn("Failed to get exception time, setting current time", e);
-            exceptionMsg.setTimestamp(getCurrentTimestamp());
-        }
-
+        exceptionMsg.setTimestamp(Util.getTimestamp(record.getTime()));
         Accessor accessor = record.getAccessor();
         //Add Optional fields
 //        exceptionMsg.setAPPUSERNAME("AppUserNameFromException");
@@ -223,6 +205,14 @@ public class JsonRecordTransformer implements RecordTransformer {
             }
         }
         return builder.build();
+    }
+
+    public Datasource.Timestamp getTimeStamp(Record record) {
+        long time = 0;
+        if(record != null){
+            time = record.getTime();
+        }
+        return Util.getTimestamp(time);
     }
 
     public Datasource.GDM_construct buildConstruct(Data recordData) {
