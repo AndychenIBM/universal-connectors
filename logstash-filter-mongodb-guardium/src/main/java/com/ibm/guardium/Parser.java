@@ -201,13 +201,13 @@ public class Parser {
 
         // set timestamp
         String dateString = Parser.parseTimestamp(data);
-        int unixTime = Parser.getTimeSeconds(dateString);
-        record.setTime(unixTime);
+        long timestamp = Parser.getTime(dateString);
+        record.setTime(timestamp);
         if (record.getData() != null) {
-            record.getData().setTimestamp(unixTime);
+            record.getData().setTimestamp(timestamp);
         } // (else it's an exception)
         if (record.isException()) {
-            record.getException().setTimestamp(String.valueOf(unixTime));
+            record.getException().setTimestamp(String.valueOf(timestamp));
         }
 
         return record;
@@ -361,10 +361,9 @@ public class Parser {
         return dateString;
     }
 
-    public static int getTimeSeconds(String dateString) throws ParseException {
+    public static long getTime(String dateString) throws ParseException {
         Date date = DATE_FORMATTER.parse(dateString);
-        int timeSeconds = (int)(date.getTime() / 1000); 
-        return timeSeconds;
+        return date.getTime();
     }
 
     /**
