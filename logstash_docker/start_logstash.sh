@@ -1,20 +1,36 @@
 #!/bin/bash
 
+function updateFromEnv(){
+    ENV_VAR=$1
+    VAR_NAME=$2
+    FILE=$3
+    ORIGINAL_STRING=$4
+    REPLACE_STRING=$5
+
+    if [ -z "$ENV_VAR" ]
+    then
+        echo "No $VAR_NAME was set as an environment variable. Using default value:"
+    else
+        sed -i -r "s/$ORIGINAL_STRING/$REPLACE_STRING/g" $FILE
+        echo "$VAR_NAME was set to $ENV_VAR"
+    fi
+}
+
 #Change log4j log level if needed
 if [[ "$UC_LOG_LEVEL" =~ ^(ALL|DEBUG|INFO|WARN|ERROR|FATAL|OFF|TRACE)$ ]]; then
-    sed -i -r "s/ERROR/$UC_LOG_LEVEL/g" $UDS_ETC/log4j.properties
-    echo "UC_LOG_LEVEL was set to $UC_LOG_LEVEL"
+    updateFromEnv "$UC_LOG_LEVEL" "UC_LOG_LEVEL" $UDS_ETC/log4j.properties "ERROR" "$UC_LOG_LEVEL"
 fi
 
-#Change connectorId
-if [ -z "$CONNECTOR_ID" ]
-then
-    echo "no connectorId was entered as an environment variable"
-else
-    sed -i -r "s/\"connectorId\":.*/\"connectorId\":\"$CONNECTOR_ID\",/g" $UDS_ETC/UniversalConnector.json
-    echo "CONNECTOR_ID was set to $CONNECTOR_ID"
-fi
+#Change connectorId if needed
+updateFromEnv "$CONNECTOR_ID" "CONNECTOR_ID" $UDS_ETC/UniversalConnector.json "\"connectorId\":.*" "\"connectorId\":\"$CONNECTOR_ID\","
 
+
+#Change filebeat/syslog ports if needed
+#Note that this option is only relevant when using mongodb-syslog-filebeat.conf as a configuration file for logstash
+MONGODB_CONF=${LOGSTASH_DIR}/pipeline/mongodb-syslog-filebeat.conf
+updateFromEnv "$FILEBEAT_PORT" "FILEBEAT_PORT" $MONGODB_CONF "beats \{ port => 5044 type => filebeat \}" "beats \{ port => $FILEBEAT_PORT type => filebeat \}}"
+updateFromEnv "$UDP_PORT" "UDP_PORT" $MONGODB_CONF "udp \{ port => 5141 type => syslog \}" "udp \{ port => $UDP_PORT type => syslog \}"
+updateFromEnv "$TCP_PORT" "TCP_PORT" $MONGODB_CONF "tcp \{ port => 5000 type => syslog \}" "tcp \{ port => $TCP_PORT type => syslog \}"
 
 #Start logstash
 logstash
