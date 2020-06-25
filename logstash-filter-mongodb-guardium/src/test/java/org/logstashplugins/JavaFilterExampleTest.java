@@ -174,7 +174,13 @@ public class JavaFilterExampleTest {
         Assert.assertEquals(2, matchListener.getMatchCount());
     }
 
-    @Test
+
+    /**
+     * REMOVED 
+     * @deprecated On events with (NONE) in remote/local, IP should be set to valid IP. 
+     * NOTE: This is deprecated, as events with "(NONE)" have no users[], so they are removed from events.
+     */
+    /*@Test
     public void testParseMongoSyslog_IPs() {
         final String mongodString = "<14>Feb 18 08:53:31 qa-db51 mongod: { \"atype\" : \"authCheck\", \"ts\" : { \"$date\" : \"2020-01-16T05:41:30.783-0500\" }, \"local\" : { \"ip\" : \"(NONE)\", \"port\" : 0 }, \"remote\" : { \"ip\" : \"(NONE)\", \"port\" : 0 }, \"users\" : [], \"roles\" : [], \"param\" : { \"command\" : \"find\", \"ns\" : \"config.transactions\", \"args\" : { \"find\" : \"transactions\", \"filter\" : { \"lastWriteDate\" : { \"$lt\" : { \"$date\" : \"2020-01-16T05:11:30.782-0500\" } } }, \"projection\" : { \"_id\" : 1 }, \"sort\" : { \"_id\" : 1 }, \"$db\" : \"config\" } }, \"result\" : 0 }";
         final String expectedIP = "0.0.0.0";
@@ -197,7 +203,7 @@ public class JavaFilterExampleTest {
         Assert.assertEquals(
                 "0.0.0.0 client IP mongo audit message passes with '(NONE)' local IP",
                 expectedIP, record.getSessionLocator().getServerIp());
-    }
+    }*/
 
     @Test
     public void testParseMongoSyslog_doNotInjectHost() {
@@ -227,9 +233,25 @@ public class JavaFilterExampleTest {
     }
 
 
+    /**
+     * Simulates cut-off towards end of Syslog message, and tests proper JSON parse error tag is attached 
+     * */
     @Test 
     public void testTagParseError() {
-        Assert.assertFalse(true);
+        String messageString = "<14>Feb 18 08:53:31 qa-db51 mongod: { \"atype\" : \"authCheck\", \"ts\" : { \"$date\" : \"2020-06-11T09:44:11.070-0400\" }, \"local\" : { \"ip\" : \"9.70.147.59\", \"port\" : 27017 }, \"remote\" : { \"ip\" : \"9.148.202.94\", \"port\" : 60185 }, \"users\" : [ { \"user\" : \"realAdmin\", \"db\" : \"admin\" } ], \"roles\" : [ { \"role\" : \"readWriteAnyDatabase\", \"db\" : \"admin\" }, { \"role\" : \"userAdminAnyDatabase\", \"db\" : \"admin\" } ], \"param\" : { \"command\" : \"find\", \"ns\" : \"admin.USERS\", \"args\" : { \"find\" : \"USERS\", \"filter\" : {}, \"lsid\" : { \"id\" : { \"$binary\" : \"mV20eHvvRha2ELTeqJxQJg==\", \"$type\" : \"04\" } }, \"$db\" : \"admin\", \"$readPreference\" : { \"mode\" : \"primaryPreferred\" } } }, \"res"; 
+        Context context = new ContextImpl(null, null);
+        JavaFilterExample filter = new JavaFilterExample("test-id", null, context);
+
+        Event e = new org.logstash.Event();
+        TestMatchListener matchListener = new TestMatchListener();
+        
+        e.setField("message", messageString);
+        Collection<Event> results = filter.filter(Collections.singletonList(e), matchListener);
+
+        Assert.assertEquals(1, results.size());
+        Assert.assertEquals(true, e.getField("tags").toString().contains(
+            JavaFilterExample.LOGSTASH_TAG_JSON_PARSE_ERROR));
+        Assert.assertEquals(0, matchListener.getMatchCount()); // just sigals as not a match, so no further tags will be added, in pipeline.
     }
 }
 
