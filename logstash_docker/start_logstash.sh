@@ -9,7 +9,7 @@ function updateFromEnv(){
 
     if [ -z "$ENV_VAR" ]
     then
-        echo "No $VAR_NAME was set as an environment variable. Using default value:"
+        echo "No $VAR_NAME was set as an environment variable. Using default value."
     else
         sed -i -r "s/$ORIGINAL_STRING/$REPLACE_STRING/g" $FILE
         echo "$VAR_NAME was set to $ENV_VAR"
