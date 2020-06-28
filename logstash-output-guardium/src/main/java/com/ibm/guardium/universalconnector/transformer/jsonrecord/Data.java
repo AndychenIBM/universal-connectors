@@ -2,7 +2,6 @@ package com.ibm.guardium.universalconnector.transformer.jsonrecord;
 
 public class Data {
     private Construct construct;
-    private int timestamp;
     private String originalSqlCommand;
     private boolean useConstruct;
 
@@ -24,14 +23,6 @@ public class Data {
 
     public void setConstruct(Construct construct) {
         this.construct = construct;
-    }
-
-    public int getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(int timestamp) {
-        this.timestamp = timestamp;
     }
 
     public String getOriginalSqlCommand() {

@@ -21,7 +21,7 @@ public class JsonFromEventBuilder {
         Record record = (new Gson()).fromJson(recordString, Record.class);
         // Record record = new Record();
         
-        record.setTime(getTimeInSec(event));
+        record.setTimeInMs(getTimeInSec(event));
         // record.setDbName(getStringField(event, "dbName", "schema"));
         // record.setAppUserName(getStringField(event, "app_user_name", "no_app_user"));
         // record.setSessionId(getStringField(event, "session_id", "sessionId123456789"));
@@ -81,7 +81,7 @@ public class JsonFromEventBuilder {
         data.setOriginalSqlCommand(getStringField(e, "original_sql", "nosql"));
         data.setOriginalSqlCommand(getStringField(e, "original_sql", "nosql"));
         try {
-            data.setTimestamp(getTimeInSec(e));
+            //data.setTimesInMs(getTimeInSec(e));
             String  constructStr = getStringField(e, "Construct", null);
             if (constructStr!=null) {
                 Construct construct = (new Gson()).fromJson(constructStr, Construct.class);

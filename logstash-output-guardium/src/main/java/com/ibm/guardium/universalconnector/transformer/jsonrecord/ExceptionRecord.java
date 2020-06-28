@@ -15,7 +15,7 @@ public class ExceptionRecord {
     private String description;
 //    private String dbProtocol; //pop by accessor
     private String sqlString;
-    private String timestamp;
+    private long timestamp;
 //{\"exceptionTypeId\":\"SQL_ERROR\",\"description\":\"parse error\",\"sqlString\":\"select from sales\",\"timestamp\":\"1588573299000\"}
 //{"exceptionTypeId":"SQL_ERROR","description":"parse error","sqlString":"select from sales","timestamp":"1588573299000"}
     public String getExceptionTypeId() {
@@ -42,11 +42,11 @@ public class ExceptionRecord {
         this.sqlString = sqlString;
     }
 
-    public String getTimestamp() {
+    public long getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(String timestamp) {
+    public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
     }
 }

@@ -3,7 +3,6 @@ package com.ibm.guardium.universalconnector.transformer;
 import com.google.gson.Gson;
 import com.google.protobuf.ByteString;
 import com.ibm.guardium.proto.datasource.Datasource;
-import com.ibm.guardium.universalconnector.transformer.RecordTransformer;
 import com.ibm.guardium.universalconnector.transformer.jsonrecord.*;
 import com.ibm.guardium.universalconnector.transformer.jsonrecord.Record;
 import org.apache.commons.logging.Log;
@@ -126,7 +125,7 @@ public class JsonRecordTransformer implements RecordTransformer {
 
     public Datasource.Session_start buildSessionStart(Record record, Datasource.Session_locator sessionLocator, Datasource.Accessor accessor){
 
-        Datasource.Timestamp sessionStartTimestamp = Datasource.Timestamp.newBuilder().setUnixTime(record.getTime()).build();
+        Datasource.Timestamp sessionStartTimestamp = getTimestamp(record.getTimeInMs());
 
         Datasource.Session_start sessionStart = Datasource.Session_start.newBuilder()
                 .setSessionLocator(sessionLocator)
@@ -140,22 +139,18 @@ public class JsonRecordTransformer implements RecordTransformer {
 
         return sessionStart;
     }
-    static public long getUnixTime() {
-        return getUnixTime(new Date());
+
+    static public Datasource.Timestamp getCurrentTimestamp() {
+        return getTimestamp(System.currentTimeMillis());
     }
 
-    /**
-     * Unix time is in seconds, Java is is in milliseconds. Simply divide by 1000.
-     * @param date Optional
-     * @return Java time divide by 1000
-     */
-    static public long getUnixTime(Date date) {
-        return date.getTime() / 1000;
+    static public Datasource.Timestamp getTimestamp(long timeInMs) {
+        int timeInSec = (int)(timeInMs / 1000);
+        int micorsecOnly = (int)(timeInMs % 1000)*1000;
+
+        return Datasource.Timestamp.newBuilder().setUnixTime(timeInSec).setUsec(micorsecOnly).build();
     }
 
-    static public Datasource.Timestamp getTimestamp() {
-        return Datasource.Timestamp.newBuilder().setUnixTime((int) getUnixTime()).build();
-    }
     /**
      *
      * This method will send an exception message based on the
@@ -173,7 +168,15 @@ public class JsonRecordTransformer implements RecordTransformer {
         ExceptionRecord recordException = record.getException();
         //Add Required fields
         exceptionMsg.setSession(sessionLocator);
-        exceptionMsg.setTimestamp(getTimestamp());
+
+        // handle exception time
+        try{
+            exceptionMsg.setTimestamp(getTimestamp(recordException.getTimestamp()));
+        } catch (Exception e){
+            log.warn("Failed to get exception time, setting current time", e);
+            exceptionMsg.setTimestamp(getCurrentTimestamp());
+        }
+
         Accessor accessor = record.getAccessor();
         //Add Optional fields
 //        exceptionMsg.setAPPUSERNAME("AppUserNameFromException");
@@ -193,8 +196,8 @@ public class JsonRecordTransformer implements RecordTransformer {
     }
 
     public Datasource.Application_data buildAppplicationData(Record record, Datasource.Session_locator sessionLocator) {
+        Datasource.Timestamp timestamp = getTimestamp(record.getTimeInMs());
         Data rd = record.getData();
-        Datasource.Timestamp timestamp = getTimeStamp(record);
         Datasource.Application_data.Data_type dataType = getDataType(record);
         String langTypeStr = LANG_TYPE_FREE_TEXT;
         // only in case where users said that record should be parsed by sniffer (does not use construct)
@@ -220,15 +223,6 @@ public class JsonRecordTransformer implements RecordTransformer {
             }
         }
         return builder.build();
-    }
-
-    public Datasource.Timestamp getTimeStamp(Record record) {
-        Data data = record.getData();
-        int timestamp = 0;
-        if(data != null){
-            timestamp = data.getTimestamp();
-        }
-        return Datasource.Timestamp.newBuilder().setUnixTime(timestamp).build();
     }
 
     public Datasource.GDM_construct buildConstruct(Data recordData) {
@@ -337,6 +331,20 @@ public class JsonRecordTransformer implements RecordTransformer {
 
         return ret;
     }
+
+    /*
+    * https://code.woboq.org/userspace/glibc/resolv/inet_pton.c.html#hex_digit_value
+    * static int hex_digit_value (char ch)
+        {
+          if ('0' <= ch && ch <= '9')
+            return ch - '0';
+          if ('a' <= ch && ch <= 'f')
+            return ch - 'a' + 10;
+          if ('A' <= ch && ch <= 'F')
+            return ch - 'A' + 10;
+          return -1;
+        }
+    * */
 
     public static Datasource.Application_data.Language_type getLanguageType(String strType){
         try {

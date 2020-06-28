@@ -5,7 +5,7 @@ public class Record {
     private String sessionId;
     private String dbName;
     private String appUserName;
-    private int    time;
+    private long timeInMs;
 
     private SessionLocator  sessionLocator;
     private Accessor        accessor;
@@ -15,12 +15,12 @@ public class Record {
     public boolean isException(){
         return  (this.exception != null);
     }
-    public int getTime() {
-        return time;
+    public long getTimeInMs() {
+        return timeInMs;
     }
 
-    public void setTime(int time) {
-        this.time = time;
+    public void setTimeInMs(long timeInMs) {
+        this.timeInMs = timeInMs;
     }
 
     public String getSessionId() {
