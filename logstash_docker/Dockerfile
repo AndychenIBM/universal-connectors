@@ -55,6 +55,7 @@ RUN chmod 755 /start_logstash.sh
 USER 1001
 
 ENV UDS_ETC=${LOGSTASH_DIR}/config/
+ENV UC_ETC=${LOGSTASH_DIR}/config/
 ENV PATH ${LOGSTASH_DIR}/bin:$PATH
 
 CMD /start_logstash.sh
