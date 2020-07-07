@@ -2,6 +2,7 @@ package com.ibm.guardium;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -29,7 +30,12 @@ public class Parser {
     private static final String MASK_STRING = "?";
     public static final String EXCEPTION_TYPE_AUTHORIZATION_STRING = "SQL_ERROR";
     public static final String EXCEPTION_TYPE_AUTHENTICATION_STRING = "LOGIN_FAILED";
-
+    /**
+     * These arguments will not be redacted, as they only contain 
+     * collection/field names rather than sensitive values.
+     */
+    public static Set<String> REDACTION_IGNORE_STRINGS = new HashSet<>(
+            Arrays.asList("from", "localField", "foreignField", "as", "connectFromField", "connectToField"));
 
     private static String DATE_FORMAT_ISO = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
     private static SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat(DATE_FORMAT_ISO);
@@ -421,9 +427,11 @@ public class Parser {
                     keysCopy.add(key);
                 }
                 for (String key : keysCopy) { 
-                    JsonElement redactedValue = Redact(object.get(key));
-                    object.remove(key);
-                    object.add(key, redactedValue); 
+                    if (!REDACTION_IGNORE_STRINGS.contains(key)) {
+                        JsonElement redactedValue = Redact(object.get(key));
+                        object.remove(key);
+                        object.add(key, redactedValue); 
+                    } 
                 }
             }
 

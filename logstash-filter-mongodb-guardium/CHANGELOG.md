@@ -3,6 +3,10 @@
 Notable changes will be documented in this file.
 
 ## [Unreleased]
+## [0.4.0]
+### Changed
+- $lookup and $graphLookup required arguments are not redacted (from, localField, foreignField, as, connectFromField, connectToField).
+
 ## [0.3.3]
 ### Fixed
 - Record & Data timestamps are now sent as Long, to allow millisecond precision.

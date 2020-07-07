@@ -37,7 +37,7 @@ The filter plugin also supports sending errors as well, though MongoDB Access co
     * Source program is not available in syslog messages sent by MongoDB. Instead, it's  always sent as "mongod". 
 * If events with "(NONE)" local/remote IP are not filtered, this filter will convert IP to "0.0.0.0", as valid IPv4 format is needed.
 * Events into the filter are not removed, but tagged if not parsed (see [Filter result](#filter-result), below).
-* MongoDB authCheck audit messages are also sent in a redacted version, where most field values are replaced with "?". Note that currently this is a naïve process, so some fields are redacted where future filter release should not redact them, like from within $lookup/$graphlookup, 1st element in $filter.cond.$eq[], etc.
+* MongoDB authCheck audit messages are also sent in a redacted version, where most field values are replaced with "?". Note that currently this is a naïve process, where most command arguments are redacted, apart from the the command, $db, and $lookup & $graphLookup required arguments (from, localField, foreignField, as, connectFromField, connectToField). Future filter release may add to this list.
 
 ## Example 
 ### syslog input
