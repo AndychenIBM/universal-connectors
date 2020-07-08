@@ -1,12 +1,17 @@
-package com.ibm.guardium.s3;
+package com.ibm.guardium.universalconnector.common;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 import com.google.gson.*;
-import com.ibm.guardium.universalconnector.common.structures.*;
-
+import com.ibm.guardium.universalconnector.common.structures.Accessor;
+import com.ibm.guardium.universalconnector.common.structures.Construct;
+import com.ibm.guardium.universalconnector.common.structures.Data;
+import com.ibm.guardium.universalconnector.common.structures.Record;
+import com.ibm.guardium.universalconnector.common.structures.Sentence;
+import com.ibm.guardium.universalconnector.common.structures.SentenceObject;
+import com.ibm.guardium.universalconnector.common.structures.SessionLocator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -161,7 +166,7 @@ public class Parser {
 
         log.debug("4");
         String time = getValue(eventData,"eventTime");
-        long unixTime = getTimestamp(time);
+        int unixTime = Parser.getTimeSeconds(time);
         record.setTime(unixTime);
 
         // ------------------ Build Session locator
@@ -240,6 +245,7 @@ public class Parser {
         log.debug("20");
         Data data = new Data();
         record.setData(data);
+        //data.setTimestamp(unixTime);
         data.setOriginalSqlCommand(fullSql);
         data.setUseConstruct(true);
 
@@ -346,13 +352,14 @@ public class Parser {
         return value;
     }
 
-    public static long getTimestamp(String dateString) throws ParseException {
+    public static int getTimeSeconds(String dateString) throws ParseException {
         if (dateString==null){
             log.warn("DateString is null");
             return 0;
         }
         Date date = DATE_FORMATTER.parse(dateString);
-        return date.getTime();
+        int timeSeconds = (int)(date.getTime() / 1000); 
+        return timeSeconds;
     }
 
     public static void main(String[] args){

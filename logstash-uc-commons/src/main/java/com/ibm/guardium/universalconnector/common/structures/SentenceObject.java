@@ -1,4 +1,4 @@
-package com.ibm.guardium.s3.connector.structures;
+package com.ibm.guardium.universalconnector.common.structures;
 
 public class SentenceObject {
     public String name; 
