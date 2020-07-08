@@ -89,26 +89,7 @@ public class ParserTest {
 
     @Test
     public void testParseAsConstruct_Aggregate_nLookups() {
-        Assert.assertFalse(true); // TODO
-        /*
-         * final String mongoString =
-         * "{ \"atype\": \"authCheck\", \"ts\": { \"$date\": \"2020-01-16T06:07:21.122-0500\" }, \"local\": { \"ip\": \"127.0.0.1\", \"port\": 27017 }, \"remote\": { \"ip\": \"127.0.0.1\", \"port\": 43600 }, \"users\": [], \"roles\": [], \"param\": { \"command\": \"aggregate\", \"ns\": \"test.users\", \"args\": { \"aggregate\": \"users\", \"pipeline\": [ { \"$match\": { \"admin\": 1 } }, { \"$lookup\": { \"from\": \"posts\", \"localField\": \"_id\", \"foreignField\": \"owner_id\", \"as\": \"posts\" } }, { \"$project\": { \"posts\": { \"$filter\": { \"input\": \"$posts\", \"as\": \"post\", \"cond\": { \"$eq\": [ \"$$post.via\", \"facebook\" ] } } }, \"admin\": 1 } } ], \"cursor\": {}, \"lsid\": { \"id\": { \"$binary\": \"9IxV+mBmQfa73jbV9n4CSQ==\", \"$type\": \"04\" } }, \"$db\": \"test\" } }, \"result\": 0 }"
-         * ;
-         * 
-         * final JsonObject mongoJson =
-         * JsonParser.parseString(mongoString).getAsJsonObject(); //final String
-         * actualResult = Parser.Parse(mongoJson); Construct result =
-         * Parser.ParseAsConstruct(mongoJson);
-         * 
-         * Sentence sentence = result.sentences.get(0); Assert.assertEquals("aggregate",
-         * sentence.verb); Assert.assertEquals("users", sentence.objects.get(0).name);
-         * Assert.assertEquals("posts", sentence.objects.get(1).name);
-         */
-    }
-
-    @Test
-    public void testParseAsConstruct_Aggregate_graphLookup() {
-        final String mongoString = "{ 'atype': 'authCheck', 'ts': { '$date': '2020-01-26T09:58:44.547-0500' }, 'local': { 'ip': '127.0.0.1', 'port': 27017 }, 'remote': { 'ip': '127.0.0.1', 'port': 56984 }, 'users': [], 'roles': [], 'param': { 'command': 'aggregate', 'ns': 'test.travelers', 'args': { 'aggregate': 'travelers', 'pipeline': [ { '$graphLookup': { 'from': 'airports', 'startWith': '$nearestAirport', 'connectFromField': 'connects', 'connectToField': 'airport', 'maxDepth': 2, 'depthField': 'numConnections', 'as': 'destinations' } } ], 'cursor': {}, 'lsid': { 'id': { '$binary': '2WoIDPhSTcKHrdJW4azoow==', '$type': '04' } }, '$db': 'test' } }, 'result': 0 }";
+        final String mongoString = "{ \"atype\": \"authCheck\", \"ts\": { \"$date\": \"2020-01-16T06:07:21.122-0500\" }, \"local\": { \"ip\": \"127.0.0.1\", \"port\": 27017 }, \"remote\": { \"ip\": \"127.0.0.1\", \"port\": 43600 }, \"users\": [], \"roles\": [], \"param\": { \"command\": \"aggregate\", \"ns\": \"test.users\", \"args\": { \"aggregate\": \"users\", \"pipeline\": [ { \"$match\": { \"admin\": 1 } }, { \"$lookup\": { \"from\": \"posts\", \"localField\": \"_id\", \"foreignField\": \"owner_id\", \"as\": \"posts\" } }, { \"$project\": { \"posts\": { \"$filter\": { \"input\": \"$posts\", \"as\": \"post\", \"cond\": { \"$eq\": [ \"$$post.via\", \"facebook\" ] } } }, \"admin\": 1 } } ], \"cursor\": {}, \"lsid\": { \"id\": { \"$binary\": \"9IxV+mBmQfa73jbV9n4CSQ==\", \"$type\": \"04\" } }, \"$db\": \"test\" } }, \"result\": 0 }";
 
         final JsonObject mongoJson = JsonParser.parseString(mongoString).getAsJsonObject();
         // final String actualResult = Parser.Parse(mongoJson);
@@ -116,8 +97,23 @@ public class ParserTest {
 
         final Sentence sentence = result.sentences.get(0);
         Assert.assertEquals("aggregate", sentence.verb);
-        Assert.assertEquals("travelers", sentence.objects.get(0).name);
-        Assert.assertEquals("airports", sentence.objects.get(1).name);
+        Assert.assertEquals("users", sentence.objects.get(0).name);
+        Assert.assertEquals("posts", sentence.objects.get(1).name);
+    }
+
+    @Test
+    public void testParseAsConstruct_Aggregate_graphLookup() {
+        final String mongoString = "{ \"atype\": \"authCheck\", \"ts\": { \"$date\": \"2020-01-16T06:07:21.122-0500\" }, \"local\": { \"ip\": \"127.0.0.1\", \"port\": 27017 }, \"remote\": { \"ip\": \"127.0.0.1\", \"port\": 43600 }, \"users\": [], \"roles\": [], \"param\": { \"command\": \"aggregate\", \"ns\": \"test.users\", \"args\": { \"aggregate\": \"users\", \"pipeline\": [ { \"$match\": { \"admin\": 1 } }, { \"$lookup\": { \"from\": \"posts\", \"localField\": \"_id\", \"foreignField\": \"owner_id\", \"as\": \"posts\" } }, { \"$lookup\": { \"from\": \"packages\", \"localField\": \"_id\", \"foreignField\": \"owner_id\", \"as\": \"packagePosts\" } }, { \"$project\": { \"posts\": { \"$filter\": { \"input\": \"$posts\", \"as\": \"post\", \"cond\": { \"$eq\": [ \"$$post.via\", \"facebook\" ] } } }, \"admin\": 1 } } ], \"cursor\": {}, \"lsid\": { \"id\": { \"$binary\": \"9IxV+mBmQfa73jbV9n4CSQ==\", \"$type\": \"04\" } }, \"$db\": \"test\" } }, \"result\": 0 }";
+
+        final JsonObject mongoJson = JsonParser.parseString(mongoString).getAsJsonObject();
+        // final String actualResult = Parser.Parse(mongoJson);
+        final Construct result = Parser.ParseAsConstruct(mongoJson);
+
+        final Sentence sentence = result.sentences.get(0);
+        Assert.assertEquals("aggregate", sentence.verb);
+        Assert.assertEquals("users", sentence.objects.get(0).name);
+        Assert.assertEquals("posts", sentence.objects.get(1).name); // 1st lookup
+        Assert.assertEquals("packages", sentence.objects.get(2).name); // 2nd lookup
     }
 
     @Test 
@@ -232,10 +228,15 @@ public class ParserTest {
         Assert.assertEquals(mongoRedactedJsonObject, mongoJson);
     }
 
+    /** 
+     * Tests that sensitive data is redacted. 
+     * Tests also that MongoDB $lookup and $graphlookup required arguments should not be redacted, 
+     * as well "as" value is not redacted, as it sets a field name to be used in result. 
+     */
     @Test 
     public void testRedactData_aggregate() {
-        final String mongoString = "{ \"atype\": \"authCheck\", \"ts\": { \"$date\": \"2020-01-16T06:07:21.122-0500\" }, \"local\": { \"ip\": \"127.0.0.1\", \"port\": 27017 }, \"remote\": { \"ip\": \"127.0.0.1\", \"port\": 43600 }, \"users\": [], \"roles\": [], \"param\": { \"command\": \"aggregate\", \"ns\": \"test.users\", \"args\": { \"aggregate\": \"users\", \"pipeline\": [ { \"$match\": { \"admin\": 1 } }, { \"$lookup\": { \"from\": \"posts\", \"localField\": \"_id\", \"foreignField\": \"owner_id\", \"as\": \"posts\" } }, { \"$project\": { \"posts\": { \"$filter\": { \"input\": \"$posts\", \"as\": \"post\", \"cond\": { \"$eq\": [ \"$$post.via\", \"facebook\" ] } } }, \"admin\": 1 } } ], \"cursor\": {}, \"lsid\": { \"id\": { \"$binary\": \"9IxV+mBmQfa73jbV9n4CSQ==\", \"$type\": \"04\" } }, \"$db\": \"test\" } }, \"result\": 0 }";
-        final String mongoRedactedString = "{ \"atype\": \"authCheck\", \"ts\": { \"$date\": \"2020-01-16T06:07:21.122-0500\" }, \"local\": { \"ip\": \"127.0.0.1\", \"port\": 27017 }, \"remote\": { \"ip\": \"127.0.0.1\", \"port\": 43600 }, \"users\": [], \"roles\": [], \"param\": { \"command\": \"aggregate\", \"ns\": \"test.users\", \"args\": { \"aggregate\": \"users\", \"pipeline\": [ { \"$match\": { \"admin\": \"?\" } }, { \"$lookup\": { \"from\": \"?\", \"localField\": \"?\", \"foreignField\": \"?\", \"as\": \"?\" } }, { \"$project\": { \"posts\": { \"$filter\": { \"input\": \"?\", \"as\": \"?\", \"cond\": { \"$eq\": [ \"?\", \"?\" ] } } }, \"admin\": \"?\" } } ], \"cursor\": {}, \"lsid\": { \"id\": { \"$binary\": \"?\", \"$type\": \"?\" } }, \"$db\": \"test\" } }, \"result\": 0 }";
+        final String mongoString = "{ \"atype\": \"authCheck\", \"ts\": { \"$date\": \"2020-01-16T06:07:21.122-0500\" }, \"local\": { \"ip\": \"127.0.0.1\", \"port\": 27017 }, \"remote\": { \"ip\": \"127.0.0.1\", \"port\": 43600 }, \"users\": [], \"roles\": [], \"param\": { \"command\": \"aggregate\", \"ns\": \"test.users\", \"args\": { \"aggregate\": \"users\", \"pipeline\": [ { \"$match\": { \"admin\": 1 } }, { \"$lookup\": { \"from\": \"posts\", \"localField\": \"_id\", \"foreignField\": \"owner_id\", \"as\": \"posts\", \"let\": { \"foo\": \"5\"} } }, { \"$project\": { \"posts\": { \"$filter\": { \"input\": \"$posts\", \"as\": \"post\", \"cond\": { \"$eq\": [ \"$$post.via\", \"facebook\" ] } } }, \"admin\": 1 } } ], \"cursor\": {}, \"lsid\": { \"id\": { \"$binary\": \"9IxV+mBmQfa73jbV9n4CSQ==\", \"$type\": \"04\" } }, \"$db\": \"test\" } }, \"result\": 0 }";
+        final String mongoRedactedString = "{ \"atype\": \"authCheck\", \"ts\": { \"$date\": \"2020-01-16T06:07:21.122-0500\" }, \"local\": { \"ip\": \"127.0.0.1\", \"port\": 27017 }, \"remote\": { \"ip\": \"127.0.0.1\", \"port\": 43600 }, \"users\": [], \"roles\": [], \"param\": { \"command\": \"aggregate\", \"ns\": \"test.users\", \"args\": { \"aggregate\": \"users\", \"pipeline\": [ { \"$match\": { \"admin\": \"?\" } }, { \"$lookup\": { \"from\": \"posts\", \"localField\": \"_id\", \"foreignField\": \"owner_id\", \"as\": \"posts\", \"let\": { \"foo\": \"?\"} } }, { \"$project\": { \"posts\": { \"$filter\": { \"input\": \"?\", \"as\": \"post\", \"cond\": { \"$eq\": [ \"?\", \"?\" ] } } }, \"admin\": \"?\" } } ], \"cursor\": {}, \"lsid\": { \"id\": { \"$binary\": \"?\", \"$type\": \"?\" } }, \"$db\": \"test\" } }, \"result\": 0 }";
         final JsonObject mongoRedactedJsonObject = JsonParser.parseString(mongoRedactedString).getAsJsonObject();
         final JsonObject mongoJson = JsonParser.parseString(mongoString).getAsJsonObject();
         final JsonObject args = mongoJson.get("param").getAsJsonObject().get("args").getAsJsonObject();
@@ -318,16 +319,21 @@ public class ParserTest {
 
     @Test
     public void testParseTimestamp() {
-        String date = parser.parseTimestamp(mongoJson);
+        String date = Parser.parseTimestamp(mongoJson);
         Assert.assertEquals("2020-01-26T09:58:44.547-0500", date);
     }
 
     @Test
-    public void testGetTimeSeconds() throws ParseException {
-        String dateString = parser.parseTimestamp(mongoJson);
-        int unixTime = parser.getTimeSeconds(dateString);
-        Date date = new Date((long) unixTime * 1000);
-        Assert.assertEquals(unixTime, date.getTime() / 1000);
+    public void testGetTime() throws ParseException {
+        String dateString = Parser.parseTimestamp(mongoJson);
+        long time = Parser.getTime(dateString);
+        
+        final String testString = "{ 'atype': 'authCheck', 'ts': { '$date': '2020-01-26T09:58:44.640-0500' }, 'local': { 'ip': '127.0.0.1', 'port': 27017 }, 'remote': { 'ip': '127.0.0.1', 'port': 56984 }, 'users': [{'user': 'tal', 'db': 'test'}, {'user': 'talb', 'db': 'bios'}], 'roles': [], 'param': { 'command': 'aggregate', 'ns': 'test.travelers', 'args': { 'aggregate': 'travelers', 'pipeline': [ { '$graphLookup': { 'from': 'airports', 'startWith': '$nearestAirport', 'connectFromField': 'connects', 'connectToField': 'airport', 'maxDepth': 2, 'depthField': 'numConnections', 'as': 'destinations' } } ], 'cursor': {}, 'lsid': { 'id': { '$binary': '2WoIDPhSTcKHrdJW4azoow==', '$type': '04' } }, '$db': 'test' } }, 'result': 0 }";
+        final JsonObject testJson = JsonParser.parseString(testString).getAsJsonObject();
+        String dateString2 = Parser.parseTimestamp(testJson);
+        long time2 = Parser.getTime(dateString2);
+
+        Assert.assertNotEquals(time, time2);
     }
 
 

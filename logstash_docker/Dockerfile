@@ -30,8 +30,8 @@ RUN apk add --no-cache bash && \
 	tar -xzf logstash*.tar.gz  -C ${LOGSTASH_DIR} --strip-components=1 && \
 	rm *.tar.gz && \
 #Install plugins
-	.${LOGSTASH_DIR}/bin/logstash-plugin install ${LOGSTASH_DIR}/config/logstash-filter-java_filter_example-0.3.2.gem && \
-    .${LOGSTASH_DIR}/bin/logstash-plugin install ${LOGSTASH_DIR}/config/logstash-output-java_output_to_guardium-1.0.7.gem && \
+	.${LOGSTASH_DIR}/bin/logstash-plugin install ${LOGSTASH_DIR}/config/logstash-filter-java_filter_example-0.4.0.gem && \
+    .${LOGSTASH_DIR}/bin/logstash-plugin install ${LOGSTASH_DIR}/config/logstash-output-java_output_to_guardium-1.0.9.gem && \
 #    .${LOGSTASH_DIR}/bin/logstash-plugin install ${LOGSTASH_DIR}/config/logstash-input-cloudwatch_logs-1.0.3.gem && \
 #Clear cache and unnecessary heavy plugins:
     rm -rf $LOGSTASH_DIR/vendor/cache/*.gem $LOGSTASH_DIR/vendor/bundle/jruby/2.5.0/cache/*.gem && \
@@ -55,6 +55,7 @@ RUN chmod 755 /start_logstash.sh
 USER 1001
 
 ENV UDS_ETC=${LOGSTASH_DIR}/config/
+ENV UC_ETC=${LOGSTASH_DIR}/config/
 ENV PATH ${LOGSTASH_DIR}/bin:$PATH
 
 CMD /start_logstash.sh

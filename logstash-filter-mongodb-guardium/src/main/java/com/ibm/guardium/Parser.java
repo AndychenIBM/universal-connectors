@@ -2,6 +2,7 @@ package com.ibm.guardium;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -29,7 +30,12 @@ public class Parser {
     private static final String MASK_STRING = "?";
     public static final String EXCEPTION_TYPE_AUTHORIZATION_STRING = "SQL_ERROR";
     public static final String EXCEPTION_TYPE_AUTHENTICATION_STRING = "LOGIN_FAILED";
-
+    /**
+     * These arguments will not be redacted, as they only contain 
+     * collection/field names rather than sensitive values.
+     */
+    public static Set<String> REDACTION_IGNORE_STRINGS = new HashSet<>(
+            Arrays.asList("from", "localField", "foreignField", "as", "connectFromField", "connectToField"));
 
     private static String DATE_FORMAT_ISO = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
     private static SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat(DATE_FORMAT_ISO);
@@ -201,13 +207,13 @@ public class Parser {
 
         // set timestamp
         String dateString = Parser.parseTimestamp(data);
-        int unixTime = Parser.getTimeSeconds(dateString);
-        record.setTime(unixTime);
+        long timestamp = Parser.getTime(dateString);
+        record.setTime(timestamp);
         if (record.getData() != null) {
-            record.getData().setTimestamp(unixTime);
+            record.getData().setTimestamp(timestamp);
         } // (else it's an exception)
         if (record.isException()) {
-            record.getException().setTimestamp(String.valueOf(unixTime));
+            record.getException().setTimestamp(String.valueOf(timestamp));
         }
 
         return record;
@@ -361,10 +367,9 @@ public class Parser {
         return dateString;
     }
 
-    public static int getTimeSeconds(String dateString) throws ParseException {
+    public static long getTime(String dateString) throws ParseException {
         Date date = DATE_FORMATTER.parse(dateString);
-        int timeSeconds = (int)(date.getTime() / 1000); 
-        return timeSeconds;
+        return date.getTime();
     }
 
     /**
@@ -422,9 +427,11 @@ public class Parser {
                     keysCopy.add(key);
                 }
                 for (String key : keysCopy) { 
-                    JsonElement redactedValue = Redact(object.get(key));
-                    object.remove(key);
-                    object.add(key, redactedValue); 
+                    if (!REDACTION_IGNORE_STRINGS.contains(key)) {
+                        JsonElement redactedValue = Redact(object.get(key));
+                        object.remove(key);
+                        object.add(key, redactedValue); 
+                    } 
                 }
             }
 

@@ -2,7 +2,7 @@ package com.ibm.guardium.connector.structures;
 
 public class Data {
     private Construct construct;
-    private int timestamp; // limit warning: use new Date((long) unixTime * 1000), to revert to Date, otherwise, int max will be reached.
+    private long timestamp; // milliseconds
     private String originalSqlCommand;
     private boolean useConstruct;
 
@@ -30,7 +30,11 @@ public class Data {
         return timestamp;
     }
 
-    public void setTimestamp(int timestamp) {
+    /**
+     * Set timestamp action, in DB, in milliseconds precision (long) 
+     * @param timestamp
+     */
+    public void setTimestamp(Long timestamp) {
         this.timestamp = timestamp;
     }
 
