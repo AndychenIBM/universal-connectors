@@ -1,0 +1,10 @@
+GUC_ENABLED=1|1;0|M|R|S|Controling GIM module. 1 - GIM is enabled. 0 - GIM is disabled||0
+GUC_DEBUG=0|1;0|O|W|N|1 - Debug mode. 0 - errors only||0
+GUC_DEST=0|1;0|O|W|N|1 - Syslog. 0 - Filebeat||0
+GUC_FORMAT=0|1;0|O|W|N|1 - BSON. 0 - JSON||0
+GUC_RESTART_DB=0|1;0|O|W|N|1 - true. 0 - false||0
+GUC_PATH=||M|W|S|Audit logs path||0
+GUC_FILTER=||M|W|S|Filter to Database||0
+GUC_URL=||M|W|S|G-Machine IP address||0
+GUC_URL_PORT=5044||M|R|S|GIM servlet port||0
+GUC_PROTOCOL=0|1;0|O|W|N|1 - TCP. 0 - UDP||0
