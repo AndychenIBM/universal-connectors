@@ -1,7 +1,7 @@
 #!/bin/bash
 
-home_dir="/usr/local/IBM/modules/GIM_UC/current/files/mongodb-server-configuration"
-logfile="${home_dir}/configureServer.log"
+home_dir=$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )
+logfile="${home_dir}/../configureServer.log"
 #Load params from configuration file
 #configfile="${home_dir}/configureServer.conf"
 ##dest=$(grep "destination" $configfile | cut -d ':' -f 2)
@@ -15,7 +15,8 @@ logfile="${home_dir}/configureServer.log"
 format="-"
 path="-"
 protocol="-"
-restart_mongodb=false
+restart_mongodb=0
+enable_loadbalance=0
 
 #Load flags
 while test $# -gt 0; do
@@ -30,7 +31,9 @@ while test $# -gt 0; do
       echo "-h, --help                Show brief help"
       echo "-f, --filter	          Specify a filter for mongodb auditLog"
 	  echo "-a, --address       	  Specify an address to send data <ip_address>:<port>"
+	  echo "--host-addresses       	  Specify addresses to send data seperated by comma. for example: <ip_address1>:<port1>,<ip_address2>:<port2>"
 	  echo "-p, --protocol       	  Specify the protocol for communication with Guardium Universal Connector: TCP or UDP"
+	  echo "--enable-loadbalance      Enable Filebeat loadbalance."
 	  echo "--restart-mongodb      	  Changes MongoDB configuration file, DB restart will be performed."
       exit 0
       ;;
@@ -54,6 +57,16 @@ while test $# -gt 0; do
         address=$1
       else
         echo "no address specified"
+        exit 1
+      fi
+      shift
+      ;;
+	  --host_addresses)
+      shift
+      if test $# -gt 0; then
+        host_addresses=$1
+      else
+        echo "no addresses specified"
         exit 1
       fi
       shift
@@ -88,8 +101,12 @@ while test $# -gt 0; do
       fi
       shift
       ;;
+	--enable-loadbalance)
+      enable_loadbalance=1;
+      shift
+      ;;
     --restart-mongodb)
-      restart_mongodb=true;
+      restart_mongodb=1;
       shift
       ;;
     *)
@@ -107,17 +124,16 @@ fi
 printf "%s: mongod params:\n\tDEST=%s\n\tFORMAT=%s\n\tPATH=%s\n\tFILTER=%s\n\tRESTART_MONGODB=%s\n" $(date +"%Y-%m-%dT%H:%M:%SZ") $dest $format "$path" "$filter" $restart_mongodb|& tee -a $logfile
 
 printf "Configuring MongoDB auditLog...\n" |& tee -a $logfile
-bash $home_dir/linux/configureMongodb.sh $dest $format $path "$filter" $restart_mongodb $logfile
+bash $home_dir/configureMongodb.sh $dest $format $path "$filter" $restart_mongodb $logfile
 
 if [ "$dest" = "syslog" ];
 then
-    printf "%s: rsyslog params:\n\tPROTOCOL=%s\n\tADDRESS=%s\n" $(date +"%Y-%m-%dT%H:%M:%SZ") $protocol $address |& tee -a $logfile
     printf "%s: Configuring syslog...\n" $(date +"%Y-%m-%dT%H:%M:%SZ") |& tee -a $logfile
-    bash $home_dir/linux/configureSyslog.sh "$protocol" "$address" "$logfile"
+    bash $home_dir/configureSyslog.sh "$protocol" "$address" "$logfile"
 elif [ "$dest" = "file" ];
 then
     printf "%s: Configuring filebeat...\n" $(date +"%Y-%m-%dT%H:%M:%SZ") |& tee -a $logfile
-    bash $home_dir/linux/configureFilebeat.sh "$format" "$path" "$address" "$logfile"
+    bash $home_dir/configureFilebeat.sh "$format" "$path" "$host_addresses" "$enable_loadbalance" "$logfile" 
 fi
 
 printf "%s: Done configuring Server.\n" $(date +"%Y-%m-%dT%H:%M:%SZ") |& tee -a $logfile
