@@ -3,6 +3,14 @@
 Notable changes will be documented in this file.
 
 ## [Unreleased]
+## [0.4.1]
+### Changed
+- DB protocol changed from Logstash to "MongoDB native audit"
+- Server type changed from "MONGODB" to "MongoDB"
+
+### Fixed
+- N/A in various fields was changed to an empty string, to better resemble how MongoDB STAP reflects unavailable data.
+
 ## [0.4.0]
 ### Changed
 - $lookup and $graphLookup required arguments are not redacted (from, localField, foreignField, as, connectFromField, connectToField).
