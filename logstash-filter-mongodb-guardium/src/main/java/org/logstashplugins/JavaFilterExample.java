@@ -9,12 +9,16 @@ import co.elastic.logstash.api.LogstashPlugin;
 import co.elastic.logstash.api.PluginConfigSpec;
 import com.google.gson.*;
 import com.ibm.guardium.Parser;
+import com.ibm.guardium.connector.Util;
 import com.ibm.guardium.connector.structures.Record;
 import com.ibm.guardium.connector.structures.SessionLocator;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 // class name must match plugin name
 @LogstashPlugin(name = "java_filter_example")
@@ -27,10 +31,12 @@ public class JavaFilterExample implements Filter {
         like "createUser", "createCollection", ... as these are already parsed in prior authCheck messages. */ 
     public static final String LOGSTASH_TAG_SKIP = "_mongoguardium_skip"; 
     public static final String LOGSTASH_TAG_JSON_PARSE_ERROR = "_mongoguardium_json_parse_error";
-
+    
     private String id;
     private String sourceField; 
     private final static String MONGOAUDIT_START_SIGNAL = "mongod: ";  
+    private final static Set<String> LOCAL_IP_LIST = new HashSet<>(
+        Arrays.asList("127.0.0.1", "0:0:0:0:0:0:0:1"));
 
     public JavaFilterExample(String id, Configuration config, Context context) {
         // constructors should validate configuration options
@@ -66,7 +72,6 @@ public class JavaFilterExample implements Filter {
                             continue;
                         }
                         
-
                         Record record = Parser.parseRecord(inputJSON);
 
                         // server_hostname
@@ -81,16 +86,7 @@ public class JavaFilterExample implements Filter {
                                 record.getAccessor().setSourceProgram(sourceProgram);
                         }
 
-                        // Override "(NONE)" IP, if not filterd, as it's internal command by MongoDB.
-                        // Note: IP needs to be in ipv4/ipv6 format
-                        
-                        SessionLocator sessionLocator = record.getSessionLocator();
-                        if (sessionLocator.getServerIp().equalsIgnoreCase("(NONE)")) {
-                            sessionLocator.setServerIp("0.0.0.0");
-                        }
-                        if (sessionLocator.getClientIp().equalsIgnoreCase("(NONE)")) {
-                            sessionLocator.setClientIp("0.0.0.0");
-                        }
+                        this.correctIPs(e, record);
 
                         // TODO: Remove flat variables after Record is used.
                         e.setField("timestamp", Parser.parseTimestamp(inputJSON));
@@ -119,6 +115,42 @@ public class JavaFilterExample implements Filter {
         // FIXME log which events skipped
         events.removeAll(skippedEvents);
         return events;
+    }
+
+    /**
+     * Overrides MongoDB local/remote IP 127.0.0.1, if Logstash Event contains "server_ip".
+     * 
+     * @param e - Logstash Event
+     * @param record - Record after parsing.
+     */
+    private void correctIPs(Event e, Record record) {
+        // Override "(NONE)" IP, if not filterd, as it's internal command by MongoDB.
+        // Note: IP needs to be in ipv4/ipv6 format
+        SessionLocator sessionLocator = record.getSessionLocator();
+        String sessionServerIp = sessionLocator.getServerIp();
+        if (LOCAL_IP_LIST.contains(sessionServerIp)
+                || sessionServerIp.equalsIgnoreCase("(NONE)")) {
+            if (e.getField("server_ip") instanceof String) {
+                String ip = e.getField("server_ip").toString();
+                if (ip != null) {
+                    if (Util.isIPv6(ip)){
+                        sessionLocator.setServerIpv6(ip);
+                        sessionLocator.setIpv6(true);
+                    } else {
+                        sessionLocator.setServerIp(ip);
+                        sessionLocator.setIpv6(false);
+                    }
+                } else if (sessionServerIp.equalsIgnoreCase("(NONE)")) {
+                    sessionLocator.setServerIp("0.0.0.0");
+                }
+            }
+        }
+        
+        String sessionClientIp = sessionLocator.getClientIp();
+        if (LOCAL_IP_LIST.contains(sessionClientIp)
+                || sessionLocator.getClientIp().equalsIgnoreCase("(NONE)")) { 
+            sessionLocator.setClientIp(sessionLocator.getServerIp()); // as clientIP & serverIP were equal
+        }
     }
 
     @Override

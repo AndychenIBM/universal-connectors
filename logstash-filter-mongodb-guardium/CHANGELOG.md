@@ -3,6 +3,10 @@
 Notable changes will be documented in this file.
 
 ## [Unreleased]
+## [0.4.2]
+### Changed
+- override localhost remote/local IPs coming from MongoDB logs, if Logstash event contains "server_ip" field.
+
 ## [0.4.1]
 ### Changed
 - DB protocol changed from Logstash to "MongoDB native audit"

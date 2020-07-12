@@ -174,22 +174,22 @@ public class JavaFilterExampleTest {
         Assert.assertEquals(2, matchListener.getMatchCount());
     }
 
-
-    /**
-     * REMOVED 
-     * @deprecated On events with (NONE) in remote/local, IP should be set to valid IP. 
-     * NOTE: This is deprecated, as events with "(NONE)" have no users[], so they are removed from events.
+/**
+     * Tests that localhost IPs stay that way, if no "server_ip" field exist in logstash event.
+     *
+     * NOTE: Events with "(NONE)" have no users[], so they are removed from events.
      */
-    /*@Test
-    public void testParseMongoSyslog_IPs() {
-        final String mongodString = "<14>Feb 18 08:53:31 qa-db51 mongod: { \"atype\" : \"authCheck\", \"ts\" : { \"$date\" : \"2020-01-16T05:41:30.783-0500\" }, \"local\" : { \"ip\" : \"(NONE)\", \"port\" : 0 }, \"remote\" : { \"ip\" : \"(NONE)\", \"port\" : 0 }, \"users\" : [], \"roles\" : [], \"param\" : { \"command\" : \"find\", \"ns\" : \"config.transactions\", \"args\" : { \"find\" : \"transactions\", \"filter\" : { \"lastWriteDate\" : { \"$lt\" : { \"$date\" : \"2020-01-16T05:11:30.782-0500\" } } }, \"projection\" : { \"_id\" : 1 }, \"sort\" : { \"_id\" : 1 }, \"$db\" : \"config\" } }, \"result\" : 0 }";
-        final String expectedIP = "0.0.0.0";
+    @Test
+    public void testParseMongoSyslog_localhostIPs_remain() {
+        final String mongodString = "<14>Feb 18 08:53:31 qa-db51 mongod: { \"atype\" : \"authCheck\", \"ts\" : { \"$date\" : \"2020-01-16T05:41:30.783-0500\" }, \"local\" : { \"ip\" : \"127.0.0.1\", \"port\" : 10400 }, \"remote\" : { \"ip\" : \"127.0.0.1\", \"port\" : 27017 }, \"users\" : [ { \"user\" : \"realAdmin\", \"db\" : \"admin\" } ], \"roles\" : [ { \"role\" : \"readWriteAnyDatabase\", \"db\" : \"admin\" }, { \"role\" : \"userAdminAnyDatabase\", \"db\" : \"admin\" } ], \"param\" : { \"command\" : \"find\", \"ns\" : \"config.transactions\", \"args\" : { \"find\" : \"transactions\", \"filter\" : { \"lastWriteDate\" : { \"$lt\" : { \"$date\" : \"2020-01-16T05:11:30.782-0500\" } } }, \"projection\" : { \"_id\" : 1 }, \"sort\" : { \"_id\" : 1 }, \"$db\" : \"config\" } }, \"result\" : 0 }";
+        final String expectedIP = "127.0.0.1";
 
         Event e = new org.logstash.Event();
         TestMatchListener matchListener = new TestMatchListener();
         
         e.setField("message", mongodString); // with "(NONE)" local/remote IPs
-
+        // no server_ip field
+        
         Collection<Event> results = filter.filter(Collections.singletonList(e), matchListener);
 
         Assert.assertEquals(1, results.size());
@@ -198,12 +198,43 @@ public class JavaFilterExampleTest {
         Assert.assertNotNull(record);
 
         Assert.assertEquals(
-                "0.0.0.0 client IP mongo audit message passes with '(NONE)' remote IP",
+                "When no server_ip field, MongoDB remote IP should not be overriden.",
                 expectedIP, record.getSessionLocator().getClientIp());
         Assert.assertEquals(
-                "0.0.0.0 client IP mongo audit message passes with '(NONE)' local IP",
+                "When no server_ip field, MongoDB local IP should not be overriden.",
                 expectedIP, record.getSessionLocator().getServerIp());
-    }*/
+    }
+    /**
+     * Tests that localhost IPs are overriden with "server_ip", if exists in logstash Event.
+     
+     * On events with local IP, convert to server IP, if sent thru logstash event by Filebeat/syslog. 
+     * NOTE: Events with "(NONE)" have no users[], so they are removed from events.
+     */
+    @Test
+    public void testParseMongoSyslog_localhostIP_override() {
+        final String mongodString = "<14>Feb 18 08:53:31 qa-db51 mongod: { \"atype\" : \"authCheck\", \"ts\" : { \"$date\" : \"2020-01-16T05:41:30.783-0500\" }, \"local\" : { \"ip\" : \"127.0.0.1\", \"port\" : 10400 }, \"remote\" : { \"ip\" : \"127.0.0.1\", \"port\" : 27017 }, \"users\" : [ { \"user\" : \"realAdmin\", \"db\" : \"admin\" } ], \"roles\" : [ { \"role\" : \"readWriteAnyDatabase\", \"db\" : \"admin\" }, { \"role\" : \"userAdminAnyDatabase\", \"db\" : \"admin\" } ], \"param\" : { \"command\" : \"find\", \"ns\" : \"config.transactions\", \"args\" : { \"find\" : \"transactions\", \"filter\" : { \"lastWriteDate\" : { \"$lt\" : { \"$date\" : \"2020-01-16T05:11:30.782-0500\" } } }, \"projection\" : { \"_id\" : 1 }, \"sort\" : { \"_id\" : 1 }, \"$db\" : \"config\" } }, \"result\" : 0 }";
+        final String expectedIP = "20.30.40.50";
+
+        Event e = new org.logstash.Event();
+        TestMatchListener matchListener = new TestMatchListener();
+        
+        e.setField("message", mongodString); // with "(NONE)" local/remote IPs
+        e.setField("server_ip", expectedIP);
+        
+        Collection<Event> results = filter.filter(Collections.singletonList(e), matchListener);
+
+        Assert.assertEquals(1, results.size());
+        String recordString = e.getField("Record").toString();
+        Record record = (new Gson()).fromJson(recordString, Record.class);
+        Assert.assertNotNull(record);
+
+        Assert.assertEquals(
+                "server_ip field should be used, if exists, when MongoDB remote IP points to localhost.",
+                expectedIP, record.getSessionLocator().getClientIp());
+        Assert.assertEquals(
+                "server_ip field should be used, if exists, when MongoDB local IP points to localhost.",
+                expectedIP, record.getSessionLocator().getServerIp());
+    }
 
     @Test
     public void testParseMongoSyslog_doNotInjectHost() {
