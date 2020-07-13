@@ -7,7 +7,7 @@ path=$3
 filter=$4
 restart_mongodb=$5
 logfile=$6
-#printf "%s: Params passed to mongod script:\nDESTINATION=%s\n\tFORMAT=%s\n\tPATH=%s\n\tFILTER=%s\n\tRESTART_MONGODB=%s\n\tLOG=%s\n" $(date +"%Y-%m-%dT%H:%M:%SZ") $dest $format $path "$filter" $restart_mongodb $logfile|& tee -a $logfile
+printf "%s: Params passed to mongod script:\nDESTINATION=%s\n\tFORMAT=%s\n\tPATH=%s\n\tFILTER=%s\n\tRESTART_MONGODB=%s\n\tLOG=%s\n" $(date +"%Y-%m-%dT%H:%M:%SZ") $dest $format $path "$filter" $restart_mongodb $logfile|& tee -a $logfile
 
 #Find mongod pid if exists
 mon_pid=$(service mongod status|grep -Eo '[0-9]+')
@@ -18,7 +18,7 @@ mongod_conf_path=$( readlink  -f /*/mongod.conf )
 printf "%s: Mongod configuration file path is: %s.\n" $(date +"%Y-%m-%dT%H:%M:%SZ") $mongod_conf_path|& tee -a $logfile
 
 current_time=$(date "+%Y%m%d-%H%M%S")
-if [ "$restart_mongodb" = true ];
+if [ "$restart_mongodb" = 1 ];
 then
     #Backup configuration file
     cp $mongod_conf_path $mongod_conf_path.$current_time
@@ -48,12 +48,27 @@ then
     sed -i "s/#setParameter: {auditAuthorizationSuccess: true}/setParameter: {auditAuthorizationSuccess: true}/g" $mongod_conf
     if [ "$dest" = "file" ];
     then
-        sed -i -r "$startRange,$endRange{h;s/$ignoreCommentsString;s/format:.*/format: $format/g;G;s/(.*)\n/\1/}" $mongod_conf
-        sed -i -r "$startRange,$endRange{h;s/$ignoreCommentsString;s/path:.*/path: ${path//\//\\/}/g;G;s/(.*)\n/\1/}" $mongod_conf
+		sed -i -r "$startRange,$endRange s/#format:.*/format: $format/w tmp.txt" $mongod_conf
+		if [ -s tmp.txt ]; then
+			printf "%s: Uncommented format and added format: $format in mongod configuration.\n" $(date +"%Y-%m-%dT%H:%M:%SZ")|& tee -a $logfile
+		else 
+			sed -i -r "$startRange,$endRange{h;s/$ignoreCommentsString;s/format:.*/format: $format/g;G;s/(.*)\n/\1/}" $mongod_conf
+			printf "%s: Added format: $format in mongod configuration.\n" $(date +"%Y-%m-%dT%H:%M:%SZ")|& tee -a $logfile
+		fi
+		
+		sed -i -r "$startRange,$endRange s/#path:.*/path: ${path//\//\\/}/w tmp.txt" $mongod_conf
+		if [ -s tmp.txt ]; then
+			printf "%s: Uncommented path and added path: ${path//\//\\/} in mongod configuration.\n" $(date +"%Y-%m-%dT%H:%M:%SZ")|& tee -a $logfile
+		else 
+			sed -i -r "$startRange,$endRange{h;s/$ignoreCommentsString;s/path:.*/path: ${path//\//\\/}/g;G;s/(.*)\n/\1/}" $mongod_conf
+			printf "%s: Added path: ${path//\//\\/} in mongod configuration.\n" $(date +"%Y-%m-%dT%H:%M:%SZ")|& tee -a $logfile
+		fi
+		rm -rf tmp.txt
     else
         #make sure format,path are commented when using syslog
         sed -i -r "$startRange,$endRange{h;s/$ignoreCommentsString;s/format:/#format:/g;G;s/(.*)\n/\1/}" $mongod_conf
         sed -i -r "$startRange,$endRange{h;s/$ignoreCommentsString;s/path:/#path:/g;G;s/(.*)\n/\1/}" $mongod_conf
+		printf "%s: Commented format and path fields in mongod configuration.\n" $(date +"%Y-%m-%dT%H:%M:%SZ")|& tee -a $logfile
     fi
 else
     printf "%s: AuditLog section will be added to mongod.conf\n" $(date +"%Y-%m-%dT%H:%M:%SZ") |& tee -a $logfile
@@ -78,7 +93,7 @@ fi
 
 
 #Restart mongod service after configuration has changed
-if [ "$restart_mongodb"=true ];
+if [ "$restart_mongodb" = 1 ];
 then
     service mongod stop
     rm -f /tmp/mongodb-27017.sock

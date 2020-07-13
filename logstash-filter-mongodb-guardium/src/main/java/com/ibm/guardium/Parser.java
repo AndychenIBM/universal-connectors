@@ -24,9 +24,9 @@ import com.ibm.guardium.connector.structures.SentenceObject;
 import com.ibm.guardium.connector.structures.SessionLocator;
 
 public class Parser {
-    public static final String DATA_PROTOCOL_STRING = "Logstash";
-    public static final String UNKOWN_STRING = "n/a";
-    public static final String SERVER_TYPE_STRING = "MONGODB";
+    public static final String DATA_PROTOCOL_STRING = "MongoDB native audit";
+    public static final String UNKOWN_STRING = "";
+    public static final String SERVER_TYPE_STRING = "MongoDB";
     private static final String MASK_STRING = "?";
     public static final String EXCEPTION_TYPE_AUTHORIZATION_STRING = "SQL_ERROR";
     public static final String EXCEPTION_TYPE_AUTHENTICATION_STRING = "LOGIN_FAILED";

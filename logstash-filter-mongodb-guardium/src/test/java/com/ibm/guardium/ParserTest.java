@@ -262,7 +262,7 @@ public class ParserTest {
 
     @Test
     public void testParseData() {
-        Data data = parser.parseData(mongoJson);
+        Data data = Parser.parseData(mongoJson);
         Construct construct = data.getConstruct();
         Assert.assertNotNull(data);
         Assert.assertEquals("aggregate", construct.sentences.get(0).verb);
@@ -312,7 +312,7 @@ public class ParserTest {
     public void testParseAccessor_nUsers() {
         final String testString = "{ 'atype': 'authCheck', 'ts': { '$date': '2020-01-26T09:58:44.547-0500' }, 'local': { 'ip': '127.0.0.1', 'port': 27017 }, 'remote': { 'ip': '127.0.0.1', 'port': 56984 }, 'users': [{'user': 'tal', 'db': 'test'}, {'user': 'talb', 'db': 'bios'}], 'roles': [], 'param': { 'command': 'aggregate', 'ns': 'test.travelers', 'args': { 'aggregate': 'travelers', 'pipeline': [ { '$graphLookup': { 'from': 'airports', 'startWith': '$nearestAirport', 'connectFromField': 'connects', 'connectToField': 'airport', 'maxDepth': 2, 'depthField': 'numConnections', 'as': 'destinations' } } ], 'cursor': {}, 'lsid': { 'id': { '$binary': '2WoIDPhSTcKHrdJW4azoow==', '$type': '04' } }, '$db': 'test' } }, 'result': 0 }";
         final JsonObject testJson = JsonParser.parseString(testString).getAsJsonObject();
-        Accessor actual = parser.parseAccessor(testJson);
+        Accessor actual = Parser.parseAccessor(testJson);
 
         Assert.assertEquals("tal talb ", actual.getDbUser());
     }
