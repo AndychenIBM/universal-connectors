@@ -4,7 +4,7 @@ $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $configfile = "C:\Users\OferHaim\universal-connector\mongodb-server-configuration\windows\configureServer.conf"
 $dest = ([string](Select-String -Path $configfile -Pattern "destination")).Split(":")[-1].Trim()
 $format = ([string](Select-String -Path $configfile -Pattern "format")).Split(":")[-1].Trim()
-$path = "- C:$(([string](Select-String -Path $configfile -Pattern "path")).Split(":")[-1].Trim())"
+$path = "C:$(([string](Select-String -Path $configfile -Pattern "path")).Split(":")[-1].Trim())"
 $filter = [string](Select-String -Path $configfile -Pattern "filter")
 $filter = $filter.Substring($filter.IndexOf("filter:") + 7).Trim()
 $host_addresses = [string](Select-String -Path $configfile -Pattern "host-addresses")
@@ -74,9 +74,9 @@ while ($i -lt $args.count)
 if ($restart_mongodb -eq 1)
 {
     Write-Host "Configuring MongoDB auditLog..."
-    ."$scriptDir\configureMongodb.ps1" $dest $format $path $filter
+    ."$scriptDir\configureMongodb.ps1" $dest $format $path $filter $restart_mongodb
 }
 
-Add-Content $logfile -value "$(Get-Date): Configuring filebeat..."
-."$scriptDir\configureFilebeat.ps1" $path $host_addresses $enable_loadbalance
+#Add-Content $logfile -value "$(Get-Date): Configuring filebeat..."
+#."$scriptDir\configureFilebeat.ps1" $path $host_addresses $enable_loadbalance
 Write-Host "$(Get-Date): Done configuring Server."

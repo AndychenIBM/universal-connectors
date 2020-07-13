@@ -11,7 +11,7 @@ Write-Host "$( Get-Date ): Params passed to filebeat script:`n`tPATH=$( $path )`
 #$filebeat_conf = gci -recurse -filter "filebeat.yml" -File -ErrorAction SilentlyContinue
 #Write-Host "$(Get-Date):  filebeat configuration file path is: $($filebeat_conf.FullName)`n"
 $filebeat_conf = "C:\Program Files\Filebeat\filebeat.yml"
-Write-Host "$( Get-Date ): Filebeat configuration file path is: $( $filebeat_conf )`n"
+Write-Host "$( Get-Date ): Filebeat configuration file path is: $( $filebeat_conf )"
 
 
 #Configure Filebeat input:
@@ -24,7 +24,7 @@ if (Select-String -Path $filebeat_conf -Pattern "$( $path )" -SimpleMatch -Quiet
 }
 else
 {
-    ."$scriptDir\replaceInLinesRange.ps1" $filebeat_conf "  paths:" "  paths:`r`n    $( $path )" $startRange $endRange
+    ."$scriptDir\replaceInLinesRange.ps1" $filebeat_conf "  paths:" "  paths:`r`n    - $( $path )" $startRange $endRange
     Write-Host "$( Get-Date ): path was entered to filebeat configuration. `n"
 }
 
@@ -58,5 +58,5 @@ else
     }
 }
 
-#Restart-Service filebeat
-#Write-Host "$( Get-Date ): Restarted filebeat."
+Restart-Service filebeat
+Write-Host "$( Get-Date ): Restarted filebeat."
