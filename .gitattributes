@@ -1,0 +1,18 @@
+# default
+* text=auto
+
+# text files to always normalize to native line endings on checkout.
+# *....
+*.java text
+*.rb text
+
+# Windows files; always have CRLF line endings on checkout
+*.bat text eol=crlf
+
+# Linux files; always use LF endings
+*.sh text eol=lf 
+
+#binary files; don't modify line endings
+*.gem binary
+*.jar binary
+*.zip binary

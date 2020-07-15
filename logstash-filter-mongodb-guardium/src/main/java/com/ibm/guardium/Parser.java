@@ -2,6 +2,7 @@ package com.ibm.guardium;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -23,13 +24,18 @@ import com.ibm.guardium.connector.structures.SentenceObject;
 import com.ibm.guardium.connector.structures.SessionLocator;
 
 public class Parser {
-    public static final String DATA_PROTOCOL_STRING = "Logstash";
-    public static final String UNKOWN_STRING = "n/a";
-    public static final String SERVER_TYPE_STRING = "MONGODB";
+    public static final String DATA_PROTOCOL_STRING = "MongoDB native audit";
+    public static final String UNKOWN_STRING = "";
+    public static final String SERVER_TYPE_STRING = "MongoDB";
     private static final String MASK_STRING = "?";
     public static final String EXCEPTION_TYPE_AUTHORIZATION_STRING = "SQL_ERROR";
     public static final String EXCEPTION_TYPE_AUTHENTICATION_STRING = "LOGIN_FAILED";
-
+    /**
+     * These arguments will not be redacted, as they only contain 
+     * collection/field names rather than sensitive values.
+     */
+    public static Set<String> REDACTION_IGNORE_STRINGS = new HashSet<>(
+            Arrays.asList("from", "localField", "foreignField", "as", "connectFromField", "connectToField"));
 
     private static String DATE_FORMAT_ISO = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
     private static SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat(DATE_FORMAT_ISO);
@@ -75,60 +81,89 @@ public class Parser {
      */
     public static Construct ParseAsConstruct(final JsonObject data) {
         try {
-            // mongo statics
-            final JsonObject param = data.get("param").getAsJsonObject();
-            final String command = param.get("command").getAsString();
-            final JsonObject args = param.getAsJsonObject("args");
-
-            // + main object
-            final Sentence sentence = new Sentence(command);
-            if (args.has(command)) {
-                final SentenceObject sentenceObject = new SentenceObject(args.get(command).getAsString());
-                sentence.objects.add(sentenceObject);
-            }
-
-            switch (command) {
-                case "aggregate":
-                    /*
-                     * Assumes no inner-lookups; only sequential stages in pipeline.
-                     */
-                    final JsonArray pipeline = args.getAsJsonArray("pipeline");
-                    if (pipeline != null && pipeline.size() > 0) {
-                        for (final JsonElement stage : pipeline) {
-                            // handle * lookups
-                            // + object if stage has $lookup or $graphLookup: { from: obj2 }
-                            JsonObject lookupStage = null;
-
-                            if (stage.getAsJsonObject().has("$lookup")) {
-                                lookupStage = stage.getAsJsonObject().getAsJsonObject("$lookup");
-                            } else if (stage.getAsJsonObject().has("$graphLookup")) {
-                                lookupStage = stage.getAsJsonObject().getAsJsonObject("$graphLookup");
-                            }
-
-                            if (lookupStage != null && lookupStage.has("from")) {
-                                final SentenceObject lookupStageObject = new SentenceObject(
-                                        lookupStage.get("from").getAsString());
-                                // + object
-                                sentence.objects.add(lookupStageObject);
-                            }
-                        }
-                    }
-                default: // find, insert, delete, update, ...
-                    break;
-            }
-
+            final Sentence sentence = Parser.parseSentence(data);
+            
             final Construct construct = new Construct();
             construct.sentences.add(sentence);
-
+            
             construct.setFull_sql(data.toString());
-
-            Parser.RedactWithExceptions(data); // Warning: overwrites data.param.args
-
+            
+            if (data.get("atype").getAsString().equals("authCheck")) {
+                // redact, though docs state args may be already redacted.
+                Parser.RedactWithExceptions(data); // Warning: overwrites data.param.args
+            }
+            
             construct.setOriginal_sql(data.toString());
             return construct;
         } catch (final Exception e) {
             throw e;
         }
+    }
+    
+    protected static Sentence parseSentence(final JsonObject data) {
+        
+        Sentence sentence = null;
+        
+        final String atype = data.get("atype").getAsString();
+        final JsonObject param = data.get("param").getAsJsonObject();
+        
+        switch (atype) {
+            case "authCheck":
+                final String command = param.get("command").getAsString();
+                final JsonObject args = param.getAsJsonObject("args");
+
+                // + main object
+                sentence = new Sentence(command);
+                if (args.has(command)) {
+                    final SentenceObject sentenceObject = new SentenceObject(args.get(command).getAsString());
+                    sentence.objects.add(sentenceObject);
+                }
+
+                switch (command) {
+                    case "aggregate":
+                        /*
+                         * Assumes no inner-lookups; only sequential stages in pipeline.
+                         */
+                        final JsonArray pipeline = args.getAsJsonArray("pipeline");
+                        if (pipeline != null && pipeline.size() > 0) {
+                            for (final JsonElement stage : pipeline) {
+                                // handle * lookups
+                                // + object if stage has $lookup or $graphLookup: { from: obj2 }
+                                JsonObject lookupStage = null;
+
+                                if (stage.getAsJsonObject().has("$lookup")) {
+                                    lookupStage = stage.getAsJsonObject().getAsJsonObject("$lookup");
+                                } else if (stage.getAsJsonObject().has("$graphLookup")) {
+                                    lookupStage = stage.getAsJsonObject().getAsJsonObject("$graphLookup");
+                                }
+
+                                if (lookupStage != null && lookupStage.has("from")) {
+                                    final SentenceObject lookupStageObject = new SentenceObject(
+                                            lookupStage.get("from").getAsString());
+                                    // + object
+                                    sentence.objects.add(lookupStageObject);
+                                }
+                            }
+                        }
+                    default: // find, insert, delete, update, ...
+                        break; // already done before switch
+                }
+                break;
+            /* case "createCollection":
+            case "dropCollection":
+                final String ns = param.get("ns").getAsString();
+                final String[] nsArray = ns.split("\\.");
+                final String db = nsArray[0];
+                final String collection = nsArray[1];
+                sentence = new Sentence(atype); // atype is command
+                final SentenceObject sentenceObject = new SentenceObject(collection, db);
+                    sentence.objects.add(sentenceObject);
+                break; */
+            default:
+                return null; // NOTE: not parsed
+        }
+
+        return sentence;
     }
 
     public static Record parseRecord(final JsonObject data) throws ParseException {
@@ -151,6 +186,9 @@ public class Parser {
             dbName = args.get("$db").getAsString();
         } else if (param != null && param.has("db")) { // in "authenticate" error message 
             dbName = param.get("db").getAsString();
+        } else if (param != null && param.has("ns")) {
+            final String ns = param.get("ns").getAsString(); 
+            dbName = ns.split("\\.")[0]; // sometimes contains "."; fallback OK.
         }
         record.setDbName(dbName);
         record.setAppUserName(Parser.UNKOWN_STRING);
@@ -169,13 +207,13 @@ public class Parser {
 
         // set timestamp
         String dateString = Parser.parseTimestamp(data);
-        int unixTime = Parser.getTimeSeconds(dateString);
-        record.setTime(unixTime);
+        long timestamp = Parser.getTime(dateString);
+        record.setTime(timestamp);
         if (record.getData() != null) {
-            record.getData().setTimestamp(unixTime);
+            record.getData().setTimestamp(timestamp);
         } // (else it's an exception)
         if (record.isException()) {
-            record.getException().setTimestamp(String.valueOf(unixTime));
+            record.getException().setTimestamp(String.valueOf(timestamp));
         }
 
         return record;
@@ -329,10 +367,9 @@ public class Parser {
         return dateString;
     }
 
-    public static int getTimeSeconds(String dateString) throws ParseException {
+    public static long getTime(String dateString) throws ParseException {
         Date date = DATE_FORMATTER.parse(dateString);
-        int timeSeconds = (int)(date.getTime() / 1000); 
-        return timeSeconds;
+        return date.getTime();
     }
 
     /**
@@ -390,9 +427,11 @@ public class Parser {
                     keysCopy.add(key);
                 }
                 for (String key : keysCopy) { 
-                    JsonElement redactedValue = Redact(object.get(key));
-                    object.remove(key);
-                    object.add(key, redactedValue); 
+                    if (!REDACTION_IGNORE_STRINGS.contains(key)) {
+                        JsonElement redactedValue = Redact(object.get(key));
+                        object.remove(key);
+                        object.add(key, redactedValue); 
+                    } 
                 }
             }
 

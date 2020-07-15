@@ -5,9 +5,18 @@ This is a filter plugin for [Logstash](https://github.com/elastic/logstash). It 
 ??It is fully free and fully open-source. The license is Apache 2.0, meaning you are free to use it however you want??
 
 ## Documentation
-### Supported commands:
-* find, insert, delete, update, ...  
-* aggregate with $lookup(s) or $graphLookup(s)
+### Supported audit messages & commands: 
+* authCheck: 
+    * find, insert, delete, update, create, drop, ... 
+    * aggregate with $lookup(s) or $graphLookup(s)
+* authenticate (with error only) 
+
+Notes: 
+* For these events to be handled propertly, few conditions must occur: 
+    * MongoDB access control must be set, as messages without users are removed. 
+    * authCheck and authenticate events should not be filtered-out from the MongoDB audit log messages.
+* Other MongoDB events/messages are removed from pipeline, as their data is already parsed in authcheck message.
+* Non-MongoDB events are skipped, but not removed (left for other filters).
 
 ### Supported errors:  
 
@@ -22,13 +31,13 @@ The filter plugin also supports sending errors as well, though MongoDB Access co
 *IPv6* addresses can be supported by MongoDB & Filter plugin, but not tested yet and need further support by Guardium pipeline. 
 
 ## Filter notes
-* Required fields: 
-    * The filter supports events sent thru Syslog, which indicate "mongod:" in their message.
-    * server_hostname - Server hostname is expected (extracted from syslog message, 2nd field).
-    * Source program is not available in syslog messages sent by MongoDB. Instead, it's  always sent as "mongod". 
-* If events with "(NONE)" local/remote IP are not filtered, this filter will convert IP to "0.0.0.0", as valid IPv4 format is needed.
+* The filter supports events sent thru Syslog or Filebeat, which indicate "mongod:" in their message.
+* Field _server_hostname_ (required) - Server hostname is expected (extracted from syslog message, 2nd field).
+* Field _server_ip_ - States the IP of the MongoDB server; if it is available for the filter plugin, the filter will use it instead localhost IPs reported by MongoDB, if actions were performed on the DB server itself. 
+* Source program is not available in syslog messages sent by MongoDB. Instead, it's  always sent as "mongod". 
+* If events with "(NONE)" local/remote IP are not filtered (unlikely, as messages without users are filtered-out), the filter plugin will convert the IP to "0.0.0.0", as a valid format is needed.
 * Events into the filter are not removed, but tagged if not parsed (see [Filter result](#filter-result), below).
-* The event is also sent in a redacted version, so most field values are replaced with "?". Note that currently this is a naïve process, so some fields are redacted where future filter release should not redact them, like from within $lookup/$graphlookup, 1st element in $filter.cond.$eq[], etc.
+* MongoDB authCheck audit messages are also sent in a redacted version, where most field values are replaced with "?". Note that currently this is a naïve process, where most command arguments are redacted, apart from the the command, $db, and $lookup & $graphLookup required arguments (from, localField, foreignField, as, connectFromField, connectToField). Future filter release may add to this list.
 
 ## Example 
 ### syslog input
@@ -40,7 +49,7 @@ Filter tweaks the event by passing a Record object to the logstash Output plugin
     {
 
       "sequence" => 0,
-        "Record" => "{"sessionId":"n/a", "dbName":"config", "appUserName":"n/a", "time":0,"sessionLocator":{"clientIp":"tals-mbp-2.haifa.ibm.com", "clientPort":0,"serverIp":"tals-mbp-2.haifa.ibm.com", "serverPort":0,"isIpv6":false,"clientIpv6":"n/a", "serverIpv6":"n/a"},"accessor":{"dbUser":"", "serverType":"MONGODB", "serverOs":"n/a", "clientOs":"n/a", "clientHostName":"n/a", "serverHostName":"qa-db51", "commProtocol":"n/a", "dbProtocol":"Logstash", "dbProtocolVersion":"n/a", "osUser":"n/a", "sourceProgram":"mongod", "client_mac":"n/a", "serverDescription":"n/a", "serviceName":"n/a", "language":"FREE_TEXT", "type":"CONSTRUCT"},"data":{"construct":{"sentences":[{"verb":"listIndexes", "objects":[{"name":"system.sessions", "type":"collection", "fields":[],"schema":""}],"descendants":[],"fields":[]}],"full_sql":"{\"atype\":\"authCheck\",\"ts\":{\"$date\":\"2020-01-26T10:47:41.225-0500\"},\"local\":{\"ip\":\"(NONE)\",\"port\":0},\"remote\":{\"ip\":\"(NONE)\",\"port\":0},\"users\":[],\"roles\":[],\"param\":{\"command\":\"listIndexes\",\"ns\":\"config.system.sessions\",\"args\":{\"listIndexes\":\"system.sessions\",\"cursor\":{},\"$db\":\"config\"}},\"result\":0}", "original_sql":"n/a"},"timestamp":0,"originalSqlCommand":"n/a", "useConstruct":true}}",
+        "Record" => "{"sessionId":"", "dbName":"config", "appUserName":"", "time":0,"sessionLocator":{"clientIp":"tals-mbp-2.haifa.ibm.com", "clientPort":0,"serverIp":"tals-mbp-2.haifa.ibm.com", "serverPort":0,"isIpv6":false,"clientIpv6":"", "serverIpv6":""},"accessor":{"dbUser":"", "serverType":"MongoDB", "serverOs":"", "clientOs":"", "clientHostName":"", "serverHostName":"qa-db51", "commProtocol":"", "dbProtocol":"MongoDB native audit", "dbProtocolVersion":"", "osUser":"", "sourceProgram":"mongod", "client_mac":"", "serverDescription":"", "serviceName":"", "language":"FREE_TEXT", "type":"CONSTRUCT"},"data":{"construct":{"sentences":[{"verb":"listIndexes", "objects":[{"name":"system.sessions", "type":"collection", "fields":[],"schema":""}],"descendants":[],"fields":[]}],"full_sql":"{\"atype\":\"authCheck\",\"ts\":{\"$date\":\"2020-01-26T10:47:41.225-0500\"},\"local\":{\"ip\":\"(NONE)\",\"port\":0},\"remote\":{\"ip\":\"(NONE)\",\"port\":0},\"users\":[],\"roles\":[],\"param\":{\"command\":\"listIndexes\",\"ns\":\"config.system.sessions\",\"args\":{\"listIndexes\":\"system.sessions\",\"cursor\":{},\"$db\":\"config\"}},\"result\":0}", "original_sql":""},"timestamp":0,"originalSqlCommand":"", "useConstruct":true}}",
         "@version" => "1",
         "@timestamp" => 2020-02-25T12:32:16.314Z,
           "type" => "syslog",
@@ -49,7 +58,7 @@ Filter tweaks the event by passing a Record object to the logstash Output plugin
 
 This transformed event is then passed to a Mongo-Guardium Output plugin, which is responsible to send it to a Guardium machine. 
 
-If parsing fails, a tag is added ("_mongoguardium_skip" or [unlikely] "_mongoguardium_json_parse_error"), which is used in logstash configuration file to pass only events that passed the filter succesffuly. 
+If event message is not related to MongoDB, the event is tagged with  "_mongoguardium_skip_not_mongodb" (not removed from pipeline). If it's an event from MongoDB but JSON parsing fails, the event is tagged with "_mongoguardium_json_parse_error" (this may happen if syslog message is too long and was truncated). These tags are used in a logstash configuration file to pass only events that passed the filter succesfully. 
 
 ## Install
 To install this plugin, clone or download, and run from your logstash installation. Replace "?" with this plugin version:

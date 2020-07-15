@@ -127,7 +127,7 @@ public class GuardConnection implements RecordTransmitter {
         setMasterIP();
         pingBytes = GuardMessage.preparePing(snifferMasterip, config.getSnifferConfig().getIp(), config.getId());
         //configBytes = GuardMessage.prepareAgentConfig(config, "999");
-        handshakeBytes = GuardMessage.prepareHandshake(snifferMasterip, config.getSnifferConfig().getIp(), config.getId(), config.getUcConfig().getVersion());
+        handshakeBytes = GuardMessage.prepareHandshake(snifferMasterip, config.getSnifferConfig().getIp(), config.getId(), config.getDatabaseDetails().getDbType(), config.getUcConfig().getVersion());
     }
 
 
@@ -149,14 +149,14 @@ public class GuardConnection implements RecordTransmitter {
     private void sendHandshake() throws IOException {
         ByteBuffer msg = new ServiceMessageBuilder(handshakeBytes, SERVICE_ID_HANDSHAKE).getMessage();
         commHandler.write(msg);
-        log.debug("Sent handshake.");
+        if (log.isDebugEnabled()) {log.debug("Sent handshake.");}
         status = Status.OPEN;
         writeStatus("OPEN","");
         lock.lock();
         connected.signalAll();
         lock.unlock();
         //sendConfig();
-        log.debug("Connection status is : " + status);
+        if (log.isDebugEnabled()) {log.debug("Connection status is : " + status);}
     }
 
     private void createNewConnection() throws Exception {

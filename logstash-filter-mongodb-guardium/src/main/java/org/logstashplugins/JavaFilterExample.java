@@ -8,13 +8,17 @@ import co.elastic.logstash.api.FilterMatchListener;
 import co.elastic.logstash.api.LogstashPlugin;
 import co.elastic.logstash.api.PluginConfigSpec;
 import com.google.gson.*;
-import com.google.gson.JsonParser;
 import com.ibm.guardium.Parser;
+import com.ibm.guardium.connector.Util;
 import com.ibm.guardium.connector.structures.Record;
 import com.ibm.guardium.connector.structures.SessionLocator;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 // class name must match plugin name
 @LogstashPlugin(name = "java_filter_example")
@@ -22,10 +26,17 @@ public class JavaFilterExample implements Filter {
 
     public static final PluginConfigSpec<String> SOURCE_CONFIG =
             PluginConfigSpec.stringSetting("source", "message");
-
+    public static final String LOGSTASH_TAG_SKIP_NOT_MONGODB = "_mongoguardium_skip_not_mongodb"; // skip messages that do not contain "mongod:"
+    /* skipping non-mongo syslog messages, and non-relevant log events 
+        like "createUser", "createCollection", ... as these are already parsed in prior authCheck messages. */ 
+    public static final String LOGSTASH_TAG_SKIP = "_mongoguardium_skip"; 
+    public static final String LOGSTASH_TAG_JSON_PARSE_ERROR = "_mongoguardium_json_parse_error";
+    
     private String id;
     private String sourceField; 
     private final static String MONGOAUDIT_START_SIGNAL = "mongod: ";  
+    private final static Set<String> LOCAL_IP_LIST = new HashSet<>(
+        Arrays.asList("127.0.0.1", "0:0:0:0:0:0:0:1"));
 
     public JavaFilterExample(String id, Configuration config, Context context) {
         // constructors should validate configuration options
@@ -37,20 +48,30 @@ public class JavaFilterExample implements Filter {
 
     @Override
     public Collection<Event> filter(Collection<Event> events, FilterMatchListener matchListener) {
+        ArrayList<Event> skippedEvents = new ArrayList<>();
         for (Event e : events) {
             // from config, use Object f = e.getField(sourceField);
             if (e.getField("message") instanceof String) {
                 String messageString = e.getField("message").toString();
-                //TODO abandon finding "mongod:"; use syslog_message
+                // finding "mongod:" to be general (syslog, filebeat)
+                // alternatively, throw JSON audit part into a specific field
                 int mongodIndex = messageString.indexOf(MONGOAUDIT_START_SIGNAL);
                 if (mongodIndex != -1) {
                     String input = messageString.substring(mongodIndex + MONGOAUDIT_START_SIGNAL.length());
                     try {
                         JsonObject inputJSON = (JsonObject) JsonParser.parseString(input);
-                        // FIXME move filterMatched later?
-                        matchListener.filterMatched(e); // Flag OK for filter input/parsing/out
                         
-
+                        // filter internal and not parsed events
+                        final String atype = inputJSON.get("atype").getAsString();
+                        final JsonArray users = inputJSON.getAsJsonArray("users");
+                        if ((!atype.equals("authCheck") && !atype.equals("authenticate")) // filter handles only authCheck message template & authentication error,
+                            || (atype.equals("authenticate") && inputJSON.get("result").getAsString().equals("0")) // not auth success,
+                            || (users.size() == 0 && !atype.equals("authenticate")) )  { // nor messages with empty users array, as it's an internal command (except authenticate, which states in param.user)
+                            e.tag(LOGSTASH_TAG_SKIP);
+							skippedEvents.add(e);
+                            continue;
+                        }
+                        
                         Record record = Parser.parseRecord(inputJSON);
 
                         // server_hostname
@@ -65,16 +86,7 @@ public class JavaFilterExample implements Filter {
                                 record.getAccessor().setSourceProgram(sourceProgram);
                         }
 
-                        // Override "(NONE)" IP, if not filterd, as it's internal command by MongoDB.
-                        // Note: IP needs to be in ipv4/ipv6 format
-                        
-                        SessionLocator sessionLocator = record.getSessionLocator();
-                        if (sessionLocator.getServerIp().equalsIgnoreCase("(NONE)")) {
-                            sessionLocator.setServerIp("0.0.0.0");
-                        }
-                        if (sessionLocator.getClientIp().equalsIgnoreCase("(NONE)")) {
-                            sessionLocator.setClientIp("0.0.0.0");
-                        }
+                        this.correctIPs(e, record);
 
                         // TODO: Remove flat variables after Record is used.
                         e.setField("timestamp", Parser.parseTimestamp(inputJSON));
@@ -84,20 +96,61 @@ public class JavaFilterExample implements Filter {
                         final Gson gson = builder.create();
                         e.setField("Record", gson.toJson(record));
 
+                        matchListener.filterMatched(e); // Flag OK for filter input/parsing/out
+                        
                     } catch (Exception exception) {
                         // FIXME: Throw? as not proper json or syntax error
                         // don't let event pass filter
                         // TODO log event removed? 
                         //events.remove(e);
-                        e.tag("_mongoguardium_json_parse_error");
+                        e.tag(LOGSTASH_TAG_JSON_PARSE_ERROR);
                     }
                 } else {
-                    //events.remove(e);
-                    e.tag("_mongoguardium_skip");
+                    e.tag(LOGSTASH_TAG_SKIP_NOT_MONGODB);
                 }
             }
         }
+
+        // Remove skipped mongodb events from reaching output
+        // FIXME log which events skipped
+        events.removeAll(skippedEvents);
         return events;
+    }
+
+    /**
+     * Overrides MongoDB local/remote IP 127.0.0.1, if Logstash Event contains "server_ip".
+     * 
+     * @param e - Logstash Event
+     * @param record - Record after parsing.
+     */
+    private void correctIPs(Event e, Record record) {
+        // Override "(NONE)" IP, if not filterd, as it's internal command by MongoDB.
+        // Note: IP needs to be in ipv4/ipv6 format
+        SessionLocator sessionLocator = record.getSessionLocator();
+        String sessionServerIp = sessionLocator.getServerIp();
+        if (LOCAL_IP_LIST.contains(sessionServerIp)
+                || sessionServerIp.equalsIgnoreCase("(NONE)")) {
+            if (e.getField("server_ip") instanceof String) {
+                String ip = e.getField("server_ip").toString();
+                if (ip != null) {
+                    if (Util.isIPv6(ip)){
+                        sessionLocator.setServerIpv6(ip);
+                        sessionLocator.setIpv6(true);
+                    } else {
+                        sessionLocator.setServerIp(ip);
+                        sessionLocator.setIpv6(false);
+                    }
+                } else if (sessionServerIp.equalsIgnoreCase("(NONE)")) {
+                    sessionLocator.setServerIp("0.0.0.0");
+                }
+            }
+        }
+        
+        String sessionClientIp = sessionLocator.getClientIp();
+        if (LOCAL_IP_LIST.contains(sessionClientIp)
+                || sessionLocator.getClientIp().equalsIgnoreCase("(NONE)")) { 
+            sessionLocator.setClientIp(sessionLocator.getServerIp()); // as clientIP & serverIP were equal
+        }
     }
 
     @Override

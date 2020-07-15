@@ -3,6 +3,7 @@ package com.ibm.guardium.universalconnector.transmitter.socket;
 import com.ibm.guardium.proto.datasource.Datasource;
 import com.ibm.guardium.proto.datasource.Datasource.Guard_ds_message;
 import com.ibm.guardium.proto.datasource.Datasource.Guard_ds_message.Type;
+import com.ibm.guardium.universalconnector.common.Util;
 import com.ibm.guardium.universalconnector.config.ConnectionConfig;
 import com.ibm.guardium.universalconnector.config.DBProtocol;
 
@@ -12,11 +13,14 @@ import java.nio.ByteBuffer;
 public class GuardMessage {
     private static final short GUARDIUM_VENDOR_ID = 0;//4001;
     private static final short SERVICE_ID_EVENT = 4;//5;
-    static public final short SERVICE_ID_DS_MESSAGE = 4;
+    private static final String DB_TYPE_PREFIX = "UC_";
     private static final int UNINSTALL_POSITION_IN_HEADER = 18;
     private static final int UNINSTALL_COMMAND = 1;
+    private static final short SERVICE_ID_DS_MESSAGE = 4;
+
     private ByteBuffer header;
     private ByteBuffer dsMsgHeader;
+
 
     public GuardMessage(ConnectionConfig config) {
         header = ByteBuffer.allocate(20);
@@ -67,44 +71,24 @@ public class GuardMessage {
                 .setClientIdentifier(clientId)
                 .setCurrentMaster(snifNetworkAddress)
                 .setCurrentMasterIp(masterIp)
-                .setTimestamp(Datasource.Timestamp
-                        .newBuilder()
-                        .setUnixTime((int) (new java.util.Date()).getTime()).build())
+                .setTimestamp(Util.getTimestamp((new java.util.Date()).getTime()))
                 .build();
         return Guard_ds_message.newBuilder().setType(Type.PING).setPing(ping).build().toByteArray();
 
 
     }
 
-    public static byte[] prepareHandshake(int masterIp, String snifNetworkAddress, String clientId, String udsVersion)
+    public static byte[] prepareHandshake(int masterIp, String snifNetworkAddress, String clientId, String dbType, String udsVersion)
     {
-//        Datasource.Handshake justHandshake = Datasource.Handshake
-//                .newBuilder()
-//                .setTimestamp(
-//                        Datasource.Timestamp
-//                                .newBuilder()
-//                                .setUnixTime((int) (new java.util.Date()).getTime()).build())
-//                .setClientIdentifier(clientId)
-//                .setCurrentMaster(snifNetworkAddress)
-//                .setCurrentMasterIp(masterIp)
-//                //.setVendor("IBM")
-//                .setVendor("IBM")
-//                .setProduct("UDS")
-//                .setVersion(udsVersion).build();
-//
-//        return Guard_ds_message.newBuilder().setType(Type.HANDSHAKE).setHandshake(justHandshake).build().toByteArray();
         Datasource.Handshake just_handshake = Datasource.Handshake
                 .newBuilder()
-                .setTimestamp(
-                        Datasource.Timestamp
-                                .newBuilder()
-                                .setUnixTime((int)(new java.util.Date()).getTime()).build())
+                .setTimestamp(Util.getTimestamp((new java.util.Date()).getTime()))
                 .setClientIdentifier(clientId)
                 .setCurrentMaster(snifNetworkAddress)
                 .setCurrentMasterIp(masterIp)
                 .setVendor("Guardium")
                 .setProduct("Universal Connector")
-                .setClientType("Universal Connector")
+                .setClientType(DB_TYPE_PREFIX+dbType)
                 .setVersion(udsVersion).build();
 
         return Guard_ds_message.newBuilder().setType(Type.HANDSHAKE).setHandshake(just_handshake).build().toByteArray();

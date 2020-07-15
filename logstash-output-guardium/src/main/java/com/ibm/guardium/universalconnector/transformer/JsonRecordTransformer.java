@@ -3,6 +3,7 @@ package com.ibm.guardium.universalconnector.transformer;
 import com.google.gson.Gson;
 import com.google.protobuf.ByteString;
 import com.ibm.guardium.proto.datasource.Datasource;
+import com.ibm.guardium.universalconnector.common.Util;
 import com.ibm.guardium.universalconnector.transformer.RecordTransformer;
 import com.ibm.guardium.universalconnector.transformer.jsonrecord.*;
 import com.ibm.guardium.universalconnector.transformer.jsonrecord.Record;
@@ -14,6 +15,7 @@ import java.util.*;
 public class JsonRecordTransformer implements RecordTransformer {
 
     private static Log log = LogFactory.getLog(JsonRecordTransformer.class);
+    private static final String LANG_TYPE_FREE_TEXT = "FREE_TEXT"; // for parser "FREE_TEXT"
 
     public static String recordSampleMongo = "{\n" +
             "  \"sessionId\": \"{\\\"id\\\":{\\\"$type\\\":\\\"04\\\",\\\"$binary\\\":\\\"x9TSJiiQRvqVuupi3W/eCA==\\\"}}\",\n" +
@@ -125,8 +127,7 @@ public class JsonRecordTransformer implements RecordTransformer {
 
     public Datasource.Session_start buildSessionStart(Record record, Datasource.Session_locator sessionLocator, Datasource.Accessor accessor){
 
-        Datasource.Timestamp sessionStartTimestamp = Datasource.Timestamp.newBuilder().setUnixTime(record.getTime()).build();
-
+        Datasource.Timestamp sessionStartTimestamp = Util.getTimestamp(record.getTime());
         Datasource.Session_start sessionStart = Datasource.Session_start.newBuilder()
                 .setSessionLocator(sessionLocator)
                 .setTimestamp(sessionStartTimestamp)
@@ -139,33 +140,13 @@ public class JsonRecordTransformer implements RecordTransformer {
 
         return sessionStart;
     }
-    static public long getUnixTime() {
-        return getUnixTime(new Date());
-    }
 
-    /**
-     * Unix time is in seconds, Java is is in milliseconds. Simply divide by 1000.
-     * @param date Optional
-     * @return Java time divide by 1000
-     */
-    static public long getUnixTime(Date date) {
-        return date.getTime() / 1000;
-    }
-
-    static public Datasource.Timestamp getTimestamp() {
-        return Datasource.Timestamp.newBuilder().setUnixTime((int) getUnixTime()).build();
-    }
     /**
      *
      * This method will send an exception message based on the
      * error code which is returned from the database server
      * An example would be "table not found" exception.
      *
-     * @param session_ID
-     * @param client_IP
-     * @param client_Port
-     * @param server_IP
-     * @param server_Port
      */
     public static Datasource.Exception buildExceptionData(Record record,Datasource.Session_locator sessionLocator)  {
         // Build the session locator information to be put into the exception message
@@ -177,7 +158,7 @@ public class JsonRecordTransformer implements RecordTransformer {
         ExceptionRecord recordException = record.getException();
         //Add Required fields
         exceptionMsg.setSession(sessionLocator);
-        exceptionMsg.setTimestamp(getTimestamp());
+        exceptionMsg.setTimestamp(Util.getTimestamp(record.getTime()));
         Accessor accessor = record.getAccessor();
         //Add Optional fields
 //        exceptionMsg.setAPPUSERNAME("AppUserNameFromException");
@@ -196,11 +177,17 @@ public class JsonRecordTransformer implements RecordTransformer {
         return exceptionMsg.build();
     }
 
-        public Datasource.Application_data buildAppplicationData(Record record, Datasource.Session_locator sessionLocator) {
+    public Datasource.Application_data buildAppplicationData(Record record, Datasource.Session_locator sessionLocator) {
+        Datasource.Timestamp timestamp = getTimestamp(record.getTimeInMs());
         Data rd = record.getData();
-        Datasource.Timestamp timestamp = getTimeStamp(record);
         Datasource.Application_data.Data_type dataType = getDataType(record);
-        Datasource.Application_data.Language_type langType = getLanguageType(/*record.getAccessor().getLanguage()*/"FREE_TEXT");
+        String langTypeStr = LANG_TYPE_FREE_TEXT;
+        // only in case where users said that record should be parsed by sniffer (does not use construct)
+        // need to set lang to language type from record
+        if ( rd!=null && !rd.isUseConstruct() && record.getAccessor()==null){
+             langTypeStr = record.getAccessor().getLanguage();
+        }
+        Datasource.Application_data.Language_type langType = getLanguageType(langTypeStr);
         Datasource.Application_data.Builder builder = Datasource.Application_data.newBuilder()
                 .setType(dataType)
                 .setLanguage(langType)
@@ -208,25 +195,24 @@ public class JsonRecordTransformer implements RecordTransformer {
                 .setDatasourceType(Datasource.Application_data.Datasource_type.UNI_CON)
                 .setApplicationUser(record.getAppUserName())
                 .setTimestamp(timestamp);
-if(rd != null) {
-    if (rd.isUseConstruct()) {
-        Datasource.GDM_construct gdmConstruct = buildConstruct(rd);
-        builder.setConstruct(gdmConstruct);
-        builder.setType(Datasource.Application_data.Data_type.CONSTRUCT);
-    } else {
-        builder.setText(rd.getOriginalSqlCommand());
-    }
-}
+        if(rd != null) {
+            if (rd.isUseConstruct()) {
+                Datasource.GDM_construct gdmConstruct = buildConstruct(rd);
+                builder.setConstruct(gdmConstruct);
+                builder.setType(Datasource.Application_data.Data_type.CONSTRUCT);
+            } else {
+                builder.setText(rd.getOriginalSqlCommand());
+            }
+        }
         return builder.build();
     }
 
     public Datasource.Timestamp getTimeStamp(Record record) {
-        Data data = record.getData();
-        int timestamp = 0;
-        if(data != null){
-            timestamp = data.getTimestamp();
+        long time = 0;
+        if(record != null){
+            time = record.getTime();
         }
-        return Datasource.Timestamp.newBuilder().setUnixTime(timestamp).build();
+        return Util.getTimestamp(time);
     }
 
     public Datasource.GDM_construct buildConstruct(Data recordData) {
@@ -281,7 +267,8 @@ if(rd != null) {
     public Datasource.Accessor buildAccessor(Record record) {
         Accessor ra = record.getAccessor();
         Datasource.Application_data.Data_type dataType = getDataType(record);
-        Datasource.Application_data.Language_type languageType = getLanguageType(ra.getLanguage());
+        String langType = (record.getData()!=null && record.getData().isUseConstruct()) ? LANG_TYPE_FREE_TEXT : ra.getLanguage();
+        Datasource.Application_data.Language_type languageType = getLanguageType(langType);
         Datasource.Accessor accessor = Datasource.Accessor.newBuilder()
                 .setDbUser(ra.getDbUser())
                 .setServerType(ra.getServerType())
@@ -335,8 +322,27 @@ if(rd != null) {
         return ret;
     }
 
+    /*
+    * https://code.woboq.org/userspace/glibc/resolv/inet_pton.c.html#hex_digit_value
+    * static int hex_digit_value (char ch)
+        {
+          if ('0' <= ch && ch <= '9')
+            return ch - '0';
+          if ('a' <= ch && ch <= 'f')
+            return ch - 'a' + 10;
+          if ('A' <= ch && ch <= 'F')
+            return ch - 'A' + 10;
+          return -1;
+        }
+    * */
+
     public static Datasource.Application_data.Language_type getLanguageType(String strType){
-        return Datasource.Application_data.Language_type.valueOf(strType.toUpperCase());
+        try {
+            return Datasource.Application_data.Language_type.valueOf(strType.toUpperCase());
+        } catch (Exception e){
+            log.error("Failed to parse languageType "+strType+", return default FREE_TEXT");
+            return Datasource.Application_data.Language_type.FREE_TEXT;
+        }
     }
 
     public static Datasource.Application_data.Data_type getDataType(Record record){

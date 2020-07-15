@@ -2,7 +2,7 @@ package com.ibm.guardium.universalconnector.transformer.jsonrecord;
 
 public class Data {
     private Construct construct;
-    private int timestamp;
+    private long timestamp; // milliseconds
     private String originalSqlCommand;
     private boolean useConstruct;
 
@@ -26,11 +26,15 @@ public class Data {
         this.construct = construct;
     }
 
-    public int getTimestamp() {
+    public long getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(int timestamp) {
+    /**
+     * Set timestamp action, in DB, in milliseconds precision (long) 
+     * @param timestamp
+     */
+    public void setTimestamp(Long timestamp) {
         this.timestamp = timestamp;
     }
 

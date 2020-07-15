@@ -5,7 +5,7 @@ public class Record {
     private String sessionId;
     private String dbName;
     private String appUserName;
-    private int    time;
+    private long   time; // milliseconds
 
     private SessionLocator  sessionLocator;
     private Accessor        accessor;
@@ -15,11 +15,16 @@ public class Record {
     public boolean isException(){
         return  (this.exception != null);
     }
-    public int getTime() {
+
+    public long getTime() {
         return time;
     }
 
-    public void setTime(int time) {
+    /**
+     * Set time of action, in DB, in milliseconds precision (long) 
+     * @param time
+     */
+    public void setTime(Long time) {
         this.time = time;
     }
 

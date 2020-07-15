@@ -16,12 +16,18 @@ public class JsonFromEventBuilder {
     private static String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
     private static SimpleDateFormat dateFormattter = new SimpleDateFormat(DATE_FORMAT);
 
+    // TODO remove buildRecord(); filter's responsibility
+    /**
+     * @deprecated filter is responsible.
+     * @param e
+     * @return
+     */
     public Record buildRecord(Event event) throws ParseException {
         String recordString = event.getField("Record").toString();
         Record record = (new Gson()).fromJson(recordString, Record.class);
         // Record record = new Record();
         
-        record.setTime(getTimeInSec(event));
+        record.setTimeInMs(getTimeInSec(event));
         // record.setDbName(getStringField(event, "dbName", "schema"));
         // record.setAppUserName(getStringField(event, "app_user_name", "no_app_user"));
         // record.setSessionId(getStringField(event, "session_id", "sessionId123456789"));
@@ -74,14 +80,19 @@ public class JsonFromEventBuilder {
         accessor.setType(getStringField(event, "type", "notype"));
         return accessor;
     }
-
-    // TODO remove when Record is complete (Tal to add Data in)
+    
+    // TODO remove builData; filter's responsibility
+    /**
+     * @deprecated filter is responsible.
+     * @param e
+     * @return
+     */
     public Data buildData(Event e) {
         Data data = new Data();
         data.setOriginalSqlCommand(getStringField(e, "original_sql", "nosql"));
         data.setOriginalSqlCommand(getStringField(e, "original_sql", "nosql"));
         try {
-            data.setTimestamp(getTimeInSec(e));
+            //data.setTimesInMs(getTimeInSec(e));
             String  constructStr = getStringField(e, "Construct", null);
             if (constructStr!=null) {
                 Construct construct = (new Gson()).fromJson(constructStr, Construct.class);
@@ -111,13 +122,12 @@ public class JsonFromEventBuilder {
         return e.getField(s) == null ? defaultValue : Integer.parseInt(e.getField(s).toString());
     }
 
-    private int getTimeInSec(Event event) throws ParseException {
+    private long getTimeInSec(Event event) throws ParseException {
         String dateStr = getStringField(event, "timestamp", null);
         if (dateStr==null) {
             dateStr = getStringField(event, "@timestamp", "2020-02-12T07:30:25.092-0500");
         }
         Date date = dateFormattter.parse(dateStr);
-        int timeInMs = (int)(date.getTime() / 1000); //todo: check this
-        return timeInMs;
+        return date.getTime();
     }
 }

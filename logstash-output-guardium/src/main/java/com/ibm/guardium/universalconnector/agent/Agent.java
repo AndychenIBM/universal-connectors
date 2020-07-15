@@ -140,7 +140,7 @@ public class Agent {
     private void waitForMessageQueue() throws InterruptedException{
         if (messageQueue.remainingCapacity() > 0)
             return;
-        log.debug("messageQueue is full, waiting. "+config.getId());
+        if (log.isDebugEnabled()) {log.debug("messageQueue is full, waiting. "+config.getId());}
         while(messageQueue.remainingCapacity() == 0)
             Thread.sleep(1);
     }
@@ -158,7 +158,7 @@ public class Agent {
         try {
             waitForMessageQueue();
             messageQueue.put(new QueuedMessage(msg));
-            log.debug("Agent queue size (proto message was added): " + messageQueue.size()+" "+config.getId());
+            if (log.isDebugEnabled()) {log.debug("Agent queue size (proto message was added): " + messageQueue.size()+" "+config.getId());}
         } catch (Exception e) {
             log.error(e);
         }
@@ -177,7 +177,7 @@ public class Agent {
         try {
             waitForMessageQueue();
             messageQueue.put(new QueuedMessage(msg));
-            log.debug("Agent queue size (byte[] message was added): " + messageQueue.size()+" "+config.getId());
+            if (log.isDebugEnabled()){log.debug("Agent queue size (byte[] message was added): " + messageQueue.size()+" "+config.getId());}
         } catch (Exception e) {
             log.error("Error sending message for "+config.getId(),e);
         }
