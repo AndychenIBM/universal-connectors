@@ -100,6 +100,10 @@ public class Agent {
 
     public void start() throws Exception{
         recordTransmitter.setup(config);
+        StatusWriter statusWriter = getStatusWriter(config);
+        statusWriter.init();
+        this.recordTransmitter.setStatusWriter(statusWriter);
+
         log.debug("ready to create connection to snif "+config.getId());
         connThread = new Thread(recordTransmitter);
         connThread.setName(config.getId() + "-recordTransmitter");
@@ -115,8 +119,6 @@ public class Agent {
         }
         log.debug("Starting stats timer."+config.getId());
         timer = new Timer();
-        StatusWriter statusWriter = getStatusWriter(config);
-        statusWriter.init();
         this.agentStatusGenerator = new AgentStatusGenerator(CONSUMER_Q_SIZE);
         statsTimer = new StatsTimer();
         timer.scheduleAtFixedRate(statsTimer, 0, 1000);
