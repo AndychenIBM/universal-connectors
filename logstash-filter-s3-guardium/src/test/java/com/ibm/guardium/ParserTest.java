@@ -2,21 +2,31 @@ package com.ibm.guardium;
 
 import static org.junit.Assert.assertEquals;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
 
+import com.ibm.guardium.s3.EventSamples;
 import com.ibm.guardium.s3.Parser;
+import com.ibm.guardium.universalconnector.common.structures.Record;
+import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+
+@RunWith(value = Parameterized.class)
 public class ParserTest {
+    private static final Gson gson = new Gson();
 
     @Test
     public void testParseAsConstruct_Find() {
 
         // final String actualResult = Parser.Parse(mongoJson);
-        JsonObject inputJSON = (JsonObject) JsonParser.parseString(Parser.GETOBJECT_EVENT);
+        JsonObject inputJSON = (JsonObject) JsonParser.parseString(EventSamples.getSamplesByEventName(EventSamples.EventName.GetObject).get(0).getJsonStr());
         try {
-           // Record result = Parser.buildRecord(inputJSON);
+            // Record result = Parser.buildRecord(inputJSON);
             System.out.println("result");
         } catch (Exception e) {
             e.printStackTrace();
@@ -28,11 +38,18 @@ public class ParserTest {
 //        Assert.assertEquals("collection", sentence.objects.get(0).type);
     }
 
- /*   Parser parser = new Parser();
-    final String mongoString = "{ \"atype\": \"authCheck\", \"ts\": { \"$date\": \"2020-01-26T09:58:44.547-0500\" }, \"local\": { \"ip\": \"127.0.0.1\", \"port\": 27017 }, \"remote\": { \"ip\": \"127.0.0.1\", \"port\": 56984 }, \"users\": [], \"roles\": [], \"param\": { \"command\": \"aggregate\", \"ns\": \"test.travelers\", \"args\": { \"aggregate\": \"travelers\", \"pipeline\": [ { \"$graphLookup\": { \"from\": \"airports\", \"startWith\": \"$nearestAirport\", \"connectFromField\": \"connects\", \"connectToField\": \"airport\", \"maxDepth\": 2, \"depthField\": \"numConnections\", \"as\": \"destinations\" } } ], \"cursor\": {}, \"lsid\": { \"id\": { \"$binary\": \"2WoIDPhSTcKHrdJW4azoow==\", \"$type\": \"04\" } }, \"$db\": \"test\" } }, \"result\": 0 }";
-    final JsonObject mongoJson = JsonParser.parseString(mongoString).getAsJsonObject();
 
-    @Test
+    public void testParseAsConstruct_dbname_1_sample(EventSamples.Sample sample) throws Exception{
+
+        JsonObject inputJSON = (JsonObject) JsonParser.parseString(sample.getJsonStr());
+        Record result = Parser.buildRecord(inputJSON);
+        Assert.assertTrue("db name is null", result.getDbName() != null);
+        Assert.assertTrue("db name is empty", result.getDbName().length() != 0);
+        Assert.assertTrue("db name is N/A", !result.getDbName().equalsIgnoreCase(Parser.UNKNOWN_STRING));
+    }
+
+
+    /*@Test
     public void testParseAsConstruct_Find() {
         final String mongoString = "{ \"atype\": \"authCheck\", \"ts\": { \"$date\": \"2020-01-14T10:46:02.431-0500\" }, \"local\": { \"ip\": \"127.0.0.1\", \"port\": 27017 }, \"remote\": { \"ip\": \"127.0.0.1\", \"port\": 33708 }, \"users\": [], \"roles\": [], \"param\": { \"command\": \"find\", \"ns\": \"test.bios\", \"args\": { \"find\": \"bios\", \"filter\": {}, \"lsid\": { \"id\": { \"$binary\": \"hg6ugx4ASiGWKSPiDRlEFw==\", \"$type\": \"04\" } }, \"$db\": \"test\" } }, \"result\": 0 }";
 
@@ -317,7 +334,6 @@ public class ParserTest {
 //        Date date = new Date((long) unixTime * 1000);
 //        Assert.assertEquals(unixTime, date.getTime() / 1000);
 //    }
-
 
 
 }
