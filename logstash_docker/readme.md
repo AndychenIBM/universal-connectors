@@ -28,17 +28,23 @@ running a container- this can be done by one of the following:
 *In order to change connectorId, use -e CONNECTOR_ID=<new_connectorId_name>. for example:
 docker run -d --name="Klaus" --network="host" -e CONNECTOR_ID="123" -it universal-connector  
 
-
+*In order to change listening port, use -e <protocol_type>=<new_listening_port>. for example:
+docker run -d --name="Klaus" --network="host" -e UDP_PORT="514" -it universal-connector  
+docker run -d --name="Klaus" --network="host" -e TCP_PORT="500" -it universal-connector  
+docker run -d --name="Klaus" --network="host" -e FILEBEAT_PORT="5044" -it universal-connector  
 
 
 Project Content:
-1. config directory:
-	1.1. pipelines.yml- defines where to read the logstash config files from (according to the selected pipeline)
-	1.2. log4j.properties- logstash configurations regarding log4j
-	1.3. SnifferConfig.json- configuration for connecting with Guardium Sniffer
-	1.4. UniversalConnector.json- more configuration needed for logstash's agent
-	1.5. plugins- gem files that will be transferred into the container
-2. pipeline directory:
-	2.1. *.conf files that will be used as the configuration for logstash (including input,filter and output)
+1. uc directory:
+    1.1. config directory:
+	    1.1.1. pipelines.yml- defines where to read the logstash config files from (according to the selected pipeline)
+	    1.1.2. log4j.properties- logstash configurations regarding log4j
+	    1.1.3. SnifferConfig.json- configuration for connecting with Guardium Sniffer
+	    1.1.4. UniversalConnector.json- more configuration needed for logstash's agent
+	    1.1.5. plugins- gem files that will be transferred into the container
+    1.2. pipeline directory:
+	    1.2.1. *.conf files that will be used as the configuration for logstash (including input,filter and output)
+	1.3. scripts directory:
+	    1.3.1. *.sh scripts for universal-connector usage
+2. uc_perf_tests directory- a directory meant for performance tests
 3. Dockerfile- import and install logstash, remove old version of the container, pass relevant files to the container, install plugins.
-4. start_logstash.sh- this script starts logstash when "docker run..." command is executed
