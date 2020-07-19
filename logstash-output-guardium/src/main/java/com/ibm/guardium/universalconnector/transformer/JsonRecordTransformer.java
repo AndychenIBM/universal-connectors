@@ -5,8 +5,7 @@ import com.google.protobuf.ByteString;
 import com.ibm.guardium.proto.datasource.Datasource;
 import com.ibm.guardium.universalconnector.common.Util;
 import com.ibm.guardium.universalconnector.transformer.RecordTransformer;
-import com.ibm.guardium.universalconnector.transformer.jsonrecord.*;
-import com.ibm.guardium.universalconnector.transformer.jsonrecord.Record;
+import com.ibm.guardium.universalconnector.common.structures.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

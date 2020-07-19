@@ -3,8 +3,7 @@ package com.ibm.guardium.universalconnector.transformer;
 
 import com.google.gson.Gson;
 import com.ibm.guardium.proto.datasource.Datasource;
-import com.ibm.guardium.universalconnector.transformer.jsonrecord.Accessor;
-import com.ibm.guardium.universalconnector.transformer.jsonrecord.Record;
+import com.ibm.guardium.universalconnector.common.structures.*;
 import org.jruby.RubyProcess;
 import org.junit.Assert;
 import org.junit.Test;
