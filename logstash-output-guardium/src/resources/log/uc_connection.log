@@ -27033,3 +27033,334 @@ java.net.ConnectException: Connection timed out: no further information
 13 Feb 11:47:45.78 DEBUG[ConnectorNumber3-recordTransmitter] - Connection status is : CLOSE
 13 Feb 11:47:45.78 DEBUG[ConnectorNumber3-recordTransmitter] - closing old connection.
 13 Feb 11:47:45.78 DEBUG[ConnectorNumber3-recordTransmitter] - Connecting to: 9.70.157.70:16022
+10 May 22:00:04.879  INFO[main] - Connection configuration ConnectionConfig{ucConfig=UCConfig{version='UniversalConnector (V1.2.44)', connectorId='ConnectorNumber5', connectorIp='127.0.0.1', configurationFetchType='file', configurationFetchFileName='SniffersConfig.json', statusWriterType='LOG'}, snifferConfig=SnifferConfig{ip='9.70.157.70', port=16022, isSSL=false}, databaseDetails=DatabaseDetails{dbName='config', dbHost='18743423', dbPort=0}}
+10 May 22:00:04.881  INFO[main] - Snif address is set to 9.70.157.70:16022 connecting with SSL=false
+10 May 22:00:10.221 DEBUG[ConnectorNumber5_9.70.157.70_config_18743423_0-recordTransmitter] - Starting connection to Snif
+10 May 22:00:10.223 DEBUG[ConnectorNumber5_9.70.157.70_config_18743423_0-recordTransmitter] - Connection status is : CLOSE
+10 May 22:00:10.232 DEBUG[ConnectorNumber5_9.70.157.70_config_18743423_0-recordTransmitter] - Connecting to: 9.70.157.70:16022
+10 May 22:00:10.396 DEBUG[ConnectorNumber5_9.70.157.70_config_18743423_0-recordTransmitter] - Sent handshake.
+10 May 22:00:10.397 DEBUG[ConnectorNumber5_9.70.157.70_config_18743423_0-recordTransmitter] - Connection status is : OPEN
+10 May 22:14:41.850  INFO[main] - Connection configuration ConnectionConfig{ucConfig=UCConfig{version='UniversalConnector (V1.2.44)', connectorId='UC', connectorIp='127.0.0.1', configurationFetchType='file', configurationFetchFileName='SniffersConfig.json', statusWriterType='LOG'}, snifferConfig=SnifferConfig{ip='9.70.157.70', port=16022, isSSL=false}, databaseDetails=DatabaseDetails{dbName='config', dbHost='18743423', dbPort=0}}
+10 May 22:14:41.850  INFO[main] - Snif address is set to 9.70.157.70:16022 connecting with SSL=false
+10 May 22:14:41.913 DEBUG[UC_config_18743423_0-recordTransmitter] - Starting connection to Snif
+10 May 22:14:41.914 DEBUG[UC_config_18743423_0-recordTransmitter] - Connection status is : CLOSE
+10 May 22:14:41.921 DEBUG[UC_config_18743423_0-recordTransmitter] - Connecting to: 9.70.157.70:16022
+10 May 22:14:42.75 DEBUG[UC_config_18743423_0-recordTransmitter] - Sent handshake.
+10 May 22:14:42.75 DEBUG[UC_config_18743423_0-recordTransmitter] - Connection status is : OPEN
+11 May 16:28:13.905  INFO[main] - Connection configuration ConnectionConfig{ucConfig=UCConfig{version='UniversalConnector (V1.2.44)', connectorId='UC', connectorIp='127.0.0.1', configurationFetchType='file', configurationFetchFileName='SniffersConfig.json', statusWriterType='LOG'}, snifferConfig=SnifferConfig{ip='9.70.157.70', port=16022, isSSL=false}, databaseDetails=DatabaseDetails{dbName='config', dbHost='qa-db51', dbPort=0}}
+11 May 16:28:13.905  INFO[main] - Snif address is set to 9.70.157.70:16022 connecting with SSL=false
+11 May 16:28:13.966 DEBUG[UC_config_qa-db51_0-recordTransmitter] - Starting connection to Snif
+11 May 16:28:13.968 DEBUG[UC_config_qa-db51_0-recordTransmitter] - Connection status is : CLOSE
+11 May 16:28:13.976 DEBUG[UC_config_qa-db51_0-recordTransmitter] - Connecting to: 9.70.157.70:16022
+11 May 16:28:14.143 DEBUG[UC_config_qa-db51_0-recordTransmitter] - Sent handshake.
+11 May 16:28:14.143 DEBUG[UC_config_qa-db51_0-recordTransmitter] - Connection status is : OPEN
+11 May 16:28:15.25 DEBUG[UC_config_qa-db51_0-recordTransmitter] - Read -1, closing socket.
+11 May 16:28:15.25 DEBUG[UC_config_qa-db51_0-recordTransmitter] - Connection status is : CLOSE
+11 May 16:28:15.26 DEBUG[UC_config_qa-db51_0-recordTransmitter] - closing old connection.
+11 May 16:28:15.26 DEBUG[UC_config_qa-db51_0-recordTransmitter] - Connecting to: 9.70.157.70:16022
+11 May 16:39:18.394  INFO[main] - Connection configuration ConnectionConfig{ucConfig=UCConfig{version='UniversalConnector (V1.2.44)', connectorId='UC', connectorIp='127.0.0.1', configurationFetchType='file', configurationFetchFileName='SniffersConfig.json', statusWriterType='LOG'}, snifferConfig=SnifferConfig{ip='9.70.157.70', port=16022, isSSL=false}, databaseDetails=DatabaseDetails{dbName='config', dbHost='qa-db51', dbPort=0}}
+11 May 16:39:18.395  INFO[main] - Snif address is set to 9.70.157.70:16022 connecting with SSL=false
+11 May 16:39:33.602 DEBUG[UC_config_qa-db51_0-recordTransmitter] - Starting connection to Snif
+11 May 16:39:33.607 DEBUG[UC_config_qa-db51_0-recordTransmitter] - Connection status is : CLOSE
+11 May 16:39:33.609 DEBUG[UC_config_qa-db51_0-recordTransmitter] - Connecting to: 9.70.157.70:16022
+11 May 16:39:33.768 DEBUG[UC_config_qa-db51_0-recordTransmitter] - Sent handshake.
+11 May 16:39:33.768 DEBUG[UC_config_qa-db51_0-recordTransmitter] - Connection status is : OPEN
+11 May 16:45:43.636  INFO[main] - Connection configuration ConnectionConfig{ucConfig=UCConfig{version='UniversalConnector (V1.2.44)', connectorId='1', connectorIp='127.0.0.1', configurationFetchType='file', configurationFetchFileName='SniffersConfig.json', statusWriterType='LOG'}, snifferConfig=SnifferConfig{ip='9.70.157.70', port=16022, isSSL=false}, databaseDetails=DatabaseDetails{dbName='config', dbHost='qa-db51', dbPort=0}}
+11 May 16:45:43.636  INFO[main] - Snif address is set to 9.70.157.70:16022 connecting with SSL=false
+11 May 16:46:28.423 DEBUG[UC1_config_qa-db51_0-recordTransmitter] - Starting connection to Snif
+11 May 16:46:28.426 DEBUG[UC1_config_qa-db51_0-recordTransmitter] - Connection status is : CLOSE
+11 May 16:46:29.510 DEBUG[UC1_config_qa-db51_0-recordTransmitter] - Connecting to: 9.70.157.70:16022
+11 May 16:46:30.120 DEBUG[UC1_config_qa-db51_0-recordTransmitter] - Sent handshake.
+11 May 16:46:30.120 DEBUG[UC1_config_qa-db51_0-recordTransmitter] - Connection status is : OPEN
+13 May 20:44:21.734  INFO[main] - Connection configuration ConnectionConfig{ucConfig=UCConfig{version='UniversalConnector (V1.2.44)', connectorId='1', connectorIp='127.0.0.1', configurationFetchType='file', configurationFetchFileName='SniffersConfig.json', statusWriterType='LOG', snifferConnectionsLimit =20}, snifferConfig=SnifferConfig{ip='9.70.157.70', port=16022, isSSL=false}, databaseDetails=DatabaseDetails{dbName='config', dbHost='qa-db51', dbPort=0}}
+13 May 20:44:21.734  INFO[main] - Snif address is set to 9.70.157.70:16022 connecting with SSL=false
+13 May 20:44:21.807 DEBUG[UC1_config_qa-db51_0-recordTransmitter] - Starting connection to Snif
+13 May 20:44:21.809 DEBUG[UC1_config_qa-db51_0-recordTransmitter] - Connection status is : CLOSE
+13 May 20:44:21.818 DEBUG[UC1_config_qa-db51_0-recordTransmitter] - Connecting to: 9.70.157.70:16022
+13 May 20:44:21.989 DEBUG[UC1_config_qa-db51_0-recordTransmitter] - Sent handshake.
+13 May 20:44:21.989 DEBUG[UC1_config_qa-db51_0-recordTransmitter] - Connection status is : OPEN
+13 May 20:45:23.299  INFO[main] - Connection configuration ConnectionConfig{ucConfig=UCConfig{version='UniversalConnector (V1.2.44)', connectorId='2', connectorIp='127.0.0.1', configurationFetchType='file', configurationFetchFileName='SniffersConfig.json', statusWriterType='LOG', snifferConnectionsLimit =20}, snifferConfig=SnifferConfig{ip='9.70.157.70', port=16022, isSSL=false}, databaseDetails=DatabaseDetails{dbName='config', dbHost='qa-db51', dbPort=0}}
+13 May 20:45:23.299  INFO[main] - Snif address is set to 9.70.157.70:16022 connecting with SSL=false
+13 May 20:45:23.362 DEBUG[UC2_config_qa-db51_0-recordTransmitter] - Starting connection to Snif
+13 May 20:45:23.363 DEBUG[UC2_config_qa-db51_0-recordTransmitter] - Connection status is : CLOSE
+13 May 20:45:23.369 DEBUG[UC2_config_qa-db51_0-recordTransmitter] - Connecting to: 9.70.157.70:16022
+13 May 20:45:23.526 DEBUG[UC2_config_qa-db51_0-recordTransmitter] - Sent handshake.
+13 May 20:45:23.526 DEBUG[UC2_config_qa-db51_0-recordTransmitter] - Connection status is : OPEN
+17 May 10:16:03.655  INFO[main] - Connection configuration ConnectionConfig{ucConfig=UCConfig{version='UniversalConnector (V1.2.44)', connectorId='3', connectorIp='127.0.0.1', configurationFetchType='file', configurationFetchFileName='SniffersConfig.json', statusWriterType='LOG', snifferConnectionsLimit =20}, snifferConfig=SnifferConfig{ip='9.70.157.70', port=16022, isSSL=false}, databaseDetails=DatabaseDetails{dbName='config', dbHost='qa-db51', dbPort=0}}
+17 May 10:16:03.657  INFO[main] - Snif address is set to 9.70.157.70:16022 connecting with SSL=false
+17 May 10:17:10.204 DEBUG[UC3_config_qa-db51_0-recordTransmitter] - Starting connection to Snif
+17 May 10:17:11.389 DEBUG[UC3_config_qa-db51_0-recordTransmitter] - Connection status is : CLOSE
+17 May 10:17:14.200 DEBUG[UC3_config_qa-db51_0-recordTransmitter] - Connecting to: 9.70.157.70:16022
+17 May 10:17:14.377 DEBUG[UC3_config_qa-db51_0-recordTransmitter] - Sent handshake.
+17 May 10:17:14.379 DEBUG[UC3_config_qa-db51_0-recordTransmitter] - Connection status is : OPEN
+17 May 10:21:15.316  INFO[main] - Connection configuration ConnectionConfig{ucConfig=UCConfig{version='UniversalConnector (V1.2.44)', connectorId='3', connectorIp='127.0.0.1', configurationFetchType='file', configurationFetchFileName='SniffersConfig.json', statusWriterType='LOG', snifferConnectionsLimit =20}, snifferConfig=SnifferConfig{ip='9.70.145.131', port=16022, isSSL=false}, databaseDetails=DatabaseDetails{dbName='config', dbHost='qa-db51', dbPort=0}}
+17 May 10:21:15.316  INFO[main] - Snif address is set to 9.70.145.131:16022 connecting with SSL=false
+17 May 10:21:15.389 DEBUG[UC3_config_qa-db51_0-recordTransmitter] - Starting connection to Snif
+17 May 10:21:15.391 DEBUG[UC3_config_qa-db51_0-recordTransmitter] - Connection status is : CLOSE
+17 May 10:21:15.398 DEBUG[UC3_config_qa-db51_0-recordTransmitter] - Connecting to: 9.70.145.131:16022
+17 May 10:21:15.556 DEBUG[UC3_config_qa-db51_0-recordTransmitter] - Sent handshake.
+17 May 10:21:15.557 DEBUG[UC3_config_qa-db51_0-recordTransmitter] - Connection status is : OPEN
+17 May 11:07:46.168  INFO[Test worker] - Connection configuration ConnectionConfig{ucConfig=UCConfig{version='UniversalConnector (V1.2.44)', connectorId='3', connectorIp='127.0.0.1', configurationFetchType='file', configurationFetchFileName='SniffersConfig.json', statusWriterType='LOG', snifferConnectionsLimit =20}, snifferConfig=SnifferConfig{ip='9.70.145.131', port=16022, isSSL=false}, databaseDetails=DatabaseDetails{dbName='config', dbHost='qa-db51', dbPort=0}}
+17 May 11:07:46.169  INFO[Test worker] - Snif address is set to 9.70.145.131:16022 connecting with SSL=false
+17 May 11:07:46.179 DEBUG[UC3_config_qa-db51_0-recordTransmitter] - Starting connection to Snif
+17 May 11:07:46.181 DEBUG[UC3_config_qa-db51_0-recordTransmitter] - Connection status is : CLOSE
+17 May 11:07:46.182 DEBUG[UC3_config_qa-db51_0-recordTransmitter] - Connecting to: 9.70.145.131:16022
+17 May 11:07:46.481 DEBUG[UC3_config_qa-db51_0-recordTransmitter] - Sent handshake.
+17 May 11:07:46.481 DEBUG[UC3_config_qa-db51_0-recordTransmitter] - Connection status is : OPEN
+17 May 12:35:47.88  INFO[Test worker] - Connection configuration ConnectionConfig{ucConfig=UCConfig{version='UniversalConnector (V1.2.44)', connectorId='3', connectorIp='127.0.0.1', configurationFetchType='file', configurationFetchFileName='SniffersConfig.json', statusWriterType='LOG', snifferConnectionsLimit =20}, snifferConfig=SnifferConfig{ip='9.70.145.131', port=16022, isSSL=false}, databaseDetails=DatabaseDetails{dbName='config', dbHost='qa-db51', dbPort=0}}
+17 May 12:35:47.89  INFO[Test worker] - Snif address is set to 9.70.145.131:16022 connecting with SSL=false
+17 May 12:35:47.105 DEBUG[UC3_config_qa-db51_0-recordTransmitter] - Starting connection to Snif
+17 May 12:35:47.107 DEBUG[UC3_config_qa-db51_0-recordTransmitter] - Connection status is : CLOSE
+17 May 12:35:47.109 DEBUG[UC3_config_qa-db51_0-recordTransmitter] - Connecting to: 9.70.145.131:16022
+17 May 12:35:47.253 DEBUG[UC3_config_qa-db51_0-recordTransmitter] - Sent handshake.
+17 May 12:35:47.253 DEBUG[UC3_config_qa-db51_0-recordTransmitter] - Connection status is : OPEN
+17 May 15:41:35.196  INFO[Test worker] - Connection configuration ConnectionConfig{ucConfig=UCConfig{version='UniversalConnector (V1.2.44)', connectorId='3', connectorIp='127.0.0.1', configurationFetchType='file', configurationFetchFileName='SniffersConfig.json', statusWriterType='LOG', snifferConnectionsLimit =20}, snifferConfig=SnifferConfig{ip='9.70.145.131', port=16022, isSSL=false}, databaseDetails=DatabaseDetails{dbName='configKokoExp', dbHost='qa-db51', dbPort=0}}
+17 May 15:41:35.196  INFO[Test worker] - Snif address is set to 9.70.145.131:16022 connecting with SSL=false
+17 May 15:41:35.207 DEBUG[UC3_qa-db51_0-recordTransmitter] - Starting connection to Snif
+17 May 15:41:35.209 DEBUG[UC3_qa-db51_0-recordTransmitter] - Connection status is : CLOSE
+17 May 15:41:35.210 DEBUG[UC3_qa-db51_0-recordTransmitter] - Connecting to: 9.70.145.131:16022
+17 May 15:41:35.353 DEBUG[UC3_qa-db51_0-recordTransmitter] - Sent handshake.
+17 May 15:41:35.354 DEBUG[UC3_qa-db51_0-recordTransmitter] - Connection status is : OPEN
+17 May 15:41:36.225  INFO[Test worker] - Connection configuration ConnectionConfig{ucConfig=UCConfig{version='UniversalConnector (V1.2.44)', connectorId='3', connectorIp='127.0.0.1', configurationFetchType='file', configurationFetchFileName='SniffersConfig.json', statusWriterType='LOG', snifferConnectionsLimit =20}, snifferConfig=SnifferConfig{ip='9.70.145.131', port=16022, isSSL=false}, databaseDetails=DatabaseDetails{dbName='configKOKO', dbHost='qa-db51', dbPort=0}}
+17 May 15:41:36.225  INFO[Test worker] - Snif address is set to 9.70.145.131:16022 connecting with SSL=false
+17 May 15:41:36.226 DEBUG[UC3_qa-db51_0-recordTransmitter] - Starting connection to Snif
+17 May 15:41:36.228 DEBUG[UC3_qa-db51_0-recordTransmitter] - Connection status is : CLOSE
+17 May 15:41:36.229 DEBUG[UC3_qa-db51_0-recordTransmitter] - Connecting to: 9.70.145.131:16022
+17 May 15:41:36.370 DEBUG[UC3_qa-db51_0-recordTransmitter] - Sent handshake.
+17 May 15:41:36.371 DEBUG[UC3_qa-db51_0-recordTransmitter] - Connection status is : OPEN
+17 May 15:41:37.215 DEBUG[UC3_qa-db51_0-recordTransmitter] - Read -1, closing socket.
+17 May 15:41:37.215 DEBUG[UC3_qa-db51_0-recordTransmitter] - Connection status is : CLOSE
+17 May 15:41:37.215 DEBUG[UC3_qa-db51_0-recordTransmitter] - closing old connection.
+17 May 15:41:37.216 DEBUG[UC3_qa-db51_0-recordTransmitter] - Connecting to: 9.70.145.131:16022
+18 May 10:27:04.160  INFO[Test worker] - Connection configuration ConnectionConfig{ucConfig=UCConfig{version='UniversalConnector (V1.2.44)', connectorId='3', connectorIp='127.0.0.1', configurationFetchType='file', configurationFetchFileName='SniffersConfig.json', statusWriterType='LOG', snifferConnectionsLimit =20}, snifferConfig=SnifferConfig{ip='9.70.145.131', port=16022, isSSL=false}, databaseDetails=DatabaseDetails{dbName='configKokoExp', dbHost='qa-db51', dbPort=0}}
+18 May 10:27:04.160  INFO[Test worker] - Snif address is set to 9.70.145.131:16022 connecting with SSL=false
+18 May 10:27:04.171 DEBUG[UC3_qa-db51_0-recordTransmitter] - Starting connection to Snif
+18 May 10:27:04.172 DEBUG[UC3_qa-db51_0-recordTransmitter] - Connection status is : CLOSE
+18 May 10:27:04.173 DEBUG[UC3_qa-db51_0-recordTransmitter] - Connecting to: 9.70.145.131:16022
+18 May 10:27:04.316 DEBUG[UC3_qa-db51_0-recordTransmitter] - Sent handshake.
+18 May 10:27:04.317 DEBUG[UC3_qa-db51_0-recordTransmitter] - Connection status is : OPEN
+18 May 10:27:05.185  INFO[Test worker] - Connection configuration ConnectionConfig{ucConfig=UCConfig{version='UniversalConnector (V1.2.44)', connectorId='3', connectorIp='127.0.0.1', configurationFetchType='file', configurationFetchFileName='SniffersConfig.json', statusWriterType='LOG', snifferConnectionsLimit =20}, snifferConfig=SnifferConfig{ip='9.70.145.131', port=16022, isSSL=false}, databaseDetails=DatabaseDetails{dbName='configKOKO', dbHost='qa-db51', dbPort=0}}
+18 May 10:27:05.185  INFO[Test worker] - Snif address is set to 9.70.145.131:16022 connecting with SSL=false
+18 May 10:27:05.186 DEBUG[UC3_qa-db51_0-recordTransmitter] - Starting connection to Snif
+18 May 10:27:05.188 DEBUG[UC3_qa-db51_0-recordTransmitter] - Connection status is : CLOSE
+18 May 10:27:05.189 DEBUG[UC3_qa-db51_0-recordTransmitter] - Connecting to: 9.70.145.131:16022
+18 May 10:27:05.329 DEBUG[UC3_qa-db51_0-recordTransmitter] - Sent handshake.
+18 May 10:27:05.330 DEBUG[UC3_qa-db51_0-recordTransmitter] - Connection status is : OPEN
+18 May 10:27:06.176 DEBUG[UC3_qa-db51_0-recordTransmitter] - Read -1, closing socket.
+18 May 10:27:06.176 DEBUG[UC3_qa-db51_0-recordTransmitter] - Connection status is : CLOSE
+18 May 10:27:06.176 DEBUG[UC3_qa-db51_0-recordTransmitter] - closing old connection.
+18 May 10:27:06.177 DEBUG[UC3_qa-db51_0-recordTransmitter] - Connecting to: 9.70.145.131:16022
+18 May 12:42:29.706  INFO[main] - Connection configuration ConnectionConfig{ucConfig=UCConfig{version='UniversalConnector (V1.2.44)', connectorId='3', connectorIp='127.0.0.1', configurationFetchType='file', configurationFetchFileName='SniffersConfig.json', statusWriterType='LOG', snifferConnectionsLimit =20}, snifferConfig=SnifferConfig{ip='9.70.145.131', port=16022, isSSL=false}, databaseDetails=DatabaseDetails{dbName='configKOKO', dbHost='qa-db51', dbPort=456}}
+18 May 12:42:29.706  INFO[main] - Snif address is set to 9.70.145.131:16022 connecting with SSL=false
+18 May 12:42:29.746 DEBUG[UC3_qa-db51_456-recordTransmitter] - Starting connection to Snif
+18 May 12:42:29.747 DEBUG[UC3_qa-db51_456-recordTransmitter] - Connection status is : CLOSE
+18 May 12:42:29.756 DEBUG[UC3_qa-db51_456-recordTransmitter] - Connecting to: 9.70.145.131:16022
+18 May 12:42:29.913 DEBUG[UC3_qa-db51_456-recordTransmitter] - Sent handshake.
+18 May 12:42:29.913 DEBUG[UC3_qa-db51_456-recordTransmitter] - Connection status is : OPEN
+18 May 12:46:40.984  INFO[main] - Connection configuration ConnectionConfig{ucConfig=UCConfig{version='UniversalConnector (V1.2.44)', connectorId='3', connectorIp='127.0.0.1', configurationFetchType='file', configurationFetchFileName='SniffersConfig.json', statusWriterType='LOG', snifferConnectionsLimit =20}, snifferConfig=SnifferConfig{ip='9.70.145.131', port=16022, isSSL=false}, databaseDetails=DatabaseDetails{dbName='configKOKO', dbHost='qa-db51', dbPort=456}}
+18 May 12:46:40.984  INFO[main] - Snif address is set to 9.70.145.131:16022 connecting with SSL=false
+18 May 12:46:40.998 DEBUG[UC3_qa-db51_456-recordTransmitter] - Starting connection to Snif
+18 May 12:46:40.999 DEBUG[UC3_qa-db51_456-recordTransmitter] - Connection status is : CLOSE
+18 May 12:46:41.01 DEBUG[UC3_qa-db51_456-recordTransmitter] - Connecting to: 9.70.145.131:16022
+18 May 12:46:41.155 DEBUG[UC3_qa-db51_456-recordTransmitter] - Sent handshake.
+18 May 12:46:41.156 DEBUG[UC3_qa-db51_456-recordTransmitter] - Connection status is : OPEN
+18 May 14:05:56.290  INFO[main] - Connection configuration ConnectionConfig{ucConfig=UCConfig{version='UniversalConnector (V1.2.44)', connectorId='3', connectorIp='127.0.0.1', configurationFetchType='file', configurationFetchFileName='SniffersConfig.json', statusWriterType='LOG', snifferConnectionsLimit =20}, snifferConfig=SnifferConfig{ip='9.70.148.158', port=16022, isSSL=false}, databaseDetails=DatabaseDetails{dbName='configKOKO', dbHost='qa-db51', dbPort=456}}
+18 May 14:05:56.291  INFO[main] - Snif address is set to 9.70.148.158:16022 connecting with SSL=false
+18 May 14:05:56.362 DEBUG[UC3_qa-db51_456-recordTransmitter] - Starting connection to Snif
+18 May 14:05:56.363 DEBUG[UC3_qa-db51_456-recordTransmitter] - Connection status is : CLOSE
+18 May 14:05:56.371 DEBUG[UC3_qa-db51_456-recordTransmitter] - Connecting to: 9.70.148.158:16022
+18 May 14:05:56.532 DEBUG[UC3_qa-db51_456-recordTransmitter] - Sent handshake.
+18 May 14:05:56.533 DEBUG[UC3_qa-db51_456-recordTransmitter] - Connection status is : OPEN
+18 May 14:09:05.179  INFO[main] - Connection configuration ConnectionConfig{ucConfig=UCConfig{version='UniversalConnector (V1.2.44)', connectorId='4', connectorIp='127.0.0.1', configurationFetchType='file', configurationFetchFileName='SniffersConfig.json', statusWriterType='LOG', snifferConnectionsLimit =20}, snifferConfig=SnifferConfig{ip='9.70.148.158', port=16022, isSSL=false}, databaseDetails=DatabaseDetails{dbName='configKOKO', dbHost='qa-db51', dbPort=456}}
+18 May 14:09:05.179  INFO[main] - Snif address is set to 9.70.148.158:16022 connecting with SSL=false
+18 May 14:09:05.188 DEBUG[UC4_qa-db51_456-recordTransmitter] - Starting connection to Snif
+18 May 14:09:05.190 DEBUG[UC4_qa-db51_456-recordTransmitter] - Connection status is : CLOSE
+18 May 14:09:05.191 DEBUG[UC4_qa-db51_456-recordTransmitter] - Connecting to: 9.70.148.158:16022
+18 May 14:09:05.344 DEBUG[UC4_qa-db51_456-recordTransmitter] - Sent handshake.
+18 May 14:09:05.344 DEBUG[UC4_qa-db51_456-recordTransmitter] - Connection status is : OPEN
+18 May 14:12:43.657  INFO[main] - Connection configuration ConnectionConfig{ucConfig=UCConfig{version='UniversalConnector (V1.2.44)', connectorId='5', connectorIp='127.0.0.1', configurationFetchType='file', configurationFetchFileName='SniffersConfig.json', statusWriterType='LOG', snifferConnectionsLimit =20}, snifferConfig=SnifferConfig{ip='9.70.148.158', port=16022, isSSL=false}, databaseDetails=DatabaseDetails{dbName='configKOKO', dbHost='qa-db51', dbPort=456}}
+18 May 14:12:43.657  INFO[main] - Snif address is set to 9.70.148.158:16022 connecting with SSL=false
+18 May 14:12:44.329 DEBUG[UC5_qa-db51_456-recordTransmitter] - Starting connection to Snif
+18 May 14:12:44.330 DEBUG[UC5_qa-db51_456-recordTransmitter] - Connection status is : CLOSE
+18 May 14:12:44.333 DEBUG[UC5_qa-db51_456-recordTransmitter] - Connecting to: 9.70.148.158:16022
+18 May 14:12:44.496 DEBUG[UC5_qa-db51_456-recordTransmitter] - Sent handshake.
+18 May 14:12:44.497 DEBUG[UC5_qa-db51_456-recordTransmitter] - Connection status is : OPEN
+18 May 14:16:28.636  INFO[main] - Connection configuration ConnectionConfig{ucConfig=UCConfig{version='UniversalConnector (V1.2.44)', connectorId='5', connectorIp='127.0.0.1', configurationFetchType='file', configurationFetchFileName='SniffersConfig.json', statusWriterType='LOG', snifferConnectionsLimit =20}, snifferConfig=SnifferConfig{ip='9.70.148.158', port=16022, isSSL=false}, databaseDetails=DatabaseDetails{dbName='configKOKO', dbHost='qa-db51', dbPort=456}}
+18 May 14:16:28.637  INFO[main] - Snif address is set to 9.70.148.158:16022 connecting with SSL=false
+18 May 14:16:28.646 DEBUG[UC5_qa-db51_456-recordTransmitter] - Starting connection to Snif
+18 May 14:16:28.648 DEBUG[UC5_qa-db51_456-recordTransmitter] - Connection status is : CLOSE
+18 May 14:16:28.649 DEBUG[UC5_qa-db51_456-recordTransmitter] - Connecting to: 9.70.148.158:16022
+18 May 14:16:28.801 DEBUG[UC5_qa-db51_456-recordTransmitter] - Sent handshake.
+18 May 14:16:28.801 DEBUG[UC5_qa-db51_456-recordTransmitter] - Connection status is : OPEN
+18 May 16:25:09.873  INFO[Test worker] - Connection configuration ConnectionConfig{ucConfig=UCConfig{version='UniversalConnector (V1.2.44)', connectorId='5', connectorIp='127.0.0.1', configurationFetchType='file', configurationFetchFileName='SniffersConfig.json', statusWriterType='LOG', snifferConnectionsLimit =20}, snifferConfig=SnifferConfig{ip='9.70.148.158', port=16022, isSSL=false}, databaseDetails=DatabaseDetails{dbName='configKokoExp', dbHost='qa-db51', dbPort=0}}
+18 May 16:25:09.874  INFO[Test worker] - Snif address is set to 9.70.148.158:16022 connecting with SSL=false
+18 May 16:25:09.884 DEBUG[UC5_qa-db51_0-recordTransmitter] - Starting connection to Snif
+18 May 16:25:09.886 DEBUG[UC5_qa-db51_0-recordTransmitter] - Connection status is : CLOSE
+18 May 16:25:09.888 DEBUG[UC5_qa-db51_0-recordTransmitter] - Connecting to: 9.70.148.158:16022
+18 May 16:25:10.34 DEBUG[UC5_qa-db51_0-recordTransmitter] - Sent handshake.
+18 May 16:25:10.34 DEBUG[UC5_qa-db51_0-recordTransmitter] - Connection status is : OPEN
+20 May 20:26:46.637  INFO[Test worker] - Connection configuration ConnectionConfig{ucConfig=UCConfig{version='UniversalConnector (V1.2.44)', connectorId='5', connectorIp='127.0.0.1', configurationFetchType='file', configurationFetchFileName='SniffersConfig.json', statusWriterType='LOG', snifferConnectionsLimit =20}, snifferConfig=SnifferConfig{ip='9.70.148.158', port=16022, isSSL=false}, databaseDetails=DatabaseDetails{dbName='configKokoExp', dbHost='qa-db51', dbPort=0}}
+20 May 20:26:46.637  INFO[Test worker] - Snif address is set to 9.70.148.158:16022 connecting with SSL=false
+20 May 20:26:46.648 DEBUG[UC5_qa-db51_0-recordTransmitter] - Starting connection to Snif
+20 May 20:26:46.650 DEBUG[UC5_qa-db51_0-recordTransmitter] - Connection status is : CLOSE
+20 May 20:26:46.652 DEBUG[UC5_qa-db51_0-recordTransmitter] - Connecting to: 9.70.148.158:16022
+20 May 20:26:46.802 DEBUG[UC5_qa-db51_0-recordTransmitter] - Sent handshake.
+20 May 20:26:46.802 DEBUG[UC5_qa-db51_0-recordTransmitter] - Connection status is : OPEN
+21 May 00:02:59.634  INFO[Test worker] - Connection configuration ConnectionConfig{ucConfig=UCConfig{version='UniversalConnector (V1.2.44)', connectorId='5', connectorIp='127.0.0.1', configurationFetchType='file', configurationFetchFileName='SniffersConfig.json', statusWriterType='LOG', snifferConnectionsLimit =20}, snifferConfig=SnifferConfig{ip='9.70.148.158', port=16022, isSSL=false}, databaseDetails=DatabaseDetails{dbName='configKokoExp', dbHost='qa-db51', dbPort=0}}
+21 May 00:02:59.634  INFO[Test worker] - Snif address is set to 9.70.148.158:16022 connecting with SSL=false
+21 May 00:02:59.652 DEBUG[UC5_qa-db51_0-recordTransmitter] - Starting connection to Snif
+21 May 00:02:59.654 DEBUG[UC5_qa-db51_0-recordTransmitter] - Connection status is : CLOSE
+21 May 00:02:59.656 DEBUG[UC5_qa-db51_0-recordTransmitter] - Connecting to: 9.70.148.158:16022
+21 May 00:02:59.797 DEBUG[UC5_qa-db51_0-recordTransmitter] - Sent handshake.
+21 May 00:02:59.797 DEBUG[UC5_qa-db51_0-recordTransmitter] - Connection status is : OPEN
+25 May 12:41:03.212  INFO[Test worker] - 1590399663212 Connection configuration ConnectionConfig{ucConfig=UCConfig{version='UniversalConnector (V1.2.44)', connectorId='5', connectorIp='127.0.0.1', configurationFetchType='file', configurationFetchFileName='SniffersConfig.json', statusWriterType='LOG', snifferConnectionsLimit =20}, snifferConfig=SnifferConfig{ip='9.70.148.158', port=16022, isSSL=false}, databaseDetails=DatabaseDetails{dbName='configKokoExp', dbHost='qa-db51', dbPort=0}}
+25 May 12:41:03.212  INFO[Test worker] - 1590399663212 Snif address is set to 9.70.148.158:16022 connecting with SSL=false
+25 May 12:41:03.222 DEBUG[UC5_qa-db51_0-recordTransmitter] - 1590399663222 Starting connection to Snif
+25 May 12:41:03.224 DEBUG[UC5_qa-db51_0-recordTransmitter] - 1590399663224 Connection status is : CLOSE
+25 May 12:41:03.225 DEBUG[UC5_qa-db51_0-recordTransmitter] - 1590399663225 Connecting to: 9.70.148.158:16022
+25 May 12:41:03.373 DEBUG[UC5_qa-db51_0-recordTransmitter] - 1590399663373 Sent handshake.
+25 May 12:41:03.373 DEBUG[UC5_qa-db51_0-recordTransmitter] - 1590399663373 Connection status is : OPEN
+25 May 12:41:04.227 DEBUG[UC5_qa-db51_0-recordTransmitter] - 1590399664227 Read -1, closing socket.
+25 May 12:41:04.227 DEBUG[UC5_qa-db51_0-recordTransmitter] - 1590399664227 Connection status is : CLOSE
+25 May 12:41:04.227 DEBUG[UC5_qa-db51_0-recordTransmitter] - 1590399664227 closing old connection.
+25 May 12:41:04.229 DEBUG[UC5_qa-db51_0-recordTransmitter] - 1590399664229 Connecting to: 9.70.148.158:16022
+26 May 16:20:37.377  INFO[main] - 1590499237377 Connection configuration ConnectionConfig{ucConfig=UCConfig{version='UniversalConnector (V1.2.44)', connectorId='5', connectorIp='127.0.0.1', configurationFetchType='file', configurationFetchFileName='SniffersConfig.json', statusWriterType='LOG', snifferConnectionsLimit =20}, snifferConfig=SnifferConfig{ip='9.70.148.158', port=16022, isSSL=false}, databaseDetails=DatabaseDetails{dbName='config', dbHost='qa-db511', dbPort=27101}}
+26 May 16:20:37.378  INFO[main] - 1590499237378 Snif address is set to 9.70.148.158:16022 connecting with SSL=false
+26 May 16:20:51.93 DEBUG[UC5_qa-db511_27101-recordTransmitter] - 1590499251092 Starting connection to Snif
+26 May 16:20:53.766 DEBUG[UC5_qa-db511_27101-recordTransmitter] - 1590499253766 Connection status is : CLOSE
+26 May 16:20:54.767 DEBUG[UC5_qa-db511_27101-ConnTimer] - new ping message was added for config UC5_qa-db511_27101
+26 May 16:20:55.56 DEBUG[UC5_qa-db511_27101-recordTransmitter] - 1590499255056 Connecting to: 9.70.148.158:16022
+26 May 16:20:55.236 DEBUG[UC5_qa-db511_27101-recordTransmitter] - 1590499255236 Sent handshake.
+26 May 16:20:55.238 DEBUG[UC5_qa-db511_27101-recordTransmitter] - 1590499255238 Connection status is : OPEN
+26 May 16:25:49.966  INFO[main] - 1590499549966 Connection configuration ConnectionConfig{ucConfig=UCConfig{version='UniversalConnector (V1.2.44)', connectorId='5', connectorIp='127.0.0.1', configurationFetchType='file', configurationFetchFileName='SniffersConfig.json', statusWriterType='LOG', snifferConnectionsLimit =20}, snifferConfig=SnifferConfig{ip='9.70.148.158', port=16022, isSSL=false}, databaseDetails=DatabaseDetails{dbName='config', dbHost='qa-db511', dbPort=27101}}
+26 May 16:25:49.966  INFO[main] - 1590499549966 Snif address is set to 9.70.148.158:16022 connecting with SSL=false
+26 May 16:25:49.988 DEBUG[UC5_qa-db511_27101-recordTransmitter] - 1590499549988 Starting connection to Snif
+26 May 16:25:51.101 DEBUG[UC5_qa-db511_27101-recordTransmitter] - 1590499551101 Connection status is : CLOSE
+26 May 16:25:53.949 DEBUG[UC5_qa-db511_27101-ConnTimer] - new ping message was added for config UC5_qa-db511_27101
+26 May 16:25:53.951 DEBUG[UC5_qa-db511_27101-recordTransmitter] - 1590499553951 Connecting to: 9.70.148.158:16022
+26 May 16:25:54.108 DEBUG[UC5_qa-db511_27101-recordTransmitter] - 1590499554108 Sent handshake.
+26 May 16:25:54.108 DEBUG[UC5_qa-db511_27101-recordTransmitter] - 1590499554108 Connection status is : OPEN
+26 May 16:26:54.377  INFO[Test worker] - 1590499614377 Connection configuration ConnectionConfig{ucConfig=UCConfig{version='UniversalConnector (V1.2.44)', connectorId='5', connectorIp='127.0.0.1', configurationFetchType='file', configurationFetchFileName='SniffersConfig.json', statusWriterType='LOG', snifferConnectionsLimit =20}, snifferConfig=SnifferConfig{ip='9.70.148.158', port=16022, isSSL=false}, databaseDetails=DatabaseDetails{dbName='configKokoExp', dbHost='qa-db51', dbPort=0}}
+26 May 16:26:54.377  INFO[Test worker] - 1590499614377 Snif address is set to 9.70.148.158:16022 connecting with SSL=false
+26 May 16:26:54.387 DEBUG[UC5_qa-db51_0-recordTransmitter] - 1590499614387 Starting connection to Snif
+26 May 16:26:54.388 DEBUG[UC5_qa-db51_0-recordTransmitter] - 1590499614388 Connection status is : CLOSE
+26 May 16:26:54.390 DEBUG[UC5_qa-db51_0-recordTransmitter] - 1590499614390 Connecting to: 9.70.148.158:16022
+26 May 16:26:54.390 DEBUG[UC5_qa-db51_0-ConnTimer] - new ping message was added for config UC5_qa-db51_0
+26 May 16:26:54.534 DEBUG[UC5_qa-db51_0-recordTransmitter] - 1590499614534 Sent handshake.
+26 May 16:26:54.535 DEBUG[UC5_qa-db51_0-recordTransmitter] - 1590499614535 Connection status is : OPEN
+26 May 16:26:55.413  INFO[Test worker] - 1590499615413 Connection configuration ConnectionConfig{ucConfig=UCConfig{version='UniversalConnector (V1.2.44)', connectorId='5', connectorIp='127.0.0.1', configurationFetchType='file', configurationFetchFileName='SniffersConfig.json', statusWriterType='LOG', snifferConnectionsLimit =20}, snifferConfig=SnifferConfig{ip='9.70.148.158', port=16022, isSSL=false}, databaseDetails=DatabaseDetails{dbName='config', dbHost='qa-db511', dbPort=27101}}
+26 May 16:26:55.413  INFO[Test worker] - 1590499615413 Snif address is set to 9.70.148.158:16022 connecting with SSL=false
+26 May 16:26:55.414 DEBUG[UC5_qa-db511_27101-recordTransmitter] - 1590499615414 Starting connection to Snif
+26 May 16:26:55.417 DEBUG[UC5_qa-db511_27101-recordTransmitter] - 1590499615417 Connection status is : CLOSE
+26 May 16:26:55.417 DEBUG[UC5_qa-db511_27101-recordTransmitter] - 1590499615417 Connecting to: 9.70.148.158:16022
+26 May 16:26:55.418 DEBUG[UC5_qa-db511_27101-ConnTimer] - new ping message was added for config UC5_qa-db511_27101
+26 May 16:26:55.559 DEBUG[UC5_qa-db511_27101-recordTransmitter] - 1590499615559 Sent handshake.
+26 May 16:26:55.559 DEBUG[UC5_qa-db511_27101-recordTransmitter] - 1590499615559 Connection status is : OPEN
+27 May 13:05:24.634  INFO[Test worker] - Connection configuration ConnectionConfig{ucConfig=UCConfig{version='UniversalConnector (V1.2.44)', connectorId='5', connectorIp='127.0.0.1', configurationFetchType='file', configurationFetchFileName='SniffersConfig.json', statusWriterType='LOG', snifferConnectionsLimit =20}, snifferConfig=SnifferConfig{ip='9.70.148.158', port=16022, isSSL=false}, databaseDetails=DatabaseDetails{dbName='configKokoExp', dbHost='qa-db51', dbPort=0}}
+27 May 13:05:24.634  INFO[Test worker] - Snif address is set to 9.70.148.158:16022 connecting with SSL=false
+27 May 13:05:24.644 DEBUG[UC5_qa-db51_0-recordTransmitter] - Starting connection to Snif
+27 May 13:05:24.646 DEBUG[UC5_qa-db51_0-recordTransmitter] - Connection status is : CLOSE
+27 May 13:05:24.647 DEBUG[UC5_qa-db51_0-recordTransmitter] - Connecting to: 9.70.148.158:16022
+27 May 13:05:24.796 DEBUG[UC5_qa-db51_0-recordTransmitter] - Sent handshake.
+27 May 13:05:24.796 DEBUG[UC5_qa-db51_0-recordTransmitter] - Connection status is : OPEN
+27 May 13:05:25.653 DEBUG[UC5_qa-db51_0-recordTransmitter] - Read -1, closing socket.
+27 May 13:05:25.653 DEBUG[UC5_qa-db51_0-recordTransmitter] - Connection status is : CLOSE
+27 May 13:05:25.654 DEBUG[UC5_qa-db51_0-recordTransmitter] - closing old connection.
+27 May 13:05:25.654 DEBUG[UC5_qa-db51_0-recordTransmitter] - Connecting to: 9.70.148.158:16022
+27 May 13:05:25.685  INFO[Test worker] - Connection configuration ConnectionConfig{ucConfig=UCConfig{version='UniversalConnector (V1.2.44)', connectorId='5', connectorIp='127.0.0.1', configurationFetchType='file', configurationFetchFileName='SniffersConfig.json', statusWriterType='LOG', snifferConnectionsLimit =20}, snifferConfig=SnifferConfig{ip='9.70.148.158', port=16022, isSSL=false}, databaseDetails=DatabaseDetails{dbName='config', dbHost='qa-db511', dbPort=27101}}
+27 May 13:05:25.685  INFO[Test worker] - Snif address is set to 9.70.148.158:16022 connecting with SSL=false
+27 May 13:05:25.687 DEBUG[UC5_qa-db511_27101-recordTransmitter] - Starting connection to Snif
+27 May 13:05:25.689 DEBUG[UC5_qa-db511_27101-recordTransmitter] - Connection status is : CLOSE
+27 May 13:05:25.689 DEBUG[UC5_qa-db511_27101-recordTransmitter] - Connecting to: 9.70.148.158:16022
+27 May 13:05:25.805 DEBUG[UC5_qa-db51_0-recordTransmitter] - Sent handshake.
+27 May 13:05:25.806 DEBUG[UC5_qa-db51_0-recordTransmitter] - Connection status is : OPEN
+27 May 13:05:25.836 DEBUG[UC5_qa-db511_27101-recordTransmitter] - Sent handshake.
+27 May 13:05:25.837 DEBUG[UC5_qa-db511_27101-recordTransmitter] - Connection status is : OPEN
+27 May 13:05:26.689 DEBUG[UC5_qa-db511_27101-recordTransmitter] - Read -1, closing socket.
+27 May 13:05:26.689 DEBUG[UC5_qa-db511_27101-recordTransmitter] - Connection status is : CLOSE
+27 May 13:05:26.689 DEBUG[UC5_qa-db511_27101-recordTransmitter] - closing old connection.
+27 May 13:05:26.689 DEBUG[UC5_qa-db511_27101-recordTransmitter] - Connecting to: 9.70.148.158:16022
+10 Jun 14:26:52.70  INFO[Test worker] - Connection configuration ConnectionConfig{ucConfig=UCConfig{version='UniversalConnector (V1.2.44)', connectorId='5', connectorIp='127.0.0.1', configurationFetchType='file', configurationFetchFileName='SniffersConfig.json', statusWriterType='LOG', snifferConnectionsLimit =20}, snifferConfig=SnifferConfig{ip='9.70.148.158', port=16022, isSSL=false}, databaseDetails=DatabaseDetails{dbName='configKokoExp', dbHost='qa-db51', dbPort=0, dbType=n/a}}
+10 Jun 14:26:52.70  INFO[Test worker] - Snif address is set to 9.70.148.158:16022 connecting with SSL=false
+10 Jun 14:26:52.80 DEBUG[qa-db51:0:UC5-recordTransmitter] - Starting connection to Snif
+10 Jun 14:26:52.81 DEBUG[qa-db51:0:UC5-recordTransmitter] - Connection status is : CLOSE
+10 Jun 14:26:52.82 DEBUG[qa-db51:0:UC5-recordTransmitter] - Connecting to: 9.70.148.158:16022
+10 Jun 14:26:52.227 DEBUG[qa-db51:0:UC5-recordTransmitter] - Sent handshake.
+10 Jun 14:26:52.227 DEBUG[qa-db51:0:UC5-recordTransmitter] - Connection status is : OPEN
+10 Jun 14:26:53.107  INFO[Test worker] - Connection configuration ConnectionConfig{ucConfig=UCConfig{version='UniversalConnector (V1.2.44)', connectorId='5', connectorIp='127.0.0.1', configurationFetchType='file', configurationFetchFileName='SniffersConfig.json', statusWriterType='LOG', snifferConnectionsLimit =20}, snifferConfig=SnifferConfig{ip='9.70.148.158', port=16022, isSSL=false}, databaseDetails=DatabaseDetails{dbName='config', dbHost='qa-db511', dbPort=27101, dbType=MONGODB}}
+10 Jun 14:26:53.108  INFO[Test worker] - Snif address is set to 9.70.148.158:16022 connecting with SSL=false
+10 Jun 14:26:53.108 DEBUG[qa-db511:27101:UC5-recordTransmitter] - Starting connection to Snif
+10 Jun 14:26:53.111 DEBUG[qa-db511:27101:UC5-recordTransmitter] - Connection status is : CLOSE
+10 Jun 14:26:53.111 DEBUG[qa-db511:27101:UC5-recordTransmitter] - Connecting to: 9.70.148.158:16022
+10 Jun 14:26:53.254 DEBUG[qa-db511:27101:UC5-recordTransmitter] - Sent handshake.
+10 Jun 14:26:53.254 DEBUG[qa-db511:27101:UC5-recordTransmitter] - Connection status is : OPEN
+11 Jun 15:22:08.848  INFO[Test worker] - Connection configuration ConnectionConfig{ucConfig=UCConfig{version='UniversalConnector (V1.2.44)', connectorId='5', connectorIp='127.0.0.1', configurationFetchType='file', configurationFetchFileName='SniffersConfig.json', statusWriterType='LOG', snifferConnectionsLimit =20}, snifferConfig=SnifferConfig{ip='9.70.148.158', port=16022, isSSL=false}, databaseDetails=DatabaseDetails{dbName='configKokoExp', dbHost='qa-db51', dbPort=0, dbType=n/a}}
+11 Jun 15:22:08.848  INFO[Test worker] - Snif address is set to 9.70.148.158:16022 connecting with SSL=false
+11 Jun 15:22:08.860 DEBUG[qa-db51:0:UC5-recordTransmitter] - Starting connection to Snif
+11 Jun 15:22:08.861 DEBUG[qa-db51:0:UC5-recordTransmitter] - Connection status is : CLOSE
+11 Jun 15:22:08.863 DEBUG[qa-db51:0:UC5-recordTransmitter] - Connecting to: 9.70.148.158:16022
+11 Jun 15:22:09.06 DEBUG[qa-db51:0:UC5-recordTransmitter] - Sent handshake.
+11 Jun 15:22:09.06 DEBUG[qa-db51:0:UC5-recordTransmitter] - Connection status is : OPEN
+11 Jun 15:22:09.890  INFO[Test worker] - Connection configuration ConnectionConfig{ucConfig=UCConfig{version='UniversalConnector (V1.2.44)', connectorId='5', connectorIp='127.0.0.1', configurationFetchType='file', configurationFetchFileName='SniffersConfig.json', statusWriterType='LOG', snifferConnectionsLimit =20}, snifferConfig=SnifferConfig{ip='9.70.148.158', port=16022, isSSL=false}, databaseDetails=DatabaseDetails{dbName='config', dbHost='qa-db511', dbPort=27101, dbType=MONGODB}}
+11 Jun 15:22:09.891  INFO[Test worker] - Snif address is set to 9.70.148.158:16022 connecting with SSL=false
+11 Jun 15:22:09.891 DEBUG[qa-db511:27101:UC5-recordTransmitter] - Starting connection to Snif
+11 Jun 15:22:09.894 DEBUG[qa-db511:27101:UC5-recordTransmitter] - Connection status is : CLOSE
+11 Jun 15:22:09.894 DEBUG[qa-db511:27101:UC5-recordTransmitter] - Connecting to: 9.70.148.158:16022
+11 Jun 15:22:10.35 DEBUG[qa-db511:27101:UC5-recordTransmitter] - Sent handshake.
+11 Jun 15:22:10.36 DEBUG[qa-db511:27101:UC5-recordTransmitter] - Connection status is : OPEN
+18 Jun 20:36:01.11  INFO[Test worker] - Connection configuration ConnectionConfig{ucConfig=UCConfig{version='UniversalConnector (V1.2.44)', connectorId='5', connectorIp='127.0.0.1', configurationFetchType='file', configurationFetchFileName='SniffersConfig.json', statusWriterType='LOG', snifferConnectionsLimit =20}, snifferConfig=SnifferConfig{ip='9.70.148.158', port=16022, isSSL=false}, databaseDetails=DatabaseDetails{dbName='configKokoExp', dbHost='qa-db51', dbPort=0, dbType=n/a}}
+18 Jun 20:36:01.12  INFO[Test worker] - Snif address is set to 9.70.148.158:16022 connecting with SSL=false
+18 Jun 20:36:01.21 DEBUG[qa-db51:0:UC5-recordTransmitter] - Starting connection to Snif
+18 Jun 20:36:01.24 DEBUG[qa-db51:0:UC5-recordTransmitter] - Connection status is : CLOSE
+18 Jun 20:36:01.25 DEBUG[qa-db51:0:UC5-recordTransmitter] - Connecting to: 9.70.148.158:16022
+18 Jun 20:36:01.181 DEBUG[qa-db51:0:UC5-recordTransmitter] - Sent handshake.
+18 Jun 20:36:01.182 DEBUG[qa-db51:0:UC5-recordTransmitter] - Connection status is : OPEN
+18 Jun 20:36:02.49  INFO[Test worker] - Connection configuration ConnectionConfig{ucConfig=UCConfig{version='UniversalConnector (V1.2.44)', connectorId='5', connectorIp='127.0.0.1', configurationFetchType='file', configurationFetchFileName='SniffersConfig.json', statusWriterType='LOG', snifferConnectionsLimit =20}, snifferConfig=SnifferConfig{ip='9.70.148.158', port=16022, isSSL=false}, databaseDetails=DatabaseDetails{dbName='config', dbHost='qa-db511', dbPort=27101, dbType=MONGODB}}
+18 Jun 20:36:02.49  INFO[Test worker] - Snif address is set to 9.70.148.158:16022 connecting with SSL=false
+18 Jun 20:36:02.50 DEBUG[qa-db511:27101:UC5-recordTransmitter] - Starting connection to Snif
+18 Jun 20:36:02.52 DEBUG[qa-db511:27101:UC5-recordTransmitter] - Connection status is : CLOSE
+18 Jun 20:36:02.52 DEBUG[qa-db511:27101:UC5-recordTransmitter] - Connecting to: 9.70.148.158:16022
+18 Jun 20:36:02.207 DEBUG[qa-db511:27101:UC5-recordTransmitter] - Sent handshake.
+18 Jun 20:36:02.208 DEBUG[qa-db511:27101:UC5-recordTransmitter] - Connection status is : OPEN
+23 Jun 16:54:32.543  INFO[Test worker] - Connection configuration ConnectionConfig{ucConfig=UCConfig{version='UniversalConnector (V1.2.44)', connectorId='5', connectorIp='127.0.0.1', configurationFetchType='file', configurationFetchFileName='SniffersConfig.json', statusWriterType='LOG', snifferConnectionsLimit =20}, snifferConfig=SnifferConfig{ip='9.70.148.158', port=16022, isSSL=false}, databaseDetails=DatabaseDetails{dbName='configKokoExp', dbHost='qa-db51', dbPort=0, dbType=n/a}}
+23 Jun 16:54:32.543  INFO[Test worker] - Snif address is set to 9.70.148.158:16022 connecting with SSL=false
+23 Jun 16:54:32.554 DEBUG[qa-db51:0:UC5-recordTransmitter] - Starting connection to Snif
+23 Jun 16:54:32.556 DEBUG[qa-db51:0:UC5-recordTransmitter] - Connection status is : CLOSE
+23 Jun 16:54:32.557 DEBUG[qa-db51:0:UC5-recordTransmitter] - Connecting to: 9.70.148.158:16022
+23 Jun 16:54:32.713 DEBUG[qa-db51:0:UC5-recordTransmitter] - Sent handshake.
+23 Jun 16:54:32.714 DEBUG[qa-db51:0:UC5-recordTransmitter] - Connection status is : OPEN
+23 Jun 16:54:33.567  INFO[Test worker] - Connection configuration ConnectionConfig{ucConfig=UCConfig{version='UniversalConnector (V1.2.44)', connectorId='5', connectorIp='127.0.0.1', configurationFetchType='file', configurationFetchFileName='SniffersConfig.json', statusWriterType='LOG', snifferConnectionsLimit =20}, snifferConfig=SnifferConfig{ip='9.70.148.158', port=16022, isSSL=false}, databaseDetails=DatabaseDetails{dbName='config', dbHost='qa-db511', dbPort=27101, dbType=MONGODB}}
+23 Jun 16:54:33.568  INFO[Test worker] - Snif address is set to 9.70.148.158:16022 connecting with SSL=false
+23 Jun 16:54:33.568 DEBUG[qa-db511:27101:UC5-recordTransmitter] - Starting connection to Snif
+23 Jun 16:54:33.571 DEBUG[qa-db511:27101:UC5-recordTransmitter] - Connection status is : CLOSE
+23 Jun 16:54:33.571 DEBUG[qa-db511:27101:UC5-recordTransmitter] - Connecting to: 9.70.148.158:16022
+23 Jun 16:54:33.727 DEBUG[qa-db511:27101:UC5-recordTransmitter] - Sent handshake.
+23 Jun 16:54:33.728 DEBUG[qa-db511:27101:UC5-recordTransmitter] - Connection status is : OPEN
+23 Jun 16:54:57.649  INFO[Test worker] - Connection configuration ConnectionConfig{ucConfig=UCConfig{version='UniversalConnector (V1.2.44)', connectorId='5', connectorIp='127.0.0.1', configurationFetchType='file', configurationFetchFileName='SniffersConfig.json', statusWriterType='LOG', snifferConnectionsLimit =20}, snifferConfig=SnifferConfig{ip='9.70.148.158', port=16022, isSSL=false}, databaseDetails=DatabaseDetails{dbName='configKokoExp', dbHost='qa-db51', dbPort=0, dbType=n/a}}
+23 Jun 16:54:57.649  INFO[Test worker] - Snif address is set to 9.70.148.158:16022 connecting with SSL=false
+23 Jun 16:54:57.661 DEBUG[qa-db51:0:UC5-recordTransmitter] - Starting connection to Snif
+23 Jun 16:54:57.663 DEBUG[qa-db51:0:UC5-recordTransmitter] - Connection status is : CLOSE
+23 Jun 16:54:57.664 DEBUG[qa-db51:0:UC5-recordTransmitter] - Connecting to: 9.70.148.158:16022
+23 Jun 16:54:57.821 DEBUG[qa-db51:0:UC5-recordTransmitter] - Sent handshake.
+23 Jun 16:54:57.821 DEBUG[qa-db51:0:UC5-recordTransmitter] - Connection status is : OPEN
+23 Jun 16:54:58.675  INFO[Test worker] - Connection configuration ConnectionConfig{ucConfig=UCConfig{version='UniversalConnector (V1.2.44)', connectorId='5', connectorIp='127.0.0.1', configurationFetchType='file', configurationFetchFileName='SniffersConfig.json', statusWriterType='LOG', snifferConnectionsLimit =20}, snifferConfig=SnifferConfig{ip='9.70.148.158', port=16022, isSSL=false}, databaseDetails=DatabaseDetails{dbName='config', dbHost='qa-db511', dbPort=27101, dbType=MONGODB}}
+23 Jun 16:54:58.675  INFO[Test worker] - Snif address is set to 9.70.148.158:16022 connecting with SSL=false
+23 Jun 16:54:58.676 DEBUG[qa-db511:27101:UC5-recordTransmitter] - Starting connection to Snif
+23 Jun 16:54:58.679 DEBUG[qa-db511:27101:UC5-recordTransmitter] - Connection status is : CLOSE
+23 Jun 16:54:58.679 DEBUG[qa-db511:27101:UC5-recordTransmitter] - Connecting to: 9.70.148.158:16022
+23 Jun 16:54:58.836 DEBUG[qa-db511:27101:UC5-recordTransmitter] - Sent handshake.
+23 Jun 16:54:58.836 DEBUG[qa-db511:27101:UC5-recordTransmitter] - Connection status is : OPEN
+26 Jun 18:05:47.637  INFO[Test worker] - Connection configuration ConnectionConfig{ucConfig=UCConfig{version='UniversalConnector (V1.2.44)', connectorId='5', connectorIp='127.0.0.1', configurationFetchType='file', configurationFetchFileName='SniffersConfig.json', statusWriterType='LOG', snifferConnectionsLimit =20}, snifferConfig=SnifferConfig{ip='9.70.148.158', port=16022, isSSL=false}, databaseDetails=DatabaseDetails{dbName='configKokoExp', dbHost='qa-db51', dbPort=0, dbType=n/a}}
+26 Jun 18:05:47.638  INFO[Test worker] - Snif address is set to 9.70.148.158:16022 connecting with SSL=false
+26 Jun 18:05:47.649 DEBUG[qa-db51:0:UC5-recordTransmitter] - Starting connection to Snif
+26 Jun 18:05:47.651 DEBUG[qa-db51:0:UC5-recordTransmitter] - Connection status is : CLOSE
+26 Jun 18:05:47.653 DEBUG[qa-db51:0:UC5-recordTransmitter] - Connecting to: 9.70.148.158:16022
+26 Jun 18:05:47.797 DEBUG[qa-db51:0:UC5-recordTransmitter] - Sent handshake.
+26 Jun 18:05:47.797 DEBUG[qa-db51:0:UC5-recordTransmitter] - Connection status is : OPEN
+26 Jun 18:05:48.662  INFO[Test worker] - Connection configuration ConnectionConfig{ucConfig=UCConfig{version='UniversalConnector (V1.2.44)', connectorId='5', connectorIp='127.0.0.1', configurationFetchType='file', configurationFetchFileName='SniffersConfig.json', statusWriterType='LOG', snifferConnectionsLimit =20}, snifferConfig=SnifferConfig{ip='9.70.148.158', port=16022, isSSL=false}, databaseDetails=DatabaseDetails{dbName='config', dbHost='qa-db511', dbPort=27101, dbType=MONGODB}}
+26 Jun 18:05:48.662  INFO[Test worker] - Snif address is set to 9.70.148.158:16022 connecting with SSL=false
+26 Jun 18:05:48.663 DEBUG[qa-db511:27101:UC5-recordTransmitter] - Starting connection to Snif
+26 Jun 18:05:48.666 DEBUG[qa-db511:27101:UC5-recordTransmitter] - Connection status is : CLOSE
+26 Jun 18:05:48.667 DEBUG[qa-db511:27101:UC5-recordTransmitter] - Connecting to: 9.70.148.158:16022
+26 Jun 18:05:48.808 DEBUG[qa-db511:27101:UC5-recordTransmitter] - Sent handshake.
+26 Jun 18:05:48.809 DEBUG[qa-db511:27101:UC5-recordTransmitter] - Connection status is : OPEN
