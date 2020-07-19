@@ -20,13 +20,11 @@ ENV LOGSTASH_DIR=/usr/share/logstash
 USER root
 
 #Copy necessary files
-COPY pipeline/ ${LOGSTASH_DIR}/pipeline
-COPY config/ ${LOGSTASH_DIR}/config
+COPY uc/. ${LOGSTASH_DIR}/
 
 #Download and extract logstash
 RUN apk add --no-cache bash && \
 	wget -q https://artifacts.elastic.co/downloads/logstash/logstash-${LOGSTASH_VERSION}.tar.gz && \
-	#mkdir -p ${LOGSTASH_DIR} && \
 	tar -xzf logstash*.tar.gz  -C ${LOGSTASH_DIR} --strip-components=1 && \
 	rm *.tar.gz && \
 #Install plugins
@@ -40,22 +38,23 @@ RUN apk add --no-cache bash && \
     logstash-input-azure-* logstash-integration-kafka-* logstash-input-http-* nokogiri-1.10.7-java \
     sequel-5.27.0 backports-3.15.0 tzinfo-data-1.2019.3 snappy-0.0.12-java \
     mail-2.6.6 logstash-input-azure_event_hubs-1.1.2 logstash-filter-jdbc_static-1.0.7 snmp-1.3.2 && \
-#change owner
-    chown -R 1001:1001 ${LOGSTASH_DIR}
+#Create customer dir
+    mkdir -p ${LOGSTASH_DIR}/customer/pipeline ${LOGSTASH_DIR}/customer/config && \
+#Change owner
+    chown -R 1001:1001 ${LOGSTASH_DIR} && \
+#Make sure scripts are not uploaded with windows characters additions
+    sed -i -e 's/\r$//' ${LOGSTASH_DIR}/scripts/*.sh
 
-COPY config/pipelines.yml ${LOGSTASH_DIR}/config/pipelines.yml
-COPY start_logstash.sh /start_logstash.sh
-
-RUN chown 1001:1001 ${LOGSTASH_DIR}/config/pipelines.yml /start_logstash.sh
-
-RUN sed -i -e 's/\r$//' /start_logstash.sh
-
-RUN chmod 755 /start_logstash.sh
+#TODO- remove these 2 lines and make sure tar command doesn't override pipelines.yml file
+COPY uc/config/pipelines.yml ${LOGSTASH_DIR}/config/pipelines.yml
+RUN chown 1001:1001 ${LOGSTASH_DIR}/config/pipelines.yml
 
 USER 1001
 
 ENV UDS_ETC=${LOGSTASH_DIR}/config/
 ENV UC_ETC=${LOGSTASH_DIR}/config/
+ENV UC_SCRIPTS=${LOGSTASH_DIR}/scripts/
 ENV PATH ${LOGSTASH_DIR}/bin:$PATH
 
-CMD /start_logstash.sh
+RUN chmod 755 ${UC_SCRIPTS}/*.sh
+CMD ${UC_SCRIPTS}/start_logstash.sh

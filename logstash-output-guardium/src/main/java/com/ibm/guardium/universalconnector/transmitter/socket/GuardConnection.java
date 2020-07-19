@@ -2,6 +2,7 @@ package com.ibm.guardium.universalconnector.transmitter.socket;
 
 import com.google.protobuf.Message;
 import com.ibm.guardium.universalconnector.config.ConnectionConfig;
+import com.ibm.guardium.universalconnector.status.StatusWriter;
 import com.ibm.guardium.universalconnector.transmitter.QueuedMessage;
 import com.ibm.guardium.universalconnector.transmitter.RecordTransmitter;
 import com.ibm.guardium.universalconnector.transmitter.TransmitterStats;
@@ -23,6 +24,14 @@ import java.util.concurrent.locks.ReentrantLock;
 
 
 public class GuardConnection implements RecordTransmitter {
+    public StatusWriter getStatusWriter() {
+        return statusWriter;
+    }
+
+    public void setStatusWriter(StatusWriter statusWriter) {
+        this.statusWriter = statusWriter;
+    }
+
     enum Status { CLOSE, OPEN, IN_PROGRESS, ERROR }
     public static final int INIT_BUF_LEN = 2048*1024;
 
@@ -49,7 +58,7 @@ public class GuardConnection implements RecordTransmitter {
     private GuardMessage msgHeader;
     private GuardAbstractConnection commHandler = null;
     private ConnectionConfig config;
-
+    private StatusWriter statusWriter;
     class ConnTimer extends TimerTask {
         private int index = 0;
         public void run() {
@@ -131,11 +140,18 @@ public class GuardConnection implements RecordTransmitter {
         lock.unlock();
     }
 
+    private void writeStatus(String status,String comment){
+        if(this.statusWriter != null){
+            this.statusWriter.updateStatus("Open","");
+
+        }
+    }
     private void sendHandshake() throws IOException {
         ByteBuffer msg = new ServiceMessageBuilder(handshakeBytes, SERVICE_ID_HANDSHAKE).getMessage();
         commHandler.write(msg);
         if (log.isDebugEnabled()) {log.debug("Sent handshake.");}
         status = Status.OPEN;
+        writeStatus("OPEN","");
         lock.lock();
         connected.signalAll();
         lock.unlock();
@@ -168,6 +184,7 @@ public class GuardConnection implements RecordTransmitter {
             commHandler.register(selector, SelectionKey.OP_READ|SelectionKey.OP_WRITE);
         } else {
             status = Status.IN_PROGRESS;
+            writeStatus("IN_PROGRESS","");
             commHandler.register(selector, SelectionKey.OP_CONNECT);
         }
         transmitterStats.setLastReceiveTime(System.currentTimeMillis());
@@ -182,6 +199,7 @@ public class GuardConnection implements RecordTransmitter {
         if (read < 0) {
             log.debug("Read -1, closing socket.");
             status= Status.CLOSE;
+            writeStatus("CLOSE","");
             return;
         }
         if (read == 0) {
@@ -245,6 +263,7 @@ public class GuardConnection implements RecordTransmitter {
         } catch (IOException e) {
             log.error(e);
             status= Status.ERROR;
+            writeStatus("ERROR",e.getMessage());
         }
     }
 
@@ -266,6 +285,7 @@ public class GuardConnection implements RecordTransmitter {
                     key.interestOps(SelectionKey.OP_WRITE|SelectionKey.OP_READ);
                 } else {
                     status = Status.CLOSE;
+                    writeStatus("CLOSE","");
                 }
             }
             keyIterator.remove();
@@ -352,6 +372,7 @@ public class GuardConnection implements RecordTransmitter {
                 log.error("Unable to close socketChannel. ", e1);
             }
             status = Status.CLOSE;
+            writeStatus("CLOSE","");
         }
     }
 
@@ -362,9 +383,11 @@ public class GuardConnection implements RecordTransmitter {
                 log.debug("Closing connection.");
                 commHandler.close();
                 status = Status.CLOSE;
+                writeStatus("CLOSE","");
             } catch (IOException e) {
                 log.error(e);
                 status = Status.ERROR;
+                writeStatus("ERROR",e.getMessage());
             }
         }
     }
@@ -402,6 +425,7 @@ public class GuardConnection implements RecordTransmitter {
                 // we are in a bad state, sleep for 10 seconds and try again.
                 Thread.sleep(1000 * 10);
                 status = Status.CLOSE;
+                writeStatus("CLOSE","");
         }
     }
 
