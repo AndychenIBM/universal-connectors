@@ -178,7 +178,7 @@ public class JsonRecordTransformer implements RecordTransformer {
     }
 
     public Datasource.Application_data buildAppplicationData(Record record, Datasource.Session_locator sessionLocator) {
-        Datasource.Timestamp timestamp = getTimestamp(record.getTimeInMs());
+        Datasource.Timestamp timestamp = getTimeStamp(record);
         Data rd = record.getData();
         Datasource.Application_data.Data_type dataType = getDataType(record);
         String langTypeStr = LANG_TYPE_FREE_TEXT;

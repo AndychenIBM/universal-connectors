@@ -8,8 +8,8 @@ import com.ibm.guardium.universalconnector.config.DatabaseDetails;
 import com.ibm.guardium.universalconnector.config.SnifferConfig;
 import com.ibm.guardium.universalconnector.config.UCConfig;
 import com.ibm.guardium.universalconnector.exceptions.GuardUCException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.HashMap;
 import java.util.List;
@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 
 public class RecordDispatcher {
-    private static Log log = LogFactory.getLog(RecordDispatcher.class);
+    private static Logger log = LogManager.getLogger(RecordDispatcher.class);
 
     private UCConfig ucConfig;
     private List<SnifferConfig> snifferConfigs;

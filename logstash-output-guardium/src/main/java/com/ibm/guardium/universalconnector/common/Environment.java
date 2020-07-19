@@ -1,15 +1,17 @@
 package com.ibm.guardium.universalconnector.common;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.FileInputStream;
 import java.util.Properties;
 
 
 public class Environment {
-    private static Log log = LogFactory.getLog(Environment.class);
-    public static final String UDS_ETC = get("UDS_ETC", "/tmp/logstash_plugin/"/*"/var/IBM/Guardium/collector/datastreams/etc"*//*"C:\\Guard\\Git\\Guardium\\apps\\UniversalConnector\\logstash-output-java_output_example\\src\\resources\\"*/);
+    private static Logger log = LogManager.getLogger(Environment.class);
+    public static final String UC_ETC = "UC_ETC";
+    public static final String UDS_ETC = get("UDS_ETC", "C:\\Guard\\Git\\universal-connector\\logstash-output-guardium\\src\\resources");
     public static final Properties properties = loadProperties();
     public static final String MINI_SNIF_SSL_ENABLED = get("MINI_SNIF_SSL_ENABLED", "false");
     public static final String MINI_SNIF_PORT = get("MINI_SNIF_PORT", "16022");
@@ -20,6 +22,34 @@ public class Environment {
 
     public static final String CONNECTOR_ID = get(CONNECTOR_ID_PROP, "1");
     public static final String CONNECTOR_IP = get (CONNECTOR_IP_PROP, "127.0.0.1");
+
+    public static final String LOG42_CONF="log4j2uc.properties";
+
+    public static String getUcEtc() {
+        String gEnv = System.getenv(UC_ETC);
+        System.out.println("System.getenv "+gEnv);
+
+        if (null == gEnv || gEnv.isEmpty()) {
+            gEnv = System.getProperty(UC_ETC);
+            System.out.println("System.getProperty "+gEnv);
+        }
+        if (null == gEnv || gEnv.isEmpty()) {
+            gEnv = "/tmp/logstash_plugin/";
+            System.out.println("failed to find UC_ETC, using default "+gEnv);
+        }
+        return gEnv;
+    }
+
+    public static String getLog42Conf() {
+        String gEnv = System.getenv(UC_ETC);
+        System.out.println("System.getenv "+gEnv);
+
+        if (null == gEnv || gEnv.isEmpty()) {
+            gEnv = System.getProperty(UC_ETC);
+            System.out.println("System.getProperty "+gEnv);
+        }
+        return gEnv+LOG42_CONF;
+    }
 
     private static String get(String envName, String defaultVal) {
         String gEnv = System.getenv(envName);

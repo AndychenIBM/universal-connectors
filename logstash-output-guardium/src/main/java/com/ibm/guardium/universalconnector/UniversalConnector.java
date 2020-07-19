@@ -10,10 +10,8 @@ import com.ibm.guardium.universalconnector.dispatcher.RecordDispatcher;
 import com.ibm.guardium.universalconnector.exceptions.GuardUCCmdlineArgsException;
 import com.ibm.guardium.universalconnector.exceptions.GuardUCException;
 import com.ibm.guardium.universalconnector.transformer.JsonRecordTransformer;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.PropertyConfigurator;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -22,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 public class UniversalConnector {
-    private static Log log = LogFactory.getLog(UniversalConnector.class);
+    private static Logger log = LogManager.getLogger(UniversalConnector.class);
 
     private boolean shouldReadFromFile = false;
     private String fileName;
@@ -202,18 +200,16 @@ public class UniversalConnector {
     }
 
     private void initConnector(){
-        log.info("using etc path as: " + Environment.UDS_ETC);
-        JsonReader reader = null;
+        log.info("using etc path as: " + Environment.getUcEtc());
         try {
-            PropertyConfigurator.configureAndWatch(Environment.UDS_ETC + "/log4j.properties", 10000);
-            reader = new JsonReader(new FileReader(Environment.UDS_ETC + "/UniversalConnector.json"));
+            JsonReader reader = new JsonReader(new FileReader(Environment.getUcEtc() + "UniversalConnector.json"));
+            UCConfig ucConfig = new Gson().fromJson(reader, UCConfig.class);
+            ucConfig.setVersion(udsAgentVersion);
+            this.ucConfig = ucConfig;
         } catch (FileNotFoundException e){
             log.error("Failed to find file");
-            throw new IllegalArgumentException("Filed to find files during connector initialization, Path base is "+Environment.UDS_ETC, e);
+            throw new IllegalArgumentException("Filed to find files during connector initialization, Path base is "+Environment.getUcEtc(), e);
         }
-        UCConfig ucConfig = new Gson().fromJson(reader, UCConfig.class);
-        ucConfig.setVersion(udsAgentVersion);
-        this.ucConfig = ucConfig;
     }
 
     private void connectorMain(String[] args) throws Exception {

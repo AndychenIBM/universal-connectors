@@ -1,8 +1,7 @@
 package com.ibm.guardium.universalconnector.transmitter.socket;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import javax.net.ssl.*;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -23,7 +22,7 @@ public class GuardSecuredConnection extends GuardAbstractConnection {
     private ExecutorService executor = Executors.newSingleThreadExecutor();
     private GuardAbstractConnection conn;
     private SSLEngine engine;
-    private static Log log = LogFactory.getLog(GuardSecuredConnection.class);
+    private static Logger log = LogManager.getLogger(GuardSecuredConnection.class);
 
     public GuardSecuredConnection(String remoteAddress, int port) throws CertificateException, IOException, NoSuchAlgorithmException, KeyManagementException {
         this.conn = new GuardNonSecuredConnection(remoteAddress, port);

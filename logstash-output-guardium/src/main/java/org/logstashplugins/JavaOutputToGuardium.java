@@ -4,17 +4,15 @@ import co.elastic.logstash.api.*;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.ibm.guardium.universalconnector.UniversalConnector;
-import com.ibm.guardium.universalconnector.UniversalConnector;
-import com.ibm.guardium.universalconnector.exceptions.GuardUCException;
-import com.ibm.guardium.universalconnector.transformer.jsonrecord.*;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.logstash.ackedqueue.io.MmapPageIOV2;
+import com.ibm.guardium.universalconnector.common.Environment;
 
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.LoggerContext;
+
+import java.io.File;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 
@@ -23,10 +21,20 @@ import java.util.concurrent.CountDownLatch;
 @LogstashPlugin(name = "java_output_to_guardium")
 public class JavaOutputToGuardium implements Output {
 
+    static {
+        try {
+            LoggerContext context = (LoggerContext) LogManager.getContext(false);
+            File file = new File(Environment.getLog42Conf());
+            context.setConfigLocation(file.toURI());
+        } catch (Exception e){
+            System.err.println("Failed to load log4j configuration "+e.getMessage());
+            e.printStackTrace();
+        }
+    }
     public static final PluginConfigSpec<String> PREFIX_CONFIG =
             PluginConfigSpec.stringSetting("prefix", "");
 
-    private static Log log = LogFactory.getLog(JavaOutputToGuardium.class);
+    private static Logger log = LogManager.getLogger(JavaOutputToGuardium.class);
 
     private final String id;
     private String prefix;
@@ -35,7 +43,6 @@ public class JavaOutputToGuardium implements Output {
     private volatile boolean stopped = false;
     private static UniversalConnector connector = null;//new UniversalConnector();
     private static Gson gson = new Gson();
-    private JsonFromEventBuilder jsonFromEventBuilder = new JsonFromEventBuilder();
 
     // all plugins must provide a constructor that accepts id, Configuration, and Context
     public JavaOutputToGuardium(final String id, final Configuration configuration, final Context context) {

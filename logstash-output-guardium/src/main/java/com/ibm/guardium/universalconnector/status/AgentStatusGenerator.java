@@ -1,13 +1,14 @@
 package com.ibm.guardium.universalconnector.status;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.Map;
 
 
 public class AgentStatusGenerator {
-    private static Log log = LogFactory.getLog(AgentStatusGenerator.class);
+    private static Logger log = LogManager.getLogger(AgentStatusGenerator.class);
     public static final long NUMBER_OF_CYCLES_TO_ALERT = 10;
     private static final long CONSUMER_Q_FULL_LEVEL = 90;
     private long gap = 0;

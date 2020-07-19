@@ -1,11 +1,11 @@
 package com.ibm.guardium.universalconnector.status;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 
 public class LogStatusWriter implements StatusWriter {
-    private Log log = LogFactory.getLog(LogStatusWriter.class);
+    private Logger log = LogManager.getLogger(LogStatusWriter.class);
     private AgentStatus currentActive = new AgentStatus().withStatus("").withComment("");
     private String agentId;
     private String tenantId;

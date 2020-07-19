@@ -10,8 +10,8 @@ import com.ibm.guardium.universalconnector.status.StatusWriter;
 import com.ibm.guardium.universalconnector.status.StatusWriterFactory;
 import com.ibm.guardium.universalconnector.transmitter.*;
 import com.ibm.guardium.universalconnector.transmitter.socket.GuardConnection;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -20,7 +20,7 @@ import java.util.concurrent.BlockingQueue;
 
 
 public class Agent {
-    private static Log log = LogFactory.getLog(Agent.class);
+    private static Logger log = LogManager.getLogger(Agent.class);
 
     private AgentState state = AgentState.STOPPED;
     //private UCConfig ucConfig;

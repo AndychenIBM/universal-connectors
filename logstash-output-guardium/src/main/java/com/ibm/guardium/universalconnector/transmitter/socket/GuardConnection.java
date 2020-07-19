@@ -6,9 +6,8 @@ import com.ibm.guardium.universalconnector.status.StatusWriter;
 import com.ibm.guardium.universalconnector.transmitter.QueuedMessage;
 import com.ibm.guardium.universalconnector.transmitter.RecordTransmitter;
 import com.ibm.guardium.universalconnector.transmitter.TransmitterStats;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -43,7 +42,7 @@ public class GuardConnection implements RecordTransmitter {
     private Status status = Status.CLOSE;
     private static final short SERVICE_ID_HANDSHAKE = 1;
     private static final short SERVICE_ID_DS_MESSAGE = 4;
-    private static Log log = LogFactory.getLog(GuardConnection.class);
+    private static Logger log = LogManager.getLogger(GuardConnection.class);
     private Selector selector = null;
     private ByteBuffer writeBuffer = ByteBuffer.allocateDirect(INIT_BUF_LEN);
     private boolean isWriteBufferEmpty = true;
