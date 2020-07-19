@@ -56,4 +56,5 @@ ENV UC_ETC=${LOGSTASH_DIR}/config/
 ENV UC_SCRIPTS=${LOGSTASH_DIR}/scripts/
 ENV PATH ${LOGSTASH_DIR}/bin:$PATH
 
+RUN chmod 755 ${UC_SCRIPTS}/*.sh
 CMD ${UC_SCRIPTS}/start_logstash.sh
