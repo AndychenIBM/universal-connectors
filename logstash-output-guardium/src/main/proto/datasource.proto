@@ -237,6 +237,7 @@ message Session_start {
     optional string terminal_id = 8;
     optional string db_name = 9;
     optional string app_user_name = 10 ;
+    optional string config_id = 11; //Used by universal connector
 }
 
 
