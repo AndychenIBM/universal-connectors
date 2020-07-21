@@ -1,0 +1,60 @@
+{
+    "eventVersion": "1.07",
+    "userIdentity": {
+        "type": "IAMUser",
+        "principalId": "AIDAJWW2XAIOY2WN3KAAM",
+        "arn": "arn:aws:iam::987076625343:user/ProxyTest",
+        "accountId": "987076625343",
+        "accessKeyId": "ASIA6LUS2AO7Z4EHS6VL",
+        "userName": "ProxyTest",
+        "sessionContext": {
+            "attributes": {
+                "creationDate": "2020-06-10T09:15:19Z",
+                "mfaAuthenticated": "false"
+            }
+        }
+    },
+    "eventTime": "2020-06-10T12:49:15Z",
+    "eventSource": "s3.amazonaws.com",
+    "eventName": "GetObject",
+    "awsRegion": "us-east-1",
+    "sourceIPAddress": "85.250.36.92",
+    "userAgent": "[Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0) Gecko/20100101 Firefox/68.0]",
+    "requestParameters": {
+        "X-Amz-Date": "20200610T124914Z",
+        "bucketName": "guardiumdatalogig",
+        "X-Amz-Algorithm": "AWS4-HMAC-SHA256",
+        "response-content-disposition": "inline",
+        "X-Amz-SignedHeaders": "host",
+        "Host": "guardiumdatalogig.s3.us-east-1.amazonaws.com",
+        "X-Amz-Expires": "300",
+        "key": "Screen Shot 2020-05-31 at 15.48.34.png"
+    },
+    "responseElements": null,
+    "additionalEventData": {
+        "SignatureVersion": "SigV4",
+        "CipherSuite": "ECDHE-RSA-AES128-GCM-SHA256",
+        "bytesTransferredIn": 0,
+        "AuthenticationMethod": "QueryString",
+        "x-amz-id-2": "m32YEFsDx1MNOzT3rJgNi1/S1qEtaYlVaAnznBlEa30C3/Amg4lTPW+XzXxPFgZ2cWIdwDZRbrc=",
+        "bytesTransferredOut": 399801
+    },
+    "requestID": "CE83452506E5C7E6",
+    "eventID": "e20f8c61-b550-4bed-aef3-a4a15775f15d",
+    "readOnly": true,
+    "resources": [
+        {
+            "type": "AWS::S3::Object",
+            "ARN": "arn:aws:s3:::guardiumdatalogig/Screen Shot 2020-05-31 at 15.48.34.png"
+        },
+        {
+            "accountId": "987076625343",
+            "type": "AWS::S3::Bucket",
+            "ARN": "arn:aws:s3:::guardiumdatalogig"
+        }
+    ],
+    "eventType": "AwsApiCall",
+    "managementEvent": false,
+    "recipientAccountId": "987076625343",
+    "eventCategory": "Data"
+}
