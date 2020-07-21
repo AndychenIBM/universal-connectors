@@ -63,27 +63,16 @@ public class LogstashFilterS3Guardium implements Filter {
         for (Event e : events) {
             try {
                 if (log.isDebugEnabled()) {
-                    String eventStr = logEvent(e);
-                    log.debug("Event: "+eventStr);
+                    log.debug("Event: "+logEvent(e));
                 }
                 JsonElement inputJSON = null;
-                // from config, use Object f = e.getField(sourceField);
-
                 if (e.getField("detail") !=null ) {
-
-                    String detailStr = e.getField("detail").toString();
-                    log.debug("DETAIL class: " + e.getField("detail").getClass().getCanonicalName() + ", string value " + detailStr);
-                    String jsonDetailsEvent = null;
-
-                    jsonDetailsEvent = gson.toJson(e.getField("detail"));
+                    String jsonDetailsEvent = gson.toJson(e.getField("detail"));
                     log.debug("DETAIL AS JSON STR3 " + jsonDetailsEvent);
-
                     inputJSON = JsonParser.parseString(jsonDetailsEvent);
-
                 } else {
                     inputJSON = gson.toJsonTree(e);
                 }
-
 
                 Record record = Parser.buildRecord(inputJSON);
                 if (record==null){
@@ -108,18 +97,23 @@ public class LogstashFilterS3Guardium implements Filter {
     }
 
     private static String logEvent(Event event){
-        StringBuffer sb = new StringBuffer();
-        sb.append("{ ");
-        boolean first = true;
-        for (Map.Entry<String, Object> stringObjectEntry : event.getData().entrySet()) {
-            if (!first){
-                sb.append(",");
+        try {
+            StringBuffer sb = new StringBuffer();
+            sb.append("{ ");
+            boolean first = true;
+            for (Map.Entry<String, Object> stringObjectEntry : event.getData().entrySet()) {
+                if (!first){
+                    sb.append(",");
+                }
+                sb.append("\""+stringObjectEntry.getKey()+"\" : \""+stringObjectEntry.getValue()+"\"");
+                first = false;
             }
-            sb.append("\""+stringObjectEntry.getKey()+"\" : \""+stringObjectEntry.getValue()+"\"");
-            first = false;
+            sb.append(" }");
+            return sb.toString();
+        } catch (Exception e){
+            log.error("Failed to create event log string", e);
+            return null;
         }
-        sb.append(" }");
-        return sb.toString();
     }
 
     @Override

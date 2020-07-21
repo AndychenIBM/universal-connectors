@@ -38,21 +38,19 @@ public class SampledEventsTest {
         JsonObject inputJSON = (JsonObject) JsonParser.parseString(event.getJsonStr());
         Record result = Parser.buildRecord(inputJSON);
         Assert.assertTrue("db name is null, event "+event, result.getDbName() != null);
-        Assert.assertTrue("db name is empty, event "+event, result.getDbName().length() != 0);
         // for PutAccessPolicy event we do not have dbname available
-        if (result.getData()!=null && !result.getData().getOriginalSqlCommand().contains("PutEventPolicy")){
-            Assert.assertTrue("db name is N/A, event "+event, !result.getDbName().equalsIgnoreCase(Parser.UNKNOWN_STRING));
+        if (!EventSamples.EventName.PutAccessPolicy.equals(event.getEventName()) &&
+            !EventSamples.EventName.CreateAccessPoint.equals(event.getEventName())) {
+            Assert.assertTrue("db name is empty, event " + event, result.getDbName().length() != 0);
         }
     }
 
     @Test
     public void testParseAsConstruct_appUserName() throws Exception{
-
         JsonObject inputJSON = (JsonObject) JsonParser.parseString(event.getJsonStr());
         Record result = Parser.buildRecord(inputJSON);
         Assert.assertTrue("app user name is null, event "+event, result.getAppUserName()!= null);
         Assert.assertTrue("app user name is empty, event "+event, result.getAppUserName().length() != 0);
-        Assert.assertTrue("app user name is N/A, event "+event, !result.getAppUserName().equalsIgnoreCase(Parser.UNKNOWN_STRING));
     }
 
     @Test

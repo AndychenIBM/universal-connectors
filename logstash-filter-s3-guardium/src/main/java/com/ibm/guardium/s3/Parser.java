@@ -18,7 +18,8 @@ public class Parser {
 
     private static final String DATE_FORMAT_ISO = "yyyy-MM-dd'T'HH:mm:ss";// "yyyy-MM-dd'T'HH:mm:ssZ";
     private static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat(DATE_FORMAT_ISO);
-    public static final String UNKNOWN_STRING = "N/A";
+    public static final String UNKNOWN_STRING = "";
+    public static final String UNKNOWN_IP = "0.0.0.0";
     public static final String BUCKETNAME_PROPERTY = "bucketName";
     public static final String BUCKET_PROPERTY = "Bucket";
     public static final String S3_TYPE = "S3";
@@ -37,21 +38,15 @@ public class Parser {
         // userIdentity is a mandatory property
         JsonObject auditObj = (JsonObject)auditEl;
         JsonObject userIdentity = auditObj.get("userIdentity").getAsJsonObject();
+        String userName = searchForAppUserName(userIdentity);
+        record.setAppUserName(userName);
+
         record.setSessionId(userIdentity.toString());
 
         JsonObject requestParameters = auditObj.get("requestParameters")!=null ? auditObj.get("requestParameters").getAsJsonObject() : null;
-        String bucketName = searchForBucketName(requestParameters);
-        if (bucketName!=null) {
-            record.setDbName(bucketName);
-        } else {
-            record.setDbName(UNKNOWN_STRING);
-        }
+        record.setDbName(searchForBucketName(requestParameters));
 
-        String userName = searchForAppUserName(auditObj);
-        record.setAppUserName(userName);
-
-        String time = getStrValue(auditObj,"eventTime");
-        long unixTime = getTimestamp(time);
+        long unixTime = getTimestamp(getStrValue(auditObj,"eventTime"));
         record.setTime(unixTime);
 
         // ------------------ Build Session locator
@@ -71,88 +66,73 @@ public class Parser {
         Accessor accessor = new Accessor();
         accessor.setDbUser(userName);
         accessor.setServerType(S3_TYPE);
-        accessor.setServerOs(UNKNOWN_STRING);
-
+        accessor.setDbProtocol(S3_TYPE);
         accessor.setClientHostName(getStrValue(auditObj,"sourceIPAddress"));
         accessor.setServerHostName(getStrValue(auditObj,"eventSource"));
+        accessor.setCommProtocol(getStrValue(auditObj,"eventType")); // talk to Itai
+        accessor.setDbProtocolVersion(getStrValue(auditObj,"eventVersion"));
+        accessor.setServiceName(getStrValue(auditObj,"eventSource"));
+        accessor.setType(getStrValue(auditObj,"eventType"));
 
-        log.debug("12");
-        String protocol = getStrValue(auditObj,"eventType");
-        accessor.setCommProtocol(protocol); // talk to Itai
-        accessor.setDbProtocol(S3_TYPE);
-
-        log.debug("13");
-        String version = getStrValue(auditObj,"eventVersion");
-        accessor.setDbProtocolVersion(version);
+        accessor.setServerDescription(getStrValue(auditObj,"awsRegion"));
+        accessor.setServerOs(UNKNOWN_STRING);
+        accessor.setOsUser(UNKNOWN_STRING);
+        accessor.setClient_mac(UNKNOWN_STRING);
+        accessor.setLanguage(UNKNOWN_STRING);
         accessor.setOsUser(UNKNOWN_STRING);
 
-        log.debug("14");
         //"userAgent": "aws-cli/1.10.32 Python/2.7.9 Windows/7 botocore/1.4.22",
         //"userAgent": "[Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0) Gecko/20100101 Firefox/68.0]"
         //"userAgent": "[S3Console/0.4, aws-internal/3 aws-sdk-java/1.11.783 Linux/4.9.217-0.1.ac.205.84.332.metal1.x86_64 OpenJDK_64-Bit_Server_VM/25.252-b09 java/1.8.0_252 vendor/Oracle_Corporation]"
         //"userAgent": "s3.amazonaws.com"
-        // parse userAgent field "[Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0) Gecko/20100101 Firefox/68.0]"
         String userAgent = getStrValue(auditObj,"userAgent");
-        if (userAgent!=null) {
-            // source program
-            int start = userAgent.indexOf("[") > 0 ? userAgent.indexOf("[") : 0;
-            int end = userAgent.indexOf("/") > 0 ? userAgent.indexOf("/") : userAgent.length();
-            String eventSource = userAgent.substring(start, end);
-            if (eventSource != null) {
-                accessor.setSourceProgram(eventSource);
-            }
 
-            // client os
-            start = userAgent != null ? userAgent.indexOf("(") : -1;
-            end = userAgent != null ? userAgent.indexOf(")", start) : -1;
-            if (start >= 0 && end > 0){
-                accessor.setClientOs(userAgent.substring(start, end + 1));
-            }
+        // source program
+        String sourceProgram = getStrValue(auditObj,"eventSource");
+        int start = userAgent.indexOf("[") > 0 ? userAgent.indexOf("[")+1 : 0;
+        int end = userAgent.indexOf("/") > 0 ? userAgent.indexOf("/") : -1;
+        if (start >= 0 && end > 0) {
+            sourceProgram = userAgent.substring(start, end);
         }
+        accessor.setSourceProgram(sourceProgram);
 
-        accessor.setServiceName(getStrValue(auditObj,"eventSource"));
+        // client os
+        String clientOs = UNKNOWN_STRING;
+        start = userAgent != null ? userAgent.indexOf(";") : -1;
+        end = userAgent != null ? userAgent.indexOf(";", start) : -1;
+        if (start >= 0 && end > 0){
+            clientOs = userAgent.substring(start, end + 1);
+        }
+        accessor.setClientOs(clientOs);
 
-        log.debug("16");
-        accessor.setLanguage(UNKNOWN_STRING);
-
-        log.debug("17");
-        String eventType = getStrValue(auditObj,"eventType");
-        accessor.setType(eventType);
-
-        log.debug("18");
         record.setAccessor(accessor);
 
-        log.debug("19");
         // ------------------ Build data or Exception
+        String auditAsSql = gson.toJson(auditObj);
         String errorCode = getStrValue(auditObj,"errorCode");
         if (!UNKNOWN_STRING.equalsIgnoreCase(errorCode)){
             ExceptionRecord exceptionRecord = new ExceptionRecord();
-            exceptionRecord.setExceptionTypeId(errorCode);
-            String desc = getStrValue(auditObj,"errorMessage");
-            if (!UNKNOWN_STRING.equalsIgnoreCase(desc)) {
-                exceptionRecord.setDescription(desc);
-            }
-            exceptionRecord.setSqlString(gson.toJson(auditObj));
             record.setException(exceptionRecord);
+
+            exceptionRecord.setExceptionTypeId(errorCode);
+            exceptionRecord.setDescription(getStrValue(auditObj,"errorMessage"));
+            exceptionRecord.setSqlString(auditAsSql);
+
         } else {
-            log.debug("20");
             Data data = new Data();
             record.setData(data);
-            String fullSql = auditObj.toString();
-            data.setOriginalSqlCommand(fullSql);
+
+            data.setOriginalSqlCommand(auditAsSql);
             data.setUseConstruct(true);
 
-            log.debug("21");
             Construct construct = new Construct();
             data.setConstruct(construct);
-            construct.setFull_sql(fullSql);
-            construct.setOriginal_sql(fullSql);
+            construct.setFull_sql(auditAsSql);
+            construct.setOriginal_sql(auditAsSql); // "original_sql" actually not so original, but an sql with redacted sensitive data
 
-            log.debug("22");
             ArrayList<Sentence> sentences = new ArrayList<>();
             construct.setSentences(sentences);
 
-            log.debug("233");
             String eventName = getStrValue(auditObj, "eventName");
             Sentence sentence = new Sentence(eventName); //verb
             sentences.add(sentence);
@@ -163,7 +143,7 @@ public class Parser {
             // if there are resources - treat each one of them as object and add to the data
             String resourcesStr = getStrValue(auditObj, "resources");
             try {
-                if (!"N/A".equals(resourcesStr) && resourcesStr != null && resourcesStr.length() > 0) {
+                if (!UNKNOWN_STRING.equals(resourcesStr) && resourcesStr != null && resourcesStr.length() > 0) {
 
                     log.debug("resourcesStr is " + resourcesStr);
                     resourcesStr = gson.toJson(auditObj.get("resources"));
@@ -190,14 +170,12 @@ public class Parser {
                     }
                 }
             } catch (Exception e) {
-                log.error("Failed to find resources for event type " + eventType + ", resourcesStr " + resourcesStr, e);
+                log.error("Failed to process resources for event, resourcesStr " + resourcesStr, e);
             }
 
             // if not found object in resources property - use the value in "key" field of request parameters
             if (objects.size() == 0) {
-                log.debug("23");
-                String objectName = getStrValue(requestParameters, "key");
-                SentenceObject object = new SentenceObject(objectName);
+                SentenceObject object = new SentenceObject(getStrValue(requestParameters, "key"));
                 objects.add(object);
             }
         }
@@ -208,10 +186,10 @@ public class Parser {
     private static String searchForBucketName(JsonElement data) {
 
         if (data==null){
-            return null;
+            return UNKNOWN_STRING;
 
         } else if (data.isJsonPrimitive()){
-            return null;
+            return UNKNOWN_STRING;
 
         } else if (data.isJsonArray()){
             // scan each arr object for bucket, use first bucket found
@@ -246,16 +224,15 @@ public class Parser {
             }
         }
         // At this point - nothing was found, so just return null
-        return null;
+        return UNKNOWN_STRING;
     }
 
-    public static String searchForAppUserName(JsonObject eventData) {
+    public static String searchForAppUserName(JsonObject userIdentity) {
         //https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-user-identity.html#cloudtrail-event-reference-user-identity-examples
         //maybe better use the link below?
         //https://docs.aws.amazon.com/macie/latest/userguide/macie-users.html
-        JsonObject userIdentity = eventData.get("userIdentity").getAsJsonObject();
         String type = getStrValue(userIdentity, "type");
-        String userName = null;
+        String userName = UNKNOWN_STRING;
         switch (type){
             case "Root":
             case "IAMUser":
@@ -274,6 +251,7 @@ public class Parser {
                 break;
             case "AWSAccount":
                 userName = "AWSService";
+                break;
             case "AWSService":
                 userName = "AWSService";
         }
@@ -301,8 +279,8 @@ public class Parser {
             return address.getHostAddress();
         }catch (UnknownHostException e){
             log.error("Falied to translate the sourceIPAdress "+sourceIPAddress+" to ip, sending original string", e);
+            return UNKNOWN_IP;
         }
-        return sourceIPAddress;
     }
 
     /*
@@ -332,7 +310,7 @@ public class Parser {
 
     private static String getStrValue(JsonObject data, String[] properties){
         if (properties==null){
-            return null;
+            return UNKNOWN_STRING;
         }
         for (String property : properties) {
             String val = getStrValue(data, property);
@@ -354,6 +332,9 @@ public class Parser {
                     value = val.toString();
                 }
             }
+        }
+        if (value==null){
+            value = UNKNOWN_STRING;
         }
         return value;
     }

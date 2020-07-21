@@ -27,16 +27,16 @@ public class AppUserNameTest {
     @Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][] {
-                {"{\"userIdentity\": {\n" +
+                {"{\n" +
                         "  \"type\": \"IAMUser\",\n" +
                         "  \"principalId\": \"AIDAJ45Q7YFFAREXAMPLE\",\n" +
                         "  \"arn\": \"arn:aws:iam::123456789012:user/Alice\",\n" +
                         "  \"accountId\": \"123456789012\",\n" +
                         "  \"accessKeyId\": \"AKIAIOSFODNN7EXAMPLE\",\n" +
                         "  \"userName\": \"Alice\"\n" +
-                        "}}", "Alice" },
+                        "}", "Alice" },
 
-                { "{\"userIdentity\": {\n" +
+                { "{\n" +
                         "    \"type\": \"AssumedRole\",\n" +
                         "    \"principalId\": \"AROAIDPPEZS35WEXAMPLE:AssumedRoleSessionName\",\n" +
                         "    \"arn\": \"arn:aws:sts::123456789012:assumed-role/RoleToBeAssumed/MySessionName\",\n" +
@@ -55,14 +55,14 @@ public class AppUserNameTest {
                         "        \"userName\": \"RoleToBeAssumed\"\n" +
                         "      }\n" +
                         "    }\n" +
-                        "}}", "RoleToBeAssumed" },
+                        "}", "RoleToBeAssumed" },
 
-                { "{\"userIdentity\": {\n" +
+                { "{\n" +
                         "    \"type\": \"AWSService\",\n" +
                         "    \"invokedBy\": \"s3.amazonaws.com\"\n" +
-                        "}}",  "AWSService"},
+                        "}",  "AWSService"},
 
-                { "{\"userIdentity\": {\n" +
+                { "{\n" +
                         "    \"accessKeyId\": \"ASIA6LUS2AO7QFH4D34Z\",\n" +
                         "    \"sessionContext\": {\n" +
                         "      \"attributes\": {\n" +
@@ -75,7 +75,7 @@ public class AppUserNameTest {
                         "    \"userName\": \"ProxyTest\",\n" +
                         "    \"type\": \"IAMUser\",\n" +
                         "    \"arn\": \"arn:aws:iam::987076625343:user/ProxyTest\"\n" +
-                        "  }}", "ProxyTest" }
+                        "  }", "ProxyTest" }
         });
     }
 
@@ -87,7 +87,6 @@ public class AppUserNameTest {
         System.out.println(userName);
         Assert.assertTrue("app user name is null, userIdentity "+userIdentity, userName!= null);
         Assert.assertTrue("app user name is empty, userIdentity "+userIdentity, userName.length() != 0);
-        Assert.assertTrue("app user name is N/A, userIdentity "+userIdentity, !userName.equalsIgnoreCase(Parser.UNKNOWN_STRING));
         Assert.assertTrue("app user name is not as expected value "+expectedUserName +" userIdentity "+userIdentity, userName.equals(expectedUserName));
     }
 }
