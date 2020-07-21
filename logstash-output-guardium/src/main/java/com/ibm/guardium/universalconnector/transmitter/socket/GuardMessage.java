@@ -3,7 +3,7 @@ package com.ibm.guardium.universalconnector.transmitter.socket;
 import com.ibm.guardium.proto.datasource.Datasource;
 import com.ibm.guardium.proto.datasource.Datasource.Guard_ds_message;
 import com.ibm.guardium.proto.datasource.Datasource.Guard_ds_message.Type;
-import com.ibm.guardium.universalconnector.common.Util;
+import com.ibm.guardium.universalconnector.common.Utilities;
 import com.ibm.guardium.universalconnector.config.ConnectionConfig;
 import com.ibm.guardium.universalconnector.config.DBProtocol;
 
@@ -66,12 +66,13 @@ public class GuardMessage {
 
     public static byte[] preparePing(int masterIp, String snifNetworkAddress, String clientId)
     {
+
         Datasource.Ping ping = Datasource.Ping
                 .newBuilder()
                 .setClientIdentifier(clientId)
                 .setCurrentMaster(snifNetworkAddress)
                 .setCurrentMasterIp(masterIp)
-                .setTimestamp(Util.getTimestamp((new java.util.Date()).getTime()))
+                .setTimestamp(Utilities.getTimestamp((new java.util.Date()).getTime()))
                 .build();
         return Guard_ds_message.newBuilder().setType(Type.PING).setPing(ping).build().toByteArray();
 
@@ -82,7 +83,7 @@ public class GuardMessage {
     {
         Datasource.Handshake just_handshake = Datasource.Handshake
                 .newBuilder()
-                .setTimestamp(Util.getTimestamp((new java.util.Date()).getTime()))
+                .setTimestamp(Utilities.getTimestamp((new java.util.Date()).getTime()))
                 .setClientIdentifier(clientId)
                 .setCurrentMaster(snifNetworkAddress)
                 .setCurrentMasterIp(masterIp)

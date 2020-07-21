@@ -61,32 +61,43 @@ public class LogstashFilterS3Guardium implements Filter {
     public Collection<Event> filter(Collection<Event> events, FilterMatchListener matchListener) {
         ArrayList<Event> skippedEvents = new ArrayList<>();
         for (Event e : events) {
-            logEvent(e);
-            // from config, use Object f = e.getField(sourceField);
-            if (e.getField("detail") !=null ) {
-                String detailStr = e.getField("detail").toString();
-                log.debug("DETAIL class: "+e.getField("detail").getClass().getCanonicalName()+", string value "+detailStr);
-                String jsonDetailsEvent = null;
-                try {
-                    jsonDetailsEvent = gson.toJson(e.getField("detail"));
-                    log.debug("DETAIL AS JSON STR3 "+jsonDetailsEvent);
-
-                    JsonObject inputJSON = (JsonObject) JsonParser.parseString(jsonDetailsEvent);
-
-                    Record record = Parser.buildRecord(inputJSON);
-                    if (record==null){
-                        log.warn("Event did not contain supported GetObject action "+logEvent(e));
-                        continue;
-                    }
-
-                    e.setField("Record", gson.toJson(record));
-
-                    matchListener.filterMatched(e); // Flag OK for filter input/parsing/out
-                        
-                } catch (Exception ex) {
-                    log.error("Error parsing jsonDetailsEvent  "+detailStr, ex);
-                    e.tag(LOGSTASH_TAG_S3_JSON_PARSE_ERROR);
+            try {
+                if (log.isDebugEnabled()) {
+                    String eventStr = logEvent(e);
+                    log.debug("Event: "+eventStr);
                 }
+                JsonElement inputJSON = null;
+                // from config, use Object f = e.getField(sourceField);
+
+                if (e.getField("detail") !=null ) {
+
+                    String detailStr = e.getField("detail").toString();
+                    log.debug("DETAIL class: " + e.getField("detail").getClass().getCanonicalName() + ", string value " + detailStr);
+                    String jsonDetailsEvent = null;
+
+                    jsonDetailsEvent = gson.toJson(e.getField("detail"));
+                    log.debug("DETAIL AS JSON STR3 " + jsonDetailsEvent);
+
+                    inputJSON = JsonParser.parseString(jsonDetailsEvent);
+
+                } else {
+                    inputJSON = gson.toJsonTree(e);
+                }
+
+
+                Record record = Parser.buildRecord(inputJSON);
+                if (record==null){
+                    log.warn("Failed to parse event "+logEvent(e));
+                    continue;
+                }
+
+                e.setField("Record", gson.toJson(record));
+
+                matchListener.filterMatched(e); // Flag OK for filter input/parsing/out
+                        
+            } catch (Exception ex) {
+                log.error("Error parsing jsonDetailsEvent  "+logEvent(e), ex);
+                e.tag(LOGSTASH_TAG_S3_JSON_PARSE_ERROR);
             }
         }
 
