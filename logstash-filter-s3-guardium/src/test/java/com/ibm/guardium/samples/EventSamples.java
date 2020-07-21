@@ -1,4 +1,4 @@
-package com.ibm.guardium.s3;
+package com.ibm.guardium.samples;
 
 import com.sun.javafx.collections.MappingChange;
 

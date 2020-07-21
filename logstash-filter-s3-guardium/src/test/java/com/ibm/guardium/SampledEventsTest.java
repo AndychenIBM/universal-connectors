@@ -1,14 +1,13 @@
 package com.ibm.guardium;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.ibm.guardium.s3.EventSamples;
+import com.ibm.guardium.samples.EventSamples;
 import com.ibm.guardium.s3.Parser;
 import com.ibm.guardium.universalconnector.common.structures.Record;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 
 import java.util.*;
@@ -40,7 +39,10 @@ public class SampledEventsTest {
         Record result = Parser.buildRecord(inputJSON);
         Assert.assertTrue("db name is null, event "+event, result.getDbName() != null);
         Assert.assertTrue("db name is empty, event "+event, result.getDbName().length() != 0);
-        Assert.assertTrue("db name is N/A, event "+event, !result.getDbName().equalsIgnoreCase(Parser.UNKNOWN_STRING));
+        // for PutAccessPolicy event we do not have dbname available
+        if (result.getData()!=null && !result.getData().getOriginalSqlCommand().contains("PutEventPolicy")){
+            Assert.assertTrue("db name is N/A, event "+event, !result.getDbName().equalsIgnoreCase(Parser.UNKNOWN_STRING));
+        }
     }
 
     @Test
