@@ -2,14 +2,51 @@ package com.ibm.guardium.universalconnector.common.structures;
 
 public class Record {
 
+    /**
+     * mandatory field - uniquely identifies sessionid
+     */
     private String sessionId;
+
+    /**
+     * optional field - name of the database (db scheme)
+     */
     private String dbName;
+
+    /**
+     * optional field - name of application user
+     */
     private String appUserName;
+
+    /**
+     *  mandatory field - time of the event, in ms
+     */
     private long    time;
 
+    /**
+     * mandatory field - object that contains session related details
+     */
     private SessionLocator  sessionLocator;
+
+    /**
+     * mandatory field - object that contains client connection details
+     */
     private Accessor        accessor;
+
+    /**
+     * one of fields [data/ exception] must appear in the record
+     * otherwise the record considered invalid
+     */
+
+    /**
+     * mandatory field (one of fields [data/ exception] must appear in the record)
+     * object that contains the details of an actual activity performed
+     */
     private Data            data;
+
+    /**
+     * mandatory field (one of fields [data/ exception] must appear in the record)
+     * object that contains session related details
+     */
     private ExceptionRecord exception;
 
     public boolean isException(){
