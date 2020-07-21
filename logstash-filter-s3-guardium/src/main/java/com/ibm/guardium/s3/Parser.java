@@ -89,7 +89,7 @@ public class Parser {
 
         // source program
         String sourceProgram = getStrValue(auditObj,"eventSource");
-        int start = userAgent.indexOf("[") > 0 ? userAgent.indexOf("[")+1 : 0;
+        int start = userAgent.indexOf("[") >= 0 ? userAgent.indexOf("[")+1 : 0;
         int end = userAgent.indexOf("/") > 0 ? userAgent.indexOf("/") : -1;
         if (start >= 0 && end > 0) {
             sourceProgram = userAgent.substring(start, end);
