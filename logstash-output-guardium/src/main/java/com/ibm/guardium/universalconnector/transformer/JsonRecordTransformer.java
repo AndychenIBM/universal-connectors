@@ -3,8 +3,7 @@ package com.ibm.guardium.universalconnector.transformer;
 import com.google.gson.Gson;
 import com.google.protobuf.ByteString;
 import com.ibm.guardium.proto.datasource.Datasource;
-import com.ibm.guardium.universalconnector.common.Util;
-import com.ibm.guardium.universalconnector.transformer.RecordTransformer;
+import com.ibm.guardium.universalconnector.common.Utilities;
 import com.ibm.guardium.universalconnector.common.structures.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -126,7 +125,7 @@ public class JsonRecordTransformer implements RecordTransformer {
 
     public Datasource.Session_start buildSessionStart(Record record, Datasource.Session_locator sessionLocator, Datasource.Accessor accessor){
 
-        Datasource.Timestamp sessionStartTimestamp = Util.getTimestamp(record.getTime());
+        Datasource.Timestamp sessionStartTimestamp = Utilities.getTimestamp(record.getTime());
         Datasource.Session_start sessionStart = Datasource.Session_start.newBuilder()
                 .setSessionLocator(sessionLocator)
                 .setTimestamp(sessionStartTimestamp)
@@ -157,7 +156,7 @@ public class JsonRecordTransformer implements RecordTransformer {
         ExceptionRecord recordException = record.getException();
         //Add Required fields
         exceptionMsg.setSession(sessionLocator);
-        exceptionMsg.setTimestamp(Util.getTimestamp(record.getTime()));
+        exceptionMsg.setTimestamp(Utilities.getTimestamp(record.getTime()));
         Accessor accessor = record.getAccessor();
         //Add Optional fields
 //        exceptionMsg.setAPPUSERNAME("AppUserNameFromException");
@@ -177,7 +176,7 @@ public class JsonRecordTransformer implements RecordTransformer {
     }
 
     public Datasource.Application_data buildAppplicationData(Record record, Datasource.Session_locator sessionLocator) {
-        Datasource.Timestamp timestamp = getTimeStamp(record);
+        Datasource.Timestamp timestamp = Utilities.getTimestamp(record.getTime());
         Data rd = record.getData();
         Datasource.Application_data.Data_type dataType = getDataType(record);
         String langTypeStr = LANG_TYPE_FREE_TEXT;
@@ -204,14 +203,6 @@ public class JsonRecordTransformer implements RecordTransformer {
             }
         }
         return builder.build();
-    }
-
-    public Datasource.Timestamp getTimeStamp(Record record) {
-        long time = 0;
-        if(record != null){
-            time = record.getTime();
-        }
-        return Util.getTimestamp(time);
     }
 
     public Datasource.GDM_construct buildConstruct(Data recordData) {
@@ -352,6 +343,12 @@ public class JsonRecordTransformer implements RecordTransformer {
 //        }
     }
 
+    public static Datasource.Timestamp getTimestamp(Long time) {
+        return Datasource.Timestamp.newBuilder()
+                .setUnixTime(Utilities.getTimeUnixTime(time))
+                .setUsec(Utilities.getTimeMicroseconds(time))
+                .build();
+    }
 
     public static void main(String[] args){
         System.out.println(1);
@@ -425,4 +422,5 @@ public class JsonRecordTransformer implements RecordTransformer {
 
         System.out.println("Result size"+messages.size());
     }
+
 }

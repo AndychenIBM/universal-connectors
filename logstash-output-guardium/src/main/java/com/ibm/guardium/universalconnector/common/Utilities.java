@@ -3,7 +3,7 @@ package com.ibm.guardium.universalconnector.common;
 import com.ibm.guardium.proto.datasource.Datasource;
 import com.ibm.guardium.proto.datasource.Datasource.Timestamp;
 
-public class Util {
+public class Utilities {
     public static int getTimeUnixTime(Long time) {
         return (int) (time/1000);
     }
@@ -14,8 +14,8 @@ public class Util {
 
     public static Timestamp getTimestamp(Long time) {
         return Datasource.Timestamp.newBuilder()
-            .setUnixTime(Util.getTimeUnixTime(time))
-            .setUsec(Util.getTimeMicroseconds(time))
+            .setUnixTime(Utilities.getTimeUnixTime(time))
+            .setUsec(Utilities.getTimeMicroseconds(time))
             .build();
     }
 }

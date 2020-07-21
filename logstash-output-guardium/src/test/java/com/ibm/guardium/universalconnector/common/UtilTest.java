@@ -12,14 +12,14 @@ public class UtilTest {
     @Test
     public void testGetTimestamp() throws Exception {
         Date date = new Date(); 
-        Timestamp timestamp = Util.getTimestamp(date.getTime());
+        Timestamp timestamp = Utilities.getTimestamp(date.getTime());
         
         Assert.assertEquals(
-            Util.getTimeMicroseconds(date.getTime()), 
+            Utilities.getTimeMicroseconds(date.getTime()),
             timestamp.getUsec());
         
         Assert.assertEquals(
-            Util.getTimeUnixTime(date.getTime()), 
+            Utilities.getTimeUnixTime(date.getTime()),
             timestamp.getUnixTime());
     }
 
@@ -29,6 +29,6 @@ public class UtilTest {
         
         Assert.assertEquals(
             "Milliseconds should be converted properly to microseconds to match proto format", 
-            Util.getTimeMicroseconds(date.getTime()), date.getTime()%1000 * 1000);
+            Utilities.getTimeMicroseconds(date.getTime()), date.getTime()%1000 * 1000);
     }
 }
