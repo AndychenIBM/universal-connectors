@@ -124,7 +124,7 @@ public class Parser {
 
         log.debug("19");
         // ------------------ Build data or Exception
-        String errorCode = getStrValue(auditObj,"eventType");
+        String errorCode = getStrValue(auditObj,"errorCode");
         if (!UNKNOWN_STRING.equalsIgnoreCase(errorCode)){
             ExceptionRecord exceptionRecord = new ExceptionRecord();
             exceptionRecord.setExceptionTypeId(errorCode);
@@ -132,7 +132,7 @@ public class Parser {
             if (!UNKNOWN_STRING.equalsIgnoreCase(desc)) {
                 exceptionRecord.setDescription(desc);
             }
-            exceptionRecord.setSqlString(auditObj.toString());
+            exceptionRecord.setSqlString(gson.toJson(auditObj));
             record.setException(exceptionRecord);
         } else {
             log.debug("20");
