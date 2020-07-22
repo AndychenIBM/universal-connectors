@@ -12,8 +12,11 @@ import com.ibm.guardium.s3.Parser;
 import com.ibm.guardium.universalconnector.common.structures.Record;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.log4j.PropertyConfigurator;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.LoggerContext;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -23,34 +26,32 @@ import java.util.Map;
 @LogstashPlugin(name = "logstash_filter_s3_guardium")
 public class LogstashFilterS3Guardium implements Filter {
 
+    public static final String LOG42_CONF="log4j2uc.properties";
+
+    static {
+        try {
+            String uc_etc = System.getenv("UC_ETC");
+            LoggerContext context = (LoggerContext) LogManager.getContext(false);
+            File file = new File(uc_etc +File.pathSeparator+LOG42_CONF);
+            context.setConfigLocation(file.toURI());
+        } catch (Exception e){
+            System.err.println("Failed to load log4j configuration "+e.getMessage());
+            e.printStackTrace();
+        }
+    }
     private static Log log = LogFactory.getLog(LogstashFilterS3Guardium.class);
 
     public static final PluginConfigSpec<String> SOURCE_CONFIG = PluginConfigSpec.stringSetting("source", "message");
     public static final String LOGSTASH_TAG_S3_JSON_PARSE_ERROR = "_s3_json_parse_error";
 
-
-
     private String id;
-    private String sourceField; 
-    private final static String MONGOAUDIT_START_SIGNAL = "mongod: ";
     private Gson gson;
 
     public LogstashFilterS3Guardium(String id, Configuration config, Context context) {
         // constructors should validate configuration options
         // init log properties
-        String uc_etc = System.getenv("UC_ETC");
-        try{
-            PropertyConfigurator.configureAndWatch(uc_etc + "/log4j.properties", 10000);
-        } catch (Exception e){
-            System.out.println("LogstashFilterS3Guardium - Failed to find log4j file");
-            log.error("Failed to log4j file");
-            //throw new IllegalArgumentException("Filed to find files during connector initialization, Path base is "+uc_etc, e);
-        }
         log.debug("Finished JavaOutputToGuardium constructor");
         this.id = id;
-        if (config != null) {
-            this.sourceField = config.get(SOURCE_CONFIG);
-        }
         final GsonBuilder builder = new GsonBuilder();
         builder.serializeNulls();
         gson = builder.create();

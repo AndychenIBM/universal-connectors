@@ -81,29 +81,7 @@ public class Parser {
         accessor.setLanguage(UNKNOWN_STRING);
         accessor.setOsUser(UNKNOWN_STRING);
 
-        //"userAgent": "aws-cli/1.10.32 Python/2.7.9 Windows/7 botocore/1.4.22",
-        //"userAgent": "[Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0) Gecko/20100101 Firefox/68.0]"
-        //"userAgent": "[S3Console/0.4, aws-internal/3 aws-sdk-java/1.11.783 Linux/4.9.217-0.1.ac.205.84.332.metal1.x86_64 OpenJDK_64-Bit_Server_VM/25.252-b09 java/1.8.0_252 vendor/Oracle_Corporation]"
-        //"userAgent": "s3.amazonaws.com"
-        String userAgent = getStrValue(auditObj,"userAgent");
-
-        // source program
-        String sourceProgram = getStrValue(auditObj,"eventSource");
-        int start = userAgent.indexOf("[") >= 0 ? userAgent.indexOf("[")+1 : 0;
-        int end = userAgent.indexOf("/") > 0 ? userAgent.indexOf("/") : -1;
-        if (start >= 0 && end > 0) {
-            sourceProgram = userAgent.substring(start, end);
-        }
-        accessor.setSourceProgram(sourceProgram);
-
-        // client os
-        String clientOs = UNKNOWN_STRING;
-        start = userAgent != null ? userAgent.indexOf(";") : -1;
-        end = userAgent != null ? userAgent.indexOf(";", start) : -1;
-        if (start >= 0 && end > 0){
-            clientOs = userAgent.substring(start, end + 1);
-        }
-        accessor.setClientOs(clientOs);
+        setUserAgentRelatedFields(accessor, auditObj);
 
         record.setAccessor(accessor);
 
@@ -181,6 +159,32 @@ public class Parser {
         }
 
         return record;
+    }
+
+    static void setUserAgentRelatedFields(Accessor accessor, JsonObject auditObj){
+        //"userAgent": "aws-cli/1.10.32 Python/2.7.9 Windows/7 botocore/1.4.22",
+        //"userAgent": "[Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0) Gecko/20100101 Firefox/68.0]"
+        //"userAgent": "[S3Console/0.4, aws-internal/3 aws-sdk-java/1.11.783 Linux/4.9.217-0.1.ac.205.84.332.metal1.x86_64 OpenJDK_64-Bit_Server_VM/25.252-b09 java/1.8.0_252 vendor/Oracle_Corporation]"
+        //"userAgent": "cloudtrail.amazonaws.com"
+        String userAgent = getStrValue(auditObj,"userAgent");
+
+        // source program
+        String sourceProgram = userAgent;
+        int start = userAgent.indexOf("[") >= 0 ? userAgent.indexOf("[")+1 : 0;
+        int end = userAgent.indexOf("/") > 0 ? userAgent.indexOf("/") : -1;
+        if (start >= 0 && end > 0) {
+            sourceProgram = userAgent.substring(start, end);
+        }
+        accessor.setSourceProgram(sourceProgram);
+
+        // client os
+        String clientOs = UNKNOWN_STRING;
+        start = userAgent != null ? userAgent.indexOf(";") : -1;
+        end = userAgent != null ? userAgent.indexOf(";", start) : -1;
+        if (start >= 0 && end > 0){
+            clientOs = userAgent.substring(start, end + 1);
+        }
+        accessor.setClientOs(clientOs);
     }
 
     private static String searchForBucketName(JsonElement data) {
