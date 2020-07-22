@@ -36,15 +36,4 @@ public class Environment {
         return gEnv+LOG42_CONF;
     }
 
-    private static String get(String envName, String defaultVal) {
-        String gEnv = System.getenv(envName);
-        if (null == gEnv || gEnv.isEmpty()) {
-            if (properties != null) {
-                defaultVal = properties.getProperty(envName, defaultVal);
-            }
-            gEnv = System.getProperty(envName, null != defaultVal ? defaultVal : "");
-        }
-        return gEnv;
-    }
-
 }

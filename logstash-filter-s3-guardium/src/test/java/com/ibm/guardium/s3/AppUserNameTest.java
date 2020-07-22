@@ -1,4 +1,4 @@
-package com.ibm.guardium.s3.RecordFieldsTest;
+package com.ibm.guardium.s3;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;

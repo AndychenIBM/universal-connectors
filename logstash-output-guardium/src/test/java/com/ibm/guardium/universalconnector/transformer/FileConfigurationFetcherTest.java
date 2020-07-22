@@ -15,7 +15,7 @@ public class FileConfigurationFetcherTest {
     @Test
     public void testEmptySniffers() throws IOException {
         String testeCase = "[]";
-        String fileFullPath = Environment.UDS_ETC+File.separator+"SniffersTest.json";
+        String fileFullPath = Environment.getUcEtc()+File.separator+"SniffersTest.json";
         BufferedWriter writer = new BufferedWriter(new FileWriter(fileFullPath));
         writer.write(testeCase);
         writer.close();
@@ -28,7 +28,7 @@ public class FileConfigurationFetcherTest {
     @Test
     public void testOneSniffer() throws IOException {
         String testeCase = "[{ \"ip\" : \"9.70.157.70\", \"port\" : \"16022\", \"isSSL\" : \"false\" }]";
-        String fileFullPath = Environment.UDS_ETC+File.separator+"SniffersTest.json";
+        String fileFullPath = Environment.getUcEtc()+File.separator+"SniffersTest.json";
         BufferedWriter writer = new BufferedWriter(new FileWriter(fileFullPath));
         writer.write(testeCase);
         writer.close();
@@ -44,7 +44,7 @@ public class FileConfigurationFetcherTest {
     @Test
     public void testTwoSniffers() throws IOException {
         String testeCase = "[{ \"ip\" : \"9.70.157.70\", \"port\" : \"16022\", \"isSSL\" : \"false\" }, { \"ip\" : \"9.70.157.72\", \"port\" : \"16023\", \"isSSL\" : \"true\" }]";
-        String fileFullPath = Environment.UDS_ETC+File.separator+"SniffersTest.json";
+        String fileFullPath = Environment.getUcEtc()+File.separator+"SniffersTest.json";
         BufferedWriter writer = new BufferedWriter(new FileWriter(fileFullPath));
         writer.write(testeCase);
         writer.close();
@@ -65,7 +65,7 @@ public class FileConfigurationFetcherTest {
     @Test
     public void testInvalidSniffers() throws IOException {
         String testeCase = "[{ \"port\" : \"16022\", \"isSSL\" : \"false\" }, { \"ip\" : \"9.70.157.72\", \"port\" : \"16023\", \"isSSL\" : \"true\" }]";
-        String fileFullPath = Environment.UDS_ETC+File.separator+"SniffersTest.json";
+        String fileFullPath = Environment.getUcEtc()+File.separator+"SniffersTest.json";
         BufferedWriter writer = new BufferedWriter(new FileWriter(fileFullPath));
         writer.write(testeCase);
         writer.close();

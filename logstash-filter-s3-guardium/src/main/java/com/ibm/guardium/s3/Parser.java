@@ -173,16 +173,16 @@ public class Parser {
         int start = userAgent.indexOf("[") >= 0 ? userAgent.indexOf("[")+1 : 0;
         int end = userAgent.indexOf("/") > 0 ? userAgent.indexOf("/") : -1;
         if (start >= 0 && end > 0) {
-            sourceProgram = userAgent.substring(start, end);
+            sourceProgram = userAgent.substring(start, end).trim();
         }
         accessor.setSourceProgram(sourceProgram);
 
         // client os
         String clientOs = UNKNOWN_STRING;
-        start = userAgent != null ? userAgent.indexOf(";") : -1;
+        start = userAgent != null ? userAgent.indexOf(";")+1 : -1;
         end = userAgent != null ? userAgent.indexOf(";", start) : -1;
         if (start >= 0 && end > 0){
-            clientOs = userAgent.substring(start, end + 1);
+            clientOs = userAgent.substring(start, end).trim();
         }
         accessor.setClientOs(clientOs);
     }
