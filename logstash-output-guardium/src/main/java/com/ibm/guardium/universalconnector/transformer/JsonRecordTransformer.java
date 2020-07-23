@@ -220,22 +220,22 @@ public class JsonRecordTransformer implements RecordTransformer {
         if (!isEmpty(ra.getClientHostName())) {
             builder.setClientHostname(ra.getClientHostName());
         }
-        if (!isEmpty(ra.getClientHostName())) {
+        if (!isEmpty(ra.getServerHostName())) {
             builder.setServerHostname(ra.getServerHostName());
         }
-        if (!isEmpty(ra.getClientHostName())) {
+        if (!isEmpty(ra.getCommProtocol())) {
             builder.setCommProtocol(ra.getCommProtocol());
         }
-        if (!isEmpty(ra.getClientHostName())) {
+        if (!isEmpty(ra.getDbProtocolVersion())) {
             builder.setDbProtocolVersion(ra.getDbProtocolVersion());
         }
-        if (!isEmpty(ra.getClientHostName())) {
+        if (!isEmpty(ra.getSourceProgram())) {
             builder.setSourceProgram(ra.getSourceProgram());
         }
-        if (!isEmpty(ra.getClientHostName())) {
+        if (!isEmpty(ra.getServerDescription())) {
             builder.setServerDescription(ra.getServerDescription());
         }
-        if (!isEmpty(ra.getClientHostName())) {
+        if (!isEmpty(ra.getServiceName())) {
             builder.setServiceName(ra.getServiceName());
         }
 
