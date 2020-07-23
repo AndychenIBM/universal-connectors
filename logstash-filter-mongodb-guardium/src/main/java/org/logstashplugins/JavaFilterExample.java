@@ -9,20 +9,34 @@ import co.elastic.logstash.api.LogstashPlugin;
 import co.elastic.logstash.api.PluginConfigSpec;
 import com.google.gson.*;
 import com.ibm.guardium.Parser;
-import com.ibm.guardium.connector.Util;
-import com.ibm.guardium.connector.structures.Record;
-import com.ibm.guardium.connector.structures.SessionLocator;
+import com.ibm.guardium.universalconnector.common.Util;
+import com.ibm.guardium.universalconnector.common.structures.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.LoggerContext;
+
+import java.io.File;
+import java.util.*;
 
 // class name must match plugin name
 @LogstashPlugin(name = "java_filter_example")
 public class JavaFilterExample implements Filter {
+
+    public static final String LOG42_CONF="log4j2uc.properties";
+    static {
+        try {
+            String uc_etc = System.getenv("UC_ETC");
+            LoggerContext context = (LoggerContext) LogManager.getContext(false);
+            File file = new File(uc_etc +File.pathSeparator+LOG42_CONF);
+            context.setConfigLocation(file.toURI());
+        } catch (Exception e){
+            System.err.println("Failed to load log4j configuration "+e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    private static Log log = LogFactory.getLog(JavaFilterExample.class);
 
     public static final PluginConfigSpec<String> SOURCE_CONFIG =
             PluginConfigSpec.stringSetting("source", "message");
@@ -103,6 +117,7 @@ public class JavaFilterExample implements Filter {
                         // don't let event pass filter
                         // TODO log event removed? 
                         //events.remove(e);
+                        log.error("Error parsing mongo event "+logEvent(e), exception);
                         e.tag(LOGSTASH_TAG_JSON_PARSE_ERROR);
                     }
                 } else {
@@ -150,6 +165,26 @@ public class JavaFilterExample implements Filter {
         if (LOCAL_IP_LIST.contains(sessionClientIp)
                 || sessionLocator.getClientIp().equalsIgnoreCase("(NONE)")) { 
             sessionLocator.setClientIp(sessionLocator.getServerIp()); // as clientIP & serverIP were equal
+        }
+    }
+
+    private static String logEvent(Event event){
+        try {
+            StringBuffer sb = new StringBuffer();
+            sb.append("{ ");
+            boolean first = true;
+            for (Map.Entry<String, Object> stringObjectEntry : event.getData().entrySet()) {
+                if (!first){
+                    sb.append(",");
+                }
+                sb.append("\""+stringObjectEntry.getKey()+"\" : \""+stringObjectEntry.getValue()+"\"");
+                first = false;
+            }
+            sb.append(" }");
+            return sb.toString();
+        } catch (Exception e){
+            log.error("Failed to create event log string", e);
+            return null;
         }
     }
 

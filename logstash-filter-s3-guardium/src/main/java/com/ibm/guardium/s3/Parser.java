@@ -105,8 +105,8 @@ public class Parser {
 
             Construct construct = new Construct();
             data.setConstruct(construct);
-            construct.setFull_sql(auditAsSql);
-            construct.setOriginal_sql(auditAsSql); // "original_sql" actually not so original, but an sql with redacted sensitive data
+            construct.setFullSql(auditAsSql);
+            construct.setRedactedSensitiveDataSql(auditAsSql);
 
             ArrayList<Sentence> sentences = new ArrayList<>();
             construct.setSentences(sentences);

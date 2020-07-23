@@ -4,6 +4,7 @@ package org.logstashplugins;
 import co.elastic.logstash.api.Context;
 import co.elastic.logstash.api.Event;
 import co.elastic.logstash.api.FilterMatchListener;
+import com.ibm.guardium.universalconnector.common.structures.Record;
 import org.junit.Assert;
 import org.junit.Test;
 //import org.logstash.plugins.ConfigurationImpl;
@@ -15,7 +16,6 @@ import java.util.Collections;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.google.gson.Gson;
-import com.ibm.guardium.connector.structures.Record;
 
 public class JavaFilterExampleTest {
 

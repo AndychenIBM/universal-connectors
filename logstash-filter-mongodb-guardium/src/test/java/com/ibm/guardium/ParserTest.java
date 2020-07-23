@@ -8,13 +8,7 @@ import java.text.ParseException;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.ibm.guardium.connector.structures.Accessor;
-import com.ibm.guardium.connector.structures.Construct;
-import com.ibm.guardium.connector.structures.Data;
-import com.ibm.guardium.connector.structures.ExceptionRecord;
-import com.ibm.guardium.connector.structures.Record;
-import com.ibm.guardium.connector.structures.Sentence;
-import com.ibm.guardium.connector.structures.SessionLocator;
+import com.ibm.guardium.universalconnector.common.structures.*;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -34,9 +28,9 @@ public class ParserTest {
         final Construct result = Parser.ParseAsConstruct(mongoJson);
 
         final Sentence sentence = result.sentences.get(0);
-        Assert.assertEquals("find", sentence.verb);
-        Assert.assertEquals("bios", sentence.objects.get(0).name);
-        Assert.assertEquals("collection", sentence.objects.get(0).type);
+        Assert.assertEquals("find", sentence.getVerb());
+        Assert.assertEquals("bios", sentence.getObjects().get(0).name);
+        Assert.assertEquals("collection", sentence.getObjects().get(0).type);
     }
 
     @Test
@@ -46,8 +40,8 @@ public class ParserTest {
         final Construct result = Parser.ParseAsConstruct(mongoJson);
 
         final Sentence sentence = result.sentences.get(0);
-        Assert.assertEquals("insert", sentence.verb);
-        Assert.assertEquals("Myuser", sentence.objects.get(0).name);
+        Assert.assertEquals("insert", sentence.getVerb());
+        Assert.assertEquals("Myuser", sentence.getObjects().get(0).name);
     }
 
     @Test
@@ -57,8 +51,8 @@ public class ParserTest {
         final Construct result = Parser.ParseAsConstruct(mongoJson);
 
         final Sentence sentence = result.sentences.get(0);
-        Assert.assertEquals("delete", sentence.verb);
-        Assert.assertEquals("posts", sentence.objects.get(0).name);
+        Assert.assertEquals("delete", sentence.getVerb());
+        Assert.assertEquals("posts", sentence.getObjects().get(0).name);
     }
 
     @Test
@@ -68,8 +62,8 @@ public class ParserTest {
         final Construct result = Parser.ParseAsConstruct(mongoJson);
 
         final Sentence sentence = result.sentences.get(0);
-        Assert.assertEquals("update", sentence.verb);
-        Assert.assertEquals("posts", sentence.objects.get(0).name);
+        Assert.assertEquals("update", sentence.getVerb());
+        Assert.assertEquals("posts", sentence.getObjects().get(0).name);
 
     }
 
@@ -82,9 +76,9 @@ public class ParserTest {
         final Construct result = Parser.ParseAsConstruct(mongoJson);
 
         final Sentence sentence = result.sentences.get(0);
-        Assert.assertEquals("aggregate", sentence.verb);
-        Assert.assertEquals("users", sentence.objects.get(0).name);
-        Assert.assertEquals("posts", sentence.objects.get(1).name);
+        Assert.assertEquals("aggregate", sentence.getVerb());
+        Assert.assertEquals("users", sentence.getObjects().get(0).name);
+        Assert.assertEquals("posts", sentence.getObjects().get(1).name);
     }
 
     @Test
@@ -96,9 +90,9 @@ public class ParserTest {
         final Construct result = Parser.ParseAsConstruct(mongoJson);
 
         final Sentence sentence = result.sentences.get(0);
-        Assert.assertEquals("aggregate", sentence.verb);
-        Assert.assertEquals("users", sentence.objects.get(0).name);
-        Assert.assertEquals("posts", sentence.objects.get(1).name);
+        Assert.assertEquals("aggregate", sentence.getVerb());
+        Assert.assertEquals("users", sentence.getObjects().get(0).name);
+        Assert.assertEquals("posts", sentence.getObjects().get(1).name);
     }
 
     @Test
@@ -110,10 +104,10 @@ public class ParserTest {
         final Construct result = Parser.ParseAsConstruct(mongoJson);
 
         final Sentence sentence = result.sentences.get(0);
-        Assert.assertEquals("aggregate", sentence.verb);
-        Assert.assertEquals("users", sentence.objects.get(0).name);
-        Assert.assertEquals("posts", sentence.objects.get(1).name); // 1st lookup
-        Assert.assertEquals("packages", sentence.objects.get(2).name); // 2nd lookup
+        Assert.assertEquals("aggregate", sentence.getVerb());
+        Assert.assertEquals("users", sentence.getObjects().get(0).name);
+        Assert.assertEquals("posts", sentence.getObjects().get(1).name); // 1st lookup
+        Assert.assertEquals("packages", sentence.getObjects().get(2).name); // 2nd lookup
     }
 
     @Test 
@@ -124,8 +118,8 @@ public class ParserTest {
         final Construct construct = record.getData().getConstruct();
         final Sentence sentence = construct.sentences.get(0);
         
-        Assert.assertEquals("createIndexes", sentence.verb);
-        Assert.assertEquals("newCollecti", sentence.objects.get(0).name);
+        Assert.assertEquals("createIndexes", sentence.getVerb());
+        Assert.assertEquals("newCollecti", sentence.getObjects().get(0).name);
         Assert.assertEquals("newDB01", record.getDbName());
     }
 
@@ -138,8 +132,8 @@ public class ParserTest {
         final Construct construct = record.getData().getConstruct();
         final Sentence sentence = construct.sentences.get(0);
         
-        Assert.assertEquals("create", sentence.verb);
-        Assert.assertEquals("newCollection01", sentence.objects.get(0).name);
+        Assert.assertEquals("create", sentence.getVerb());
+        Assert.assertEquals("newCollection01", sentence.getObjects().get(0).name);
         Assert.assertEquals("newDB01", record.getDbName());
     }
 
@@ -202,8 +196,8 @@ public class ParserTest {
         final Construct result = Parser.ParseAsConstruct(mongoJson);
 
         final Sentence sentence = result.sentences.get(0);
-        Assert.assertEquals("listIndexes", sentence.verb);
-        Assert.assertEquals("system.sessions", sentence.objects.get(0).name);
+        Assert.assertEquals("listIndexes", sentence.getVerb());
+        Assert.assertEquals("system.sessions", sentence.getObjects().get(0).name);
     }
 
     @Test 
@@ -265,8 +259,8 @@ public class ParserTest {
         Data data = Parser.parseData(mongoJson);
         Construct construct = data.getConstruct();
         Assert.assertNotNull(data);
-        Assert.assertEquals("aggregate", construct.sentences.get(0).verb);
-        Assert.assertEquals(mongoString.replace(" ", ""), construct.getFull_sql());
+        Assert.assertEquals("aggregate", construct.sentences.get(0).getVerb());
+        Assert.assertEquals(mongoString.replace(" ", ""), construct.getFullSql());
     }
 
     @Test

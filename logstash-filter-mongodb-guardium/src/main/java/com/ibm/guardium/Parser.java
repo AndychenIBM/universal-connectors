@@ -13,17 +13,15 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.ibm.guardium.connector.Util;
-import com.ibm.guardium.connector.structures.Accessor;
-import com.ibm.guardium.connector.structures.Construct;
-import com.ibm.guardium.connector.structures.Data;
-import com.ibm.guardium.connector.structures.ExceptionRecord;
-import com.ibm.guardium.connector.structures.Record;
-import com.ibm.guardium.connector.structures.Sentence;
-import com.ibm.guardium.connector.structures.SentenceObject;
-import com.ibm.guardium.connector.structures.SessionLocator;
+import com.ibm.guardium.universalconnector.common.Util;
+import com.ibm.guardium.universalconnector.common.structures.*;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class Parser {
+
+    private static Log log = LogFactory.getLog(Parser.class);
+
     public static final String DATA_PROTOCOL_STRING = "MongoDB native audit";
     public static final String UNKOWN_STRING = "";
     public static final String SERVER_TYPE_STRING = "MongoDB";
@@ -59,6 +57,7 @@ public class Parser {
             return gson.toJson(construct);
 
         } catch (final Exception e) {
+            log.error("mongo: Error parsing data", e);
             throw e;
         }
 
@@ -86,14 +85,14 @@ public class Parser {
             final Construct construct = new Construct();
             construct.sentences.add(sentence);
             
-            construct.setFull_sql(data.toString());
+            construct.setFullSql(data.toString());
             
             if (data.get("atype").getAsString().equals("authCheck")) {
                 // redact, though docs state args may be already redacted.
                 Parser.RedactWithExceptions(data); // Warning: overwrites data.param.args
             }
             
-            construct.setOriginal_sql(data.toString());
+            construct.setRedactedSensitiveDataSql(data.toString());
             return construct;
         } catch (final Exception e) {
             throw e;
@@ -116,7 +115,7 @@ public class Parser {
                 sentence = new Sentence(command);
                 if (args.has(command)) {
                     final SentenceObject sentenceObject = new SentenceObject(args.get(command).getAsString());
-                    sentence.objects.add(sentenceObject);
+                    sentence.getObjects().add(sentenceObject);
                 }
 
                 switch (command) {
@@ -141,7 +140,7 @@ public class Parser {
                                     final SentenceObject lookupStageObject = new SentenceObject(
                                             lookupStage.get("from").getAsString());
                                     // + object
-                                    sentence.objects.add(lookupStageObject);
+                                    sentence.getObjects().add(lookupStageObject);
                                 }
                             }
                         }
@@ -209,12 +208,6 @@ public class Parser {
         String dateString = Parser.parseTimestamp(data);
         long timestamp = Parser.getTime(dateString);
         record.setTime(timestamp);
-        if (record.getData() != null) {
-            record.getData().setTimestamp(timestamp);
-        } // (else it's an exception)
-        if (record.isException()) {
-            record.getException().setTimestamp(String.valueOf(timestamp));
-        }
 
         return record;
     }
@@ -346,11 +339,11 @@ public class Parser {
                 data.setConstruct(construct);
                 data.setUseConstruct(true);
 
-                if (construct.getFull_sql() == null) {
-                    construct.setFull_sql(Parser.UNKOWN_STRING);
+                if (construct.getFullSql() == null) {
+                    construct.setFullSql(Parser.UNKOWN_STRING);
                 }
-                if (construct.getOriginal_sql() == null) {
-                    construct.setOriginal_sql(Parser.UNKOWN_STRING);
+                if (construct.getRedactedSensitiveDataSql() == null) {
+                    construct.setRedactedSensitiveDataSql(Parser.UNKOWN_STRING);
                 }
             }
         } catch (Exception e) {

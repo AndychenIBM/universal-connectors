@@ -2,6 +2,9 @@ package com.ibm.guardium.universalconnector.common.structures;
 
 public class Data {
     private Construct construct;
+    /**
+     * this field is only required if guardium should parse sql (instead of using construct object)
+     */
     private String originalSqlCommand;
     private boolean useConstruct;
 

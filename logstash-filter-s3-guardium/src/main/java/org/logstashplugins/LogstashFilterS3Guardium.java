@@ -12,7 +12,6 @@ import com.ibm.guardium.s3.Parser;
 import com.ibm.guardium.universalconnector.common.structures.Record;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
 

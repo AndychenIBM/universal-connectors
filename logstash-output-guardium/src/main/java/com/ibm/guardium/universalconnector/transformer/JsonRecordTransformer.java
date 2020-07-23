@@ -5,6 +5,7 @@ import com.google.protobuf.ByteString;
 import com.ibm.guardium.proto.datasource.Datasource;
 import com.ibm.guardium.universalconnector.common.Utilities;
 import com.ibm.guardium.universalconnector.common.structures.*;
+import com.ibm.guardium.universalconnector.exceptions.GuardUCInvalidRecordException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -15,76 +16,19 @@ public class JsonRecordTransformer implements RecordTransformer {
     private static Log log = LogFactory.getLog(JsonRecordTransformer.class);
     private static final String LANG_TYPE_FREE_TEXT = "FREE_TEXT"; // for parser "FREE_TEXT"
 
-    public static String recordSampleMongo = "{\n" +
-            "  \"sessionId\": \"{\\\"id\\\":{\\\"$type\\\":\\\"04\\\",\\\"$binary\\\":\\\"x9TSJiiQRvqVuupi3W/eCA==\\\"}}\",\n" +
-            "  \"dbName\": \"test.inventory\",\n" +
-            "  \"appUserName\": \"\",\n" +
-            "  \"time\": 123456789,\n" +
-            "\n" +
-            "  \"sessionLocator\": {\n" +
-            "    \"clientIp\": \"127.0.0.11\",\n" +
-            "    \"clientPort\":61126,\n" +
-            "    \"serverIp\": \"127.0.0.1\",\n" +
-            "    \"serverPort\":27017,\n" +
-            "    \"isIpv6\": false,\n" +
-            "    \"clientIpv6\":\"\",\n" +
-            "    \"serverIpv6\":\"\"\n" +
-            "  },\n" +
-            "\n" +
-            "  \"accessor\": {\n" +
-            "    \"dbUser\": \"BILL\",\n" +
-            "    \"serverType\": \"MONGODB\",\n" +
-            "    \"serverOs\": \"\",\n" +
-            "    \"clientOs\": \"\",\n" +
-            "    \"clientHostName\": \"\",\n" +
-            "    \"serverHostName\": \"qa-db51\",\n" +
-            "    \"commProtocol\": \"\" ,\n" +
-            "    \"dbProtocol\": \"MONGODB WIRE PROTOCOL\",\n" +
-            "    \"dbProtocolVersion\": \"\",\n" +
-            "    \"osUser\": \"\",\n" +
-            "    \"sourceProgram\": \"\",\n" +
-            "    \"client_mac\": \"\",\n" +
-            "    \"serverDescription\": \"\",\n" +
-            "    \"serviceName\": \"\",\n" +
-            "    \"language\": \"DB2\"\n" +
-            "  },\n" +
-            "\n" +
-            "  \"data\": {\n" +
-            "    \"construct\": {\n" +
-            "      \"sentences\": [\n" +
-            "        {\n" +
-            "          \"verb\": \"find\",\n" +
-            "          \"objects\": [\n" +
-            "            {\"name\": \"inventory\",\"type\": \"collection\",\"fields\": [\"mongo_field_1\"],\"schema\": \"blabla\"}\n" +
-            "          ],\n" +
-            "          \"descendants\": [],\n" +
-            "          \"fields\": [\"mongo_field_211\"]\n" +
-            "        }\n" +
-            "      ],\n" +
-            "      \"full_sql\": \"full_sqlfull_sql\",\n" +
-            "      \"original_sql\": \"original_sqloriginal_sql\"\n" +
-            "    },\n" +
-            "    \"timestamp\": 123456789,\n" +
-            "    \"originalSqlCommand\": \"originalSqlCommandoriginalSqlCommand\",\n" +
-            "    \"useConstruct\": true\n" +
-            "  }\n" +
-            "\n" +
-            "}";
-
     @Override
     public List<Datasource.Guard_ds_message> transform(String recordStr) {
-        //recordStr = recordSample;
-        //recordStr = recordSampleMongo;
 
         List<Datasource.Guard_ds_message> messages = new LinkedList<>();
 
         Record record = new Gson().fromJson(recordStr, Record.class);
 
-        Datasource.Session_locator   sessionLocator = buildSessionLocator(record);
+        // from each audit log record we need to build 2 proto messages -
+        // session_start and one of client_request or exception
 
-        // build session start msg
-        Datasource.Accessor  accessor = buildAccessor(record); //todo: handle differently error/exception record - do not put data_type in accessor from "data" json
-
+        // 1. Session_Start message
+        Datasource.Session_locator sessionLocator = buildSessionLocator(record);
+        Datasource.Accessor accessor = buildAccessor(record);
         Datasource.Session_start sessionStart = buildSessionStart(record, sessionLocator, accessor);
 
         Datasource.Guard_ds_message startMsg = Datasource.Guard_ds_message.newBuilder()
@@ -94,7 +38,10 @@ public class JsonRecordTransformer implements RecordTransformer {
 
         messages.add(startMsg);
 
+
+        // 2. Client_request or exception
         if(record.isException()){
+            // build exception - the one that has data on errors
             Datasource.Exception exception = buildExceptionData(record, sessionLocator);
             Datasource.Guard_ds_message exceptionMsg = Datasource.Guard_ds_message.newBuilder()
                     .setType(Datasource.Guard_ds_message.Type.EXCEPTION)
@@ -117,26 +64,39 @@ public class JsonRecordTransformer implements RecordTransformer {
                     .setClientRequest(clientRequest)
                     .build();
 
-
             messages.add(sqlMsg);
         }
         return messages;
     }
 
+    private boolean isEmpty(String value){
+        return value==null || value.trim().length()==0;
+    }
+
     public Datasource.Session_start buildSessionStart(Record record, Datasource.Session_locator sessionLocator, Datasource.Accessor accessor){
 
-        Datasource.Timestamp sessionStartTimestamp = Utilities.getTimestamp(record.getTime());
-        Datasource.Session_start sessionStart = Datasource.Session_start.newBuilder()
+        // mandatory field - no need to build without it
+        if (isEmpty(record.getSessionId())){
+            throw new GuardUCInvalidRecordException("Invalid sessionId value "+record.getSessionId());
+        }
+
+        Datasource.Session_start.Builder builder = Datasource.Session_start.newBuilder()
                 .setSessionLocator(sessionLocator)
-                .setTimestamp(sessionStartTimestamp)
+                .setTimestamp(Utilities.getTimestamp(record.getTime()))
                 .setAccessor(accessor)
                 .setProcessId(record.getSessionId())
-                .setSessionId(record.getSessionId().hashCode())//todo: check with Tim session id issue
-                .setDbName(record.getDbName())
-                .setAppUserName(record.getAppUserName())
-                .build();
+                .setSessionId(record.getSessionId().hashCode());
 
-        return sessionStart;
+        // optional fields - only set them if they have some value
+        if (!isEmpty(record.getAppUserName())){
+            builder.setAppUserName(record.getAppUserName());
+        }
+
+        if (isEmpty(record.getDbName())){
+            builder.setDbName(record.getDbName());
+        }
+
+        return builder.build();
     }
 
     /**
@@ -175,36 +135,6 @@ public class JsonRecordTransformer implements RecordTransformer {
         return exceptionMsg.build();
     }
 
-    public Datasource.Application_data buildAppplicationData(Record record, Datasource.Session_locator sessionLocator) {
-        Datasource.Timestamp timestamp = Utilities.getTimestamp(record.getTime());
-        Data rd = record.getData();
-        Datasource.Application_data.Data_type dataType = getDataType(record);
-        String langTypeStr = LANG_TYPE_FREE_TEXT;
-        // only in case where users said that record should be parsed by sniffer (does not use construct)
-        // need to set lang to language type from record
-        if ( rd!=null && !rd.isUseConstruct() && record.getAccessor()==null){
-             langTypeStr = record.getAccessor().getLanguage();
-        }
-        Datasource.Application_data.Language_type langType = getLanguageType(langTypeStr);
-        Datasource.Application_data.Builder builder = Datasource.Application_data.newBuilder()
-                .setType(dataType)
-                .setLanguage(langType)
-                .setSessionLocator(sessionLocator)
-                .setDatasourceType(Datasource.Application_data.Datasource_type.UNI_CON)
-                .setApplicationUser(record.getAppUserName())
-                .setTimestamp(timestamp);
-        if(rd != null) {
-            if (rd.isUseConstruct()) {
-                Datasource.GDM_construct gdmConstruct = buildConstruct(rd);
-                builder.setConstruct(gdmConstruct);
-                builder.setType(Datasource.Application_data.Data_type.CONSTRUCT);
-            } else {
-                builder.setText(rd.getOriginalSqlCommand());
-            }
-        }
-        return builder.build();
-    }
-
     public Datasource.GDM_construct buildConstruct(Data recordData) {
         Datasource.GDM_construct.Builder gdmConstructBuilder = Datasource.GDM_construct.newBuilder();
 
@@ -215,8 +145,11 @@ public class JsonRecordTransformer implements RecordTransformer {
             gdmConstructBuilder.addSentences(gdmSentence);
         }
 
-        int sentenceType = 0;// todo: check with Jim what are the values
-        gdmConstructBuilder.setFullSql(construct.getFull_sql()).setOriginalSql(construct.getOriginal_sql()).setStatementType(sentenceType).build();
+        int sentenceType = 0;// todo: check with Tim what are the values
+        gdmConstructBuilder.setFullSql(construct.getFullSql()).setStatementType(sentenceType);
+        if (!isEmpty(construct.getRedactedSensitiveDataSql())){
+            gdmConstructBuilder.setOriginalSql(construct.getRedactedSensitiveDataSql());
+        }
 
         return gdmConstructBuilder.build();
     }
@@ -231,8 +164,6 @@ public class JsonRecordTransformer implements RecordTransformer {
         for (String field : fields) {
             Datasource.GDM_field gdmField = Datasource.GDM_field.newBuilder().setName(field).build();
             gdmSentenceBuilder.addFields(gdmField);
-            Datasource.GDM_field gdmField2 = Datasource.GDM_field.newBuilder().setName("TEST_FIELD_VALUES2130").setValue(ByteString.copyFrom("TEST_FIELD_VALUES_VALUE2121".getBytes())).build();
-            gdmSentenceBuilder.addFields(gdmField2);
         }
 
         // handle objects
@@ -255,30 +186,65 @@ public class JsonRecordTransformer implements RecordTransformer {
     }
 
     public Datasource.Accessor buildAccessor(Record record) {
-        Accessor ra = record.getAccessor();
+        // dataType specifies if sniffer should parse sql (type=TEXT)
+        // or just enter to guardium the fields (sentences/object/etc) as is (type=CONSTRUCT)
         Datasource.Application_data.Data_type dataType = getDataType(record);
-        String langType = (record.getData()!=null && record.getData().isUseConstruct()) ? LANG_TYPE_FREE_TEXT : ra.getLanguage();
-        Datasource.Application_data.Language_type languageType = getLanguageType(langType);
-        Datasource.Accessor accessor = Datasource.Accessor.newBuilder()
+
+        // mandatory fields - no need to build without it
+        Accessor ra = record.getAccessor();
+        if (isEmpty(ra.getDbUser())){
+            throw new GuardUCInvalidRecordException("Invalid getDbUser value "+ra.getDbUser());
+        }
+        if (Datasource.Application_data.Data_type.CONSTRUCT.equals(dataType) && isEmpty(ra.getServerType())){
+            throw new GuardUCInvalidRecordException("Invalid getServerType() value "+ra.getServerType());
+        }
+        if (isEmpty(ra.getDbProtocol())){ // method used to get audits
+            throw new GuardUCInvalidRecordException("Invalid getDbProtocol() value "+ra.getDbProtocol());
+        }
+        if (Datasource.Application_data.Data_type.TEXT.equals(dataType) && isEmpty(ra.getLanguage())){
+            throw new GuardUCInvalidRecordException("Invalid getLanguage() value "+ra.getLanguage());
+        }
+
+        Datasource.Accessor.Builder builder = Datasource.Accessor.newBuilder()
                 .setDbUser(ra.getDbUser())
                 .setServerType(ra.getServerType())
-                .setServerOs(ra.getServerOs())
-                .setClientHostname(ra.getClientHostName())
-                .setServerHostname(ra.getServerHostName())
-                .setCommProtocol(ra.getCommProtocol())
                 .setDbProtocol(ra.getDbProtocol())
-                .setDbProtocolVersion(ra.getDbProtocolVersion())
-                .setSourceProgram(ra.getSourceProgram())
-                .setServerDescription(ra.getServerDescription())
-                .setServiceName(ra.getServiceName())
-                .setLanguage(languageType)
+                .setLanguage(getLanguageType(record))
                 .setType(dataType)
-                .setDatasourceType(Datasource.Application_data.Datasource_type.UNI_CON)
-                .build();
-        return accessor;
+                .setDatasourceType(Datasource.Application_data.Datasource_type.UNI_CON);
+
+        // optional fields - no need to set if they are empty;
+        if (!isEmpty(ra.getServerOs())) {
+            builder.setServerOs(ra.getServerOs());
+        }
+        if (!isEmpty(ra.getClientHostName())) {
+            builder.setClientHostname(ra.getClientHostName());
+        }
+        if (!isEmpty(ra.getClientHostName())) {
+            builder.setServerHostname(ra.getServerHostName());
+        }
+        if (!isEmpty(ra.getClientHostName())) {
+            builder.setCommProtocol(ra.getCommProtocol());
+        }
+        if (!isEmpty(ra.getClientHostName())) {
+            builder.setDbProtocolVersion(ra.getDbProtocolVersion());
+        }
+        if (!isEmpty(ra.getClientHostName())) {
+            builder.setSourceProgram(ra.getSourceProgram());
+        }
+        if (!isEmpty(ra.getClientHostName())) {
+            builder.setServerDescription(ra.getServerDescription());
+        }
+        if (!isEmpty(ra.getClientHostName())) {
+            builder.setServiceName(ra.getServiceName());
+        }
+
+        return builder.build();
     }
 
+
     public Datasource.Session_locator buildSessionLocator(Record record){
+
         SessionLocator rsl = record.getSessionLocator();
         String clientIp = rsl.isIpv6() ? rsl.getClientIpv6() : rsl.getClientIp();
         String serverIp = rsl.isIpv6() ? rsl.getServerIpv6() : rsl.getServerIp();
@@ -312,6 +278,36 @@ public class JsonRecordTransformer implements RecordTransformer {
         return ret;
     }
 
+    public Datasource.Application_data buildAppplicationData(Record record, Datasource.Session_locator sessionLocator) {
+
+        Datasource.Application_data.Data_type dataType = getDataType(record);
+        if (Datasource.Application_data.Data_type.TEXT.equals(dataType) && isEmpty(record.getAccessor().getLanguage())){
+            throw new GuardUCInvalidRecordException("Invalid getLanguage() value "+record.getAccessor().getLanguage());
+        }
+
+        Datasource.Application_data.Builder builder = Datasource.Application_data.newBuilder()
+                .setType(dataType)
+                .setLanguage(getLanguageType(record))
+                .setSessionLocator(sessionLocator)
+                .setDatasourceType(Datasource.Application_data.Datasource_type.UNI_CON)
+                .setTimestamp(Utilities.getTimestamp(record.getTime()));
+
+        if (!isEmpty(record.getAppUserName())){
+            builder.setApplicationUser(record.getAppUserName());
+        }
+
+        Data rd = record.getData();
+        if(rd != null) {
+            if (rd.isUseConstruct()) {
+                Datasource.GDM_construct gdmConstruct = buildConstruct(rd);
+                builder.setConstruct(gdmConstruct);
+            } else {
+                builder.setText(rd.getOriginalSqlCommand());
+            }
+        }
+        return builder.build();
+    }
+
     /*
     * https://code.woboq.org/userspace/glibc/resolv/inet_pton.c.html#hex_digit_value
     * static int hex_digit_value (char ch)
@@ -326,21 +322,23 @@ public class JsonRecordTransformer implements RecordTransformer {
         }
     * */
 
-    public static Datasource.Application_data.Language_type getLanguageType(String strType){
+    public static Datasource.Application_data.Language_type getLanguageType(Record record){
+        String langType = (record.getData()!=null && record.getData().isUseConstruct()) ? LANG_TYPE_FREE_TEXT : record.getAccessor().getLanguage();
         try {
-            return Datasource.Application_data.Language_type.valueOf(strType.toUpperCase());
+            return Datasource.Application_data.Language_type.valueOf(langType.toUpperCase());
         } catch (Exception e){
-            log.error("Failed to parse languageType "+strType+", return default FREE_TEXT");
+            log.error("Failed to parse languageType "+langType+", return default FREE_TEXT");
             return Datasource.Application_data.Language_type.FREE_TEXT;
         }
     }
 
     public static Datasource.Application_data.Data_type getDataType(Record record){
-//        if (record.getData()!=null && record.getData().isUseConstruct()){
-        return Datasource.Application_data.Data_type.CONSTRUCT;
-//        } else {
-//            return Datasource.Application_data.Data_type.TEXT;
-//        }
+        // only if "do not use construct" was set explicitly ( meaning "parse sql instead of passed objects" )
+        if (record.getData()!=null && !record.getData().isUseConstruct()){
+            return Datasource.Application_data.Data_type.TEXT;
+        } else {
+            return Datasource.Application_data.Data_type.CONSTRUCT;
+        }
     }
 
     public static Datasource.Timestamp getTimestamp(Long time) {
