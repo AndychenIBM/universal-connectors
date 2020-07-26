@@ -4,6 +4,7 @@ package com.ibm.guardium.universalconnector.common;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.util.Properties;
 
@@ -33,7 +34,7 @@ public class Environment {
 
     public static String getLog42Conf() {
         String gEnv = getUcEtc();
-        return gEnv+LOG42_CONF;
+        return gEnv+ File.separator+LOG42_CONF;
     }
 
 }
