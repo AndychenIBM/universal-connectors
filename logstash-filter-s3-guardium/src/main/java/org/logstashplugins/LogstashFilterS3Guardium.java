@@ -31,7 +31,7 @@ public class LogstashFilterS3Guardium implements Filter {
         try {
             String uc_etc = System.getenv("UC_ETC");
             LoggerContext context = (LoggerContext) LogManager.getContext(false);
-            File file = new File(uc_etc +File.pathSeparator+LOG42_CONF);
+            File file = new File(uc_etc +File.separator+LOG42_CONF);
             context.setConfigLocation(file.toURI());
         } catch (Exception e){
             System.err.println("Failed to load log4j configuration "+e.getMessage());
