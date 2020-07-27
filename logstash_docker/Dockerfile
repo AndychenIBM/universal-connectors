@@ -20,18 +20,19 @@ ENV LOGSTASH_DIR=/usr/share/logstash
 #Copy necessary files
 COPY uc/. ${LOGSTASH_DIR}/
 
-ENV LOGSTASH_VERSION=7.5.0
 ENV UDS_ETC=${LOGSTASH_DIR}/config/
 ENV UC_ETC=${LOGSTASH_DIR}/config/
 ENV UC_SCRIPTS=${LOGSTASH_DIR}/scripts/
 
 #Download bash
 RUN apk add --no-cache bash && \
+#Add guc user as a sudo user
+    addgroup sudo && adduser -h ${LOGSTASH_DIR} -s /bin/bash -g root -G sudo -u 1001 guc -D && \
 #Change owner
-    chown -R 1001:1001 ${LOGSTASH_DIR}
+    chown -R guc:sudo ${LOGSTASH_DIR}
 
-#Change User to 1001
-USER 1001
+#Change User to guc
+USER guc
 
 #Download and extract logstash
 RUN	wget -q https://artifacts.elastic.co/downloads/logstash/logstash-${LOGSTASH_VERSION}.tar.gz -P ${LOGSTASH_DIR} && \
