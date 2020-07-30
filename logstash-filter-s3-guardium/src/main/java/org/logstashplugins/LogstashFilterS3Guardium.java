@@ -67,11 +67,19 @@ public class LogstashFilterS3Guardium implements Filter {
                 }
                 JsonElement inputJSON = null;
                 if (e.getField("detail") !=null ) {
-                    String jsonDetailsEvent = gson.toJson(e.getField("detail"));
-                    log.debug("DETAIL AS JSON STR3 " + jsonDetailsEvent);
-                    inputJSON = JsonParser.parseString(jsonDetailsEvent);
+
+                    String jsonDetailsProp = gson.toJson(e.getField("detail"));
+                    if (log.isDebugEnabled()) { log.debug("sqs event 'detail' property value " + jsonDetailsProp); }
+                    inputJSON = JsonParser.parseString(jsonDetailsProp);
+
+                } else if (e.getField("cloudwatch_logs") !=null ) {
+
+                    inputJSON = JsonParser.parseString(e.getField("message").toString());
+                    if (log.isDebugEnabled()) { log.debug("cloudwatch_logs event 'message' property value " + inputJSON); }
+
                 } else {
-                    inputJSON = gson.toJsonTree(e);
+
+                    throw new Exception("Invalid event, no relevant for s3 parser properties found");
                 }
 
                 Record record = Parser.buildRecord(inputJSON);

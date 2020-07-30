@@ -2,7 +2,7 @@ package com.ibm.guardium.universalconnector.common.structures;
 
 public class SentenceObject {
     public String name; 
-    public String type = "collection"; // in mongo
+    public String type; // in mongo
     public String[] fields = new String[]{};
     public String schema = "";
 
