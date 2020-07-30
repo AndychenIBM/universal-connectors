@@ -35,7 +35,7 @@ RUN apk add --no-cache bash && \
 USER guc
 
 #Download and extract logstash
-RUN	wget -q https://artifacts.elastic.co/downloads/logstash/logstash-${LOGSTASH_VERSION}.tar.gz -P ${LOGSTASH_DIR} && \
+RUN	wget -q https://artifacts.elastic.co/downloads/logstash/logstash-oss-${LOGSTASH_VERSION}.tar.gz -P ${LOGSTASH_DIR} && \
 	tar -xzf ${LOGSTASH_DIR}/logstash*.tar.gz  -C ${LOGSTASH_DIR} --strip-components=1 && \
 	rm ${LOGSTASH_DIR}/*.tar.gz && \
 #Install plugins
