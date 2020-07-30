@@ -92,7 +92,7 @@ public class JsonRecordTransformer implements RecordTransformer {
             builder.setAppUserName(record.getAppUserName());
         }
 
-        if (isEmpty(record.getDbName())){
+        if (!isEmpty(record.getDbName())){
             builder.setDbName(record.getDbName());
         }
 
