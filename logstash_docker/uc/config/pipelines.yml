@@ -1,7 +1,6 @@
 - pipeline.id: syslog_pipeline
   path.config: "/usr/share/logstash/pipeline/mongodb-syslog-filebeat.conf"
-  queue.type: persisted
+  #queue.type: persisted
 - pipeline.id: customer_pipeline
   path.config: "/usr/share/logstash/customer/pipeline/"
-  queue.type: persisted
 
