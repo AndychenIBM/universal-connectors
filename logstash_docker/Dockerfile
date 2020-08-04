@@ -23,6 +23,12 @@ COPY uc/. ${LOGSTASH_DIR}/
 ENV UDS_ETC=${LOGSTASH_DIR}/config/
 ENV UC_ETC=${LOGSTASH_DIR}/config/
 ENV UC_SCRIPTS=${LOGSTASH_DIR}/scripts/
+ENV LOG_GUC_DIR=/var/log/guc_test
+
+#Create a persistent volume which can be monted on the host
+RUN mkdir ${LOG_GUC_DIR}
+RUN chown -R 1001:991 ${LOG_GUC_DIR}
+VOLUME /var/log/guc_test
 
 #Download bash
 RUN apk add --no-cache bash && \
