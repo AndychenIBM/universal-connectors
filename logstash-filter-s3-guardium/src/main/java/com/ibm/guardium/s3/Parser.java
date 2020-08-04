@@ -1,7 +1,5 @@
 package com.ibm.guardium.s3;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -11,6 +9,7 @@ import com.ibm.guardium.universalconnector.common.structures.*;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import sun.net.util.IPAddressUtil;
 
 public class Parser {
 
@@ -51,12 +50,12 @@ public class Parser {
 
         // ------------------ Build Session locator
         SessionLocator sessionLocator = new SessionLocator();
-        String sourceIPAddress = resolveHostToIP(getStrValue(auditObj,"sourceIPAddress"));
+        String sourceIPAddress = validateIP(getStrValue(auditObj,"sourceIPAddress"));
         sessionLocator.setClientIp(sourceIPAddress);
         sessionLocator.setClientPort(0);
 
         String host = getHost(requestParameters);
-        String serverIP = resolveHostToIP(host);
+        String serverIP = UNKNOWN_IP;//validateIP(host);
         sessionLocator.setServerIp(serverIP);
         sessionLocator.setServerPort(0);
 
@@ -72,13 +71,14 @@ public class Parser {
         accessor.setCommProtocol(getStrValue(auditObj,"eventType")); // talk to Itai
         accessor.setDbProtocolVersion(getStrValue(auditObj,"eventVersion"));
         accessor.setServiceName(getStrValue(auditObj,"eventSource"));
-        accessor.setType(getStrValue(auditObj,"eventType"));
+        accessor.setType(Accessor.TYPE_CONSTRUCT_STRING);
 
         accessor.setServerDescription(getStrValue(auditObj,"awsRegion"));
+        accessor.setLanguage(Accessor.LANGUAGE_FREE_TEXT_STRING);
+
         accessor.setServerOs(UNKNOWN_STRING);
         accessor.setOsUser(UNKNOWN_STRING);
         accessor.setClient_mac(UNKNOWN_STRING);
-        accessor.setLanguage(UNKNOWN_STRING);
         accessor.setOsUser(UNKNOWN_STRING);
 
         setUserAgentRelatedFields(accessor, auditObj);
@@ -277,12 +277,10 @@ public class Parser {
         return null;
     }
 
-    public static String resolveHostToIP(String sourceIPAddress){
-        try {
-            InetAddress address = InetAddress.getByName(sourceIPAddress);
-            return address.getHostAddress();
-        }catch (UnknownHostException e){
-            log.error("Falied to translate the sourceIPAdress "+sourceIPAddress+" to ip, sending original string", e);
+    public static String validateIP(String sourceIPAddress){
+        if (IPAddressUtil.isIPv4LiteralAddress(sourceIPAddress) || IPAddressUtil.isIPv6LiteralAddress(sourceIPAddress)){
+            return sourceIPAddress;
+        } else {
             return UNKNOWN_IP;
         }
     }
@@ -355,6 +353,9 @@ public class Parser {
     public static void main(String[] args){
         //Parser parser = new Parser();
         try {
+            String dateString = "2020-08-03T22:12:19Z";
+            Date date = DATE_FORMATTER.parse(dateString);
+
             String anotherEvent = "{\"eventID\":\"e3de78ee-4fab-40ef-b421-bfeff7f3c61c\",\"awsRegion\":\"us-east-1\",\"eventCategory\":\"Data\",\"eventVersion\":\"1.07\",\"responseElements\":null,\"sourceIPAddress\":\"77.125.48.244\",\"requestParameters\":{\"bucketName\":\"bucketnewbucketkkkkk\",\"X-Amz-Date\":\"20200622T202153Z\",\"response-content-disposition\":\"inline\",\"X-Amz-Algorithm\":\"AWS4-HMAC-SHA256\",\"X-Amz-SignedHeaders\":\"host\",\"Host\":\"bucketnewbucketkkkkk.s3.us-east-1.amazonaws.com\",\"X-Amz-Expires\":\"300\",\"key\":\"mkkkk/sampleJson.json\"},\"eventSource\":\"s3.amazonaws.com\",\"resources\":[{\"type\":\"AWS::S3::Object\",\"ARN\":\"arn:aws:s3:::bucketnewbucketkkkkk/mkkkk/sampleJson.json\"},{\"type\":\"AWS::S3::Bucket\",\"ARN\":\"arn:aws:s3:::bucketnewbucketkkkkk\",\"accountId\":\"987076625343\"}],\"readOnly\":true,\"userAgent\":\"[Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36]\",\"userIdentity\":{\"sessionContext\":{\"attributes\":{\"mfaAuthenticated\":\"false\",\"creationDate\":\"2020-06-22T08:52:40Z\"}},\"accessKeyId\":\"ASIA6LUS2AO73E6D2NJP\",\"accountId\":\"987076625343\",\"principalId\":\"AIDAJWW2XAIOY2WN3KAAM\",\"arn\":\"arn:aws:iam::987076625343:user/ProxyTest\",\"type\":\"IAMUser\",\"userName\":\"ProxyTest\"},\"eventType\":\"AwsApiCall\",\"additionalEventData\":{\"SignatureVersion\":\"SigV4\",\"AuthenticationMethod\":\"QueryString\",\"x-amz-id-2\":\"CcbPzGZRlYbGdJPjFp8IcxuVi7ZhB01wkVVwhjkRDFbUDdFB+GKsV5oRannp3oOt2qCMUEXy37I\\u003d\",\"CipherSuite\":\"ECDHE-RSA-AES128-GCM-SHA256\",\"bytesTransferredOut\":19.0,\"bytesTransferredIn\":0.0},\"requestID\":\"4D5B1CD23AEDD7C7\",\"eventTime\":\"2020-06-22T20:21:53Z\",\"eventName\":\"GetObject\",\"recipientAccountId\":\"987076625343\",\"managementEvent\":false}";
             JsonObject inputJSON = (JsonObject) JsonParser.parseString(anotherEvent);
 

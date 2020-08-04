@@ -8,7 +8,9 @@ import com.ibm.guardium.universalconnector.common.structures.*;
 import com.ibm.guardium.universalconnector.exceptions.GuardUCInvalidRecordException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import sun.net.util.IPAddressUtil;
 
+import java.math.BigInteger;
 import java.util.*;
 
 public class JsonRecordTransformer implements RecordTransformer {
@@ -253,6 +255,7 @@ public class JsonRecordTransformer implements RecordTransformer {
                 .setClientPort(rsl.getClientPort())
                 .setServerIp(convert_ipstr_to_int(serverIp))
                 .setServerPort(rsl.getServerPort())
+                .setIsIpv6(rsl.isIpv6())
                 .build();
         return sessionLocator;
     }
@@ -276,6 +279,20 @@ public class JsonRecordTransformer implements RecordTransformer {
         }
 
         return ret;
+//        if (ip==null){
+//            log.error("Failed to trandslate ip to a number, ip string is "+ip);
+//            return 0;
+//        }
+//        byte[] arr = IPAddressUtil.textToNumericFormatV4(ip);
+//        if (arr==null){
+//            arr = IPAddressUtil.textToNumericFormatV6(ip);
+//        }
+//        if (arr==null){
+//            log.error("Failed to trandslate ip to a number, ip string is "+ip);
+//            return 0;
+//        }
+//        BigInteger bigInteger = new BigInteger(arr);
+//        return bigInteger.intValue();
     }
 
     public Datasource.Application_data buildAppplicationData(Record record, Datasource.Session_locator sessionLocator) {
