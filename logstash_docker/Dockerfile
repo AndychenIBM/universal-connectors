@@ -23,12 +23,12 @@ COPY uc/. ${LOGSTASH_DIR}/
 ENV UDS_ETC=${LOGSTASH_DIR}/config/
 ENV UC_ETC=${LOGSTASH_DIR}/config/
 ENV UC_SCRIPTS=${LOGSTASH_DIR}/scripts/
-ENV LOG_GUC_DIR=/var/log/guc_test
+ENV LOG_GUC_DIR=/var/log/uc/
 
 #Create a persistent volume which can be monted on the host
 RUN mkdir ${LOG_GUC_DIR}
 RUN chown -R 1001:991 ${LOG_GUC_DIR}
-VOLUME /var/log/guc_test
+VOLUME /var/log/uc
 
 #Download bash
 RUN apk add --no-cache bash && \
@@ -64,10 +64,6 @@ RUN	wget -q https://artifacts.elastic.co/downloads/logstash/logstash-oss-${LOGST
     chmod 755 ${UC_SCRIPTS}/*.sh && \
 #Make sure scripts are not uploaded with windows characters additions
     sed -i -e 's/\r$//' ${LOGSTASH_DIR}/scripts/*.sh
-
-RUN mkdir -p /tmp/logstash_plugin/log
-RUN chown -R guc:sudo /tmp/logstash_plugin/log
-VOLUME /tmp/logstash_plugin/log
 
 ENV PATH ${LOGSTASH_DIR}/bin:$PATH
 
