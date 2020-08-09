@@ -63,7 +63,7 @@ RUN	wget -q https://artifacts.elastic.co/downloads/logstash/logstash-oss-${LOGST
 #Make sure user can read,write and execute the scripts
     chmod 755 ${UC_SCRIPTS}/*.sh && \
 #Make sure scripts are not uploaded with windows characters additions
-    sed -i -e 's/\r$//' ${LOGSTASH_DIR}/scripts/*.sh
+    sed -i -e 's/\r$//' ${LOGSTASH_DIR}/scripts/*.sh ${UC_ETC}/log4j2uc.properties
 
 ENV PATH ${LOGSTASH_DIR}/bin:$PATH
 

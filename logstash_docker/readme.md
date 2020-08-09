@@ -22,8 +22,8 @@ running a container- this can be done by one of the following:
 2. direct run using:
     docker run -d --name="Klaus" --network="host" -it universal-connector
     
-*Logstash is set to ERROR level. in order to set another level you can set it as an env variable. for example:
- docker run -d --name="Klaus" --network="host" -e UC_LOG_LEVEL="DEBUG" -it universal-connector
+*Logstash is set to error level. in order to set another level you can set it as an env variable. for example:
+ docker run -d --name="Klaus" --network="host" -e UC_LOG_LEVEL="debug" -it universal-connector
  
 *In order to change connectorId, use -e CONNECTOR_ID=<new_connectorId_name>. for example:
 docker run -d --name="Klaus" --network="host" -e CONNECTOR_ID="123" -it universal-connector  
