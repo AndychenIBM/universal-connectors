@@ -65,9 +65,6 @@ RUN	wget -q https://artifacts.elastic.co/downloads/logstash/logstash-oss-${LOGST
 #Make sure scripts are not uploaded with windows characters additions
     sed -i -e 's/\r$//' ${LOGSTASH_DIR}/scripts/*.sh
 
-#TODO- remove these line and make sure tar command doesn't override pipelines.yml file
-COPY uc/pipelines.yml ${LOGSTASH_DIR}/config/pipelines.yml
-
 RUN mkdir -p /tmp/logstash_plugin/log
 RUN chown -R guc:sudo /tmp/logstash_plugin/log
 VOLUME /tmp/logstash_plugin/log
