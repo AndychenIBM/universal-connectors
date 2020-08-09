@@ -44,6 +44,8 @@ USER guc
 RUN	wget -q https://artifacts.elastic.co/downloads/logstash/logstash-oss-${LOGSTASH_VERSION}.tar.gz -P ${LOGSTASH_DIR} && \
 	tar -xzf ${LOGSTASH_DIR}/logstash*.tar.gz  -C ${LOGSTASH_DIR} --strip-components=1 && \
 	rm ${LOGSTASH_DIR}/*.tar.gz && \
+#Preserve local pipelines.yml file
+    mv -f ${LOGSTASH_DIR}/pipelines.yml ${LOGSTASH_DIR}/config/. && \
 #Install plugins
 	.${LOGSTASH_DIR}/bin/logstash-plugin install ${LOGSTASH_DIR}/config/logstash-filter-java_filter_example-0.4.3.gem && \
     .${LOGSTASH_DIR}/bin/logstash-plugin install ${LOGSTASH_DIR}/config/logstash-output-java_output_to_guardium-1.1.3.gem && \
@@ -64,7 +66,7 @@ RUN	wget -q https://artifacts.elastic.co/downloads/logstash/logstash-oss-${LOGST
     sed -i -e 's/\r$//' ${LOGSTASH_DIR}/scripts/*.sh
 
 #TODO- remove these line and make sure tar command doesn't override pipelines.yml file
-COPY uc/config/pipelines.yml ${LOGSTASH_DIR}/config/pipelines.yml
+COPY uc/pipelines.yml ${LOGSTASH_DIR}/config/pipelines.yml
 
 RUN mkdir -p /tmp/logstash_plugin/log
 RUN chown -R guc:sudo /tmp/logstash_plugin/log
