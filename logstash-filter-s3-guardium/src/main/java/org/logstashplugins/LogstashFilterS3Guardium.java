@@ -10,8 +10,8 @@ import co.elastic.logstash.api.PluginConfigSpec;
 import com.google.gson.*;
 import com.ibm.guardium.s3.Parser;
 import com.ibm.guardium.universalconnector.common.structures.Record;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
 
@@ -38,7 +38,7 @@ public class LogstashFilterS3Guardium implements Filter {
             e.printStackTrace();
         }
     }
-    private static Log log = LogFactory.getLog(LogstashFilterS3Guardium.class);
+    private static Logger log = LogManager.getLogger(LogstashFilterS3Guardium.class);
 
     public static final PluginConfigSpec<String> SOURCE_CONFIG = PluginConfigSpec.stringSetting("source", "message");
     public static final String LOGSTASH_TAG_S3_JSON_PARSE_ERROR = "_s3_json_parse_error";

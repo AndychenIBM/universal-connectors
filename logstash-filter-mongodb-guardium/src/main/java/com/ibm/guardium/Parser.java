@@ -15,12 +15,12 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.ibm.guardium.universalconnector.common.Util;
 import com.ibm.guardium.universalconnector.common.structures.*;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class Parser {
 
-    private static Log log = LogFactory.getLog(Parser.class);
+    private static Logger log = LogManager.getLogger(Parser.class);
 
     public static final String DATA_PROTOCOL_STRING = "MongoDB native audit";
     public static final String UNKOWN_STRING = "";
@@ -115,6 +115,7 @@ public class Parser {
                 sentence = new Sentence(command);
                 if (args.has(command)) {
                     final SentenceObject sentenceObject = new SentenceObject(args.get(command).getAsString());
+                    sentenceObject.setType("collection"); // this used to be default value, but since sentence is defined in common package, "collection" as default value was removed
                     sentence.getObjects().add(sentenceObject);
                 }
 

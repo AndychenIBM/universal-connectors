@@ -12,9 +12,8 @@ import com.ibm.guardium.Parser;
 import com.ibm.guardium.universalconnector.common.Util;
 import com.ibm.guardium.universalconnector.common.structures.*;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
 
 import java.io.File;
@@ -36,7 +35,7 @@ public class JavaFilterExample implements Filter {
             e.printStackTrace();
         }
     }
-    private static Log log = LogFactory.getLog(JavaFilterExample.class);
+    private static Logger log = LogManager.getLogger(JavaFilterExample.class);
 
     public static final PluginConfigSpec<String> SOURCE_CONFIG =
             PluginConfigSpec.stringSetting("source", "message");
@@ -64,6 +63,9 @@ public class JavaFilterExample implements Filter {
     public Collection<Event> filter(Collection<Event> events, FilterMatchListener matchListener) {
         ArrayList<Event> skippedEvents = new ArrayList<>();
         for (Event e : events) {
+            if (log.isDebugEnabled()) {
+                log.debug("Event: "+logEvent(e));
+            }
             // from config, use Object f = e.getField(sourceField);
             if (e.getField("message") instanceof String) {
                 String messageString = e.getField("message").toString();

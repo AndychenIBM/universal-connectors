@@ -2,12 +2,12 @@ package com.ibm.guardium;
 
 import static org.junit.Assert.assertEquals;
 
-import java.sql.Date;
 import java.text.ParseException;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.ibm.guardium.Parser;
 import com.ibm.guardium.universalconnector.common.structures.*;
 
 import org.junit.Assert;
