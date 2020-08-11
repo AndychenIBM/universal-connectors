@@ -117,7 +117,6 @@ public class RecordDispatcher {
                         if (log.isDebugEnabled()) { log.debug("Finished creating agent for " + dbId);  }
                     } catch (Exception e) {
                         log.error("Failed to creating/starting agent for sniffer configuration " + snifferConfigs.get(0) + " and dbDetails " + dbDetails, e);
-                        System.err.print(e);
                     }
                 }
             }
