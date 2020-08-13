@@ -78,9 +78,9 @@ public class JsonRecordTransformer implements RecordTransformer {
     public Datasource.Session_start buildSessionStart(Record record, Datasource.Session_locator sessionLocator, Datasource.Accessor accessor){
 
         // mandatory field - no need to build without it
-        if (isEmpty(record.getSessionId())){
-            throw new GuardUCInvalidRecordException("Invalid sessionId value "+record.getSessionId());
-        }
+//        if (isEmpty(record.getSessionId())){
+//            throw new GuardUCInvalidRecordException("Invalid sessionId value "+record.getSessionId());
+//        } currently sniffer accepts empty session id messages, so will pass it on
 
         Datasource.Session_start.Builder builder = Datasource.Session_start.newBuilder()
                 .setSessionLocator(sessionLocator)
@@ -224,6 +224,10 @@ public class JsonRecordTransformer implements RecordTransformer {
         }
         if (!isEmpty(ra.getServerHostName())) {
             builder.setServerHostname(ra.getServerHostName());
+        } else {
+            // try to put server ip if host is empty
+            String serverIp = record.getSessionLocator().isIpv6() ? record.getSessionLocator().getServerIpv6() : record.getSessionLocator().getServerIp();
+            builder.setServerHostname(serverIp);
         }
         if (!isEmpty(ra.getCommProtocol())) {
             builder.setCommProtocol(ra.getCommProtocol());
