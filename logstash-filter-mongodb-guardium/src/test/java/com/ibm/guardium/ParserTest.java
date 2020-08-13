@@ -1,13 +1,10 @@
 package com.ibm.guardium;
 
-import static org.junit.Assert.assertEquals;
-
 import java.text.ParseException;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.ibm.guardium.Parser;
 import com.ibm.guardium.universalconnector.common.structures.*;
 
 import org.junit.Assert;
@@ -65,6 +62,45 @@ public class ParserTest {
         Assert.assertEquals("update", sentence.getVerb());
         Assert.assertEquals("posts", sentence.getObjects().get(0).name);
 
+    }
+
+    /**
+     * Tests that internal MongoDB commands like applyOps, which have a complex
+     * object, return "" in object.
+     * 
+     * args: { "applySys": ...} is a JSON object, not a simple string.
+     */
+    @Test
+    public void testParseAsConstruct_applyOps() {
+        final String mongoString = "{ 'atype' : 'authCheck', 'ts' : { '$date' : '2020-08-11T11:13:05.480-0400' }, 'local' : { 'ip' : '127.0.0.1', 'port' : 27017 }, 'remote' : { 'ip' : '127.0.0.1', 'port' : 35634 }, 'users' : [ { 'user' : 'admin', 'db' : 'admin' } ], 'roles' : [ { 'role' : 'root', 'db' : 'admin' } ], 'param' : { 'command' : 'applyOps', 'ns' : 'admin', 'args' : { 'applyOps' : [ { 'op' : 'c', 'ns' : 'test.$cmd', 'o' : { 'create' : 'viewColl', 'viewOn' : 'test', 'pipeline' : [] } } ], 'lsid' : { 'id' : { '$binary' : '0x6EvqPyQNy0czzyrvR1dw==', '$type' : '04' } }, '$db' : 'admin' } }, 'result' : 0 }";
+        final JsonObject mongoJson = JsonParser.parseString(mongoString).getAsJsonObject();
+        final Construct result = Parser.ParseAsConstruct(mongoJson);
+
+        final Sentence sentence = result.sentences.get(0);
+        Assert.assertEquals("applyOps", sentence.getVerb());
+        Assert.assertEquals("", sentence.getObjects().get(0).name);
+    }
+
+    @Test
+    public void testParseAsConstruct_mapReduce() {
+        final String mongoString = "{ 'atype' : 'authCheck', 'ts' : { '$date' : '2020-08-12T05:38:57.912-0400' }, 'local' : { 'ip' : '127.0.0.1', 'port' : 27017 }, 'remote' : { 'ip' : '127.0.0.1', 'port' : 36648 }, 'users' : [ { 'user' : 'realAdmin', 'db' : 'admin' } ], 'roles' : [ { 'role' : 'readWriteAnyDatabase', 'db' : 'admin' }, { 'role' : 'readWrite', 'db' : 'newDB02' }, { 'role' : 'userAdminAnyDatabase', 'db' : 'admin' } ], 'param' : { 'command' : 'mapReduce', 'ns' : 'test.orders', 'args' : { 'mapreduce' : 'orders', 'map' : 'function() {\n   emit(this.cust_id, this.price);\n}', 'reduce' : 'function(keyCustId, valuesPrices) {\n   return Array.sum(valuesPrices);\n}', 'out' : 'map_reduce_example', 'lsid' : { 'id' : { '$binary' : 'HmeBAmiJSkaY43ZrPCEw+A==', '$type' : '04' } }, '$db' : 'test' } }, 'result' : 0 }";
+        final JsonObject mongoJson = JsonParser.parseString(mongoString).getAsJsonObject();
+        final Construct result = Parser.ParseAsConstruct(mongoJson);
+
+        final Sentence sentence = result.sentences.get(0);
+        Assert.assertEquals("mapReduce", sentence.getVerb());
+        Assert.assertEquals("orders", sentence.getObjects().get(0).name);
+    }
+
+    @Test
+    public void testParseAsConstruct_resetErrors() {
+        final String mongoString = "{ 'atype' : 'authCheck', 'ts' : { '$date' : '2020-08-12T05:55:46.413-0400' }, 'local' : { 'ip' : '127.0.0.1', 'port' : 27017 }, 'remote' : { 'ip' : '127.0.0.1', 'port' : 36648 }, 'users' : [ { 'user' : 'realAdmin', 'db' : 'admin' } ], 'roles' : [ { 'role' : 'readWriteAnyDatabase', 'db' : 'admin' }, { 'role' : 'readWrite', 'db' : 'newDB02' }, { 'role' : 'userAdminAnyDatabase', 'db' : 'admin' } ], 'param' : { 'command' : 'resetError', 'ns' : 'test', 'args' : { 'reseterror' : 1, 'lsid' : { 'id' : { '$binary' : 'HmeBAmiJSkaY43ZrPCEw+A==', '$type' : '04' } }, '$db' : 'test' } }, 'result' : 0 }";
+        final JsonObject mongoJson = JsonParser.parseString(mongoString).getAsJsonObject();
+        final Construct result = Parser.ParseAsConstruct(mongoJson);
+
+        final Sentence sentence = result.sentences.get(0);
+        Assert.assertEquals("resetError", sentence.getVerb());
+        Assert.assertEquals("1", sentence.getObjects().get(0).name);
     }
 
     @Test

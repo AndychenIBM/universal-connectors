@@ -59,6 +59,8 @@ dependencies {
     
     testCompile 'junit:junit:4.12'
     testCompile 'org.jruby:jruby-complete:9.2.7.0'
+    
+    testCompile fileTree(dir: LOGSTASH_UC_COMMONS_PATH, include: "logstash-uc-commons-1.0-SNAPSHOT.jar")
 }
 
 clean {

@@ -114,10 +114,12 @@ public class Parser {
                 // + main object
                 sentence = new Sentence(command);
                 if (args.has(command)) {
-                    final SentenceObject sentenceObject = new SentenceObject(args.get(command).getAsString());
-                    sentenceObject.setType("collection"); // this used to be default value, but since sentence is defined in common package, "collection" as default value was removed
-                    sentence.getObjects().add(sentenceObject);
+                    sentence.getObjects().add(parseSentenceObject(args, command));
+                } else if (args.has(command.toLowerCase())) { // 2 word commands are changed to lowercase in args, sometimes(?), like mapReduce, resetErrors
+                    sentence.getObjects().add(parseSentenceObject(args, command.toLowerCase()));
                 }
+
+                
 
                 switch (command) {
                     case "aggregate":
@@ -165,6 +167,18 @@ public class Parser {
 
         return sentence;
     }
+
+    protected static SentenceObject parseSentenceObject(JsonObject args, String command) {
+        SentenceObject sentenceObject = null;
+        if (args.get(command).isJsonPrimitive()) {
+            sentenceObject = new SentenceObject(args.get(command).getAsString());
+            sentenceObject.setType("collection"); // this used to be default value, but since sentence is defined in common package, "collection" as default value was removed
+        } else {
+            sentenceObject = new SentenceObject("");
+        }
+        return sentenceObject;
+    }
+
 
     public static Record parseRecord(final JsonObject data) throws ParseException {
         // TODO get param.args.lsid, or fabricate

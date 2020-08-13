@@ -3,6 +3,9 @@
 Notable changes will be documented in this file.
 
 ## [Unreleased]
+## [0.4.5]
+- Fixed support for commands with 2 words, like "mapReduce", "resetErrors".
+ 
 ## [0.4.2]
 ### Changed
 - override localhost remote/local IPs coming from MongoDB logs, if Logstash event contains "server_ip" field.
