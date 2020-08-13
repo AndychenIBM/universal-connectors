@@ -410,22 +410,18 @@ public class GuardConnection implements RecordTransmitter {
         }
         switch (status) {
             case CLOSE:
-                log.debug("----Connection closed, going to open");
                 transmitterStats.incrementReconnects();
                 openConnection();
                 break;
             case IN_PROGRESS:
-                log.debug("----Connection in_progress");
                 checkConnection();
                 break;
             case OPEN:
-                log.debug("----Connection open");
                 getMessageFromQ();
                 handleReadWrite();
                 break;
             case ERROR:
             default:
-                log.debug("----Connection in error state, doing nothing for 10 sec then change state to CLOSE");
                 transmitterStats.incrementErrors();
                 // we are in a bad state, sleep for 10 seconds and try again.
                 Thread.sleep(1000 * 10);
