@@ -354,24 +354,23 @@ public class GuardConnection implements RecordTransmitter {
     }
 
     private void preformConnectionTasks() {
-        try {
-            while (true) {
-                if (status != Status.OPEN)
-                    log.debug("Connection status is : " + status);
-
-                preformConnectionTasksByStatus();
-            }
-        } catch (InterruptedException e) {
-            log.warn("Connection thread was stopped.");
-        } catch (Exception e) {
-            log.error("An Exception during connection thread." , e);
+        boolean keepRunning  = true;
+        while (keepRunning ) {
             try {
-                commHandler.close();
-            } catch (IOException e1) {
-                log.error("Unable to close socketChannel. ", e1);
+                preformConnectionTasksByStatus();
+            } catch (InterruptedException e) {
+                log.warn("Connection thread was stopped.");
+                keepRunning  = false;
+            } catch (Exception e) {
+                log.error("An Exception during connection thread.", e);
+                try {
+                    commHandler.close();
+                } catch (IOException e1) {
+                    log.error("Unable to close socketChannel. ", e1);
+                }
+                status = Status.CLOSE;
+                writeStatus("CLOSE", "");
             }
-            status = Status.CLOSE;
-            writeStatus("CLOSE","");
         }
     }
 
@@ -406,20 +405,27 @@ public class GuardConnection implements RecordTransmitter {
     }
 
     private void preformConnectionTasksByStatus() throws Exception {
+        if (status != Status.OPEN) {
+            log.debug("Connection status is : " + status);
+        }
         switch (status) {
             case CLOSE:
+                log.debug("----Connection closed, going to open");
                 transmitterStats.incrementReconnects();
                 openConnection();
                 break;
             case IN_PROGRESS:
+                log.debug("----Connection in_progress");
                 checkConnection();
                 break;
             case OPEN:
+                log.debug("----Connection open");
                 getMessageFromQ();
                 handleReadWrite();
                 break;
             case ERROR:
             default:
+                log.debug("----Connection in error state, doing nothing for 10 sec then change state to CLOSE");
                 transmitterStats.incrementErrors();
                 // we are in a bad state, sleep for 10 seconds and try again.
                 Thread.sleep(1000 * 10);
