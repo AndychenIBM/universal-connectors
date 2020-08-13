@@ -25,7 +25,8 @@ if [[ -z "$logstash_pid" ]]; then
     #Change log4j2uc.properties log level if needed
     if [[ "$UC_LOG_LEVEL" =~ ^(all|debug|info|warn|error|fatal|off|trace)$ ]]; then
         updateFromEnv "$UC_LOG_LEVEL" "UC_LOG_LEVEL" $UDS_ETC/log4j2uc.properties "filter.threshold.level = error" "filter.threshold.level = $UC_LOG_LEVEL"
-        updateFromEnv "$UC_LOG_LEVEL" "UC_LOG_LEVEL" $UDS_ETC/log4j2uc.properties "logger.rolling.level = error" "logger.rolling.level = $UC_LOG_LEVEL"
+        updateFromEnv "$UC_LOG_LEVEL" "UC_LOG_LEVEL" $UDS_ETC/log4j2uc.properties "logger.guardium.level = error" "logger.guardium.level = $UC_LOG_LEVEL"
+        updateFromEnv "$UC_LOG_LEVEL" "UC_LOG_LEVEL" $UDS_ETC/log4j2uc.properties "logger.logstashplugins.level = error" "logger.logstashplugins.level = $UC_LOG_LEVEL"
     fi
 
     #Change connectorId if needed
