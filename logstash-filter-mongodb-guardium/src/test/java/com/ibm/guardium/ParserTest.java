@@ -71,14 +71,14 @@ public class ParserTest {
      * args: { "applySys": ...} is a JSON object, not a simple string.
      */
     @Test
-    public void testParseAsConstruct_applyOps() {
+    public void testParse_compound_object() {
         final String mongoString = "{ 'atype' : 'authCheck', 'ts' : { '$date' : '2020-08-11T11:13:05.480-0400' }, 'local' : { 'ip' : '127.0.0.1', 'port' : 27017 }, 'remote' : { 'ip' : '127.0.0.1', 'port' : 35634 }, 'users' : [ { 'user' : 'admin', 'db' : 'admin' } ], 'roles' : [ { 'role' : 'root', 'db' : 'admin' } ], 'param' : { 'command' : 'applyOps', 'ns' : 'admin', 'args' : { 'applyOps' : [ { 'op' : 'c', 'ns' : 'test.$cmd', 'o' : { 'create' : 'viewColl', 'viewOn' : 'test', 'pipeline' : [] } } ], 'lsid' : { 'id' : { '$binary' : '0x6EvqPyQNy0czzyrvR1dw==', '$type' : '04' } }, '$db' : 'admin' } }, 'result' : 0 }";
         final JsonObject mongoJson = JsonParser.parseString(mongoString).getAsJsonObject();
         final Construct result = Parser.ParseAsConstruct(mongoJson);
 
         final Sentence sentence = result.sentences.get(0);
         Assert.assertEquals("applyOps", sentence.getVerb());
-        Assert.assertEquals("", sentence.getObjects().get(0).name);
+        Assert.assertEquals("[compound object]", sentence.getObjects().get(0).name);
     }
 
     @Test

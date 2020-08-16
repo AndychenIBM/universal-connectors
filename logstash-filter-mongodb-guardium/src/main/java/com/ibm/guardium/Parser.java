@@ -174,7 +174,7 @@ public class Parser {
             sentenceObject = new SentenceObject(args.get(command).getAsString());
             sentenceObject.setType("collection"); // this used to be default value, but since sentence is defined in common package, "collection" as default value was removed
         } else {
-            sentenceObject = new SentenceObject("");
+            sentenceObject = new SentenceObject("[compound object]");
         }
         return sentenceObject;
     }
