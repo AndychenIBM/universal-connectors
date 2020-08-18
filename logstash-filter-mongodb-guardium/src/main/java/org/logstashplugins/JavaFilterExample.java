@@ -69,7 +69,7 @@ public class JavaFilterExample implements Filter {
             // from config, use Object f = e.getField(sourceField);
             if (e.getField("message") instanceof String) {
                 String messageString = e.getField("message").toString();
-                // finding "mongod:" to be general (syslog, filebeat)
+                // finding "mongod:" to be general (syslog, filebeat); it's not [client] source program
                 // alternatively, throw JSON audit part into a specific field
                 int mongodIndex = messageString.indexOf(MONGOAUDIT_START_SIGNAL);
                 if (mongodIndex != -1) {
@@ -95,11 +95,6 @@ public class JavaFilterExample implements Filter {
                             String serverHost = e.getField("server_hostname").toString();
                             if (serverHost != null)
                                 record.getAccessor().setServerHostName(serverHost);
-                        }
-                        if (e.getField("source_program") instanceof String) {
-                            String sourceProgram = e.getField("source_program").toString();
-                            if (sourceProgram != null)
-                                record.getAccessor().setSourceProgram(sourceProgram);
                         }
 
                         this.correctIPs(e, record);

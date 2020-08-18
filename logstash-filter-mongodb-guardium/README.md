@@ -35,7 +35,7 @@ The filter plugin also supports sending errors as well, though MongoDB Access co
 * The filter supports events sent thru Syslog or Filebeat, which indicate "mongod:" in their message.
 * Field _server_hostname_ (required) - Server hostname is expected (extracted from syslog message, 2nd field).
 * Field _server_ip_ - States the IP of the MongoDB server; if it is available for the filter plugin, the filter will use it instead localhost IPs reported by MongoDB, if actions were performed on the DB server itself. 
-* Source program is not available in syslog messages sent by MongoDB. Instead, it's  always sent as "mongod". 
+* Client "Source program" is not available in messages sent by MongoDB. 
 * If events with "(NONE)" local/remote IP are not filtered (unlikely, as messages without users are filtered-out), the filter plugin will convert the IP to "0.0.0.0", as a valid format is needed.
 * Events into the filter are not removed, but tagged if not parsed (see [Filter result](#filter-result), below).
 * MongoDB authCheck audit messages are also sent in a redacted version, where most field values are replaced with "?". Note that currently this is a naïve process, where most command arguments are redacted, apart from the the command, $db, and $lookup & $graphLookup required arguments (from, localField, foreignField, as, connectFromField, connectToField). Future filter release may add to this list.
