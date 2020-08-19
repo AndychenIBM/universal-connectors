@@ -252,51 +252,69 @@ public class JsonRecordTransformer implements RecordTransformer {
     public Datasource.Session_locator buildSessionLocator(Record record){
 
         SessionLocator rsl = record.getSessionLocator();
-        String clientIp = rsl.isIpv6() ? rsl.getClientIpv6() : rsl.getClientIp();
-        String serverIp = rsl.isIpv6() ? rsl.getServerIpv6() : rsl.getServerIp();
-        Datasource.Session_locator sessionLocator = Datasource.Session_locator.newBuilder()
-                .setClientIp(convert_ipstr_to_int(clientIp))
-                .setClientPort(rsl.getClientPort())
-                .setServerIp(convert_ipstr_to_int(serverIp))
-                .setServerPort(rsl.getServerPort())
-                .setIsIpv6(rsl.isIpv6())
-                .build();
-        return sessionLocator;
+        Datasource.Session_locator.Builder sessionBuilder =
+                Datasource.Session_locator.newBuilder()
+                        .setClientPort(rsl.getClientPort())
+                        .setServerPort(rsl.getServerPort())
+                        .setIsIpv6(rsl.isIpv6());
+        if (!rsl.isIpv6()){
+            sessionBuilder.setServerIp(convert_ipstr_to_int(rsl.getServerIp())).setClientIp(convert_ipstr_to_int(rsl.getClientIp()));
+        } else {
+            sessionBuilder.setServerIpv6(rsl.getServerIpv6()).setClientIpv6(rsl.getClientIpv6());
+        }
+        return sessionBuilder.build();
     }
 
-    public static int convert_ipstr_to_int(String ip){
+//    public static int convert_ipstr_to_int(String ip){
+//        int ret = 0;
+//        String[] segs = ip.split("\\.");
+//
+//        if (segs!=null && segs.length>0){
+//
+//            for (int i = segs.length-1; i >= 0; i--){
+//                int value = 0;
+//                try{
+//                    value = Integer.valueOf(segs[i]);
+//                    value = value << 8*i;
+//                }catch (java.lang.Exception e){
+//                    log.error("Failed to translate string IP to number, IP is "+ip+" section is "+segs[i], e);
+//                }
+//                ret += value ;
+//            }
+//        }
+//
+//        return ret;
+//    }
+    public static int convert_ipstr_to_int(String ip) {
+        if (ip==null){
+            System.out.println("Failed to translate ip to a number, ip string is "+ip);
+            return 0;
+        }
+        byte[] arr = IPAddressUtil.textToNumericFormatV4(ip);
+        if (arr==null){
+            System.out.println("Failed to translate ip to a number, ip string is "+ip);
+            return 0;
+        }
+        int num = convert_ip_bytes_to_int(arr);
+        return num;
+    }
+
+    public static int convert_ip_bytes_to_int(byte[] bytes) {
         int ret = 0;
-        String[] segs = ip.split("\\.");
-
-        if (segs!=null && segs.length>0){
-
-            for (int i = segs.length-1; i >= 0; i--){
+        if (bytes != null && bytes.length > 0) {
+            for (int i = bytes.length - 1; i >= 0; i--) {
                 int value = 0;
-                try{
-                    value = Integer.valueOf(segs[i]);
-                    value = value << 8*i;
-                }catch (java.lang.Exception e){
-                    log.error("Failed to translate string IP to number, IP is "+ip+" section is "+segs[i], e);
+                try {
+                    value = Byte.toUnsignedInt(bytes[i]);
+                    value = value << 8 * i;
+                } catch (java.lang.Exception e) {
+                    System.out.println("Failed to translate string IP to number ip as string "+new String(bytes)+", section is "+value);
+                    System.err.println(e);
                 }
-                ret += value ;
+                ret += value;
             }
         }
-
         return ret;
-//        if (ip==null){
-//            log.error("Failed to trandslate ip to a number, ip string is "+ip);
-//            return 0;
-//        }
-//        byte[] arr = IPAddressUtil.textToNumericFormatV4(ip);
-//        if (arr==null){
-//            arr = IPAddressUtil.textToNumericFormatV6(ip);
-//        }
-//        if (arr==null){
-//            log.error("Failed to trandslate ip to a number, ip string is "+ip);
-//            return 0;
-//        }
-//        BigInteger bigInteger = new BigInteger(arr);
-//        return bigInteger.intValue();
     }
 
     public Datasource.Application_data buildAppplicationData(Record record, Datasource.Session_locator sessionLocator) {

@@ -7,7 +7,10 @@ import com.ibm.guardium.universalconnector.common.structures.*;
 import org.jruby.RubyProcess;
 import org.junit.Assert;
 import org.junit.Test;
+import sun.net.util.IPAddressUtil;
 
+import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 public class JsonRecordTransformerTest {
@@ -67,20 +70,6 @@ public class JsonRecordTransformerTest {
         Record record = (new Gson()).fromJson(recordString, Record.class);
 
         Assert.assertTrue("failed to parse record string to json", record!=null);
-    }
-
-     @Test
-    public void testIpTranslation() {
-
-        JsonRecordTransformer transformer = new JsonRecordTransformer();
-        int val = transformer.convert_ipstr_to_int("9.70.147.59");
-        Assert.assertEquals("Failed to parse 9.70.147.59",val,999507465);
-
-        val = transformer.convert_ipstr_to_int("127.0.0.1");
-        Assert.assertEquals("Failed to parse 127.0.0.1",val,16777343);
-
-        val = transformer.convert_ipstr_to_int("0.0.0.0");
-        Assert.assertEquals("Failed to parse 0.0.0.0",val,0);
     }
 
     @Test
@@ -157,5 +146,94 @@ public class JsonRecordTransformerTest {
         JsonRecordTransformer transformer = new JsonRecordTransformer();
         List<Datasource.Guard_ds_message> msgs = transformer.transform(msgS3);
     }
+
+    @Test
+    public void testIp() {
+
+        Record record = (new Gson()).fromJson(msgTemplateIPV6, Record.class);
+
+        Assert.assertTrue("failed to parse record string to json", record != null);
+        Assert.assertTrue("failed to set ipv6 type", record.getSessionLocator().isIpv6());
+        Assert.assertTrue("failed to set client ip", "1:1:1:1:1:1:1:1".equals(record.getSessionLocator().getClientIpv6()));
+        Assert.assertTrue("failed to set server ip", "2001:0db8:0000:0000:0000:ff00:0042:8329".equals(record.getSessionLocator().getServerIpv6()));
+
+        record = (new Gson()).fromJson(recordString, Record.class);
+        Assert.assertTrue("failed to set ipv4 type", !record.getSessionLocator().isIpv6());
+    }
+
+    @Test
+    public void testIpTranslation() {
+
+        JsonRecordTransformer transformer = new JsonRecordTransformer();
+        int val = transformer.convert_ipstr_to_int("9.70.147.59");
+        Assert.assertEquals("Failed to parse 9.70.147.59",val,999507465);
+
+        val = transformer.convert_ipstr_to_int("127.0.0.1");
+        Assert.assertEquals("Failed to parse 127.0.0.1",val,16777343);
+
+        val = transformer.convert_ipstr_to_int("0.0.0.0");
+        Assert.assertEquals("Failed to parse 0.0.0.0",val,0);
+
+        val = transformer.convert_ipstr_to_int("::ffff:123.45.67.89");
+        System.out.println("val "+val);
+    }
+
+    public static final String msgTemplateIPV6="{\n" +
+            "\t\"sessionId\": \"\",\n" +
+            "\t\"dbName\": \"admin\",\n" +
+            "\t\"appUserName\": \"\",\n" +
+            "\t\"time\": 1581841318,\n" +
+            "\t\"sessionLocator\": {\n" +
+            "\t\t\"clientIp\": \"\",\n" +
+            "\t\t\"clientPort\": 36802,\n" +
+            "\t\t\"serverIp\": \"\",\n" +
+            "\t\t\"serverPort\": 111,\n" +
+            "\t\t\"isIpv6\": true,\n" +
+            "\t\t\"clientIpv6\": \"1:1:1:1:1:1:1:1\",\n" +
+            "\t\t\"serverIpv6\": \"2001:0db8:0000:0000:0000:ff00:0042:8329\"\n" +
+            "\t},\n" +
+            "\t\"accessor\": {\n" +
+            "\t\t\"dbUser\": \"QQQ\",\n" +
+            "\t\t\"serverType\": \"MongoDB\",\n" +
+            "\t\t\"serverOs\": \"\",\n" +
+            "\t\t\"clientOs\": \"\",\n" +
+            "\t\t\"clientHostName\": \"\",\n" +
+            "\t\t\"serverHostName\": \"AAAAAA\",\n" +
+            "\t\t\"commProtocol\": \"\",\n" +
+            "\t\t\"dbProtocol\": \"MongoDB native audit\",\n" +
+            "\t\t\"dbProtocolVersion\": \"\",\n" +
+            "\t\t\"osUser\": \"\",\n" +
+            "\t\t\"sourceProgram\": \"mongod\",\n" +
+            "\t\t\"client_mac\": \"\",\n" +
+            "\t\t\"serverDescription\": \"\",\n" +
+            "\t\t\"serviceName\": \"admin\",\n" +
+            "\t\t\"language\": \"FREE_TEXT\",\n" +
+            "\t\t\"type\": \"CONSTRUCT\"\n" +
+            "\t},\n" +
+            "\t\"data\": {\n" +
+            "\t\t\"construct\": {\n" +
+            "\t\t\t\"sentences\": [\n" +
+            "\t\t\t\t{\n" +
+            "\t\t\t\t\t\"verb\": \"insert\",\n" +
+            "\t\t\t\t\t\"objects\": [\n" +
+            "\t\t\t\t\t\t{\n" +
+            "\t\t\t\t\t\t\t\"name\": \"system.users.BBBB\",\n" +
+            "\t\t\t\t\t\t\t\"type\": \"collection\",\n" +
+            "\t\t\t\t\t\t\t\"fields\": [],\n" +
+            "\t\t\t\t\t\t\t\"schema\": \"\"\n" +
+            "\t\t\t\t\t\t}\n" +
+            "\t\t\t\t\t],\n" +
+            "\t\t\t\t\t\"descendants\": [],\n" +
+            "\t\t\t\t\t\"fields\": []\n" +
+            "\t\t\t\t}\n" +
+            "\t\t\t],\n" +
+            "\t\t\t\"fullSql\": \"{\\\"atype\\\":\\\"authCheck\\\",\\\"ts\\\":{\\\"$date\\\":\\\"2020-08-13T05:56:26.518-0400\\\"},\\\"local\\\":{\\\"ip\\\":\\\"127.0.0.1\\\",\\\"port\\\":27017},\\\"remote\\\":{\\\"ip\\\":\\\"127.0.0.1\\\",\\\"port\\\":36802},\\\"users\\\":[{\\\"user\\\":\\\"admin\\\",\\\"db\\\":\\\"admin\\\"}],\\\"roles\\\":[{\\\"role\\\":\\\"root\\\",\\\"db\\\":\\\"admin\\\"}],\\\"param\\\":{\\\"command\\\":\\\"insert\\\",\\\"ns\\\":\\\"admin.system.users\\\",\\\"args\\\":{\\\"insert\\\":\\\"system.users\\\",\\\"bypassDocumentValidation\\\":false,\\\"ordered\\\":true,\\\"$db\\\":\\\"admin\\\",\\\"documents\\\":[{\\\"_id\\\":\\\"admin.accountAdmin01\\\",\\\"userId\\\":{\\\"$binary\\\":\\\"afqdFgM0QRWMrjkX7iYbGg==\\\",\\\"$type\\\":\\\"04\\\"},\\\"user\\\":\\\"accountAdmin01\\\",\\\"db\\\":\\\"admin\\\",\\\"credentials\\\":{\\\"SCRAM-SHA-1\\\":{\\\"iterationCount\\\":10000,\\\"salt\\\":\\\"Z29DxpJONJhacqELtKMaTg==\\\",\\\"storedKey\\\":\\\"qB0+KFWmWp+ri6Q+S8nmuPrpnUI=\\\",\\\"serverKey\\\":\\\"hy/3s2oajbPM7WEtNeQqWriUUNg=\\\"},\\\"SCRAM-SHA-256\\\":{\\\"iterationCount\\\":15000,\\\"salt\\\":\\\"6QiTwW12fv+la9VhbzTl3Uv7RdBNrox1SdirtQ==\\\",\\\"storedKey\\\":\\\"IIKOj7fIs5YgipTW/KH1dybI80OcgYwyg6WixwSyAys=\\\",\\\"serverKey\\\":\\\"USBpc2bFYigXyTx5CG1tHXJWvJJ3NlQrbJY7arUKKr4=\\\"}},\\\"customData\\\":{\\\"employeeId\\\":12345},\\\"roles\\\":[{\\\"role\\\":\\\"clusterAdmin\\\",\\\"db\\\":\\\"admin\\\"},{\\\"role\\\":\\\"readAnyDatabase\\\",\\\"db\\\":\\\"admin\\\"},{\\\"role\\\":\\\"readWrite\\\",\\\"db\\\":\\\"admin\\\"}]}]}},\\\"result\\\":0}\",\n" +
+            "\t\t\t\"redactedSensitiveDataSql\": \"{\\\"atype\\\":\\\"authCheck\\\",\\\"ts\\\":{\\\"$date\\\":\\\"2020-08-13T05:56:26.518-0400\\\"},\\\"local\\\":{\\\"ip\\\":\\\"127.0.0.1\\\",\\\"port\\\":27017},\\\"remote\\\":{\\\"ip\\\":\\\"127.0.0.1\\\",\\\"port\\\":36802},\\\"users\\\":[{\\\"user\\\":\\\"admin\\\",\\\"db\\\":\\\"admin\\\"}],\\\"roles\\\":[{\\\"role\\\":\\\"root\\\",\\\"db\\\":\\\"admin\\\"}],\\\"param\\\":{\\\"command\\\":\\\"insert\\\",\\\"ns\\\":\\\"admin.system.users\\\",\\\"args\\\":{\\\"ordered\\\":\\\"?\\\",\\\"documents\\\":[{\\\"credentials\\\":{\\\"SCRAM-SHA-1\\\":{\\\"iterationCount\\\":\\\"?\\\",\\\"salt\\\":\\\"?\\\",\\\"serverKey\\\":\\\"?\\\",\\\"storedKey\\\":\\\"?\\\"},\\\"SCRAM-SHA-256\\\":{\\\"iterationCount\\\":\\\"?\\\",\\\"salt\\\":\\\"?\\\",\\\"serverKey\\\":\\\"?\\\",\\\"storedKey\\\":\\\"?\\\"}},\\\"roles\\\":[{\\\"role\\\":\\\"?\\\",\\\"db\\\":\\\"?\\\"},{\\\"role\\\":\\\"?\\\",\\\"db\\\":\\\"?\\\"},{\\\"role\\\":\\\"?\\\",\\\"db\\\":\\\"?\\\"}],\\\"customData\\\":{\\\"employeeId\\\":\\\"?\\\"},\\\"_id\\\":\\\"?\\\",\\\"userId\\\":{\\\"$binary\\\":\\\"?\\\",\\\"$type\\\":\\\"?\\\"},\\\"user\\\":\\\"?\\\",\\\"db\\\":\\\"?\\\"}],\\\"bypassDocumentValidation\\\":\\\"?\\\",\\\"insert\\\":\\\"system.users\\\",\\\"$db\\\":\\\"admin\\\"}},\\\"result\\\":0}\"\n" +
+            "\t\t},\n" +
+            "\t\t\"originalSqlCommand\": \"\",\n" +
+            "\t\t\"useConstruct\": true\n" +
+            "\t},\n" +
+            "\t\"exception\": null\n" +
+            "}";
 
 }

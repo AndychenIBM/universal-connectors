@@ -14,7 +14,7 @@ import java.util.*;
 
 public class JavaOutputExampleTest {
 
-//    @Test
+    //@Test
     public void testJavaOutputExample() throws InterruptedException {
         //GRD-43047
           String prefix = "Prefix";
@@ -33,13 +33,13 @@ public class JavaOutputExampleTest {
         int count = 2;
         while (keepGoing /*&& count++<30*/) {
             Date time = new Date();
-            int ipSuffix = random.ints(0, 255).findFirst().getAsInt();
+            int ipSuffix = random.ints(0, 1).findFirst().getAsInt();
             int serverPort = random.ints(0,3).findFirst().getAsInt();
             System.out.println("serverPort "+serverPort);
-            System.out.println("    clientIp 9.42.29."+ipSuffix);
+            System.out.println("ipSuffix "+ipSuffix);
 
             // test based on mongo-guardium filter v0.0.2, which currently sends Event like this:
-            String record = String.format(msgTemplate, time.getTime(), ipSuffix, serverPort);
+            String record = String.format(msgTemplateIPV6, time.getTime(), ipSuffix, serverPort);
             e.setField("Record", record);
             events.add(e);
 
@@ -98,6 +98,64 @@ public class JavaOutputExampleTest {
 
         output.output(events);
     }
+
+    public static final String msgTemplateIPV6="{\n" +
+            "\t\"sessionId\": \"\",\n" +
+            "\t\"dbName\": \"admin\",\n" +
+            "\t\"appUserName\": \"\",\n" +
+            "\t\"time\": %d,\n" +
+            "\t\"sessionLocator\": {\n" +
+            "\t\t\"clientIp\": \"\",\n" +
+            "\t\t\"clientPort\": 36802,\n" +
+            "\t\t\"serverIp\": \"\",\n" +
+            "\t\t\"serverPort\": %d,\n" +
+            "\t\t\"isIpv6\": true,\n" +
+            "\t\t\"clientIpv6\": \"1:1:1:1:1:1:1:%d\",\n" +
+            "\t\t\"serverIpv6\": \"2001:0db8:0000:0000:0000:ff00:0042:8329\"\n" +
+            "\t},\n" +
+            "\t\"accessor\": {\n" +
+            "\t\t\"dbUser\": \"QQQ\",\n" +
+            "\t\t\"serverType\": \"MongoDB\",\n" +
+            "\t\t\"serverOs\": \"\",\n" +
+            "\t\t\"clientOs\": \"\",\n" +
+            "\t\t\"clientHostName\": \"\",\n" +
+            "\t\t\"serverHostName\": \"AAAAAA\",\n" +
+            "\t\t\"commProtocol\": \"\",\n" +
+            "\t\t\"dbProtocol\": \"MongoDB native audit\",\n" +
+            "\t\t\"dbProtocolVersion\": \"\",\n" +
+            "\t\t\"osUser\": \"\",\n" +
+            "\t\t\"sourceProgram\": \"mongod\",\n" +
+            "\t\t\"client_mac\": \"\",\n" +
+            "\t\t\"serverDescription\": \"\",\n" +
+            "\t\t\"serviceName\": \"admin\",\n" +
+            "\t\t\"language\": \"FREE_TEXT\",\n" +
+            "\t\t\"type\": \"CONSTRUCT\"\n" +
+            "\t},\n" +
+            "\t\"data\": {\n" +
+            "\t\t\"construct\": {\n" +
+            "\t\t\t\"sentences\": [\n" +
+            "\t\t\t\t{\n" +
+            "\t\t\t\t\t\"verb\": \"insert\",\n" +
+            "\t\t\t\t\t\"objects\": [\n" +
+            "\t\t\t\t\t\t{\n" +
+            "\t\t\t\t\t\t\t\"name\": \"system.users.BBBB\",\n" +
+            "\t\t\t\t\t\t\t\"type\": \"collection\",\n" +
+            "\t\t\t\t\t\t\t\"fields\": [],\n" +
+            "\t\t\t\t\t\t\t\"schema\": \"\"\n" +
+            "\t\t\t\t\t\t}\n" +
+            "\t\t\t\t\t],\n" +
+            "\t\t\t\t\t\"descendants\": [],\n" +
+            "\t\t\t\t\t\"fields\": []\n" +
+            "\t\t\t\t}\n" +
+            "\t\t\t],\n" +
+            "\t\t\t\"fullSql\": \"{\\\"atype\\\":\\\"authCheck\\\",\\\"ts\\\":{\\\"$date\\\":\\\"2020-08-13T05:56:26.518-0400\\\"},\\\"local\\\":{\\\"ip\\\":\\\"127.0.0.1\\\",\\\"port\\\":27017},\\\"remote\\\":{\\\"ip\\\":\\\"127.0.0.1\\\",\\\"port\\\":36802},\\\"users\\\":[{\\\"user\\\":\\\"admin\\\",\\\"db\\\":\\\"admin\\\"}],\\\"roles\\\":[{\\\"role\\\":\\\"root\\\",\\\"db\\\":\\\"admin\\\"}],\\\"param\\\":{\\\"command\\\":\\\"insert\\\",\\\"ns\\\":\\\"admin.system.users\\\",\\\"args\\\":{\\\"insert\\\":\\\"system.users\\\",\\\"bypassDocumentValidation\\\":false,\\\"ordered\\\":true,\\\"$db\\\":\\\"admin\\\",\\\"documents\\\":[{\\\"_id\\\":\\\"admin.accountAdmin01\\\",\\\"userId\\\":{\\\"$binary\\\":\\\"afqdFgM0QRWMrjkX7iYbGg==\\\",\\\"$type\\\":\\\"04\\\"},\\\"user\\\":\\\"accountAdmin01\\\",\\\"db\\\":\\\"admin\\\",\\\"credentials\\\":{\\\"SCRAM-SHA-1\\\":{\\\"iterationCount\\\":10000,\\\"salt\\\":\\\"Z29DxpJONJhacqELtKMaTg==\\\",\\\"storedKey\\\":\\\"qB0+KFWmWp+ri6Q+S8nmuPrpnUI=\\\",\\\"serverKey\\\":\\\"hy/3s2oajbPM7WEtNeQqWriUUNg=\\\"},\\\"SCRAM-SHA-256\\\":{\\\"iterationCount\\\":15000,\\\"salt\\\":\\\"6QiTwW12fv+la9VhbzTl3Uv7RdBNrox1SdirtQ==\\\",\\\"storedKey\\\":\\\"IIKOj7fIs5YgipTW/KH1dybI80OcgYwyg6WixwSyAys=\\\",\\\"serverKey\\\":\\\"USBpc2bFYigXyTx5CG1tHXJWvJJ3NlQrbJY7arUKKr4=\\\"}},\\\"customData\\\":{\\\"employeeId\\\":12345},\\\"roles\\\":[{\\\"role\\\":\\\"clusterAdmin\\\",\\\"db\\\":\\\"admin\\\"},{\\\"role\\\":\\\"readAnyDatabase\\\",\\\"db\\\":\\\"admin\\\"},{\\\"role\\\":\\\"readWrite\\\",\\\"db\\\":\\\"admin\\\"}]}]}},\\\"result\\\":0}\",\n" +
+            "\t\t\t\"redactedSensitiveDataSql\": \"{\\\"atype\\\":\\\"authCheck\\\",\\\"ts\\\":{\\\"$date\\\":\\\"2020-08-13T05:56:26.518-0400\\\"},\\\"local\\\":{\\\"ip\\\":\\\"127.0.0.1\\\",\\\"port\\\":27017},\\\"remote\\\":{\\\"ip\\\":\\\"127.0.0.1\\\",\\\"port\\\":36802},\\\"users\\\":[{\\\"user\\\":\\\"admin\\\",\\\"db\\\":\\\"admin\\\"}],\\\"roles\\\":[{\\\"role\\\":\\\"root\\\",\\\"db\\\":\\\"admin\\\"}],\\\"param\\\":{\\\"command\\\":\\\"insert\\\",\\\"ns\\\":\\\"admin.system.users\\\",\\\"args\\\":{\\\"ordered\\\":\\\"?\\\",\\\"documents\\\":[{\\\"credentials\\\":{\\\"SCRAM-SHA-1\\\":{\\\"iterationCount\\\":\\\"?\\\",\\\"salt\\\":\\\"?\\\",\\\"serverKey\\\":\\\"?\\\",\\\"storedKey\\\":\\\"?\\\"},\\\"SCRAM-SHA-256\\\":{\\\"iterationCount\\\":\\\"?\\\",\\\"salt\\\":\\\"?\\\",\\\"serverKey\\\":\\\"?\\\",\\\"storedKey\\\":\\\"?\\\"}},\\\"roles\\\":[{\\\"role\\\":\\\"?\\\",\\\"db\\\":\\\"?\\\"},{\\\"role\\\":\\\"?\\\",\\\"db\\\":\\\"?\\\"},{\\\"role\\\":\\\"?\\\",\\\"db\\\":\\\"?\\\"}],\\\"customData\\\":{\\\"employeeId\\\":\\\"?\\\"},\\\"_id\\\":\\\"?\\\",\\\"userId\\\":{\\\"$binary\\\":\\\"?\\\",\\\"$type\\\":\\\"?\\\"},\\\"user\\\":\\\"?\\\",\\\"db\\\":\\\"?\\\"}],\\\"bypassDocumentValidation\\\":\\\"?\\\",\\\"insert\\\":\\\"system.users\\\",\\\"$db\\\":\\\"admin\\\"}},\\\"result\\\":0}\"\n" +
+            "\t\t},\n" +
+            "\t\t\"originalSqlCommand\": \"\",\n" +
+            "\t\t\"useConstruct\": true\n" +
+            "\t},\n" +
+            "\t\"exception\": null\n" +
+            "}";
 
     public static final String msgTemplate="{\n" +
             "\t\"sessionId\": \"\",\n" +
