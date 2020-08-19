@@ -2,6 +2,8 @@ package com.ibm.guardium.s3;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import com.google.gson.*;
@@ -16,7 +18,7 @@ public class Parser {
     private static Logger log = LogManager.getLogger(Parser.class);
 
     private static final String DATE_FORMAT_ISO = "yyyy-MM-dd'T'HH:mm:ss";// "yyyy-MM-dd'T'HH:mm:ssZ";
-    private static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat(DATE_FORMAT_ISO);
+    private static DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ISO_DATE_TIME;
     public static final String UNKNOWN_STRING = "";
     public static final String UNKNOWN_IP = "0.0.0.0";
     public static final String BUCKETNAME_PROPERTY = "bucketName";
@@ -341,26 +343,20 @@ public class Parser {
         return value;
     }
 
-    public static long getTimestamp(String dateString) throws ParseException {
+    public static long getTimestamp(String dateString){
         if (dateString==null){
             log.warn("DateString is null");
             return 0;
         }
-        Date date = DATE_FORMATTER.parse(dateString);
-        return date.getTime();
+        ZonedDateTime date = ZonedDateTime.parse(dateString, DATE_TIME_FORMATTER);
+        long millis = date.toInstant().toEpochMilli();
+
+        return millis;
     }
 
     public static void main(String[] args){
         //Parser parser = new Parser();
         try {
-            String mongo = "2020-08-09T06:30:08.871-0400";
-            String DATE_FORMAT_ISO_M = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
-            SimpleDateFormat DATE_FORMATTER_M = new SimpleDateFormat(DATE_FORMAT_ISO_M);
-            Date datem = DATE_FORMATTER_M.parse(mongo);
-
-            String dateString = "2020-08-03T22:12:19Z";
-            Date date = DATE_FORMATTER.parse(dateString);
-
 //            String anotherEvent = "{\"eventID\":\"e3de78ee-4fab-40ef-b421-bfeff7f3c61c\",\"awsRegion\":\"us-east-1\",\"eventCategory\":\"Data\",\"eventVersion\":\"1.07\",\"responseElements\":null,\"sourceIPAddress\":\"77.125.48.244\",\"requestParameters\":{\"bucketName\":\"bucketnewbucketkkkkk\",\"X-Amz-Date\":\"20200622T202153Z\",\"response-content-disposition\":\"inline\",\"X-Amz-Algorithm\":\"AWS4-HMAC-SHA256\",\"X-Amz-SignedHeaders\":\"host\",\"Host\":\"bucketnewbucketkkkkk.s3.us-east-1.amazonaws.com\",\"X-Amz-Expires\":\"300\",\"key\":\"mkkkk/sampleJson.json\"},\"eventSource\":\"s3.amazonaws.com\",\"resources\":[{\"type\":\"AWS::S3::Object\",\"ARN\":\"arn:aws:s3:::bucketnewbucketkkkkk/mkkkk/sampleJson.json\"},{\"type\":\"AWS::S3::Bucket\",\"ARN\":\"arn:aws:s3:::bucketnewbucketkkkkk\",\"accountId\":\"987076625343\"}],\"readOnly\":true,\"userAgent\":\"[Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36]\",\"userIdentity\":{\"sessionContext\":{\"attributes\":{\"mfaAuthenticated\":\"false\",\"creationDate\":\"2020-06-22T08:52:40Z\"}},\"accessKeyId\":\"ASIA6LUS2AO73E6D2NJP\",\"accountId\":\"987076625343\",\"principalId\":\"AIDAJWW2XAIOY2WN3KAAM\",\"arn\":\"arn:aws:iam::987076625343:user/ProxyTest\",\"type\":\"IAMUser\",\"userName\":\"ProxyTest\"},\"eventType\":\"AwsApiCall\",\"additionalEventData\":{\"SignatureVersion\":\"SigV4\",\"AuthenticationMethod\":\"QueryString\",\"x-amz-id-2\":\"CcbPzGZRlYbGdJPjFp8IcxuVi7ZhB01wkVVwhjkRDFbUDdFB+GKsV5oRannp3oOt2qCMUEXy37I\\u003d\",\"CipherSuite\":\"ECDHE-RSA-AES128-GCM-SHA256\",\"bytesTransferredOut\":19.0,\"bytesTransferredIn\":0.0},\"requestID\":\"4D5B1CD23AEDD7C7\",\"eventTime\":\"2020-06-22T20:21:53Z\",\"eventName\":\"GetObject\",\"recipientAccountId\":\"987076625343\",\"managementEvent\":false}";
 //            JsonObject inputJSON = (JsonObject) JsonParser.parseString(anotherEvent);
 

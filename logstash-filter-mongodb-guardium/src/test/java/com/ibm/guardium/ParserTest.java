@@ -1,6 +1,8 @@
 package com.ibm.guardium;
 
 import java.text.ParseException;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -15,6 +17,13 @@ public class ParserTest {
     Parser parser = new Parser();
     final String mongoString = "{ \"atype\": \"authCheck\", \"ts\": { \"$date\": \"2020-01-26T09:58:44.547-0500\" }, \"local\": { \"ip\": \"127.0.0.1\", \"port\": 27017 }, \"remote\": { \"ip\": \"127.0.0.1\", \"port\": 56984 }, \"users\": [], \"roles\": [], \"param\": { \"command\": \"aggregate\", \"ns\": \"test.travelers\", \"args\": { \"aggregate\": \"travelers\", \"pipeline\": [ { \"$graphLookup\": { \"from\": \"airports\", \"startWith\": \"$nearestAirport\", \"connectFromField\": \"connects\", \"connectToField\": \"airport\", \"maxDepth\": 2, \"depthField\": \"numConnections\", \"as\": \"destinations\" } } ], \"cursor\": {}, \"lsid\": { \"id\": { \"$binary\": \"2WoIDPhSTcKHrdJW4azoow==\", \"$type\": \"04\" } }, \"$db\": \"test\" } }, \"result\": 0 }";
     final JsonObject mongoJson = JsonParser.parseString(mongoString).getAsJsonObject();
+
+    @Test
+    public void testDateParing() throws ParseException {
+        String dateStr = "2020-01-14T10:46:02.431-0500";
+        long timeInMs = Parser.getTime(dateStr);
+        Assert.assertTrue("Failed to parse date, time is "+timeInMs, 1579016762431L==timeInMs);
+   }
 
     @Test
     public void testParseAsConstruct_Find() {
