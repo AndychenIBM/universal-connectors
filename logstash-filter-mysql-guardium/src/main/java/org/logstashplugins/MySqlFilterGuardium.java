@@ -44,8 +44,9 @@ public class MySqlFilterGuardium implements Filter {
     private static final String CLASS_TYPE_TABLE_ACCESS = "table_access";
     private static final String DATA_TYPE_TABLE_ACCESS = "table_access_data";
     private static final String DATA_TYPE_GENERAL = "general_data";
+    private static final String DATA_TYPE_CONNECTION = "connection_data";
     
-    
+    private static final String MYSQL_AUDIT_START_SIGNAL = "mysql_audit_log: "; 
     public static final String DATA_PROTOCOL_STRING = "MySQL native audit";
     public static final String UNKNOWN_STRING = "";
     public static final String SERVER_TYPE_STRING = "MySql";
@@ -84,7 +85,13 @@ public class MySqlFilterGuardium implements Filter {
     @Override
     public Collection<Event> filter(Collection<Event> events, FilterMatchListener matchListener) {
         for (Event e : events) {
-            if (e.getField("mysql_message") instanceof String) {
+            String messageString = e.getField("message").toString();
+
+            int mysqlIndex = messageString.indexOf(MYSQL_AUDIT_START_SIGNAL);
+            // log.warn(messageString);
+            
+            if ((mysqlIndex != -1) && (e.getField("mysql_message") instanceof String)) {
+                
                 String mysqlMsgString = e.getField("mysql_message").toString();
                 int msgStrLen = mysqlMsgString.length();
                                    
@@ -97,18 +104,26 @@ public class MySqlFilterGuardium implements Filter {
                 //log.warn(mysqlMsgString);
                 try {
                     JsonObject inputJSON = (JsonObject) JsonParser.parseString(mysqlMsgString);
+                    final String class_type = inputJSON.get("class").getAsString();
                     final String timestamp = inputJSON.get("timestamp").getAsString();
                     final int connection_id = inputJSON.get("connection_id").getAsInt();
-                    final String class_type = inputJSON.get("class").getAsString();
 
-                    if (class_type.equals(CLASS_TYPE_CONNECTION) && inputJSON.has("connection_data")) {
-                        parseConnectionData(inputJSON);
-                    }
-                    else if (class_type.equals(CLASS_TYPE_GENERAL) || class_type.equals(CLASS_TYPE_TABLE_ACCESS)) {
+                    if ( class_type.equals(CLASS_TYPE_CONNECTION) 
+                        || class_type.equals(CLASS_TYPE_GENERAL)
+                        || class_type.equals(CLASS_TYPE_TABLE_ACCESS)) {
+                            
                         Record record = new Record();
                         boolean validRecord = false;
+
+                        record.setDbName(UNKNOWN_STRING);
                         
-                        if (inputJSON.has(DATA_TYPE_TABLE_ACCESS)){
+                        if (inputJSON.has(DATA_TYPE_CONNECTION)) {
+                            String eventField = inputJSON.get("event").getAsString();
+                            if (eventField.equals("connect")) {
+                                validRecord = false;
+                            }
+                        } 
+                        else if (inputJSON.has(DATA_TYPE_TABLE_ACCESS)){
                             final JsonObject table_access_data = inputJSON.get(DATA_TYPE_TABLE_ACCESS).getAsJsonObject();
                             final String query = table_access_data.get("query").getAsString();
                             final String db_name = table_access_data.get("db").getAsString();
@@ -128,23 +143,22 @@ public class MySqlFilterGuardium implements Filter {
                         else if (inputJSON.has(DATA_TYPE_GENERAL)) {
                             final JsonObject gen_data = inputJSON.get(DATA_TYPE_GENERAL).getAsJsonObject();
                             final String command = gen_data.get("command").getAsString(); 
-                            final String query = gen_data.get("query").getAsString();
-                            final int query_status = gen_data.get("status").getAsInt();
+                            final int status = gen_data.get("status").getAsInt();
                         
                             if (command.equals(QUERY_STRING)) {
                             
-                                if (query_status != 0) {
+                                final String query = gen_data.get("query").getAsString();
+                                if (status != 0) {
                                     // https://dev.mysql.com/doc/refman/8.0/en/error-message-components.html                                
                                     ExceptionRecord exceptionRecord = new ExceptionRecord();
                                     record.setException(exceptionRecord);
 
                                     exceptionRecord.setExceptionTypeId(EXCEPTION_TYPE_SQL_ERROR_STRING);
-                                    exceptionRecord.setDescription("Error (" + query_status + ")"); 
+                                    exceptionRecord.setDescription("Error (" + status + ")"); 
                                     exceptionRecord.setSqlString(query);
                                     validRecord = true;
                                 }
                             }
-                            record.setDbName(UNKNOWN_STRING);
 
                         } // end general_data
                         if (validRecord) {
@@ -155,7 +169,7 @@ public class MySqlFilterGuardium implements Filter {
                             record.setTime(unixTime);
                                 
                             record.setSessionLocator(parseSessionLocator(e, inputJSON));
-                            record.setAccessor(parseAccessor(inputJSON));
+                            record.setAccessor(parseAccessor(e, inputJSON));
 
                             this.correctIPs(e, record);
                                 
@@ -225,8 +239,18 @@ public class MySqlFilterGuardium implements Filter {
         return sessionLocator;
     }
 
-    public static Accessor parseAccessor(JsonObject data) {
+    public static Accessor parseAccessor(Event e, JsonObject data) {
         Accessor accessor = new Accessor();
+        String serverHostname = UNKNOWN_STRING;
+        String sourceProgram = UNKNOWN_STRING;
+        String osStr = UNKNOWN_STRING;
+        String osUser = UNKNOWN_STRING;
+        
+        if (e.getField("server_hostname") instanceof String)
+            serverHostname = e.getField("server_hostname").toString();
+
+        if (e.getField("source_program") instanceof String)
+            sourceProgram = e.getField("source_program").toString();
 
         accessor.setDbProtocol(DATA_PROTOCOL_STRING);
         accessor.setServerType(SERVER_TYPE_STRING);
@@ -237,8 +261,20 @@ public class MySqlFilterGuardium implements Filter {
 
             accessor.setDbUser(user);
         }
-        accessor.setServerHostName(UNKNOWN_STRING); // populated from Event, later
-        accessor.setSourceProgram(UNKNOWN_STRING); // populated from Event, later
+        
+       if (data.has(DATA_TYPE_CONNECTION)) {
+            JsonObject connection_data = data.getAsJsonObject(DATA_TYPE_CONNECTION);
+            if (connection_data.has("connection_attributes")) {
+                JsonObject connection_attribs = connection_data.getAsJsonObject("connection_attributes");
+                if (connection_attribs.has("_os"))
+                    osStr = connection_attribs.get("_os").getAsString();
+                if (connection_attribs.has("os_user"))
+                    osUser = connection_attribs.get("os_user").getAsString();
+            }
+        }
+ 
+        accessor.setServerHostName(serverHostname); 
+        accessor.setSourceProgram(sourceProgram);
 
         accessor.setLanguage("MYSQL");
         accessor.setType("TEXT");
@@ -248,9 +284,9 @@ public class MySqlFilterGuardium implements Filter {
         accessor.setClientOs(UNKNOWN_STRING);
         accessor.setCommProtocol(UNKNOWN_STRING);
         accessor.setDbProtocolVersion(UNKNOWN_STRING);
-        accessor.setOsUser(UNKNOWN_STRING);
+        accessor.setOsUser(osUser);
         accessor.setServerDescription(UNKNOWN_STRING);
-        accessor.setServerOs(UNKNOWN_STRING);
+        accessor.setServerOs(osStr);
         accessor.setServiceName(UNKNOWN_STRING);
 
         return accessor;
@@ -277,7 +313,6 @@ public class MySqlFilterGuardium implements Filter {
     }
     
    private void correctIPs(Event e, Record record) {
-        // Override "(NONE)" IP, if not filterd, as it's internal command by MongoDB.
         // Note: IP needs to be in ipv4/ipv6 format
         SessionLocator sessionLocator = record.getSessionLocator();
         String sessionServerIp = sessionLocator.getServerIp();
@@ -308,13 +343,6 @@ public class MySqlFilterGuardium implements Filter {
         }
     }
     
-    public static void parseConnectionData(JsonObject data) {
-        String event = data.get("event").getAsString();
-        if (event.equals("connect")) {
-        } // end event connect
-        else if (event.equals("disconnect")) {
-        } // end event disconnect       
-    }
     
     @Override
     public Collection<PluginConfigSpec<?>> configSchema() {
