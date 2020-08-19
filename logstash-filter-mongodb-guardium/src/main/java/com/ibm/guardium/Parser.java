@@ -1,7 +1,8 @@
 package com.ibm.guardium;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
@@ -36,7 +37,7 @@ public class Parser {
             Arrays.asList("from", "localField", "foreignField", "as", "connectFromField", "connectToField"));
 
     private static String DATE_FORMAT_ISO = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
-    private static SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat(DATE_FORMAT_ISO);
+    private static DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT_ISO);
 
     /**
      * Parses a MongoDB native audit sent over syslog. Format looks as the
@@ -375,9 +376,10 @@ public class Parser {
         return dateString;
     }
 
-    public static long getTime(String dateString) throws ParseException {
-        Date date = DATE_FORMATTER.parse(dateString);
-        return date.getTime();
+    public static long getTime(String dateString){
+        ZonedDateTime date = ZonedDateTime.parse(dateString, DATE_TIME_FORMATTER);
+        long millis = date.toInstant().toEpochMilli();
+        return millis;
     }
 
     /**

@@ -114,6 +114,7 @@ public class JavaFilterExample implements Filter {
                         // don't let event pass filter
                         // TODO log event removed? 
                         //events.remove(e);
+                        log.error("Error handling mongo message "+input);
                         log.error("Error parsing mongo event "+logEvent(e), exception);
                         e.tag(LOGSTASH_TAG_JSON_PARSE_ERROR);
                     }
