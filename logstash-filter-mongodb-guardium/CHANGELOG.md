@@ -3,6 +3,9 @@
 Notable changes will be documented in this file.
 
 ## [Unreleased]
+## [0.4.6]
+- Remove source program ("mongod" is not \[client\] source program) 
+
 ## [0.4.5]
 - Support commands with 2 words, like "mapReduce", "resetErrors", if logged case-insensitive.
 - Send [compound object] when object is not a JSON primitive
