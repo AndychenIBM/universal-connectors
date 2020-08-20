@@ -9,6 +9,7 @@ import co.elastic.logstash.api.LogstashPlugin;
 import co.elastic.logstash.api.PluginConfigSpec;
 import com.google.gson.*;
 import com.ibm.guardium.s3.Parser;
+import com.ibm.guardium.universalconnector.common.GuardConstants;
 import com.ibm.guardium.universalconnector.common.structures.Record;
 
 import org.apache.logging.log4j.Logger;
@@ -88,7 +89,7 @@ public class LogstashFilterS3Guardium implements Filter {
                     continue;
                 }
 
-                e.setField("Record", gson.toJson(record));
+                e.setField(GuardConstants.GUARDIUM_RECORD_FIELD_NAME, gson.toJson(record));
 
                 matchListener.filterMatched(e); // Flag OK for filter input/parsing/out
                         

@@ -4,6 +4,7 @@ package org.logstashplugins;
 import co.elastic.logstash.api.Context;
 import co.elastic.logstash.api.Event;
 import co.elastic.logstash.api.FilterMatchListener;
+import com.ibm.guardium.universalconnector.common.GuardConstants;
 import com.ibm.guardium.universalconnector.common.structures.Record;
 import org.junit.Assert;
 import org.junit.Test;
@@ -55,7 +56,7 @@ public class JavaFilterExampleTest {
         Collection<Event> results = filter.filter(Collections.singletonList(e), matchListener);
 
         Assert.assertEquals(1, results.size());
-        Assert.assertNotNull(e.getField("Record"));
+        Assert.assertNotNull(e.getField(GuardConstants.GUARDIUM_RECORD_FIELD_NAME));
         Assert.assertEquals(1, matchListener.getMatchCount());
     }
 
@@ -66,15 +67,14 @@ public class JavaFilterExampleTest {
 
         Event e = new org.logstash.Event();
         TestMatchListener matchListener = new TestMatchListener();
-        
+
         e.setField("message", mongodString);
         Collection<Event> results = filter.filter(Collections.singletonList(e), matchListener);
 
         Assert.assertEquals(1, results.size());
-        Assert.assertNotNull(e.getField("Record"));
+        Assert.assertNotNull(e.getField(GuardConstants.GUARDIUM_RECORD_FIELD_NAME));
         Assert.assertEquals(1, matchListener.getMatchCount());
     }
-    
 
     @Test 
     public void testParseOtherSyslog() {
@@ -212,7 +212,7 @@ public class JavaFilterExampleTest {
         Collection<Event> results = filter.filter(Collections.singletonList(e), matchListener);
 
         Assert.assertEquals(1, results.size());
-        String recordString = e.getField("Record").toString();
+        String recordString = e.getField(GuardConstants.GUARDIUM_RECORD_FIELD_NAME).toString();
         Record record = (new Gson()).fromJson(recordString, Record.class);
         Assert.assertNotNull(record);
 
@@ -243,7 +243,7 @@ public class JavaFilterExampleTest {
         Collection<Event> results = filter.filter(Collections.singletonList(e), matchListener);
 
         Assert.assertEquals(1, results.size());
-        String recordString = e.getField("Record").toString();
+        String recordString = e.getField(GuardConstants.GUARDIUM_RECORD_FIELD_NAME).toString();
         Record record = (new Gson()).fromJson(recordString, Record.class);
         Assert.assertNotNull(record);
 
@@ -270,7 +270,7 @@ public class JavaFilterExampleTest {
         Collection<Event> results = filter.filter(Collections.singletonList(e), matchListener);
 
         Assert.assertEquals(1, results.size());
-        String recordString = e.getField("Record").toString();
+        String recordString = e.getField(GuardConstants.GUARDIUM_RECORD_FIELD_NAME).toString();
         Record record = (new Gson()).fromJson(recordString, Record.class);
         Assert.assertNotNull(record);
 

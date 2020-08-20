@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import com.ibm.guardium.universalconnector.UniversalConnector;
 import com.ibm.guardium.universalconnector.common.Environment;
 
+import com.ibm.guardium.universalconnector.common.GuardConstants;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
@@ -65,13 +66,14 @@ public class JavaOutputToGuardium implements Output {
         while (z.hasNext() && !stopped) {
             event = z.next();
             try {
-                if (log.isDebugEnabled()) {
-                    log.debug("==========Event " + logEvent(event));
-                }
 
-                if (event.getField("Record")!=null) {
+                if (event.getField(GuardConstants.GUARDIUM_RECORD_FIELD_NAME)!=null) {
 
-                    String recordString = event.getField("Record").toString();
+                    if (log.isDebugEnabled()) {
+                        log.debug("==========Event " + logEvent(event));
+                    }
+
+                    String recordString = event.getField("GuardRecord").toString();
 
                     if (log.isDebugEnabled()) {
                         log.debug("==========Record " + recordString);

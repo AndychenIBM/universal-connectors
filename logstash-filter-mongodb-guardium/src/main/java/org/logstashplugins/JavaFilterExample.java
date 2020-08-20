@@ -9,6 +9,7 @@ import co.elastic.logstash.api.LogstashPlugin;
 import co.elastic.logstash.api.PluginConfigSpec;
 import com.google.gson.*;
 import com.ibm.guardium.Parser;
+import com.ibm.guardium.universalconnector.common.GuardConstants;
 import com.ibm.guardium.universalconnector.common.Util;
 import com.ibm.guardium.universalconnector.common.structures.*;
 
@@ -105,7 +106,7 @@ public class JavaFilterExample implements Filter {
                         final GsonBuilder builder = new GsonBuilder();
                         builder.serializeNulls();
                         final Gson gson = builder.create();
-                        e.setField("Record", gson.toJson(record));
+                        e.setField(GuardConstants.GUARDIUM_RECORD_FIELD_NAME, gson.toJson(record));
 
                         matchListener.filterMatched(e); // Flag OK for filter input/parsing/out
                         

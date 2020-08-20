@@ -14,7 +14,7 @@ import java.util.*;
 
 public class JavaOutputExampleTest {
 
-    @Test
+    //@Test
     public void testJavaOutputExample() throws InterruptedException {
         //GRD-43047
           String prefix = "Prefix";

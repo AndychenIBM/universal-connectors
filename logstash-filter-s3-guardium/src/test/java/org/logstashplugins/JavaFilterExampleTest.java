@@ -6,6 +6,7 @@ import co.elastic.logstash.api.Context;
 import co.elastic.logstash.api.Event;
 import co.elastic.logstash.api.FilterMatchListener;
 import com.ibm.guardium.s3.Parser;
+import com.ibm.guardium.universalconnector.common.GuardConstants;
 import com.ibm.guardium.universalconnector.common.structures.Time;
 import org.junit.Assert;
 import org.junit.Test;
@@ -33,6 +34,7 @@ public class JavaFilterExampleTest {
 
     @Test
     public void testJavaExampleFilter() {
+
         String sourceField = "foo";
         Configuration config = new ConfigurationImpl(Collections.singletonMap("source", sourceField));
         Context context = new ContextImpl(null, null);
@@ -63,7 +65,7 @@ public class JavaFilterExampleTest {
         Collection<Event> results = filter.filter(Collections.singletonList(e), matchListener);
         Assert.assertEquals(1, results.size());
 
-        String recordStr = e.getField("Record").toString();
+        String recordStr = e.getField(GuardConstants.GUARDIUM_RECORD_FIELD_NAME).toString();
         Assert.assertTrue(recordStr!=null && recordStr.length()>0);
 
 //      ip resolution s3-1.amazonaws.com may give different ips, no need to test only relevant properties and think about worthiness of ip resolution here ...
