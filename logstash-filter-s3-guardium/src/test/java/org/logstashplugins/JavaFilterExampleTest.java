@@ -5,14 +5,16 @@ import co.elastic.logstash.api.Configuration;
 import co.elastic.logstash.api.Context;
 import co.elastic.logstash.api.Event;
 import co.elastic.logstash.api.FilterMatchListener;
-import com.google.gson.Gson;
-import com.ibm.guardium.universalconnector.common.structures.Record;
+import com.ibm.guardium.s3.Parser;
+import com.ibm.guardium.universalconnector.common.structures.Time;
 import org.junit.Assert;
 import org.junit.Test;
 import org.logstash.plugins.ConfigurationImpl;
 import org.logstash.plugins.ContextImpl;
 //import org.logstash.plugins.ConfigurationImpl;
 
+import java.text.ParseException;
+import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -22,6 +24,13 @@ public class JavaFilterExampleTest {
 //    final static String mongodString = "<14>Feb 18 08:53:31 qa-db51 mongod: { \"atype\" : \"authCheck\", \"ts\" : { \"$date\" : \"2020-01-16T05:41:30.783-0500\" }, \"local\" : { \"ip\" : \"(NONE)\", \"port\" : 0 }, \"remote\" : { \"ip\" : \"(NONE)\", \"port\" : 0 }, \"users\" : [], \"roles\" : [], \"param\" : { \"command\" : \"find\", \"ns\" : \"config.transactions\", \"args\" : { \"find\" : \"transactions\", \"filter\" : { \"lastWriteDate\" : { \"$lt\" : { \"$date\" : \"2020-01-16T05:11:30.782-0500\" } } }, \"projection\" : { \"_id\" : 1 }, \"sort\" : { \"_id\" : 1 }, \"$db\" : \"config\" } }, \"result\" : 0 }";
 //    final static Context context = new ContextImpl(null, null);
 //    final static JavaS3ToGuardiumFilter filter = new JavaS3ToGuardiumFilter("test-id", null, context);
+    @Test
+    public void testDateParing() throws ParseException {
+        String dateStr = "2020-07-14T04:03:57Z";
+        Time time = Parser.getTime(dateStr);
+        Assert.assertTrue("Failed to parse date, time is "+time, 1594699437000L==time.getTimstamp());
+    }
+
     @Test
     public void testJavaExampleFilter() {
         String sourceField = "foo";

@@ -21,8 +21,8 @@ public class ParserTest {
     @Test
     public void testDateParing() throws ParseException {
         String dateStr = "2020-01-14T10:46:02.431-0500";
-        long timeInMs = Parser.getTime(dateStr);
-        Assert.assertTrue("Failed to parse date, time is "+timeInMs, 1579016762431L==timeInMs);
+        Time time = Parser.getTime(dateStr);
+        Assert.assertTrue("Failed to parse date, time is "+time.getTimstamp(), 1579016762431L==time.getTimstamp());
    }
 
     @Test
@@ -365,12 +365,12 @@ public class ParserTest {
     @Test
     public void testGetTime() throws ParseException {
         String dateString = Parser.parseTimestamp(mongoJson);
-        long time = Parser.getTime(dateString);
+        long time = Parser.getTime(dateString).getTimstamp();
         
         final String testString = "{ 'atype': 'authCheck', 'ts': { '$date': '2020-01-26T09:58:44.640-0500' }, 'local': { 'ip': '127.0.0.1', 'port': 27017 }, 'remote': { 'ip': '127.0.0.1', 'port': 56984 }, 'users': [{'user': 'tal', 'db': 'test'}, {'user': 'talb', 'db': 'bios'}], 'roles': [], 'param': { 'command': 'aggregate', 'ns': 'test.travelers', 'args': { 'aggregate': 'travelers', 'pipeline': [ { '$graphLookup': { 'from': 'airports', 'startWith': '$nearestAirport', 'connectFromField': 'connects', 'connectToField': 'airport', 'maxDepth': 2, 'depthField': 'numConnections', 'as': 'destinations' } } ], 'cursor': {}, 'lsid': { 'id': { '$binary': '2WoIDPhSTcKHrdJW4azoow==', '$type': '04' } }, '$db': 'test' } }, 'result': 0 }";
         final JsonObject testJson = JsonParser.parseString(testString).getAsJsonObject();
         String dateString2 = Parser.parseTimestamp(testJson);
-        long time2 = Parser.getTime(dateString2);
+        long time2 = Parser.getTime(dateString2).getTimstamp();
 
         Assert.assertNotEquals(time, time2);
     }

@@ -1,7 +1,5 @@
 package com.ibm.guardium.s3;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -18,7 +16,7 @@ public class Parser {
     private static Logger log = LogManager.getLogger(Parser.class);
 
     private static final String DATE_FORMAT_ISO = "yyyy-MM-dd'T'HH:mm:ss";// "yyyy-MM-dd'T'HH:mm:ssZ";
-    private static DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ISO_DATE_TIME;
+    public static DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ISO_DATE_TIME;
     public static final String UNKNOWN_STRING = "";
     public static final String UNKNOWN_IP = "0.0.0.0";
     public static final String BUCKETNAME_PROPERTY = "bucketName";
@@ -47,8 +45,8 @@ public class Parser {
         JsonObject requestParameters = auditObj.get("requestParameters")!=null ? auditObj.get("requestParameters").getAsJsonObject() : null;
         record.setDbName(searchForBucketName(requestParameters));
 
-        long unixTime = getTimestamp(getStrValue(auditObj,"eventTime"));
-        record.setTime(unixTime);
+        Time time = getTime(getStrValue(auditObj,"eventTime"));
+        record.setTime(time);
 
         // ------------------ Build Session locator
         SessionLocator sessionLocator = new SessionLocator();
@@ -343,15 +341,12 @@ public class Parser {
         return value;
     }
 
-    public static long getTimestamp(String dateString){
-        if (dateString==null){
-            log.warn("DateString is null");
-            return 0;
-        }
+    public static Time getTime(String dateString){
         ZonedDateTime date = ZonedDateTime.parse(dateString, DATE_TIME_FORMATTER);
         long millis = date.toInstant().toEpochMilli();
-
-        return millis;
+        int  minOffset = date.getOffset().getTotalSeconds()/60;
+        //int  minDst = date.getOffset().getRules().isDaylightSavings(date.toInstant()) ? 60 : 0;
+        return new Time(millis, minOffset, 0);
     }
 
     public static void main(String[] args){

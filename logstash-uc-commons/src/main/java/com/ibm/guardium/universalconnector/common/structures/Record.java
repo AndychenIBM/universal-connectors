@@ -20,7 +20,7 @@ public class Record {
     /**
      *  mandatory field - time of the event, in ms
      */
-    private long    time;
+    private Time   time;
 
     /**
      * mandatory field - object that contains session related details
@@ -52,11 +52,11 @@ public class Record {
     public boolean isException(){
         return  (this.exception != null);
     }
-    public long getTime() {
+    public Time getTime() {
         return time;
     }
 
-    public void setTime(long time) {
+    public void setTime(Time time) {
         this.time = time;
     }
 

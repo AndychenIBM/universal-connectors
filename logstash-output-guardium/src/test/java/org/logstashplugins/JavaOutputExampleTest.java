@@ -14,7 +14,7 @@ import java.util.*;
 
 public class JavaOutputExampleTest {
 
-    //@Test
+    @Test
     public void testJavaOutputExample() throws InterruptedException {
         //GRD-43047
           String prefix = "Prefix";
@@ -103,7 +103,7 @@ public class JavaOutputExampleTest {
             "\t\"sessionId\": \"\",\n" +
             "\t\"dbName\": \"admin\",\n" +
             "\t\"appUserName\": \"\",\n" +
-            "\t\"time\": %d,\n" +
+            "\t\"time\": {\"timestamp\":%d, \"minOffsetFromGMT\":0, \"minDst\":0},\n" +
             "\t\"sessionLocator\": {\n" +
             "\t\t\"clientIp\": \"\",\n" +
             "\t\t\"clientPort\": 36802,\n" +
@@ -114,7 +114,7 @@ public class JavaOutputExampleTest {
             "\t\t\"serverIpv6\": \"2001:0db8:0000:0000:0000:ff00:0042:8329\"\n" +
             "\t},\n" +
             "\t\"accessor\": {\n" +
-            "\t\t\"dbUser\": \"QQQ\",\n" +
+            "\t\t\"dbUser\": \"WWWWW\",\n" +
             "\t\t\"serverType\": \"MongoDB\",\n" +
             "\t\t\"serverOs\": \"\",\n" +
             "\t\t\"clientOs\": \"\",\n" +

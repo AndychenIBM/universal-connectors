@@ -40,6 +40,25 @@ public class JavaFilterExampleTest {
     } */
 
     @Test
+    public void testParseMongSSS() {
+//        final String mongodString = "\"mongod: { \"atype\" : \"dropIndex\", \"ts\" : { \"$date\" : \"2020-08-16T08:35:01.318-0400\" }, \"local\" : { \"ip\" : \"9.42.29.56\", \"port\" : 27017 }, \"remote\" : { \"ip\" : \"9.42.29.56\", \"port\" : 46096 }, \"users\" : [ { \"user\" : \"Debra\", \"db\" : \"admin\" } ], \"roles\" : [ { \"role\" : \"root\", \"db\" : \"admin\" } ], \"param\" : { \"ns\" : \"admin.WORKERS_A0\", \"indexName\" : \"_id_\" }, \"result\" : 0 }";
+//        final String mongodString = "\"mongod: { \"atype\" : \"authenticate\", \"ts\" : { \"$date\" : \"2020-08-16T08:35:01.314-0400\" }, \"local\" : { \"ip\" : \"9.42.29.56\", \"port\" : 27017 }, \"remote\" : { \"ip\" : \"9.42.29.56\", \"port\" : 46116 }, \"users\" : [ { \"user\" : \"Debra\", \"db\" : \"admin\" } ], \"roles\" : [ { \"role\" : \"root\", \"db\" : \"admin\" } ], \"param\" : { \"user\" : \"Debra\", \"db\" : \"admin\", \"mechanism\" : \"SCRAM-SHA-256\" }, \"result\" : 0 }";
+        final String mongodString2 = "mongod: { \"atype\" : \"authCheck\", \"ts\" : { \"$date\" : \"2020-08-19T11:52:27.495-0400\" }, \"local\" : { \"ip\" : \"127.0.0.1\", \"port\" : 27017 }, \"remote\" : { \"ip\" : \"127.0.0.1\", \"port\" : 10688 }, \"users\" : [ { \"user\" : \"realAdmin\", \"db\" : \"admin\" } ], \"roles\" : [ { \"role\" : \"readWriteAnyDatabase\", \"db\" : \"admin\" }, { \"role\" : \"readWrite\", \"db\" : \"newDB02\" }, { \"role\" : \"userAdminAnyDatabase\", \"db\" : \"admin\" } ], \"param\" : { \"command\" : \"getCmdLineOpts\", \"ns\" : \"admin\", \"args\" : { \"getCmdLineOpts\" : 1, \"lsid\" : { \"id\" : { \"$binary\" : \"9d5Ezoo2ROy/uYNsTpGJww==\", \"$type\" : \"04\" } }, \"$db\" : \"admin\" } }, \"result\" : 13 }";
+
+        Context context = new ContextImpl(null, null);
+        JavaFilterExample filter = new JavaFilterExample("test-id", null, context);
+
+        Event e = new org.logstash.Event();
+        TestMatchListener matchListener = new TestMatchListener();
+        
+        e.setField("message", mongodString2);
+        Collection<Event> results = filter.filter(Collections.singletonList(e), matchListener);
+
+        Assert.assertEquals(1, results.size());
+        Assert.assertNotNull(e.getField("Record"));
+        Assert.assertEquals(1, matchListener.getMatchCount());
+    }
+
     public void testParseMongoSyslog() {
         final String mongodString = "<14>Feb 18 08:53:31 qa-db51 mongod: { \"atype\" : \"authCheck\", \"ts\" : { \"$date\" : \"2020-06-11T09:44:11.070-0400\" }, \"local\" : { \"ip\" : \"9.70.147.59\", \"port\" : 27017 }, \"remote\" : { \"ip\" : \"9.148.202.94\", \"port\" : 60185 }, \"users\" : [ { \"user\" : \"realAdmin\", \"db\" : \"admin\" } ], \"roles\" : [ { \"role\" : \"readWriteAnyDatabase\", \"db\" : \"admin\" }, { \"role\" : \"userAdminAnyDatabase\", \"db\" : \"admin\" } ], \"param\" : { \"command\" : \"find\", \"ns\" : \"admin.USERS\", \"args\" : { \"find\" : \"USERS\", \"filter\" : {}, \"lsid\" : { \"id\" : { \"$binary\" : \"mV20eHvvRha2ELTeqJxQJg==\", \"$type\" : \"04\" } }, \"$db\" : \"admin\", \"$readPreference\" : { \"mode\" : \"primaryPreferred\" } } }, \"result\" : 0 }";
         Context context = new ContextImpl(null, null);

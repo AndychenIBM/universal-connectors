@@ -1,8 +1,12 @@
 package com.ibm.guardium.universalconnector.common;
 
+import com.ibm.guardium.universalconnector.common.structures.Time;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Date;
 
 import com.ibm.guardium.proto.datasource.Datasource.Timestamp;
@@ -11,16 +15,15 @@ public class UtilTest {
 
     @Test
     public void testGetTimestamp() throws Exception {
-        Date date = new Date(); 
-        Timestamp timestamp = Utilities.getTimestamp(date.getTime());
+        Instant instant = Instant.now();
+        ZonedDateTime zonedInstant = instant.atZone(ZoneId.systemDefault());
+        Time time = new Time(instant.toEpochMilli(), zonedInstant.getOffset().getTotalSeconds()/60, 0);
+
+        Timestamp timestamp = Utilities.getTimestamp(time);
         
-        Assert.assertEquals(
-            Utilities.getTimeMicroseconds(date.getTime()),
-            timestamp.getUsec());
+        Assert.assertEquals(instant.toEpochMilli()%1000* 1000, timestamp.getUsec());
         
-        Assert.assertEquals(
-            Utilities.getTimeUnixTime(date.getTime()),
-            timestamp.getUnixTime());
+        Assert.assertEquals(instant.toEpochMilli()/1000, timestamp.getUnixTime());
     }
 
     @Test

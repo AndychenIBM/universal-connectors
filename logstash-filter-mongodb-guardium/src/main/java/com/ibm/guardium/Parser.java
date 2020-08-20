@@ -222,8 +222,8 @@ public class Parser {
 
         // set timestamp
         String dateString = Parser.parseTimestamp(data);
-        long timestamp = Parser.getTime(dateString);
-        record.setTime(timestamp);
+        Time time = Parser.getTime(dateString);
+        record.setTime(time);
 
         return record;
     }
@@ -376,10 +376,12 @@ public class Parser {
         return dateString;
     }
 
-    public static long getTime(String dateString){
+    public static Time getTime(String dateString){
         ZonedDateTime date = ZonedDateTime.parse(dateString, DATE_TIME_FORMATTER);
         long millis = date.toInstant().toEpochMilli();
-        return millis;
+        int  minOffset = date.getOffset().getTotalSeconds()/60;
+        //int  minDst = date.getOffset().getRules().isDaylightSavings(date.toInstant()) ? 60 : 0;
+        return new Time(millis, minOffset, 0);
     }
 
     /**

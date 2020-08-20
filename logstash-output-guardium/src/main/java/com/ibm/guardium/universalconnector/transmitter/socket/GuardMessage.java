@@ -4,10 +4,14 @@ import com.ibm.guardium.proto.datasource.Datasource;
 import com.ibm.guardium.proto.datasource.Datasource.Guard_ds_message;
 import com.ibm.guardium.proto.datasource.Datasource.Guard_ds_message.Type;
 import com.ibm.guardium.universalconnector.common.Utilities;
+import com.ibm.guardium.universalconnector.common.structures.Time;
 import com.ibm.guardium.universalconnector.config.ConnectionConfig;
 import com.ibm.guardium.universalconnector.config.DBProtocol;
 
 import java.nio.ByteBuffer;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 
 public class GuardMessage {
@@ -72,18 +76,23 @@ public class GuardMessage {
                 .setClientIdentifier(clientId)
                 .setCurrentMaster(snifNetworkAddress)
                 .setCurrentMasterIp(masterIp)
-                .setTimestamp(Utilities.getTimestamp((new java.util.Date()).getTime()))
+                .setTimestamp(getCurentTime())
                 .build();
         return Guard_ds_message.newBuilder().setType(Type.PING).setPing(ping).build().toByteArray();
+    }
 
-
+    private static Datasource.Timestamp getCurentTime(){
+        Instant instant = Instant.now();
+        ZonedDateTime zonedInstant = instant.atZone(ZoneId.systemDefault());
+        Time time = new Time(instant.toEpochMilli(), zonedInstant.getOffset().getTotalSeconds()/60, 0);
+        return Utilities.getTimestamp(time);
     }
 
     public static byte[] prepareHandshake(int masterIp, String snifNetworkAddress, String clientId, String dbType, String udsVersion)
     {
         Datasource.Handshake just_handshake = Datasource.Handshake
                 .newBuilder()
-                .setTimestamp(Utilities.getTimestamp((new java.util.Date()).getTime()))
+                .setTimestamp(getCurentTime())
                 .setClientIdentifier(clientId)
                 .setCurrentMaster(snifNetworkAddress)
                 .setCurrentMasterIp(masterIp)
