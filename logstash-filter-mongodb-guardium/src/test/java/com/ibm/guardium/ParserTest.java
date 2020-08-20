@@ -1,8 +1,6 @@
 package com.ibm.guardium;
 
 import java.text.ParseException;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;

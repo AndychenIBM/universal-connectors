@@ -6,7 +6,7 @@ Notable changes will be documented in this file.
 
 ## [0.4.9]
 ### Fixed 
-- Send "\[JSON-object\]" when object is not a JSON primitive, as two word objects are not supported in Investigation dashboard. 
+- Send "\[json-object\]" when object is not a JSON primitive, as two word objects are not supported in Investigation dashboard. 
 ### Changed
 - time formate changed to include timezone, to better represent time of datasource server.
 - change Record field to GuardRecord.

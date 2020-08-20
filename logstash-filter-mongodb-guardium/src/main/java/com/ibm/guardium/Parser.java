@@ -4,7 +4,6 @@ import java.text.ParseException;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -29,7 +28,7 @@ public class Parser {
     private static final String MASK_STRING = "?";
     public static final String EXCEPTION_TYPE_AUTHORIZATION_STRING = "SQL_ERROR";
     public static final String EXCEPTION_TYPE_AUTHENTICATION_STRING = "LOGIN_FAILED";
-    public static final String COMPOUND_OBJECT_STRING = "[JSON-object]";
+    public static final String COMPOUND_OBJECT_STRING = "[json-object]";
     /**
      * These arguments will not be redacted, as they only contain 
      * collection/field names rather than sensitive values.
