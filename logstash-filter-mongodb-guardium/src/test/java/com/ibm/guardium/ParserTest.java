@@ -87,7 +87,7 @@ public class ParserTest {
 
         final Sentence sentence = result.sentences.get(0);
         Assert.assertEquals("applyOps", sentence.getVerb());
-        Assert.assertEquals("[compound object]", sentence.getObjects().get(0).name);
+        Assert.assertEquals(Parser.COMPOUND_OBJECT_STRING, sentence.getObjects().get(0).name);
     }
 
     @Test
@@ -110,6 +110,16 @@ public class ParserTest {
         final Sentence sentence = result.sentences.get(0);
         Assert.assertEquals("resetError", sentence.getVerb());
         Assert.assertEquals("1", sentence.getObjects().get(0).name);
+    }
+
+    @Test
+    public void testParseAsConstruct_endSessions() {
+        final String mongoString = "{ \"atype\" : \"authCheck\", \"ts\" : { \"$date\" : \"2020-08-19T10:09:35.757-0400\" }, \"local\" : { \"ip\" : \"127.0.0.1\", \"port\" : 27017 }, \"remote\" : { \"ip\" : \"127.0.0.1\", \"port\" : 10390 }, \"users\" : [ { \"user\" : \"realAdmin\", \"db\" : \"admin\" } ], \"roles\" : [ { \"role\" : \"readWriteAnyDatabase\", \"db\" : \"admin\" }, { \"role\" : \"readWrite\", \"db\" : \"newDB02\" }, { \"role\" : \"userAdminAnyDatabase\", \"db\" : \"admin\" } ], \"param\" : { \"command\" : \"endSessions\", \"ns\" : \"admin\", \"args\" : { \"endSessions\" : [ { \"id\" : { \"$binary\" : \"Mc0gWYOhR6mxvfMc3THs9g==\", \"$type\" : \"04\" } } ], \"$db\" : \"admin\" } }, \"result\" : 0 }";
+        final JsonObject mongoJson = JsonParser.parseString(mongoString).getAsJsonObject();
+        final Construct result = Parser.ParseAsConstruct(mongoJson);
+        final Sentence sentence = result.sentences.get(0);
+        Assert.assertEquals("endSessions", sentence.getVerb());
+        Assert.assertEquals(Parser.COMPOUND_OBJECT_STRING, sentence.getObjects().get(0).name);
     }
 
     @Test

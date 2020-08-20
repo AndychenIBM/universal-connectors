@@ -3,10 +3,20 @@
 Notable changes will be documented in this file.
 
 ## [Unreleased]
+
+## [0.4.9]
+### Fixed 
+- Send "\[JSON-object\]" when object is not a JSON primitive, as two word objects are not supported in Investigation dashboard. 
+### Changed
+- time formate changed to include timezone, to better represent time of datasource server.
+- change Record field to GuardRecord.
+
 ## [0.4.6]
+### Fixed
 - Remove source program ("mongod" is not \[client\] source program) 
 
 ## [0.4.5]
+### Added
 - Support commands with 2 words, like "mapReduce", "resetErrors", if logged case-insensitive.
 - Send [compound object] when object is not a JSON primitive
 

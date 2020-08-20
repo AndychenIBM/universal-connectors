@@ -9,7 +9,7 @@ This is a filter plugin for [Logstash](https://github.com/elastic/logstash). It 
 * authCheck: 
     * find, insert, delete, update, create, drop, ... 
     * aggregate with $lookup(s) or $graphLookup(s)
-    * applyOps: An internal command but can be triggered manually to create/drop collection. It's object is written as "[compound object]" in Guardium; details are included inGuardium Full SQL field, if available. 
+    * applyOps: An internal command but can be triggered manually to create/drop collection. It's object is written as "\[JSON-object\]" in Guardium; details are included inGuardium Full SQL field, if available. 
 * authenticate (with error only) 
 
 Notes: 
@@ -46,11 +46,11 @@ The filter plugin also supports sending errors as well, though MongoDB Access co
     2020-01-26T10:47:41.225272-05:00 qa-db51 mongod: { 'atype' : 'authCheck', 'ts' : { '$date' : '2020-01-26T10:47:41.225-0500' }, 'local' : { 'ip' : '(NONE)', 'port' : 0 }, 'remote' : { 'ip' : '(NONE)', 'port' : 0 }, 'users' : [], 'roles' : [], 'param' : { 'command' : 'listIndexes', 'ns' : 'config.system.sessions', 'args' : { 'listIndexes' : 'system.sessions', 'cursor' : {}, '$db' : 'config' } }, 'result' : 0 }
 
 ## Filter result
-Filter tweaks the event by passing a Record object to the logstash Output plugin (as JSON string), which contains a "Construct" object with the parsed query: 
+Filter tweaks the event by passing a Record object to the logstash Output plugin (as JSON string), in a field "GuardRecord" (GuardConstants.GUARDIUM_RECORD_FIELD_NAME) which contains a "Construct" object with the parsed query: 
     {
 
       "sequence" => 0,
-        "Record" => "{"sessionId":"", "dbName":"config", "appUserName":"", "time":0,"sessionLocator":{"clientIp":"tals-mbp-2.haifa.ibm.com", "clientPort":0,"serverIp":"tals-mbp-2.haifa.ibm.com", "serverPort":0,"isIpv6":false,"clientIpv6":"", "serverIpv6":""},"accessor":{"dbUser":"", "serverType":"MongoDB", "serverOs":"", "clientOs":"", "clientHostName":"", "serverHostName":"qa-db51", "commProtocol":"", "dbProtocol":"MongoDB native audit", "dbProtocolVersion":"", "osUser":"", "sourceProgram":"mongod", "client_mac":"", "serverDescription":"", "serviceName":"", "language":"FREE_TEXT", "type":"CONSTRUCT"},"data":{"construct":{"sentences":[{"verb":"listIndexes", "objects":[{"name":"system.sessions", "type":"collection", "fields":[],"schema":""}],"descendants":[],"fields":[]}],"full_sql":"{\"atype\":\"authCheck\",\"ts\":{\"$date\":\"2020-01-26T10:47:41.225-0500\"},\"local\":{\"ip\":\"(NONE)\",\"port\":0},\"remote\":{\"ip\":\"(NONE)\",\"port\":0},\"users\":[],\"roles\":[],\"param\":{\"command\":\"listIndexes\",\"ns\":\"config.system.sessions\",\"args\":{\"listIndexes\":\"system.sessions\",\"cursor\":{},\"$db\":\"config\"}},\"result\":0}", "original_sql":""},"timestamp":0,"originalSqlCommand":"", "useConstruct":true}}",
+        "GuardRecord" => "{"sessionId":"", "dbName":"config", "appUserName":"", "time":0,"sessionLocator":{"clientIp":"tals-mbp-2.haifa.ibm.com", "clientPort":0,"serverIp":"tals-mbp-2.haifa.ibm.com", "serverPort":0,"isIpv6":false,"clientIpv6":"", "serverIpv6":""},"accessor":{"dbUser":"", "serverType":"MongoDB", "serverOs":"", "clientOs":"", "clientHostName":"", "serverHostName":"qa-db51", "commProtocol":"", "dbProtocol":"MongoDB native audit", "dbProtocolVersion":"", "osUser":"", "sourceProgram":"mongod", "client_mac":"", "serverDescription":"", "serviceName":"", "language":"FREE_TEXT", "type":"CONSTRUCT"},"data":{"construct":{"sentences":[{"verb":"listIndexes", "objects":[{"name":"system.sessions", "type":"collection", "fields":[],"schema":""}],"descendants":[],"fields":[]}],"full_sql":"{\"atype\":\"authCheck\",\"ts\":{\"$date\":\"2020-01-26T10:47:41.225-0500\"},\"local\":{\"ip\":\"(NONE)\",\"port\":0},\"remote\":{\"ip\":\"(NONE)\",\"port\":0},\"users\":[],\"roles\":[],\"param\":{\"command\":\"listIndexes\",\"ns\":\"config.system.sessions\",\"args\":{\"listIndexes\":\"system.sessions\",\"cursor\":{},\"$db\":\"config\"}},\"result\":0}", "original_sql":""},"timestamp":0,"originalSqlCommand":"", "useConstruct":true}}",
         "@version" => "1",
         "@timestamp" => 2020-02-25T12:32:16.314Z,
           "type" => "syslog",
