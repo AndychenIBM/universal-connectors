@@ -9,7 +9,7 @@ This is a filter plugin for [Logstash](https://github.com/elastic/logstash). It 
 * authCheck: 
     * find, insert, delete, update, create, drop, ... 
     * aggregate with $lookup(s) or $graphLookup(s)
-    * applyOps: An internal command but can be triggered manually to create/drop collection. It's object is written as "[compound object]" in Guardium; details are included inGuardium Full SQL field, if available. 
+    * applyOps: An internal command but can be triggered manually to create/drop collection. It's object is written as "\[JSON-object\]" in Guardium; details are included inGuardium Full SQL field, if available. 
 * authenticate (with error only) 
 
 Notes: 

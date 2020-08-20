@@ -29,6 +29,7 @@ public class Parser {
     private static final String MASK_STRING = "?";
     public static final String EXCEPTION_TYPE_AUTHORIZATION_STRING = "SQL_ERROR";
     public static final String EXCEPTION_TYPE_AUTHENTICATION_STRING = "LOGIN_FAILED";
+    public static final String COMPOUND_OBJECT_STRING = "[JSON-object]";
     /**
      * These arguments will not be redacted, as they only contain 
      * collection/field names rather than sensitive values.
@@ -175,7 +176,7 @@ public class Parser {
             sentenceObject = new SentenceObject(args.get(command).getAsString());
             sentenceObject.setType("collection"); // this used to be default value, but since sentence is defined in common package, "collection" as default value was removed
         } else {
-            sentenceObject = new SentenceObject("[compound object]");
+            sentenceObject = new SentenceObject(COMPOUND_OBJECT_STRING);
         }
         return sentenceObject;
     }
