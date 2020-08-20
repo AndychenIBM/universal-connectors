@@ -70,7 +70,7 @@ public class Parser {
         accessor.setServerHostName(getStrValue(auditObj,"eventSource"));
         accessor.setCommProtocol(getStrValue(auditObj,"eventType")); // talk to Itai
         accessor.setDbProtocolVersion(getStrValue(auditObj,"eventVersion"));
-        accessor.setServiceName(getStrValue(auditObj,"eventSource"));
+        accessor.setServiceName(getStrValue(auditObj,"awsRegion"));
         accessor.setType(Accessor.TYPE_CONSTRUCT_STRING);
 
         accessor.setServerDescription(getStrValue(auditObj,"awsRegion"));
