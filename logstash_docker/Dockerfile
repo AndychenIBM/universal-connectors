@@ -49,6 +49,7 @@ RUN	wget -q https://artifacts.elastic.co/downloads/logstash/logstash-oss-${LOGST
 #Install plugins
 	.${LOGSTASH_DIR}/bin/logstash-plugin install ${LOGSTASH_DIR}/config/logstash-filter-java_filter_example-0.4.9.gem && \
     .${LOGSTASH_DIR}/bin/logstash-plugin install ${LOGSTASH_DIR}/config/logstash-output-java_output_to_guardium-1.1.9.gem && \
+    .${LOGSTASH_DIR}/bin/logstash-plugin install ${LOGSTASH_DIR}/config/logstash-filter-mysql_filter_guardium-1.0.0.gem && \
     .${LOGSTASH_DIR}/bin/logstash-plugin install ${LOGSTASH_DIR}/config/logstash-input-cloudwatch_logs-1.0.3.gem && \
     .${LOGSTASH_DIR}/bin/logstash-plugin install ${LOGSTASH_DIR}/config/logstash-filter-logstash_filter_s3_guardium-0.5.0.gem && \
 #Clear cache and unnecessary heavy plugins:

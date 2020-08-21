@@ -18,11 +18,14 @@ import com.google.gson.*;
 
 import java.util.*;
 import java.io.File;
+import java.time.ZonedDateTime;
+import java.time.ZoneId;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
 import com.ibm.guardium.universalconnector.common.structures.*;
 import com.ibm.guardium.universalconnector.common.Util;
+import com.ibm.guardium.universalconnector.common.GuardConstants;
 
 // class name must match plugin name
 @LogstashPlugin(name = "mysql_filter_guardium")
@@ -120,7 +123,19 @@ public class MySqlFilterGuardium implements Filter {
                         if (inputJSON.has(DATA_TYPE_CONNECTION)) {
                             String eventField = inputJSON.get("event").getAsString();
                             if (eventField.equals("connect")) {
-                                validRecord = false;
+                                final JsonObject conn_data = inputJSON.get(DATA_TYPE_CONNECTION).getAsJsonObject();
+                                final int status = conn_data.get("status").getAsInt();
+
+                                if (status != 0) {
+                                    // https://dev.mysql.com/doc/refman/8.0/en/error-message-components.html                                
+                                    ExceptionRecord exceptionRecord = new ExceptionRecord();
+                                    record.setException(exceptionRecord);
+
+                                    exceptionRecord.setExceptionTypeId(EXCEPTION_TYPE_LOGIN_FAILED_STRING);
+                                    exceptionRecord.setDescription("Login Failed (" + status + ")"); 
+                                    exceptionRecord.setSqlString(UNKNOWN_STRING);
+                                    validRecord = true;
+                                }
                             }
                         } 
                         else if (inputJSON.has(DATA_TYPE_TABLE_ACCESS)){
@@ -165,7 +180,7 @@ public class MySqlFilterGuardium implements Filter {
                             record.setSessionId(""+connection_id);
                             record.setAppUserName(UNKNOWN_STRING);
                                 
-                            long unixTime = getTimestamp(timestamp);
+                            Time unixTime = getTimestamp(timestamp);
                             record.setTime(unixTime);
                                 
                             record.setSessionLocator(parseSessionLocator(e, inputJSON));
@@ -176,7 +191,7 @@ public class MySqlFilterGuardium implements Filter {
                             final GsonBuilder builder = new GsonBuilder();
                             builder.serializeNulls();
                             final Gson gson = builder.create();
-                            e.setField("Record", gson.toJson(record));
+                            e.setField(GuardConstants.GUARDIUM_RECORD_FIELD_NAME, gson.toJson(record));
                         } // validRecord
                         else {
                             e.tag(LOGSTASH_TAG_MYSQL_IGNORE);
@@ -195,13 +210,16 @@ public class MySqlFilterGuardium implements Filter {
         return events;
     }
 
-    public static synchronized long getTimestamp(String dateString) throws ParseException {
+    public static synchronized Time getTimestamp(String dateString) throws ParseException {
         if (dateString == null){
             log.warn("DateString is null");
-            return 0;
+            return new Time(0, 0, 0);
         }
         Date date = DATE_FORMATTER.parse(dateString);
-        return date.getTime();
+        ZonedDateTime zdt = ZonedDateTime.ofInstant(date.toInstant(), ZoneId.of("UTC"));
+        long millis = zdt.toInstant().toEpochMilli();
+        int  minOffset = zdt.getOffset().getTotalSeconds()/60;
+        return new Time(millis, minOffset, 0);
     }
         
     private static SessionLocator parseSessionLocator(Event e, JsonObject data) {
