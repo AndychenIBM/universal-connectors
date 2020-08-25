@@ -41,7 +41,7 @@ if [[ -z "$logstash_pid" ]]; then
     updateFromEnv "$TCP_PORT" "TCP_PORT" $MONGODB_CONF "tcp \{ port => 5000 type => syslog" "tcp \{ port => $TCP_PORT type => syslog"
 
     #Start logstash
-    logstash
+    logstash -l ${LOG_GUC_DIR}
 else
     echo "Logstash is already running..."
 fi
