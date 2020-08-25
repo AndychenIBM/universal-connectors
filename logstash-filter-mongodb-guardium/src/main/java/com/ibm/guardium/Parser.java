@@ -3,6 +3,7 @@ package com.ibm.guardium;
 import java.text.ParseException;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -36,8 +37,10 @@ public class Parser {
     public static Set<String> REDACTION_IGNORE_STRINGS = new HashSet<>(
             Arrays.asList("from", "localField", "foreignField", "as", "connectFromField", "connectToField"));
 
-    private static String DATE_FORMAT_ISO = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
-    private static DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT_ISO);
+    private static final DateTimeFormatterBuilder dateTimeFormatterBuilder = new DateTimeFormatterBuilder()
+            .append(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS[[XXX][X]]"));
+
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = dateTimeFormatterBuilder.toFormatter();
 
     /**
      * Parses a MongoDB native audit sent over syslog. Format looks as the

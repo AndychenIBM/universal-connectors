@@ -1,6 +1,9 @@
 package com.ibm.guardium;
 
 import java.text.ParseException;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -21,7 +24,12 @@ public class ParserTest {
         String dateStr = "2020-01-14T10:46:02.431-0500";
         Time time = Parser.getTime(dateStr);
         Assert.assertTrue("Failed to parse date, time is "+time.getTimstamp(), 1579016762431L==time.getTimstamp());
-   }
+
+        dateStr = "2020-01-14T10:46:02.431-05:00";
+        time = Parser.getTime(dateStr);
+        Assert.assertTrue("Failed to parse date, time is "+time.getTimstamp(), 1579016762431L==time.getTimstamp());
+
+    }
 
     @Test
     public void testParseAsConstruct_Find() {
