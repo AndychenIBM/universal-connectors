@@ -91,8 +91,8 @@ public class MySqlFilterGuardium implements Filter {
             String messageString = e.getField("message").toString();
 
             int mysqlIndex = messageString.indexOf(MYSQL_AUDIT_START_SIGNAL);
-            // log.warn(messageString);
-            
+            //log.warn(messageString);
+            //log.warn("\n\n");
             if ((mysqlIndex != -1) && (e.getField("mysql_message") instanceof String)) {
                 
                 String mysqlMsgString = e.getField("mysql_message").toString();
@@ -112,8 +112,7 @@ public class MySqlFilterGuardium implements Filter {
                     final int connection_id = inputJSON.get("connection_id").getAsInt();
 
                     if ( class_type.equals(CLASS_TYPE_CONNECTION) 
-                        || class_type.equals(CLASS_TYPE_GENERAL)
-                        || class_type.equals(CLASS_TYPE_TABLE_ACCESS)) {
+                        || class_type.equals(CLASS_TYPE_GENERAL)) {
                             
                         Record record = new Record();
                         boolean validRecord = false;
@@ -137,24 +136,7 @@ public class MySqlFilterGuardium implements Filter {
                                     validRecord = true;
                                 }
                             }
-                        } 
-                        else if (inputJSON.has(DATA_TYPE_TABLE_ACCESS)){
-                            final JsonObject table_access_data = inputJSON.get(DATA_TYPE_TABLE_ACCESS).getAsJsonObject();
-                            final String query = table_access_data.get("query").getAsString();
-                            final String db_name = table_access_data.get("db").getAsString();
-                            
-                            Data data = new Data();
-                            record.setData(data);
-                            if (query != null)
-                            {
-                                data.setOriginalSqlCommand(query);
-                                data.setUseConstruct(false);
-                                validRecord = true;
-                            }
-                            record.setDbName(db_name);
-
-                        } // end table_access_data
-                        
+                        }                         
                         else if (inputJSON.has(DATA_TYPE_GENERAL)) {
                             final JsonObject gen_data = inputJSON.get(DATA_TYPE_GENERAL).getAsJsonObject();
                             final String command = gen_data.get("command").getAsString(); 
@@ -172,6 +154,16 @@ public class MySqlFilterGuardium implements Filter {
                                     exceptionRecord.setDescription("Error (" + status + ")"); 
                                     exceptionRecord.setSqlString(query);
                                     validRecord = true;
+                                }
+                                else {
+                                     Data data = new Data();
+                                     record.setData(data);
+                                     if (query != null)
+                                     {
+                                         data.setOriginalSqlCommand(query);
+                                         data.setUseConstruct(false);
+                                         validRecord = true;
+                                     }
                                 }
                             }
 
@@ -197,7 +189,10 @@ public class MySqlFilterGuardium implements Filter {
                             e.tag(LOGSTASH_TAG_MYSQL_IGNORE);
                         }
                         
-                    } // end general or table_access class
+                    } // end general or connection data
+                    else {
+                        e.tag(LOGSTASH_TAG_MYSQL_IGNORE);
+                    }
                 } catch (Exception exception) {
                     // TODO log event removed? 
                     //events.remove(e);
