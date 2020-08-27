@@ -2,6 +2,7 @@ package org.logstashplugins;
 
 import co.elastic.logstash.api.Configuration;
 import co.elastic.logstash.api.Event;
+import com.ibm.guardium.universalconnector.common.GuardConstants;
 import com.ibm.guardium.universalconnector.transformer.JsonRecordTransformer;
 import org.junit.Test;
 import org.logstash.plugins.ConfigurationImpl;
@@ -14,10 +15,11 @@ import java.util.*;
 
 public class JavaOutputExampleTest {
 
+
     //@Test
-    public void testJavaOutputExample() throws InterruptedException {
+    public void testActualSendingDataToRealMachine() throws InterruptedException {
         //GRD-43047
-          String prefix = "Prefix";
+        String prefix = "Prefix";
         Map<String, Object> configValues = new HashMap<>();
         configValues.put(JavaOutputToGuardium.PREFIX_CONFIG.name(), prefix);
         Configuration config = new ConfigurationImpl(configValues);
@@ -34,13 +36,14 @@ public class JavaOutputExampleTest {
         while (keepGoing /*&& count++<30*/) {
             Date time = new Date();
             int ipSuffix = random.ints(0, 1).findFirst().getAsInt();
-            int serverPort = random.ints(0,3).findFirst().getAsInt();
-            System.out.println("serverPort "+serverPort);
-            System.out.println("ipSuffix "+ipSuffix);
+            int serverPort = random.ints(0, 3).findFirst().getAsInt();
+            System.out.println("serverPort " + serverPort);
+            System.out.println("ipSuffix " + ipSuffix);
 
-            // test based on mongo-guardium filter v0.0.2, which currently sends Event like this:
-            String record = String.format(msgTemplateIPV6, time.getTime(), ipSuffix, serverPort);
-            e.setField("Record", record);
+//            String record = String.format(msgTemplateIPV6, time.getTime(), ipSuffix, serverPort);
+//            e.setField("Record", record);
+            e.setField(GuardConstants.GUARDIUM_RECORD_FIELD_NAME, s3Record);
+
             events.add(e);
 
             output.output(events);
@@ -99,7 +102,7 @@ public class JavaOutputExampleTest {
         output.output(events);
     }
 
-    public static final String msgTemplateIPV6="{\n" +
+    public static final String msgTemplateIPV6 = "{\n" +
             "\t\"sessionId\": \"\",\n" +
             "\t\"dbName\": \"admin\",\n" +
             "\t\"appUserName\": \"\",\n" +
@@ -157,7 +160,7 @@ public class JavaOutputExampleTest {
             "\t\"exception\": null\n" +
             "}";
 
-    public static final String msgTemplate="{\n" +
+    public static final String msgTemplate = "{\n" +
             "\t\"sessionId\": \"\",\n" +
             "\t\"dbName\": \"admin\",\n" +
             "\t\"appUserName\": \"\",\n" +
@@ -216,7 +219,7 @@ public class JavaOutputExampleTest {
             "}";
 
 
-    public static final String msg1="{\n" +
+    public static final String msg1 = "{\n" +
             "\t\"sessionId\": \"testsessionid\",\n" +
             "\t\"dbName\": \"admin\",\n" +
             "\t\"appUserName\": \"\",\n" +
@@ -273,5 +276,8 @@ public class JavaOutputExampleTest {
             "\t},\n" +
             "\t\"exception\": null\n" +
             "}";
+
+
+    public static String s3Record = "{\"sessionId\":\"{\\\"invokedBy\\\":\\\"cloudtrail.amazonaws.com\\\",\\\"type\\\":\\\"AWSService\\\"}\",\"dbName\":\"ucdoctargetbucketlogs\",\"appUserName\":\"AWSService\",\"time\":{\"timstamp\":1597921835000,\"minOffsetFromGMT\":0,\"minDst\":0},\"sessionLocator\":{\"clientIp\":\"1.1.1.1\",\"clientPort\":0,\"serverIp\":\"2.2.2.2\",\"serverPort\":0,\"isIpv6\":false,\"clientIpv6\":null,\"serverIpv6\":null},\"accessor\":{\"dbUser\":\"AWSService\",\"serverType\":\"S3\",\"serverOs\":\"\",\"clientOs\":\"\",\"clientHostName\":\"cloudtrail.amazonaws.com\",\"serverHostName\":\"s33.amazonaws.com\",\"commProtocol\":\"AwsApiCall\",\"dbProtocol\":\"S3\",\"dbProtocolVersion\":\"1.07\",\"osUser\":\"\",\"sourceProgram\":\"cloudtrail22.amazonaws.com\",\"client_mac\":\"\",\"serverDescription\":\"us-east-1\",\"serviceName\":\"s-east-1\",\"language\":\"FREE_TEXT\",\"type\":\"CONSTRUCT\"},\"data\":{\"construct\":{\"sentences\":[{\"verb\":\"PutObject\",\"objects\":[{\"name\":\"ucdoctargetbucketlogs/AWSLogs/987076625343/CloudTrail/eu-west-2/2020/08/20/987076625343_CloudTrail_eu-west-2_20200820T1055Z_eAOjq1eVy9BvU7rJ.json.gz\",\"type\":\"Object\",\"fields\":[],\"schema\":\"\"},{\"name\":\"ucdoctargetbucketlogs\",\"type\":\"Bucket\",\"fields\":[],\"schema\":\"\"}],\"descendants\":[],\"fields\":[]}],\"fullSql\":\"{\\\"eventID\\\":\\\"1b443621-e5a7-432d-a06c-1a9ba479059f\\\",\\\"awsRegion\\\":\\\"us-east-1\\\",\\\"eventCategory\\\":\\\"Data\\\",\\\"eventVersion\\\":\\\"1.07\\\",\\\"responseElements\\\":{\\\"x-amz-server-side-encryption\\\":\\\"AES256\\\"},\\\"sourceIPAddress\\\":\\\"cloudtrail.amazonaws.com\\\",\\\"eventSource\\\":\\\"s3.amazonaws.com\\\",\\\"requestParameters\\\":{\\\"bucketName\\\":\\\"ucdoctargetbucketlogs\\\",\\\"Host\\\":\\\"ucdoctargetbucketlogs.s3.us-east-1.amazonaws.com\\\",\\\"x-amz-acl\\\":\\\"bucket-owner-full-control\\\",\\\"x-amz-server-side-encryption\\\":\\\"AES256\\\",\\\"key\\\":\\\"AWSLogs/987076625343/CloudTrail/eu-west-2/2020/08/20/987076625343_CloudTrail_eu-west-2_20200820T1055Z_eAOjq1eVy9BvU7rJ.json.gz\\\"},\\\"resources\\\":[{\\\"type\\\":\\\"AWS::S3::Object\\\",\\\"ARN\\\":\\\"arn:aws:s3:::ucdoctargetbucketlogs/AWSLogs/987076625343/CloudTrail/eu-west-2/2020/08/20/987076625343_CloudTrail_eu-west-2_20200820T1055Z_eAOjq1eVy9BvU7rJ.json.gz\\\"},{\\\"type\\\":\\\"AWS::S3::Bucket\\\",\\\"accountId\\\":\\\"987076625343\\\",\\\"ARN\\\":\\\"arn:aws:s3:::ucdoctargetbucketlogs\\\"}],\\\"userAgent\\\":\\\"cloudtrail.amazonaws.com\\\",\\\"readOnly\\\":false,\\\"userIdentity\\\":{\\\"invokedBy\\\":\\\"cloudtrail.amazonaws.com\\\",\\\"type\\\":\\\"AWSService\\\"},\\\"eventType\\\":\\\"AwsApiCall\\\",\\\"additionalEventData\\\":{\\\"SignatureVersion\\\":\\\"SigV4\\\",\\\"CipherSuite\\\":\\\"ECDHE-RSA-AES128-SHA\\\",\\\"bytesTransferredIn\\\":765.0,\\\"SSEApplied\\\":\\\"SSE_S3\\\",\\\"AuthenticationMethod\\\":\\\"AuthHeader\\\",\\\"x-amz-id-2\\\":\\\"76JGAE28IdmL+xJ8rrssKzzH2H2Xaj1CovuOGNZ66fqORclykbG6tw5y1IRfMR/IjjxfQ+kn5Jo\\\\u003d\\\",\\\"bytesTransferredOut\\\":0.0},\\\"sharedEventID\\\":\\\"607cf029-2b4a-4782-9dd4-c469ed245314\\\",\\\"requestID\\\":\\\"7857A6C0C78C86BC\\\",\\\"eventTime\\\":\\\"2020-08-20T11:10:35Z\\\",\\\"recipientAccountId\\\":\\\"987076625343\\\",\\\"eventName\\\":\\\"PutObject\\\",\\\"managementEvent\\\":false}\",\"redactedSensitiveDataSql\":\"{\\\"eventID\\\":\\\"1b443621-e5a7-432d-a06c-1a9ba479059f\\\",\\\"awsRegion\\\":\\\"us-east-1\\\",\\\"eventCategory\\\":\\\"Data\\\",\\\"eventVersion\\\":\\\"1.07\\\",\\\"responseElements\\\":{\\\"x-amz-server-side-encryption\\\":\\\"AES256\\\"},\\\"sourceIPAddress\\\":\\\"cloudtrail.amazonaws.com\\\",\\\"eventSource\\\":\\\"s3.amazonaws.com\\\",\\\"requestParameters\\\":{\\\"bucketName\\\":\\\"ucdoctargetbucketlogs\\\",\\\"Host\\\":\\\"ucdoctargetbucketlogs.s3.us-east-1.amazonaws.com\\\",\\\"x-amz-acl\\\":\\\"bucket-owner-full-control\\\",\\\"x-amz-server-side-encryption\\\":\\\"AES256\\\",\\\"key\\\":\\\"AWSLogs/987076625343/CloudTrail/eu-west-2/2020/08/20/987076625343_CloudTrail_eu-west-2_20200820T1055Z_eAOjq1eVy9BvU7rJ.json.gz\\\"},\\\"resources\\\":[{\\\"type\\\":\\\"AWS::S3::Object\\\",\\\"ARN\\\":\\\"arn:aws:s3:::ucdoctargetbucketlogs/AWSLogs/987076625343/CloudTrail/eu-west-2/2020/08/20/987076625343_CloudTrail_eu-west-2_20200820T1055Z_eAOjq1eVy9BvU7rJ.json.gz\\\"},{\\\"type\\\":\\\"AWS::S3::Bucket\\\",\\\"accountId\\\":\\\"987076625343\\\",\\\"ARN\\\":\\\"arn:aws:s3:::ucdoctargetbucketlogs\\\"}],\\\"userAgent\\\":\\\"cloudtrail.amazonaws.com\\\",\\\"readOnly\\\":false,\\\"userIdentity\\\":{\\\"invokedBy\\\":\\\"cloudtrail.amazonaws.com\\\",\\\"type\\\":\\\"AWSService\\\"},\\\"eventType\\\":\\\"AwsApiCall\\\",\\\"additionalEventData\\\":{\\\"SignatureVersion\\\":\\\"SigV4\\\",\\\"CipherSuite\\\":\\\"ECDHE-RSA-AES128-SHA\\\",\\\"bytesTransferredIn\\\":765.0,\\\"SSEApplied\\\":\\\"SSE_S3\\\",\\\"AuthenticationMethod\\\":\\\"AuthHeader\\\",\\\"x-amz-id-2\\\":\\\"76JGAE28IdmL+xJ8rrssKzzH2H2Xaj1CovuOGNZ66fqORclykbG6tw5y1IRfMR/IjjxfQ+kn5Jo\\\\u003d\\\",\\\"bytesTransferredOut\\\":0.0},\\\"sharedEventID\\\":\\\"607cf029-2b4a-4782-9dd4-c469ed245314\\\",\\\"requestID\\\":\\\"7857A6C0C78C86BC\\\",\\\"eventTime\\\":\\\"2020-08-20T11:10:35Z\\\",\\\"recipientAccountId\\\":\\\"987076625343\\\",\\\"eventName\\\":\\\"PutObject\\\",\\\"managementEvent\\\":false}\"},\"originalSqlCommand\":\"{\\\"eventID\\\":\\\"1b443621-e5a7-432d-a06c-1a9ba479059f\\\",\\\"awsRegion\\\":\\\"us-east-1\\\",\\\"eventCategory\\\":\\\"Data\\\",\\\"eventVersion\\\":\\\"1.07\\\",\\\"responseElements\\\":{\\\"x-amz-server-side-encryption\\\":\\\"AES256\\\"},\\\"sourceIPAddress\\\":\\\"cloudtrail.amazonaws.com\\\",\\\"eventSource\\\":\\\"s3.amazonaws.com\\\",\\\"requestParameters\\\":{\\\"bucketName\\\":\\\"ucdoctargetbucketlogs\\\",\\\"Host\\\":\\\"ucdoctargetbucketlogs.s3.us-east-1.amazonaws.com\\\",\\\"x-amz-acl\\\":\\\"bucket-owner-full-control\\\",\\\"x-amz-server-side-encryption\\\":\\\"AES256\\\",\\\"key\\\":\\\"AWSLogs/987076625343/CloudTrail/eu-west-2/2020/08/20/987076625343_CloudTrail_eu-west-2_20200820T1055Z_eAOjq1eVy9BvU7rJ.json.gz\\\"},\\\"resources\\\":[{\\\"type\\\":\\\"AWS::S3::Object\\\",\\\"ARN\\\":\\\"arn:aws:s3:::ucdoctargetbucketlogs/AWSLogs/987076625343/CloudTrail/eu-west-2/2020/08/20/987076625343_CloudTrail_eu-west-2_20200820T1055Z_eAOjq1eVy9BvU7rJ.json.gz\\\"},{\\\"type\\\":\\\"AWS::S3::Bucket\\\",\\\"accountId\\\":\\\"987076625343\\\",\\\"ARN\\\":\\\"arn:aws:s3:::ucdoctargetbucketlogs\\\"}],\\\"userAgent\\\":\\\"cloudtrail.amazonaws.com\\\",\\\"readOnly\\\":false,\\\"userIdentity\\\":{\\\"invokedBy\\\":\\\"cloudtrail.amazonaws.com\\\",\\\"type\\\":\\\"AWSService\\\"},\\\"eventType\\\":\\\"AwsApiCall\\\",\\\"additionalEventData\\\":{\\\"SignatureVersion\\\":\\\"SigV4\\\",\\\"CipherSuite\\\":\\\"ECDHE-RSA-AES128-SHA\\\",\\\"bytesTransferredIn\\\":765.0,\\\"SSEApplied\\\":\\\"SSE_S3\\\",\\\"AuthenticationMethod\\\":\\\"AuthHeader\\\",\\\"x-amz-id-2\\\":\\\"76JGAE28IdmL+xJ8rrssKzzH2H2Xaj1CovuOGNZ66fqORclykbG6tw5y1IRfMR/IjjxfQ+kn5Jo\\\\u003d\\\",\\\"bytesTransferredOut\\\":0.0},\\\"sharedEventID\\\":\\\"607cf029-2b4a-4782-9dd4-c469ed245314\\\",\\\"requestID\\\":\\\"7857A6C0C78C86BC\\\",\\\"eventTime\\\":\\\"2020-08-20T11:10:35Z\\\",\\\"recipientAccountId\\\":\\\"987076625343\\\",\\\"eventName\\\":\\\"PutObject\\\",\\\"managementEvent\\\":false}\",\"useConstruct\":true},\"exception\":null}";
 
 }

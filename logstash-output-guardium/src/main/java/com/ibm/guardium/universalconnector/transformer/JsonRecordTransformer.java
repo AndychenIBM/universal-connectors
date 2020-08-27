@@ -57,7 +57,6 @@ public class JsonRecordTransformer implements RecordTransformer {
 
             Datasource.Client_request clientRequest = Datasource.Client_request.newBuilder()
                     .setSessionId(record.getSessionId().hashCode())//todo: check with Tim Session id issue
-                    .setRequestId(record.getSessionId().hashCode())//todo: check with Tim Request id issue
                     .setData(appData)
                     .build();
 
