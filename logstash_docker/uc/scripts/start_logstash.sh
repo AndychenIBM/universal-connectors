@@ -1,20 +1,6 @@
 #!/bin/bash
-
-function updateFromEnv(){
-    ENV_VAR=$1
-    VAR_NAME=$2
-    FILE=$3
-    ORIGINAL_STRING=$4
-    REPLACE_STRING=$5
-
-    if [ -z "$ENV_VAR" ]
-    then
-        echo "No $VAR_NAME was set as an environment variable. Using default value."
-    else
-        sed -i -r "s/$ORIGINAL_STRING/$REPLACE_STRING/g" $FILE
-        echo "$VAR_NAME was set to $ENV_VAR"
-    fi
-}
+source ${UC_SCRIPTS}/utils.sh
+source ${UC_SCRIPTS}/set_uc_log_level.sh
 
 logstash_pid=$(/usr/share/logstash/scripts/get_logstash_pid.sh)
 if [[ -z "$logstash_pid" ]]; then
@@ -23,11 +9,7 @@ if [[ -z "$logstash_pid" ]]; then
     updateFromEnv "$SNIF_IP" "Sniffer IP address" $UDS_ETC/SniffersConfig.json "127.0.0.1" "$SNIF_IP"
 
     #Change log4j2uc.properties log level if needed
-    if [[ "$UC_LOG_LEVEL" =~ ^(all|debug|info|warn|error|fatal|off|trace)$ ]]; then
-        updateFromEnv "$UC_LOG_LEVEL" "UC_LOG_LEVEL" $UDS_ETC/log4j2uc.properties "filter.threshold.level = error" "filter.threshold.level = $UC_LOG_LEVEL"
-        updateFromEnv "$UC_LOG_LEVEL" "UC_LOG_LEVEL" $UDS_ETC/log4j2uc.properties "logger.guardium.level = error" "logger.guardium.level = $UC_LOG_LEVEL"
-        updateFromEnv "$UC_LOG_LEVEL" "UC_LOG_LEVEL" $UDS_ETC/log4j2uc.properties "logger.logstashplugins.level = error" "logger.logstashplugins.level = $UC_LOG_LEVEL"
-    fi
+    setUcLogLevel "$UC_LOG_LEVEL"
 
     #Change connectorId if needed
     updateFromEnv "$CONNECTOR_ID" "CONNECTOR_ID" $UDS_ETC/UniversalConnector.json "\"connectorId\":.*" "\"connectorId\":\"$CONNECTOR_ID\","
@@ -41,7 +23,7 @@ if [[ -z "$logstash_pid" ]]; then
     updateFromEnv "$TCP_PORT" "TCP_PORT" $MONGODB_CONF "tcp \{ port => 5000 type => syslog" "tcp \{ port => $TCP_PORT type => syslog"
 
     #Start logstash
-    logstash -l ${LOG_GUC_DIR}
+    logstash -l ${LOG_GUC_DIR} 2>&1 | tee -a ${LOG_GUC_DIR}/logstash_stdout_stderr.log
 else
     echo "Logstash is already running..."
 fi
