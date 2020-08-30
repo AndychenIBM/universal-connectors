@@ -161,7 +161,6 @@ public class MySqlFilterGuardium implements Filter {
                                      if (query != null)
                                      {
                                          data.setOriginalSqlCommand(query);
-                                         data.setUseConstruct(false);
                                          validRecord = true;
                                      }
                                 }
@@ -290,7 +289,7 @@ public class MySqlFilterGuardium implements Filter {
         accessor.setSourceProgram(sourceProgram);
 
         accessor.setLanguage("MYSQL");
-        accessor.setType("TEXT");
+        accessor.setDataType(Accessor.DATA_TYPE_GUARDIUM_SHOULD_PARSE_SQL);
 
         accessor.setClient_mac(UNKNOWN_STRING);
         accessor.setClientHostName(UNKNOWN_STRING);

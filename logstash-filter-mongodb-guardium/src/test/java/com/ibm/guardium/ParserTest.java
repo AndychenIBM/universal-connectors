@@ -1,9 +1,6 @@
 package com.ibm.guardium;
 
 import java.text.ParseException;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -37,7 +34,7 @@ public class ParserTest {
 
         final JsonObject mongoJson = JsonParser.parseString(mongoString).getAsJsonObject();
         // final String actualResult = Parser.Parse(mongoJson);
-        final Construct result = Parser.ParseAsConstruct(mongoJson);
+        final Construct result = Parser.parseAsConstruct(mongoJson);
 
         final Sentence sentence = result.sentences.get(0);
         Assert.assertEquals("find", sentence.getVerb());
@@ -49,7 +46,7 @@ public class ParserTest {
     public void testParseAsConstruct_insert() {
         final String mongoString = "{ \"atype\": \"authCheck\", \"ts\": { \"$date\": \"2020-01-21T04:37:30.174-0500\" }, \"local\": { \"ip\": \"127.0.0.1\", \"port\": 27017 }, \"remote\": { \"ip\": \"127.0.0.1\", \"port\": 47638 }, \"users\": [ { \"user\": \"BILL\", \"db\": \"admin\" } ], \"roles\": [ { \"role\": \"readWrite\", \"db\": \"admin\" } ], \"param\": { \"command\": \"insert\", \"ns\": \"test.Myuser\", \"args\": { \"insert\": \"Myuser\", \"ordered\": true, \"lsid\": { \"id\": { \"$binary\": \"ql5vZfbGTgWXrBSZOU6l5w==\", \"$type\": \"04\" } }, \"$db\": \"test\", \"documents\": [ { \"_id\": { \"$oid\": \"58842568c706f50f5c1de663\" }, \"userId\": \"123456\", \"user_name\": \"Eli\", \"interestedTags\": [ \"music\", \"cricket\", \"hiking\", \"F1\", \"Mobile\", \"racing\" ], \"listFriends\": [ \"111111\", \"222222\", \"333333\" ] } ] } }, \"result\": 0 }";
         final JsonObject mongoJson = JsonParser.parseString(mongoString).getAsJsonObject();
-        final Construct result = Parser.ParseAsConstruct(mongoJson);
+        final Construct result = Parser.parseAsConstruct(mongoJson);
 
         final Sentence sentence = result.sentences.get(0);
         Assert.assertEquals("insert", sentence.getVerb());
@@ -60,7 +57,7 @@ public class ParserTest {
     public void testParseAsConstruct_deleteOne() {
         final String mongoString = "{ 'atype': 'authCheck', 'ts': { '$date': '2020-01-26T08:25:10.527-0500' }, 'local': { 'ip': '127.0.0.1', 'port': 27017 }, 'remote': { 'ip': '127.0.0.1', 'port': 56470 }, 'users': [], 'roles': [], 'param': { 'command': 'delete', 'ns': 'test.posts', 'args': { 'delete': 'posts', 'ordered': true, 'lsid': { 'id': { '$binary': '1P3A98W7QbqeDMqMdP2trA==', '$type': '04' } }, '$db': 'test', 'deletes': [ { 'q': { 'owner_id': '12345' }, 'limit': 1 } ] } }, 'result': 0 }";
         final JsonObject mongoJson = JsonParser.parseString(mongoString).getAsJsonObject();
-        final Construct result = Parser.ParseAsConstruct(mongoJson);
+        final Construct result = Parser.parseAsConstruct(mongoJson);
 
         final Sentence sentence = result.sentences.get(0);
         Assert.assertEquals("delete", sentence.getVerb());
@@ -71,7 +68,7 @@ public class ParserTest {
     public void testParseAsConstruct_updateOne() {
         final String mongoString = "{ 'atype': 'authCheck', 'ts': { '$date': '2020-01-26T08:57:50.972-0500' }, 'local': { 'ip': '127.0.0.1', 'port': 27017 }, 'remote': { 'ip': '127.0.0.1', 'port': 56470 }, 'users': [], 'roles': [], 'param': { 'command': 'update', 'ns': 'test.posts', 'args': { 'update': 'posts', 'ordered': true, 'lsid': { 'id': { '$binary': '1P3A98W7QbqeDMqMdP2trA==', '$type': '04' } }, '$db': 'test', 'updates': [ { 'q': { 'owner_id': '6789' }, 'u': { '$set': { 'via': 'instagram' } }, 'multi': false, 'upsert': false } ] } }, 'result': 0 }";
         final JsonObject mongoJson = JsonParser.parseString(mongoString).getAsJsonObject();
-        final Construct result = Parser.ParseAsConstruct(mongoJson);
+        final Construct result = Parser.parseAsConstruct(mongoJson);
 
         final Sentence sentence = result.sentences.get(0);
         Assert.assertEquals("update", sentence.getVerb());
@@ -89,7 +86,7 @@ public class ParserTest {
     public void testParse_compound_object() {
         final String mongoString = "{ 'atype' : 'authCheck', 'ts' : { '$date' : '2020-08-11T11:13:05.480-0400' }, 'local' : { 'ip' : '127.0.0.1', 'port' : 27017 }, 'remote' : { 'ip' : '127.0.0.1', 'port' : 35634 }, 'users' : [ { 'user' : 'admin', 'db' : 'admin' } ], 'roles' : [ { 'role' : 'root', 'db' : 'admin' } ], 'param' : { 'command' : 'applyOps', 'ns' : 'admin', 'args' : { 'applyOps' : [ { 'op' : 'c', 'ns' : 'test.$cmd', 'o' : { 'create' : 'viewColl', 'viewOn' : 'test', 'pipeline' : [] } } ], 'lsid' : { 'id' : { '$binary' : '0x6EvqPyQNy0czzyrvR1dw==', '$type' : '04' } }, '$db' : 'admin' } }, 'result' : 0 }";
         final JsonObject mongoJson = JsonParser.parseString(mongoString).getAsJsonObject();
-        final Construct result = Parser.ParseAsConstruct(mongoJson);
+        final Construct result = Parser.parseAsConstruct(mongoJson);
 
         final Sentence sentence = result.sentences.get(0);
         Assert.assertEquals("applyOps", sentence.getVerb());
@@ -100,7 +97,7 @@ public class ParserTest {
     public void testParseAsConstruct_mapReduce() {
         final String mongoString = "{ 'atype' : 'authCheck', 'ts' : { '$date' : '2020-08-12T05:38:57.912-0400' }, 'local' : { 'ip' : '127.0.0.1', 'port' : 27017 }, 'remote' : { 'ip' : '127.0.0.1', 'port' : 36648 }, 'users' : [ { 'user' : 'realAdmin', 'db' : 'admin' } ], 'roles' : [ { 'role' : 'readWriteAnyDatabase', 'db' : 'admin' }, { 'role' : 'readWrite', 'db' : 'newDB02' }, { 'role' : 'userAdminAnyDatabase', 'db' : 'admin' } ], 'param' : { 'command' : 'mapReduce', 'ns' : 'test.orders', 'args' : { 'mapreduce' : 'orders', 'map' : 'function() {\n   emit(this.cust_id, this.price);\n}', 'reduce' : 'function(keyCustId, valuesPrices) {\n   return Array.sum(valuesPrices);\n}', 'out' : 'map_reduce_example', 'lsid' : { 'id' : { '$binary' : 'HmeBAmiJSkaY43ZrPCEw+A==', '$type' : '04' } }, '$db' : 'test' } }, 'result' : 0 }";
         final JsonObject mongoJson = JsonParser.parseString(mongoString).getAsJsonObject();
-        final Construct result = Parser.ParseAsConstruct(mongoJson);
+        final Construct result = Parser.parseAsConstruct(mongoJson);
 
         final Sentence sentence = result.sentences.get(0);
         Assert.assertEquals("mapReduce", sentence.getVerb());
@@ -111,7 +108,7 @@ public class ParserTest {
     public void testParseAsConstruct_resetErrors() {
         final String mongoString = "{ 'atype' : 'authCheck', 'ts' : { '$date' : '2020-08-12T05:55:46.413-0400' }, 'local' : { 'ip' : '127.0.0.1', 'port' : 27017 }, 'remote' : { 'ip' : '127.0.0.1', 'port' : 36648 }, 'users' : [ { 'user' : 'realAdmin', 'db' : 'admin' } ], 'roles' : [ { 'role' : 'readWriteAnyDatabase', 'db' : 'admin' }, { 'role' : 'readWrite', 'db' : 'newDB02' }, { 'role' : 'userAdminAnyDatabase', 'db' : 'admin' } ], 'param' : { 'command' : 'resetError', 'ns' : 'test', 'args' : { 'reseterror' : 1, 'lsid' : { 'id' : { '$binary' : 'HmeBAmiJSkaY43ZrPCEw+A==', '$type' : '04' } }, '$db' : 'test' } }, 'result' : 0 }";
         final JsonObject mongoJson = JsonParser.parseString(mongoString).getAsJsonObject();
-        final Construct result = Parser.ParseAsConstruct(mongoJson);
+        final Construct result = Parser.parseAsConstruct(mongoJson);
 
         final Sentence sentence = result.sentences.get(0);
         Assert.assertEquals("resetError", sentence.getVerb());
@@ -122,7 +119,7 @@ public class ParserTest {
     public void testParseAsConstruct_endSessions() {
         final String mongoString = "{ \"atype\" : \"authCheck\", \"ts\" : { \"$date\" : \"2020-08-19T10:09:35.757-0400\" }, \"local\" : { \"ip\" : \"127.0.0.1\", \"port\" : 27017 }, \"remote\" : { \"ip\" : \"127.0.0.1\", \"port\" : 10390 }, \"users\" : [ { \"user\" : \"realAdmin\", \"db\" : \"admin\" } ], \"roles\" : [ { \"role\" : \"readWriteAnyDatabase\", \"db\" : \"admin\" }, { \"role\" : \"readWrite\", \"db\" : \"newDB02\" }, { \"role\" : \"userAdminAnyDatabase\", \"db\" : \"admin\" } ], \"param\" : { \"command\" : \"endSessions\", \"ns\" : \"admin\", \"args\" : { \"endSessions\" : [ { \"id\" : { \"$binary\" : \"Mc0gWYOhR6mxvfMc3THs9g==\", \"$type\" : \"04\" } } ], \"$db\" : \"admin\" } }, \"result\" : 0 }";
         final JsonObject mongoJson = JsonParser.parseString(mongoString).getAsJsonObject();
-        final Construct result = Parser.ParseAsConstruct(mongoJson);
+        final Construct result = Parser.parseAsConstruct(mongoJson);
         final Sentence sentence = result.sentences.get(0);
         Assert.assertEquals("endSessions", sentence.getVerb());
         Assert.assertEquals(Parser.COMPOUND_OBJECT_STRING, sentence.getObjects().get(0).name);
@@ -134,7 +131,7 @@ public class ParserTest {
 
         final JsonObject mongoJson = JsonParser.parseString(mongoString).getAsJsonObject();
         // final String actualResult = Parser.Parse(mongoJson);
-        final Construct result = Parser.ParseAsConstruct(mongoJson);
+        final Construct result = Parser.parseAsConstruct(mongoJson);
 
         final Sentence sentence = result.sentences.get(0);
         Assert.assertEquals("aggregate", sentence.getVerb());
@@ -148,7 +145,7 @@ public class ParserTest {
 
         final JsonObject mongoJson = JsonParser.parseString(mongoString).getAsJsonObject();
         // final String actualResult = Parser.Parse(mongoJson);
-        final Construct result = Parser.ParseAsConstruct(mongoJson);
+        final Construct result = Parser.parseAsConstruct(mongoJson);
 
         final Sentence sentence = result.sentences.get(0);
         Assert.assertEquals("aggregate", sentence.getVerb());
@@ -162,7 +159,7 @@ public class ParserTest {
 
         final JsonObject mongoJson = JsonParser.parseString(mongoString).getAsJsonObject();
         // final String actualResult = Parser.Parse(mongoJson);
-        final Construct result = Parser.ParseAsConstruct(mongoJson);
+        final Construct result = Parser.parseAsConstruct(mongoJson);
 
         final Sentence sentence = result.sentences.get(0);
         Assert.assertEquals("aggregate", sentence.getVerb());
@@ -254,7 +251,7 @@ public class ParserTest {
 
         final JsonObject mongoJson = JsonParser.parseString(mongoString).getAsJsonObject();
         // final String actualResult = Parser.Parse(mongoJson);
-        final Construct result = Parser.ParseAsConstruct(mongoJson);
+        final Construct result = Parser.parseAsConstruct(mongoJson);
 
         final Sentence sentence = result.sentences.get(0);
         Assert.assertEquals("listIndexes", sentence.getVerb());

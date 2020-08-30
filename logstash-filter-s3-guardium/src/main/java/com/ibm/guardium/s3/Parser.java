@@ -71,7 +71,7 @@ public class Parser {
         accessor.setCommProtocol(getStrValue(auditObj,"eventType")); // talk to Itai
         accessor.setDbProtocolVersion(getStrValue(auditObj,"eventVersion"));
         accessor.setServiceName(getStrValue(auditObj,"awsRegion"));
-        accessor.setType(Accessor.TYPE_CONSTRUCT_STRING);
+        accessor.setDataType(Accessor.DATA_TYPE_GUARDIUM_SHOULD_NOT_PARSE_SQL);
 
         accessor.setServerDescription(getStrValue(auditObj,"awsRegion"));
         accessor.setLanguage(Accessor.LANGUAGE_FREE_TEXT_STRING);
@@ -100,9 +100,6 @@ public class Parser {
             Data data = new Data();
             record.setData(data);
 
-            data.setOriginalSqlCommand(auditAsSql);
-            data.setUseConstruct(true);
-
             Construct construct = new Construct();
             data.setConstruct(construct);
             construct.setFullSql(auditAsSql);
@@ -123,9 +120,7 @@ public class Parser {
             try {
                 if (!UNKNOWN_STRING.equals(resourcesStr) && resourcesStr != null && resourcesStr.length() > 0) {
 
-                    log.debug("resourcesStr is " + resourcesStr);
                     resourcesStr = gson.toJson(auditObj.get("resources"));
-                    log.debug("resourcesStr AS JSON STR3 " + resourcesStr);
 
                     JsonElement resourcesJSON = JsonParser.parseString(resourcesStr);
                     if (resourcesJSON.isJsonArray()) {

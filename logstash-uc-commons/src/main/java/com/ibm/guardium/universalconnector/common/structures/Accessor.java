@@ -2,8 +2,8 @@ package com.ibm.guardium.universalconnector.common.structures;
 
 public class Accessor {
     // TYPE
-    public static final String TYPE_CONSTRUCT_STRING = "CONSTRUCT"; // Signals Guardium not to parse
-    private static final String TYPE_TEXT_STRING = "TEXT";  // Signals Guardium to parse (supported DB languages only)
+    public static final String  DATA_TYPE_GUARDIUM_SHOULD_NOT_PARSE_SQL = "CONSTRUCT"; // Signals Guardium not to parse
+    public static final String  DATA_TYPE_GUARDIUM_SHOULD_PARSE_SQL = "TEXT";  // Signals Guardium to parse (supported DB languages only)
     
     public static final String LANGUAGE_FREE_TEXT_STRING = "FREE_TEXT"; // Used when no need to parse by Guardium Sniffer 
 
@@ -22,7 +22,7 @@ public class Accessor {
     private String serverDescription;
     private String serviceName;
     private String language;
-    private String type;
+    private String dataType;
 
     public String getDbUser() {
         return dbUser;
@@ -144,11 +144,11 @@ public class Accessor {
         this.language = language;
     }
 
-    public String getType() {
-        return type;
+    public String getDataType() {
+        return dataType;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setDataType(String dataType) {
+        this.dataType = dataType;
     }
 }

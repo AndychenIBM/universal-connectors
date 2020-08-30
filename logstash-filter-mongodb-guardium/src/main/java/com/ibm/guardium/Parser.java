@@ -53,7 +53,7 @@ public class Parser {
 
         try {
 
-            final Construct construct = Parser.ParseAsConstruct(data);
+            final Construct construct = Parser.parseAsConstruct(data);
 
             final GsonBuilder builder = new GsonBuilder();
             builder.setPrettyPrinting().serializeNulls();
@@ -82,7 +82,7 @@ public class Parser {
      * @return Construct Used by Parse and for easier testing, as well
      * @author Tal Daniel
      */
-    public static Construct ParseAsConstruct(final JsonObject data) {
+    public static Construct parseAsConstruct(final JsonObject data) {
         try {
             final Sentence sentence = Parser.parseSentence(data);
             
@@ -217,7 +217,7 @@ public class Parser {
         if (result.equals("0")) {
             record.setData(Parser.parseData(data));
         } else { // 13, 18
-            record.setException(Parser.ParseException(data, result));
+            record.setException(Parser.parseException(data, result));
         }
 
         // post populate fields:
@@ -237,7 +237,7 @@ public class Parser {
      * @param resultCode
      * @return
      */
-    private static ExceptionRecord ParseException(JsonObject data, String resultCode) {
+    private static ExceptionRecord parseException(JsonObject data, String resultCode) {
         ExceptionRecord exceptionRecord = new ExceptionRecord();
         if (resultCode.equals("13")) {
             exceptionRecord.setExceptionTypeId(Parser.EXCEPTION_TYPE_AUTHORIZATION_STRING);
@@ -285,7 +285,7 @@ public class Parser {
         accessor.setSourceProgram(Parser.UNKOWN_STRING); // populated from Event, later
 
         accessor.setLanguage(Accessor.LANGUAGE_FREE_TEXT_STRING);
-        accessor.setType(Accessor.TYPE_CONSTRUCT_STRING);
+        accessor.setDataType(Accessor.DATA_TYPE_GUARDIUM_SHOULD_NOT_PARSE_SQL);
 
         accessor.setClient_mac(Parser.UNKOWN_STRING);
         accessor.setClientHostName(Parser.UNKOWN_STRING);
@@ -353,10 +353,9 @@ public class Parser {
         Data data = new Data();
         data.setOriginalSqlCommand(Parser.UNKOWN_STRING); // TODO: remove if not used
         try {
-            Construct construct = ParseAsConstruct(inputJSON);
+            Construct construct = parseAsConstruct(inputJSON);
             if (construct != null) {
                 data.setConstruct(construct);
-                data.setUseConstruct(true);
 
                 if (construct.getFullSql() == null) {
                     construct.setFullSql(Parser.UNKOWN_STRING);
@@ -366,6 +365,7 @@ public class Parser {
                 }
             }
         } catch (Exception e) {
+            log.error("Error parsing mongo data json "+inputJSON, e);
             throw e;
         }
         return data;

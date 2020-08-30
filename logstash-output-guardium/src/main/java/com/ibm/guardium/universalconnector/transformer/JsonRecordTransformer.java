@@ -1,7 +1,6 @@
 package com.ibm.guardium.universalconnector.transformer;
 
 import com.google.gson.Gson;
-import com.google.protobuf.ByteString;
 import com.ibm.guardium.proto.datasource.Datasource;
 import com.ibm.guardium.universalconnector.common.Utilities;
 import com.ibm.guardium.universalconnector.common.structures.*;
@@ -10,7 +9,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import sun.net.util.IPAddressUtil;
 
-import java.math.BigInteger;
 import java.util.*;
 
 public class JsonRecordTransformer implements RecordTransformer {
@@ -189,7 +187,7 @@ public class JsonRecordTransformer implements RecordTransformer {
     public Datasource.Accessor buildAccessor(Record record) {
         // dataType specifies if sniffer should parse sql (type=TEXT)
         // or just enter to guardium the fields (sentences/object/etc) as is (type=CONSTRUCT)
-        Datasource.Application_data.Data_type dataType = getDataType(record);
+        Datasource.Application_data.Data_type dataType = getAccessorDataType(record.getAccessor());
 
         // mandatory fields - no need to build without it
         Accessor ra = record.getAccessor();
@@ -210,7 +208,7 @@ public class JsonRecordTransformer implements RecordTransformer {
                 .setDbUser(ra.getDbUser())
                 .setServerType(ra.getServerType())
                 .setDbProtocol(ra.getDbProtocol())
-                .setLanguage(getLanguageType(record))
+                .setLanguage(getLanguageType(record.getAccessor()))
                 .setType(dataType)
                 .setDatasourceType(Datasource.Application_data.Datasource_type.UNI_CON);
 
@@ -316,16 +314,22 @@ public class JsonRecordTransformer implements RecordTransformer {
         return ret;
     }
 
-    public Datasource.Application_data buildAppplicationData(Record record, Datasource.Session_locator sessionLocator) {
+    public static boolean shouldGuardiumParseSql(Datasource.Application_data.Data_type dataType){
+        return Datasource.Application_data.Data_type.TEXT.equals(dataType);
+    }
 
-        Datasource.Application_data.Data_type dataType = getDataType(record);
-        if (Datasource.Application_data.Data_type.TEXT.equals(dataType) && isEmpty(record.getAccessor().getLanguage())){
+    public Datasource.Application_data buildAppplicationData(Record record, Datasource.Session_locator sessionLocator){
+
+        // can not set data type to TEXT ( meaning that guardium should parse data)
+        // without specifying what is the language that should be parsed
+        Datasource.Application_data.Data_type dataType = getAccessorDataType(record.getAccessor());
+        if (shouldGuardiumParseSql(dataType) && isEmpty(record.getAccessor().getLanguage())){
             throw new GuardUCInvalidRecordException("Invalid getLanguage() value "+record.getAccessor().getLanguage());
         }
 
         Datasource.Application_data.Builder builder = Datasource.Application_data.newBuilder()
                 .setType(dataType)
-                .setLanguage(getLanguageType(record))
+                .setLanguage(getLanguageType(record.getAccessor()))
                 .setSessionLocator(sessionLocator)
                 .setDatasourceType(Datasource.Application_data.Datasource_type.UNI_CON)
                 .setTimestamp(Utilities.getTimestamp(record.getTime()));
@@ -336,7 +340,7 @@ public class JsonRecordTransformer implements RecordTransformer {
 
         Data rd = record.getData();
         if(rd != null) {
-            if (rd.isUseConstruct()) {
+            if (shouldGuardiumParseSql(dataType)) {
                 Datasource.GDM_construct gdmConstruct = buildConstruct(rd);
                 builder.setConstruct(gdmConstruct);
             } else {
@@ -360,8 +364,8 @@ public class JsonRecordTransformer implements RecordTransformer {
         }
     * */
 
-    public static Datasource.Application_data.Language_type getLanguageType(Record record){
-        String langType = (record.getData()!=null && record.getData().isUseConstruct()) ? LANG_TYPE_FREE_TEXT : record.getAccessor().getLanguage();
+    public static Datasource.Application_data.Language_type getLanguageType(Accessor recordAccessor){
+        String langType = !shouldGuardiumParseSql(getAccessorDataType(recordAccessor)) ? LANG_TYPE_FREE_TEXT : recordAccessor.getLanguage();
         try {
             return Datasource.Application_data.Language_type.valueOf(langType.toUpperCase());
         } catch (Exception e){
@@ -370,12 +374,13 @@ public class JsonRecordTransformer implements RecordTransformer {
         }
     }
 
-    public static Datasource.Application_data.Data_type getDataType(Record record){
-        // only if "do not use construct" was set explicitly ( meaning "parse sql instead of passed objects" )
-        if (record.getData()!=null && !record.getData().isUseConstruct()){
+    public static Datasource.Application_data.Data_type getAccessorDataType(Accessor recordAccessor) throws GuardUCInvalidRecordException {
+        if (Accessor.DATA_TYPE_GUARDIUM_SHOULD_PARSE_SQL.equalsIgnoreCase(recordAccessor.getDataType())){
             return Datasource.Application_data.Data_type.TEXT;
-        } else {
+        } else if (Accessor.DATA_TYPE_GUARDIUM_SHOULD_NOT_PARSE_SQL.equalsIgnoreCase(recordAccessor.getDataType())){
             return Datasource.Application_data.Data_type.CONSTRUCT;
+        } else {
+            throw new GuardUCInvalidRecordException("Invalid Accessor data type: "+recordAccessor.getDataType());
         }
     }
 
