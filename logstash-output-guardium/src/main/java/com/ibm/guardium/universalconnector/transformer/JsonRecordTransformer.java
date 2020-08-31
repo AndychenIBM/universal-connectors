@@ -341,10 +341,10 @@ public class JsonRecordTransformer implements RecordTransformer {
         Data rd = record.getData();
         if(rd != null) {
             if (shouldGuardiumParseSql(dataType)) {
+                builder.setText(rd.getOriginalSqlCommand());
+            } else {
                 Datasource.GDM_construct gdmConstruct = buildConstruct(rd);
                 builder.setConstruct(gdmConstruct);
-            } else {
-                builder.setText(rd.getOriginalSqlCommand());
             }
         }
         return builder.build();
