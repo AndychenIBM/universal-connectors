@@ -1,5 +1,14 @@
 FROM universal-connector-base
 
+LABEL maintainer="IBM Security" \
+    #build_date=
+    #version=
+    #release=
+    name="Universal-Connector" \
+    summary="Image for Guardium Universal Connector" \
+    description="This image contains universal-connector-base image, along with plugins for supporting a variety of databses. For more information on this image please see documentation files" \
+    vendor="IBM Corp."
+
 #Copy Universal-Connector files
 #Note that using 'COPY --chown="guc:guardium" uc/. ${LOGSTASH_DIR}/' command instead of the following 4 commands can save approximately 190MB
 USER root

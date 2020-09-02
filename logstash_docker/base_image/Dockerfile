@@ -1,5 +1,14 @@
 FROM registry.redhat.io/ubi8/ubi-minimal:8.2
 
+LABEL maintainer="IBM Security" \
+    #build_date=
+    #version=
+    #release=
+    name="Universal-Connector Base Image" \
+    summary="Base image for Guardium Universal Connector" \
+    description="This image contains Logstash running on Java OpenJDK, installed on UBI operating system. For more information on this image please see documentation files" \
+    vendor="IBM Corp."
+
 ENV JAVA_HOME=/opt/java/openjdk \
     PATH="/opt/java/openjdk/bin:$PATH" \
     JAVA_VERSION="jdk-11.0.8+10_openj9-0.21.0" \
