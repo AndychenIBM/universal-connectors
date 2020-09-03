@@ -1,7 +1,7 @@
 #!/bin/bash
 
 DEFAULT_UC_HOSTNAME="*.guard.swg.usma.ibm.com"
-UC_HOSTNAME=${1:-DEFAULT_UC_HOSTNAME}
+UC_HOSTNAME=${1:-$DEFAULT_UC_HOSTNAME}
 SSL_DIR=${LOGSTASH_DIR}/ssl
 my_openssl_cnf_path=/etc/pki/logstash/my_openssl.cnf
 
