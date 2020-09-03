@@ -46,6 +46,5 @@ Project Content:
 	    1.2.1. *.conf files that will be used as the configuration for Logstash (including input,filter and output)
 	1.3. scripts directory:
 	    1.3.1. *.sh scripts for universal-connector usage
-	1.4. pipelines.yml- configure pipelines for Logstash
 2. uc_perf_tests directory- a directory meant for performance tests
 3. Dockerfile- import and install Logstash, remove old version of the container, pass relevant files to the container, install plugins.
