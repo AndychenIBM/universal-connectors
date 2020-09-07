@@ -4,6 +4,10 @@ Notable changes will be documented in this file.
 
 ## [Unreleased]
 
+## [0.5.1]
+## Fixed 
+- Added support for MongoDB v4.4 timeformat change in ts.$date (with unit tests for createCollection & mapReduce).
+
 ## [0.4.9]
 ### Fixed 
 - Send "\[json-object\]" when object is not a JSON primitive, as two word objects are not supported in Investigation dashboard. 

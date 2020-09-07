@@ -23,29 +23,17 @@ public class JavaFilterExampleTest {
     final static String mongodString = "<14>Feb 18 08:53:31 qa-db51 mongod: { \"atype\" : \"authCheck\", \"ts\" : { \"$date\" : \"2020-01-16T05:41:30.783-0500\" }, \"local\" : { \"ip\" : \"(NONE)\", \"port\" : 0 }, \"remote\" : { \"ip\" : \"(NONE)\", \"port\" : 0 }, \"users\" : [], \"roles\" : [], \"param\" : { \"command\" : \"find\", \"ns\" : \"config.transactions\", \"args\" : { \"find\" : \"transactions\", \"filter\" : { \"lastWriteDate\" : { \"$lt\" : { \"$date\" : \"2020-01-16T05:11:30.782-0500\" } } }, \"projection\" : { \"_id\" : 1 }, \"sort\" : { \"_id\" : 1 }, \"$db\" : \"config\" } }, \"result\" : 0 }";
     final static Context context = new ContextImpl(null, null);
     final static JavaFilterExample filter = new JavaFilterExample("test-id", null, context);
-    /*@Test
-    public void testJavaExampleFilter() {
-        String sourceField = "foo";
-        Configuration config = new ConfigurationImpl(Collections.singletonMap("source", sourceField));
-        Context context = new ContextImpl(null, null);
-        JavaFilterExample filter = new JavaFilterExample("test-id", config, context);
 
-        Event e = new org.logstash.Event();
-        TestMatchListener matchListener = new TestMatchListener();
-        e.setField(sourceField, "abcdef");
-        Collection<Event> results = filter.filter(Collections.singletonList(e), matchListener);
-
-        Assert.assertEquals(1, results.size());
-        Assert.assertEquals("fedcba", e.getField(sourceField));
-        Assert.assertEquals(1, matchListener.getMatchCount());
-    } */
-
+    /**
+     * To feed Guardium universal connector, a "GuardRecord" fields must exist. 
+     * 
+     * Filter should add field "GuardRecord" to the Event, which Universal connector then inserts into Guardium.   
+     */
     @Test
-    public void testParseMongSSS() {
-//        final String mongodString = "\"mongod: { \"atype\" : \"dropIndex\", \"ts\" : { \"$date\" : \"2020-08-16T08:35:01.318-0400\" }, \"local\" : { \"ip\" : \"9.42.29.56\", \"port\" : 27017 }, \"remote\" : { \"ip\" : \"9.42.29.56\", \"port\" : 46096 }, \"users\" : [ { \"user\" : \"Debra\", \"db\" : \"admin\" } ], \"roles\" : [ { \"role\" : \"root\", \"db\" : \"admin\" } ], \"param\" : { \"ns\" : \"admin.WORKERS_A0\", \"indexName\" : \"_id_\" }, \"result\" : 0 }";
-//        final String mongodString = "\"mongod: { \"atype\" : \"authenticate\", \"ts\" : { \"$date\" : \"2020-08-16T08:35:01.314-0400\" }, \"local\" : { \"ip\" : \"9.42.29.56\", \"port\" : 27017 }, \"remote\" : { \"ip\" : \"9.42.29.56\", \"port\" : 46116 }, \"users\" : [ { \"user\" : \"Debra\", \"db\" : \"admin\" } ], \"roles\" : [ { \"role\" : \"root\", \"db\" : \"admin\" } ], \"param\" : { \"user\" : \"Debra\", \"db\" : \"admin\", \"mechanism\" : \"SCRAM-SHA-256\" }, \"result\" : 0 }";
+    public void testFieldGuardRecord() {
         final String mongodString2 = "mongod: { \"atype\" : \"authCheck\", \"ts\" : { \"$date\" : \"2020-08-19T11:52:27.495-0400\" }, \"local\" : { \"ip\" : \"127.0.0.1\", \"port\" : 27017 }, \"remote\" : { \"ip\" : \"127.0.0.1\", \"port\" : 10688 }, \"users\" : [ { \"user\" : \"realAdmin\", \"db\" : \"admin\" } ], \"roles\" : [ { \"role\" : \"readWriteAnyDatabase\", \"db\" : \"admin\" }, { \"role\" : \"readWrite\", \"db\" : \"newDB02\" }, { \"role\" : \"userAdminAnyDatabase\", \"db\" : \"admin\" } ], \"param\" : { \"command\" : \"getCmdLineOpts\", \"ns\" : \"admin\", \"args\" : { \"getCmdLineOpts\" : 1, \"lsid\" : { \"id\" : { \"$binary\" : \"9d5Ezoo2ROy/uYNsTpGJww==\", \"$type\" : \"04\" } }, \"$db\" : \"admin\" } }, \"result\" : 13 }";
 
+        // Configuration config = new ConfigurationImpl(Collections.singletonMap("source", sourceField));
         Context context = new ContextImpl(null, null);
         JavaFilterExample filter = new JavaFilterExample("test-id", null, context);
 
