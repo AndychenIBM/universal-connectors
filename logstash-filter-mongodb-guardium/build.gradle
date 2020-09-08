@@ -7,17 +7,17 @@ apply from: LOGSTASH_CORE_PATH + "/../rubyUtils.gradle"
 // ===========================================================================
 // plugin info
 // ===========================================================================
-group                      'org.logstashplugins' // must match the package of the main plugin class
+group                      'com.ibm.guardium.mongodb' // must match the package of the main plugin class
 version                    "${file("VERSION").text.trim()}" // read from required VERSION file
-description                = "Example Java filter"
+description                = "MongoDB-Guardium filter plugin"
 pluginInfo.licenses        = ['Apache-2.0'] // list of SPDX license IDs
-pluginInfo.longDescription = "This gem is a Logstash plugin required to be installed on top of the Logstash core pipeline using \$LS_HOME/bin/logstash-plugin install gemname. This gem is not a stand-alone program"
-pluginInfo.authors         = ['IBM']
+pluginInfo.longDescription = "This gem is a Logstash MongoDB filter plugin required to be installed as part of IBM Security Guardium, Guardium Universal connector configuration. This gem is not a stand-alone program."
+pluginInfo.authors         = ['IBM', 'Tal Daniel', 'Natali Geymakher']
 pluginInfo.email           = ['taldan@il.ibm.com']
 pluginInfo.homepage        = "http://www.elastic.co/guide/en/logstash/current/index.html"
 pluginInfo.pluginType      = "filter"
-pluginInfo.pluginClass     = "JavaFilterExample"
-pluginInfo.pluginName      = "java_filter_example" // must match the @LogstashPlugin annotation in the main plugin class
+pluginInfo.pluginClass     = "MongodbGuardiumFilter"
+pluginInfo.pluginName      = "mongodb_guardium_filter" // must match the @LogstashPlugin annotation in the main plugin class
 // ===========================================================================
 
 sourceCompatibility = 1.8

@@ -1,4 +1,4 @@
-package com.ibm.guardium;
+package com.ibm.guardium.mongodb;
 
 import java.text.ParseException;
 

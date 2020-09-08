@@ -1,4 +1,4 @@
-package com.ibm.guardium; // TODO .mongodb RECOMMENDATION: be specific, to prevent clash with other plugin classes
+package com.ibm.guardium.mongodb; // RECOMMENDATION: be specific; this will prevent clashes with classes of other plugins
 
 import java.text.ParseException;
 import java.time.ZonedDateTime;

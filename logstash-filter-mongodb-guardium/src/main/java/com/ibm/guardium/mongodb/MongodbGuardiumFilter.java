@@ -1,4 +1,4 @@
-package org.logstashplugins;
+package com.ibm.guardium.mongodb;
 
 import co.elastic.logstash.api.Configuration;
 import co.elastic.logstash.api.Context;
@@ -8,7 +8,6 @@ import co.elastic.logstash.api.FilterMatchListener;
 import co.elastic.logstash.api.LogstashPlugin;
 import co.elastic.logstash.api.PluginConfigSpec;
 import com.google.gson.*;
-import com.ibm.guardium.Parser;
 import com.ibm.guardium.universalconnector.common.GuardConstants;
 import com.ibm.guardium.universalconnector.common.Util;
 import com.ibm.guardium.universalconnector.common.structures.*;
@@ -21,43 +20,42 @@ import java.io.File;
 import java.util.*;
 
 // class name must match plugin name
-@LogstashPlugin(name = "java_filter_example")
-public class JavaFilterExample implements Filter {
+@LogstashPlugin(name = "mongodb_guardium_filter")
+public class MongodbGuardiumFilter implements Filter {
 
-    public static final String LOG42_CONF="log4j2uc.properties";
+    public static final String LOG42_CONF = "log4j2uc.properties";
     static {
         try {
             String uc_etc = System.getenv("UC_ETC");
             LoggerContext context = (LoggerContext) LogManager.getContext(false);
-            File file = new File(uc_etc +File.separator+LOG42_CONF);
+            File file = new File(uc_etc + File.separator + LOG42_CONF);
             context.setConfigLocation(file.toURI());
-        } catch (Exception e){
-            System.err.println("Failed to load log4j configuration "+e.getMessage());
+        } catch (Exception e) {
+            System.err.println("Failed to load log4j configuration " + e.getMessage());
             e.printStackTrace();
         }
     }
-    private static Logger log = LogManager.getLogger(JavaFilterExample.class);
+    private static Logger log = LogManager.getLogger(MongodbGuardiumFilter.class);
 
-    public static final PluginConfigSpec<String> SOURCE_CONFIG =
-            PluginConfigSpec.stringSetting("source", "message");
-    public static final String LOGSTASH_TAG_SKIP_NOT_MONGODB = "_mongoguardium_skip_not_mongodb"; // skip messages that do not contain "mongod:"
-    /* skipping non-mongo syslog messages, and non-relevant log events 
-        like "createUser", "createCollection", ... as these are already parsed in prior authCheck messages. */ 
-    public static final String LOGSTASH_TAG_SKIP = "_mongoguardium_skip"; 
+    public static final PluginConfigSpec<String> SOURCE_CONFIG = PluginConfigSpec.stringSetting("source", "message");
+    public static final String LOGSTASH_TAG_SKIP_NOT_MONGODB = "_mongoguardium_skip_not_mongodb"; // skip messages that
+                                                                                                  // do not contain
+                                                                                                  // "mongod:"
+    /*
+     * skipping non-mongo syslog messages, and non-relevant log events like
+     * "createUser", "createCollection", ... as these are already parsed in prior
+     * authCheck messages.
+     */
+    public static final String LOGSTASH_TAG_SKIP = "_mongoguardium_skip";
     public static final String LOGSTASH_TAG_JSON_PARSE_ERROR = "_mongoguardium_json_parse_error";
-    
-    private String id;
-    private String sourceField; 
-    private final static String MONGOAUDIT_START_SIGNAL = "mongod: ";  
-    private final static Set<String> LOCAL_IP_LIST = new HashSet<>(
-        Arrays.asList("127.0.0.1", "0:0:0:0:0:0:0:1"));
 
-    public JavaFilterExample(String id, Configuration config, Context context) {
+    private String id;
+    private final static String MONGOAUDIT_START_SIGNAL = "mongod: ";
+    private final static Set<String> LOCAL_IP_LIST = new HashSet<>(Arrays.asList("127.0.0.1", "0:0:0:0:0:0:0:1"));
+
+    public MongodbGuardiumFilter(String id, Configuration config, Context context) {
         // constructors should validate configuration options
         this.id = id;
-        if (config != null) {
-            this.sourceField = config.get(SOURCE_CONFIG);
-        }
     }
 
     @Override

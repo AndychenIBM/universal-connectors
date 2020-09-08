@@ -4,8 +4,12 @@ Notable changes will be documented in this file.
 
 ## [Unreleased]
 
+## [0.6.0]
+### Changed
+- Renamed filter name to mongodb-guardium-filter (instead of java-filter-example) and moved package to com.ibm.guardium.mongodb
+
 ## [0.5.1]
-## Fixed 
+### Fixed 
 - Added support for MongoDB v4.4 timeformat change in ts.$date (with unit tests for createCollection & mapReduce).
 
 ## [0.4.9]
