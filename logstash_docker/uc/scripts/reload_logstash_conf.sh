@@ -1,5 +1,5 @@
 #!/bin/bash
-logstash_pid=$(pgrep /opt/ibm/java/jre/bin/java)
+logstash_pid=$(bash ${UC_SCRIPTS}/get_logstash_pid.sh)
 if [[ -z $logstash_pid ]];
 then
     echo "logstash is not running"

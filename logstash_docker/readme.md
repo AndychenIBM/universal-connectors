@@ -1,17 +1,17 @@
 Prerequisites:
-1. docker (already installed in gmachines)
+1. docker (already installed on gmachines)
 
 
 installation and configuration:
 1. checkout Universal-Connector branch from https://github.ibm.com/Guardium/universal-connector
-2. build the 2 .gem plugins based on - logstash-filter-mongodb-guardium and logstash-output-guardium using gradle
-3. copy the .gem plugins into universal-connector/logstash_docker/config
+2. build the .gem plugins
+3. copy the .gem plugins into universal-connector/logstash_docker/uc/config
 4. login to artifactory:
     docker login  https://sec-guardium-next-gen-docker-local.artifactory.swg-devops.com/v2/ibmjava-ubi-minimal/manifests/latest
     user name: <ibm_email_addres>
     password: <artifactory_key> 
 5. from logstash_docker directory, build the GUC image using the following command : docker build -t universal-connector .
-    *need to make sure that the docker file contains the correct plugins' path
+    *need to make sure that the docker file contains the correct plugins path
 6. save the image on /var/IBM/Guardium/imagedata/:
     docker save universal-connector:latest | gzip > /var/IBM/Guardium/imagedata/uc.tgz
 
@@ -37,14 +37,14 @@ docker run -d --name="Klaus" --network="host" -e FILEBEAT_PORT="5044" -it univer
 Project Content:
 1. uc directory:
     1.1. config directory:
-	    1.1.1. pipelines.yml- defines where to read the logstash config files from (according to the selected pipeline)
-	    1.1.2. log4j.properties- logstash configurations regarding log4j
+	    1.1.1. pipelines.yml- defines where to read the Logstash config files from (according to the selected pipeline)
+	    1.1.2. log4j.properties- Logstash configurations regarding log4j
 	    1.1.3. SnifferConfig.json- configuration for connecting with Guardium Sniffer
-	    1.1.4. UniversalConnector.json- more configuration needed for logstash's agent
+	    1.1.4. UniversalConnector.json- more configuration needed for Logstash's agent
 	    1.1.5. plugins- gem files that will be transferred into the container
     1.2. pipeline directory:
-	    1.2.1. *.conf files that will be used as the configuration for logstash (including input,filter and output)
+	    1.2.1. *.conf files that will be used as the configuration for Logstash (including input,filter and output)
 	1.3. scripts directory:
 	    1.3.1. *.sh scripts for universal-connector usage
 2. uc_perf_tests directory- a directory meant for performance tests
-3. Dockerfile- import and install logstash, remove old version of the container, pass relevant files to the container, install plugins.
+3. Dockerfile- import and install Logstash, remove old version of the container, pass relevant files to the container, install plugins.

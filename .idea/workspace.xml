@@ -1,54 +1,233 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="e79f277a-bf01-40e1-af15-4758f1cd71ca" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/universal-connector.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/logstash-output-guardium/src/main/java/com/ibm/guardium/universalconnector/common/Environment.java" beforeDir="false" afterPath="$PROJECT_DIR$/logstash-output-guardium/src/main/java/com/ibm/guardium/universalconnector/common/Environment.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/logstash-output-guardium/src/main/proto/datasource.proto" beforeDir="false" afterPath="$PROJECT_DIR$/logstash-output-guardium/src/main/proto/datasource.proto" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/logstash-output-guardium/src/resources/log/uc.log" beforeDir="false" afterPath="$PROJECT_DIR$/logstash-output-guardium/src/resources/log/uc.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/logstash-output-guardium/src/resources/log/uc_connection.log" beforeDir="false" afterPath="$PROJECT_DIR$/logstash-output-guardium/src/resources/log/uc_connection.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/logstash-output-guardium/src/resources/log4j.properties" beforeDir="false" afterPath="$PROJECT_DIR$/logstash-output-guardium/src/resources/log4j.properties" afterDir="false" />
+    <list default="true" id="e79f277a-bf01-40e1-af15-4758f1cd71ca" name="Default Changelist" comment="GRD-43432: Changed .bash file to .sh">
+      <change afterPath="$PROJECT_DIR$/logstash_docker/uc/scripts/create_ssl_key.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/logstash_docker/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/logstash_docker/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/logstash_docker/readme.md" beforeDir="false" afterPath="$PROJECT_DIR$/logstash_docker/readme.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/logstash_docker/uc/scripts/get_logstash_pid.sh" beforeDir="false" afterPath="$PROJECT_DIR$/logstash_docker/uc/scripts/get_logstash_pid.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/logstash_docker/uc/scripts/reload_logstash_conf.sh" beforeDir="false" afterPath="$PROJECT_DIR$/logstash_docker/uc/scripts/reload_logstash_conf.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/logstash_docker/uc/scripts/stop_logstash.sh" beforeDir="false" afterPath="$PROJECT_DIR$/logstash_docker/uc/scripts/stop_logstash.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/logstash_docker/uc/scripts/utils.sh" beforeDir="false" afterPath="$PROJECT_DIR$/logstash_docker/uc/scripts/utils.sh" afterDir="false" />
     </list>
+    <ignored path="$PROJECT_DIR$/.gradle/" />
+    <ignored path="$PROJECT_DIR$/build/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="DefaultGradleProjectSettings">
+    <option name="isMigrated" value="true" />
+  </component>
+  <component name="ExternalProjectsData">
+    <projectState path="$PROJECT_DIR$">
+      <ProjectState />
+    </projectState>
+  </component>
+  <component name="ExternalProjectsManager">
+    <system id="GRADLE">
+      <state>
+        <task path="$PROJECT_DIR$/logstash-filter-s3-guardium/build.gradle">
+          <activation />
+        </task>
+        <projects_view />
+      </state>
+    </system>
+  </component>
   <component name="FileEditorManager">
-    <leaf>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/logstash-filter-mongodb-guardium/build.gradle">
+        <entry file="file://$PROJECT_DIR$/logstash_docker/Dockerfile">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="340">
-              <caret line="62" column="7" selection-start-line="62" selection-start-column="7" selection-end-line="62" selection-end-column="7" />
-              <folding>
-                <element signature="e#0#26#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="731">
+              <caret line="46" column="23" lean-forward="true" selection-start-line="46" selection-start-column="23" selection-end-line="46" selection-end-column="23" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/logstash_docker/uc/scripts/create_ssl_key.sh">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="272">
+              <caret line="16" column="113" lean-forward="true" selection-start-line="16" selection-start-column="113" selection-end-line="16" selection-end-column="113" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/mongodb-server-configuration/linux/configureFilebeat.sh">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="203">
+              <caret line="23" column="79" selection-start-line="23" selection-start-column="64" selection-end-line="23" selection-end-column="79" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/logstash_docker/uc/pipeline/mongodb-syslog-filebeat.conf">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="34">
+              <caret line="2" column="36" lean-forward="true" selection-start-line="2" selection-start-column="36" selection-end-line="2" selection-end-column="36" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/logstash_docker/uc/scripts/set_uc_log_level.sh">
+          <provider selected="true" editor-type-id="text-editor" />
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/logstash_docker/uc/scripts/install_customer_plugins.sh">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="153">
+              <caret line="9" selection-start-line="9" selection-end-line="9" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/logstash_docker/uc/scripts/start_logstash.sh">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="85">
+              <caret line="5" column="33" selection-start-line="5" selection-start-column="33" selection-end-line="5" selection-end-column="33" />
             </state>
           </provider>
         </entry>
       </file>
     </leaf>
   </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>server_ip</find>
+      <find>guc</find>
+      <find>JAVA_HOME</find>
+      <find>libc-base</find>
+      <find>glibc-base</find>
+      <find>LANG</find>
+      <find>JAVA_VERSION</find>
+      <find>tar</find>
+      <find>logstash</find>
+      <find>LOGSTASH_VERSION</find>
+    </findStrings>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="5928b72d9f183357f4dc3041a336cb673909de67" />
+      </map>
+    </option>
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/logstash_docker/test.java" />
+        <option value="$PROJECT_DIR$/mongodb-server-configuration/windows/configureServer.ps1" />
+        <option value="$PROJECT_DIR$/mongodb-server-configuration/windows/configureServer.conf" />
+        <option value="$PROJECT_DIR$/logstash_docker/uc/config/pipelines.yml" />
+        <option value="$PROJECT_DIR$/logstash_docker/uc/scripts/persistent_queue.bash" />
+        <option value="$PROJECT_DIR$/logstash_docker/uc/scripts/persistent_queue.sh" />
+        <option value="$PROJECT_DIR$/logstash_docker/uc/config/log4j2uc.properties" />
+        <option value="$PROJECT_DIR$/logstash_docker/uc/pipeline/mongodb-syslog-filebeat.conf" />
+        <option value="$PROJECT_DIR$/.gitignore" />
+        <option value="$PROJECT_DIR$/logstash_docker/uc/scripts/start_logstash.sh" />
+        <option value="$PROJECT_DIR$/logstash_docker/uc/scripts/install_customer_plugins.sh" />
+        <option value="$PROJECT_DIR$/logstash_docker/ubi8-openjdk11-dockerfile/alpine3.12-openjdk11-dockerfile/Dockerfile" />
+        <option value="$PROJECT_DIR$/logstash_docker/alpine3.12-openjdk11-dockerfile/Dockerfile" />
+        <option value="$PROJECT_DIR$/logstash_docker/ubi8-openjdk11-dockerfile/Dockerfile" />
+        <option value="$PROJECT_DIR$/logstash_docker/ubi/Dockerfile" />
+        <option value="$PROJECT_DIR$/logstash_docker/readme.md" />
+        <option value="$PROJECT_DIR$/logstash_docker/uc/scripts/reload_logstash_conf.sh" />
+        <option value="$PROJECT_DIR$/logstash_docker/uc/scripts/stop_logstash.sh" />
+        <option value="$PROJECT_DIR$/logstash_docker/uc/scripts/get_logstash_pid.sh" />
+        <option value="$PROJECT_DIR$/logstash_docker/uc/scripts/create_ssl_key.sh" />
+        <option value="$PROJECT_DIR$/logstash_docker/Dockerfile" />
+      </list>
+    </option>
+  </component>
+  <component name="ProjectFrameBounds" extendedState="6">
+    <option name="x" value="231" />
+    <option name="y" value="47" />
+    <option name="width" value="3220" />
+    <option name="height" value="1758" />
+  </component>
   <component name="ProjectView">
     <navigator proportions="" version="1">
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="ProjectPane" />
       <pane id="PackagesPane" />
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="universal-connector" type="b2602c69:ProjectViewProjectNode" />
+              <item name="universal-connector" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
+            </path>
+            <path>
+              <item name="universal-connector" type="b2602c69:ProjectViewProjectNode" />
+              <item name="universal-connector" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
+              <item name="logstash_docker" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="universal-connector" type="b2602c69:ProjectViewProjectNode" />
+              <item name="universal-connector" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
+              <item name="logstash_docker" type="462c0819:PsiDirectoryNode" />
+              <item name="uc" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="universal-connector" type="b2602c69:ProjectViewProjectNode" />
+              <item name="universal-connector" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
+              <item name="logstash_docker" type="462c0819:PsiDirectoryNode" />
+              <item name="uc" type="462c0819:PsiDirectoryNode" />
+              <item name="pipeline" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="universal-connector" type="b2602c69:ProjectViewProjectNode" />
+              <item name="universal-connector" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
+              <item name="logstash_docker" type="462c0819:PsiDirectoryNode" />
+              <item name="uc" type="462c0819:PsiDirectoryNode" />
+              <item name="scripts" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="universal-connector" type="b2602c69:ProjectViewProjectNode" />
+              <item name="universal-connector" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
+              <item name="mongodb-server-configuration" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="universal-connector" type="b2602c69:ProjectViewProjectNode" />
+              <item name="universal-connector" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
+              <item name="mongodb-server-configuration" type="462c0819:PsiDirectoryNode" />
+              <item name="linux" type="462c0819:PsiDirectoryNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
       <pane id="Scope" />
       <pane id="CatdeaLogs" />
     </panes>
   </component>
   <component name="PropertiesComponent">
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1592501563213" />
+    <property name="extract.method.default.visibility" value="private" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/logstash_docker/ubi" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\OferHaim\universal-connector\logstash_docker\ubi" />
+      <recent name="C:\Users\OferHaim\universal-connector\logstash_docker\uc\pipeline" />
+      <recent name="C:\Users\OferHaim\universal-connector\logstash_docker\uc\scripts" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\OferHaim\universal-connector\logstash_docker" />
+      <recent name="C:\Users\OferHaim\universal-connector\logstash_docker\uc" />
+    </key>
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -62,7 +241,20 @@
       </list>
     </option>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Bash.create_ssl_key.sh">
+    <configuration name="create_ssl_key.sh" type="BashConfigurationType" factoryName="Bash" temporary="true">
+      <module name="universal-connector" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="INTERPRETER_PATH" value="" />
+      <option name="PROJECT_INTERPRETER" value="false" />
+      <option name="WORKING_DIRECTORY" value="C:\Users\OferHaim\universal-connector\logstash_docker\uc\scripts" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SCRIPT_NAME" value="C:\Users\OferHaim\universal-connector\logstash_docker\uc\scripts\create_ssl_key.sh" />
+      <option name="PARAMETERS" value="" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="C:/Guard/Git/universal-connector/logstash-filter-s3-guardium/build.gradle" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
@@ -80,8 +272,24 @@
       <GradleScriptDebugEnabled>true</GradleScriptDebugEnabled>
       <method v="2" />
     </configuration>
+    <configuration name="configureFilebeat.ps1" type="PowerShellRunType" factoryName="PowerShell" temporary="true" scriptUrl="$PROJECT_DIR$/mongodb-server-configuration/windows/configureFilebeat.ps1" workingDirectory="C:\Users\OferHaim">
+      <method v="2" />
+    </configuration>
+    <configuration name="configureServer.ps1" type="PowerShellRunType" factoryName="PowerShell" temporary="true" scriptUrl="$PROJECT_DIR$/mongodb-server-configuration/windows/configureServer.ps1" workingDirectory="C:\Users\OferHaim">
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="Gradle.C:/Guard/Git/universal-connector/logstash-filter-s3-guardium/build.gradle" />
+      <item itemvalue="PowerShell.configureServer.ps1" />
+      <item itemvalue="PowerShell.configureFilebeat.ps1" />
+      <item itemvalue="Bash.create_ssl_key.sh" />
+    </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Bash.create_ssl_key.sh" />
+        <item itemvalue="PowerShell.configureServer.ps1" />
+        <item itemvalue="PowerShell.configureFilebeat.ps1" />
+        <item itemvalue="Gradle.C:/Guard/Git/universal-connector/logstash-filter-s3-guardium/build.gradle" />
         <item itemvalue="Gradle.C:/Guard/Git/universal-connector/logstash-filter-s3-guardium/build.gradle" />
       </list>
     </recent_temporary>
@@ -97,40 +305,213 @@
       <option name="presentableId" value="Default" />
       <updated>1592423239784</updated>
     </task>
+    <task id="LOCAL-00001" summary="Updated logstash to OSS version">
+      <created>1596114736820</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1596114736820</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Switched default log4j log_level to error">
+      <created>1596123141115</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1596123141115</updated>
+    </task>
+    <task id="LOCAL-00003" summary="GRD-43432: Disabled persistent queue by default">
+      <created>1596366423061</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1596366423061</updated>
+    </task>
+    <task id="LOCAL-00004" summary="GRD-43870: Changed install plugin script to install offline-package">
+      <created>1596456672617</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1596456672617</updated>
+    </task>
+    <task id="LOCAL-00005" summary="GRD-43838: Updated get_logstash_pid.sh script">
+      <created>1596541982702</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1596541982702</updated>
+    </task>
+    <task id="LOCAL-00006" summary="GRD-43432: Changed .bash file to .sh">
+      <created>1596617104140</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1596617104140</updated>
+    </task>
+    <task id="LOCAL-00007" summary="GRD-43432: fixed permissions issue">
+      <created>1596956286757</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1596956286757</updated>
+    </task>
+    <task id="LOCAL-00008" summary="GRD-43432: Changed .bash file to .sh">
+      <created>1596956858290</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1596956858290</updated>
+    </task>
+    <task id="LOCAL-00009" summary="GRD-42624: Changed logs dir">
+      <created>1596966895060</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1596966895060</updated>
+    </task>
+    <task id="LOCAL-00010" summary="GRD-42624: modified metrics to save events per sec in /var/log/uc">
+      <created>1596969698959</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1596969698959</updated>
+    </task>
+    <task id="LOCAL-00011" summary="GRD-44290: make sure logstash isn't running before starting it">
+      <created>1597313117189</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1597313117189</updated>
+    </task>
+    <task id="LOCAL-00012" summary="GRD-44537: save logstash-plain.log in shared volume">
+      <created>1598360653201</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1598360653201</updated>
+    </task>
+    <task id="LOCAL-00013" summary="GRD-44741: Fixed install_customer_plugins.sh">
+      <created>1598519935225</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1598519935225</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
+  <component name="TodoView">
+    <todo-panel id="selected-file">
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+    <todo-panel id="all">
+      <are-packages-shown value="true" />
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+  </component>
   <component name="ToolWindowManager">
-    <frame x="-7" y="1" width="1546" height="836" extended-state="0" />
+    <frame x="-7" y="-7" width="2062" height="1126" extended-state="7" />
     <layout>
-      <window_info id="Favorites" side_tool="true" />
-      <window_info id="Image Layers" />
-      <window_info id="Designer" />
-      <window_info id="UI Designer" />
-      <window_info id="Capture Tool" />
-      <window_info id="Learn" />
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.1332436" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.27022976" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info anchor="bottom" id="Tool Output" />
-      <window_info anchor="bottom" id="Version Control" />
-      <window_info anchor="bottom" id="ANTLR Preview" />
-      <window_info anchor="bottom" id="Terminal" />
-      <window_info anchor="bottom" id="Event Log" side_tool="true" />
+      <window_info id="Designer" order="2" />
+      <window_info id="Learn" order="3" />
+      <window_info id="UI Designer" order="4" />
+      <window_info id="Favorites" order="5" side_tool="true" />
+      <window_info id="Capture Tool" order="6" />
+      <window_info id="Image Layers" order="7" />
+      <window_info id="Project Explorer" order="8" />
+      <window_info id="Job Explorer" order="9" />
+      <window_info anchor="bottom" id="Messages" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.24705882" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.5028329" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
-      <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="right" id="Palette" />
-      <window_info anchor="right" id="Theme Preview" />
-      <window_info anchor="right" id="Capture Analysis" />
-      <window_info anchor="right" id="Maven" />
-      <window_info anchor="right" id="Palette&#9;" />
+      <window_info anchor="bottom" id="TODO" order="6" weight="0.3286119" />
+      <window_info anchor="bottom" id="Terminal" order="7" weight="0.3286119" />
+      <window_info anchor="bottom" id="Tool Output" order="8" />
+      <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.5024975" side_tool="true" visible="true" weight="0.20925553" />
+      <window_info active="true" anchor="bottom" id="Version Control" order="10" sideWeight="0.4975025" visible="true" weight="0.20925553" />
+      <window_info anchor="bottom" id="ANTLR Preview" order="11" />
+      <window_info anchor="bottom" id="Docker" order="12" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Console" order="13" />
+      <window_info anchor="bottom" id="Build" order="14" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info anchor="right" id="Maven" order="3" />
+      <window_info anchor="right" id="Palette" order="4" />
+      <window_info anchor="right" id="Capture Analysis" order="5" />
+      <window_info anchor="right" id="Palette&#9;" order="6" />
+      <window_info anchor="right" id="Theme Preview" order="7" />
+      <window_info anchor="right" id="Gradle" order="8" />
     </layout>
+  </component>
+  <component name="Vcs.Log.History.Properties">
+    <option name="COLUMN_ORDER">
+      <list>
+        <option value="0" />
+        <option value="2" />
+        <option value="3" />
+        <option value="1" />
+      </list>
+    </option>
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="RECENTLY_FILTERED_USER_GROUPS">
+                <collection />
+              </option>
+              <option name="RECENTLY_FILTERED_BRANCH_GROUPS">
+                <collection />
+              </option>
+              <option name="COLUMN_ORDER">
+                <list>
+                  <option value="0" />
+                  <option value="1" />
+                  <option value="2" />
+                  <option value="3" />
+                </list>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="RECENT_FILTERS">
+      <map>
+        <entry key="Branch">
+          <value>
+            <list />
+          </value>
+        </entry>
+        <entry key="User">
+          <value>
+            <list />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Updated logstash to OSS version" />
+    <MESSAGE value="Switched default log4j log_level to error" />
+    <MESSAGE value="GRD-43432: Disabled persistent queue by default" />
+    <MESSAGE value="GRD-43870: Changed install plugin script to install offline-package" />
+    <MESSAGE value="GRD-43838: Updated get_logstash_pid.sh script" />
+    <MESSAGE value="GRD-43432: fixed permissions issue" />
+    <MESSAGE value="GRD-43432: Changed .bash file to .sh" />
+    <MESSAGE value="GRD-42624: Changed logs dir" />
+    <MESSAGE value="GRD-42624: modified metrics to save events per sec in /var/log/uc" />
+    <MESSAGE value="GRD-44290: make sure logstash isn't running before starting it" />
+    <MESSAGE value="GRD-44537: save logstash-plain.log in shared volume" />
+    <MESSAGE value="GRD-44741: Fixed install_customer_plugins.sh" />
+    <option name="LAST_COMMIT_MESSAGE" value="GRD-44741: Fixed install_customer_plugins.sh" />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/logstash-filter-s3-guardium/src/main/java/org/logstashplugins/LogstashFilterS3Guardium.java">
@@ -147,6 +528,241 @@
           <folding>
             <element signature="e#0#26#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logstash_docker/test.java" />
+    <entry file="file://$PROJECT_DIR$/logstash_docker/uc/config/log4j.properties" />
+    <entry file="file://$PROJECT_DIR$/mongodb-server-configuration/windows/configureFilebeat.ps1">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="204">
+          <caret line="12" column="56" selection-start-line="12" selection-start-column="18" selection-end-line="12" selection-end-column="56" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mongodb-server-configuration/windows/configureServer.ps1">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1360">
+          <caret line="80" selection-start-line="80" selection-end-line="80" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mongodb-server-configuration/windows/configureServer.conf">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="119">
+          <caret line="7" column="50" selection-start-line="7" selection-start-column="50" selection-end-line="7" selection-end-column="50" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logstash_docker/uc/pipeline/cloudWatch.conf">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="306">
+          <caret line="18" selection-start-line="18" selection-end-line="18" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mongodb-server-configuration/windows/configureMongodb.ps1">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="311">
+          <caret line="51" column="71" selection-start-line="51" selection-start-column="49" selection-end-line="51" selection-end-column="71" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logstash_docker/uc/scripts/install_all_customer_plugins.sh" />
+    <entry file="file://$PROJECT_DIR$/mongodb-server-configuration/linux/configureSyslog.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="187">
+          <caret line="11" selection-start-line="11" selection-end-line="11" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logstash_docker/xregsafe.sh">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logstash-filter-mongodb-guardium/src/main/java/org/logstashplugins/JavaFilterExample.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2040">
+          <caret line="137" column="80" selection-start-line="137" selection-start-column="80" selection-end-line="137" selection-end-column="80" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logstash-filter-mongodb-guardium/src/main/java/com/ibm/guardium/Parser.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="170">
+          <caret line="26" column="38" selection-start-line="26" selection-start-column="38" selection-end-line="26" selection-end-column="38" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logstash_docker/uc/config/log4j2uc.properties">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="612">
+          <caret line="36" selection-start-line="36" selection-end-line="36" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logstash_docker/uc/pipeline/test-file.conf">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="697">
+          <caret line="41" column="3" selection-start-line="41" selection-start-column="3" selection-end-line="41" selection-end-column="51" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.idea/vcs.xml">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="51">
+          <caret line="3" selection-start-line="3" selection-end-line="3" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logstash_docker/uc/pipeline/mysql-syslog-filebeat.conf">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="51">
+          <caret line="3" column="41" selection-start-line="3" selection-start-column="41" selection-end-line="3" selection-end-column="41" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logstash_docker/uc/pipelines.yml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="102">
+          <caret line="6" selection-start-line="6" selection-end-line="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logstash_docker/uc/pipeline/test_ssl.conf">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="204">
+          <caret line="12" column="1" lean-forward="true" selection-start-line="12" selection-start-column="1" selection-end-line="12" selection-end-column="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logstash_docker/alpine3.12-openjdk11-dockerfile/Dockerfile">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="203">
+          <caret line="27" column="49" selection-start-line="27" selection-start-column="45" selection-end-line="27" selection-end-column="49" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logstash_docker/ubi/uc/config/log4j2uc.properties">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logstash_docker/ubi8-openjdk11-dockerfile/Dockerfile">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="659">
+          <caret line="64" column="35" lean-forward="true" selection-start-line="11" selection-end-line="64" selection-end-column="35" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logstash_docker/ubi/Dockerfile">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="391">
+          <caret line="35" column="33" lean-forward="true" selection-end-line="79" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logstash_docker/readme.md">
+      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+        <state split_layout="SPLIT">
+          <first_editor relative-caret-position="612">
+            <caret line="48" column="56" selection-start-line="48" selection-start-column="56" selection-end-line="48" selection-end-column="56" />
+          </first_editor>
+          <second_editor />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mongodb-server-configuration/linux/configureServer.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="279">
+          <caret line="117" column="9" selection-start-line="117" selection-end-line="118" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mongodb-server-configuration/linux/configureMongodb.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="527">
+          <caret line="46" column="43" selection-start-line="46" selection-start-column="43" selection-end-line="46" selection-end-column="43" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logstash_docker/uc/scripts/persistent_queue.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="238">
+          <caret line="14" selection-start-line="14" selection-end-line="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logstash_docker/uc/scripts/set_uc_log_level.sh">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logstash_docker/uc/scripts/install_customer_plugins.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="153">
+          <caret line="9" selection-start-line="9" selection-end-line="9" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logstash_docker/uc/scripts/stop_logstash.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="34">
+          <caret line="2" column="50" selection-start-line="2" selection-start-column="50" selection-end-line="2" selection-end-column="50" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logstash_docker/uc/scripts/utils.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="272">
+          <caret line="16" column="1" selection-start-line="16" selection-start-column="1" selection-end-line="16" selection-end-column="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logstash_docker/uc/scripts/reload_logstash_conf.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="119">
+          <caret line="7" column="2" selection-start-line="7" selection-start-column="2" selection-end-line="7" selection-end-column="2" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logstash_docker/uc/scripts/get_logstash_pid.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="17">
+          <caret line="1" column="10" lean-forward="true" selection-start-line="1" selection-start-column="10" selection-end-line="1" selection-end-column="10" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logstash_docker/uc/scripts/start_logstash.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="85">
+          <caret line="5" column="33" selection-start-line="5" selection-start-column="33" selection-end-line="5" selection-end-column="33" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mongodb-server-configuration/linux/configureFilebeat.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="203">
+          <caret line="23" column="79" selection-start-line="23" selection-start-column="64" selection-end-line="23" selection-end-column="79" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logstash_docker/uc/pipeline/mongodb-syslog-filebeat.conf">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="34">
+          <caret line="2" column="36" lean-forward="true" selection-start-line="2" selection-start-column="36" selection-end-line="2" selection-end-column="36" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logstash_docker/uc/scripts/create_ssl_key.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="272">
+          <caret line="16" column="113" lean-forward="true" selection-start-line="16" selection-start-column="113" selection-end-line="16" selection-end-column="113" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logstash_docker/Dockerfile">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="731">
+          <caret line="46" column="23" lean-forward="true" selection-start-line="46" selection-start-column="23" selection-end-line="46" selection-end-column="23" />
         </state>
       </provider>
     </entry>
