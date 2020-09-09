@@ -1,4 +1,4 @@
-FROM universal-connector-base
+FROM sec-guardium-next-gen-docker-local.artifactory.swg-devops.com/universal-connector-base
 
 LABEL maintainer="IBM Security" \
     #build_date=
