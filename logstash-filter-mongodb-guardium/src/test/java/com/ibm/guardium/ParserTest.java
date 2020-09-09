@@ -105,6 +105,17 @@ public class ParserTest {
     }
 
     @Test
+    public void testParseAsConstruct_mapReduce_v4_4() {
+        final String mongoString = "{ \"atype\" : \"authCheck\", \"ts\" : { \"$date\" : \"2020-08-30T10:33:45.884-04:00\" }, \"local\" : { \"ip\" : \"127.0.0.1\", \"port\" : 27017 }, \"remote\" : { \"ip\" : \"127.0.0.1\", \"port\" : 51216 }, \"users\" : [ { \"user\" : \"admin\", \"db\" : \"admin\" } ], \"roles\" : [ { \"role\" : \"root\", \"db\" : \"admin\" } ], \"param\" : { \"command\" : \"mapReduce\", \"ns\" : \"mydatabase.orders\", \"args\" : { \"mapreduce\" : \"orders\", \"map\" : { \"$code\" : \"function() { emit(this.cust_id, this.price); }\" }, \"reduce\" : { \"$code\" : \"function(keyCustId, valuesPrices) { return Array.sum(valuesPrices);}\" }, \"out\" : \"map_reduce_example\", \"lsid\" : { \"id\" : { \"$binary\" : \"Kpla0wPqSDOw3M9IEQxADg==\", \"$type\" : \"04\" } }, \"$db\" : \"mydatabase\" } }, \"result\" : 0 }";
+        final JsonObject mongoJson = JsonParser.parseString(mongoString).getAsJsonObject();
+        final Construct result = Parser.parseAsConstruct(mongoJson);
+
+        final Sentence sentence = result.sentences.get(0);
+        Assert.assertEquals("mapReduce", sentence.getVerb());
+        Assert.assertEquals("orders", sentence.getObjects().get(0).name);
+    }
+
+    @Test
     public void testParseAsConstruct_resetErrors() {
         final String mongoString = "{ 'atype' : 'authCheck', 'ts' : { '$date' : '2020-08-12T05:55:46.413-0400' }, 'local' : { 'ip' : '127.0.0.1', 'port' : 27017 }, 'remote' : { 'ip' : '127.0.0.1', 'port' : 36648 }, 'users' : [ { 'user' : 'realAdmin', 'db' : 'admin' } ], 'roles' : [ { 'role' : 'readWriteAnyDatabase', 'db' : 'admin' }, { 'role' : 'readWrite', 'db' : 'newDB02' }, { 'role' : 'userAdminAnyDatabase', 'db' : 'admin' } ], 'param' : { 'command' : 'resetError', 'ns' : 'test', 'args' : { 'reseterror' : 1, 'lsid' : { 'id' : { '$binary' : 'HmeBAmiJSkaY43ZrPCEw+A==', '$type' : '04' } }, '$db' : 'test' } }, 'result' : 0 }";
         final JsonObject mongoJson = JsonParser.parseString(mongoString).getAsJsonObject();
@@ -195,6 +206,20 @@ public class ParserTest {
         Assert.assertEquals("newDB01", record.getDbName());
     }
 
+
+    @Test
+    public void testParseRecord_createCollection_v4_4() throws ParseException {
+        // skipping dedicated log messages "{ \"atype\" : \"createCollection\", \"ts\" : { \"$date\" : \"2020-05-11T06:24:38.168-0400\" } , \"local\" : { \"ip\" : \"127.0.0.1\", \"port\" : 27017 } , \"remote\" : { \"ip\" : \"127.0.0.1\", \"port\" : 48458 } , \"users\" : [], \"roles\" : [], \"param\" : { \"ns\" : \"test.collection3\" } , \"result\" : 0 }";
+        final String mongoString = "{ \"atype\" : \"authCheck\", \"ts\" : { \"$date\" : \"2020-08-30T07:22:46.361-04:00\" }, \"local\" : { \"ip\" : \"127.0.0.1\", \"port\" : 27017 }, \"remote\" : { \"ip\" : \"127.0.0.1\", \"port\" : 49990 }, \"users\" : [ { \"user\" : \"admin\", \"db\" : \"admin\" } ], \"roles\" : [ { \"role\" : \"root\", \"db\" : \"admin\" } ], \"param\" : { \"command\" : \"create\", \"ns\" : \"test.newCollection01tal\", \"args\" : { \"create\" : \"newCollection01tal\", \"lsid\" : { \"id\" : { \"$binary\" : \"nWP0p95qTgKYH2VwpukLcQ==\", \"$type\" : \"04\" } }, \"$db\" : \"test\" } }, \"result\" : 0 }";
+        final JsonObject mongoJson = JsonParser.parseString(mongoString).getAsJsonObject();
+        Record record = Parser.parseRecord(mongoJson);
+        final Construct construct = record.getData().getConstruct();
+        final Sentence sentence = construct.sentences.get(0);
+        
+        Assert.assertEquals("create", sentence.getVerb());
+        Assert.assertEquals("newCollection01tal", sentence.getObjects().get(0).name);
+        Assert.assertEquals("test", record.getDbName());
+    }
     /**
      * NOT USED: Test authorization error messsage can be parsed as usual (query is needed later)
      */
