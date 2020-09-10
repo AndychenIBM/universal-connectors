@@ -26,8 +26,20 @@ VOLUME /var/log/uc
 
 WORKDIR ${LOGSTASH_DIR}
 
+RUN echo "--add-opens=java.base/java.lang=ALL-UNNAMED \
+    --add-opens=java.base/java.security=ALL-UNNAMED \
+    --add-opens=java.base/java.util=ALL-UNNAMED \
+    --add-opens=java.base/java.security.cert=ALL-UNNAMED \
+    --add-opens=java.base/java.util.zip=ALL-UNNAMED \
+    --add-opens=java.base/java.lang.reflect=ALL-UNNAMED \
+    --add-opens=java.base/java.util.regex=ALL-UNNAMED \
+    --add-opens=java.base/java.net=ALL-UNNAMED \
+    --add-opens=java.base/java.io=ALL-UNNAMED \
+    --add-opens=java.base/java.lang=ALL-UNNAMED \
+    --add-opens=java.base/javax.crypto=ALL-UNNAMED \
+    --add-opens=java.management/sun.management=ALL-UNNAMED" >>${UC_ETC}/jvm.options && \
 #Install plugins
-RUN cd ${LOGSTASH_DIR}/config/ && \
+    cd ${LOGSTASH_DIR}/config/ && \
 	${LOGSTASH_DIR}/bin/logstash-plugin install logstash-filter-mongodb_guardium_filter-0.6.0.gem \
 	logstash-output-java_output_to_guardium-1.2.2.gem \
     logstash-filter-mysql_filter_guardium-1.0.0.gem \
