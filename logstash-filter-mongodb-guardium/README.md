@@ -91,11 +91,11 @@ To test filter installation on your development logstash
 
 
 ## Contribute
-You can either enhance this filter and open a pull request to suggest your changes, or use the project to create a different filter for Guardium that supports other data source.
+You can either enhance this filter and open a pull request to suggest your changes, or use the project to create a different filter plugin for Guardium that supports other data source.
 
 
 ## References
-See The documentation for Logstash Java plugins is available [here](https://www.elastic.co/guide/en/logstash/current/contributing-java-plugin.html).
+See [documentation for Logstash Java plugins](https://www.elastic.co/guide/en/logstash/current/contributing-java-plugin.html).
 
-See the Guardium Universal connector commons library for more details regarding the standard Guardium Record object.
+See [Guardium Universal connector commons](https://www.github.com/IBM/guardium-universalconnector-commons) library for more details regarding the standard Guardium Record object.
 
