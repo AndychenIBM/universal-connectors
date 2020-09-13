@@ -18,8 +18,7 @@ USER guc
 
 ENV UDS_ETC=${LOGSTASH_DIR}/config/ \
     UC_ETC=${LOGSTASH_DIR}/config/ \
-    UC_SCRIPTS=${LOGSTASH_DIR}/scripts/ \
-    LOG_GUC_DIR=/var/log/uc/
+    UC_SCRIPTS=${LOGSTASH_DIR}/scripts/
 
 #Create a persistent volume which can be monted on the host
 VOLUME /var/log/uc
