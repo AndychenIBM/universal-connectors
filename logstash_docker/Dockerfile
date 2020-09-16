@@ -39,11 +39,11 @@ RUN echo "--add-opens=java.base/java.lang=ALL-UNNAMED \
     --add-opens=java.management/sun.management=ALL-UNNAMED" >>${UC_ETC}/jvm.options && \
 #Install plugins
     cd ${LOGSTASH_DIR}/config/ && \
-	${LOGSTASH_DIR}/bin/logstash-plugin install logstash-filter-mongodb_guardium_filter-0.6.0.gem \
-	logstash-output-java_output_to_guardium-1.2.2.gem \
+	${LOGSTASH_DIR}/bin/logstash-plugin install logstash-filter-mongodb_guardium_filter-0.6.1.gem \
+	logstash-output-java_output_to_guardium-1.2.3.gem \
     logstash-filter-mysql_filter_guardium-1.0.0.gem \
     logstash-input-cloudwatch_logs-1.0.3.gem \
-    logstash-filter-logstash_filter_s3_guardium-0.5.1.gem && \
+    logstash-filter-logstash_filter_s3_guardium-0.5.2.gem && \
 #Create a customer dir
     mkdir -p ${LOGSTASH_DIR}/customer/pipeline ${LOGSTASH_DIR}/customer/config && \
 #Make sure user can read,write and execute the scripts

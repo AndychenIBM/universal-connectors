@@ -305,7 +305,7 @@ public class Parser {
         sessionLocator.setIpv6(false);
 
         sessionLocator.setClientIp(Parser.UNKOWN_STRING);
-        sessionLocator.setClientPort(0);
+        sessionLocator.setClientPort(SessionLocator.PORT_DEFAULT);
         sessionLocator.setClientIpv6(Parser.UNKOWN_STRING);
 
         if (data.has("remote")) {

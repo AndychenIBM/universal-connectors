@@ -52,12 +52,12 @@ public class Parser {
         SessionLocator sessionLocator = new SessionLocator();
         String sourceIPAddress = validateIP(getStrValue(auditObj,"sourceIPAddress"));
         sessionLocator.setClientIp(sourceIPAddress);
-        sessionLocator.setClientPort(0);
+        sessionLocator.setClientPort(SessionLocator.PORT_DEFAULT);
 
         String host = getHost(requestParameters);
         String serverIP = UNKNOWN_IP;//validateIP(host);
         sessionLocator.setServerIp(serverIP);
-        sessionLocator.setServerPort(0);
+        sessionLocator.setServerPort(SessionLocator.PORT_DEFAULT);
 
         record.setSessionLocator(sessionLocator);
 

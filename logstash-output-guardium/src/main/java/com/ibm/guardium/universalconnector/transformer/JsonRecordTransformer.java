@@ -250,10 +250,18 @@ public class JsonRecordTransformer implements RecordTransformer {
 
         SessionLocator rsl = record.getSessionLocator();
         Datasource.Session_locator.Builder sessionBuilder =
-                Datasource.Session_locator.newBuilder()
-                        .setClientPort(rsl.getClientPort())
-                        .setServerPort(rsl.getServerPort())
-                        .setIsIpv6(rsl.isIpv6());
+                Datasource.Session_locator.newBuilder().setIsIpv6(rsl.isIpv6());
+
+        // GRD-44925 - when both ports are not sent to sniffer - it will use sessionId to decide whether to create new session or not
+        // in all other cases session id value is ignored by sniffer and only combination of ips and ports is used for session creation
+        if (rsl.getClientPort()!=SessionLocator.PORT_DEFAULT){
+            sessionBuilder.setClientPort(rsl.getClientPort());
+        }
+
+        if (rsl.getServerPort()!=SessionLocator.PORT_DEFAULT){
+            sessionBuilder.setServerPort(rsl.getServerPort());
+        }
+
         if (!rsl.isIpv6()){
             sessionBuilder.setServerIp(convert_ipstr_to_int(rsl.getServerIp())).setClientIp(convert_ipstr_to_int(rsl.getClientIp()));
         } else {

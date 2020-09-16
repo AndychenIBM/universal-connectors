@@ -2,10 +2,11 @@ package com.ibm.guardium.universalconnector.common.structures;
 
 public class SessionLocator {
 
+    public static final int PORT_DEFAULT = -1;
     private String clientIp;
-    private int clientPort;
+    private int clientPort=PORT_DEFAULT;
     private String serverIp;
-    private int    serverPort;
+    private int    serverPort=PORT_DEFAULT;
     private boolean isIpv6;
     private String clientIpv6;
     private String serverIpv6;
