@@ -271,7 +271,6 @@ public class ParserTest {
 
     @Test 
     public void testLogFile() {
-        // TODO: read from file stream
         final String mongoString = "{ \"atype\" : \"authCheck\", \"ts\" : { \"$date\" : \"2020-02-16T03:36:53.800-0500\" }, \"local\" : { \"ip\" : \"(NONE)\", \"port\" : 0 }, \"remote\" : { \"ip\" : \"(NONE)\", \"port\" : 0 }, \"users\" : [], \"roles\" : [], \"param\" : { \"command\" : \"listIndexes\", \"ns\" : \"config.system.sessions\", \"args\" : { \"listIndexes\" : \"system.sessions\", \"cursor\" : {}, \"$db\" : \"config\" } }, \"result\" : 0 }";
 
         final JsonObject mongoJson = JsonParser.parseString(mongoString).getAsJsonObject();
@@ -332,7 +331,6 @@ public class ParserTest {
         Assert.assertEquals("2WoIDPhSTcKHrdJW4azoow==", record.getSessionId());
         Assert.assertEquals("test", record.getDbName());
         Assert.assertEquals(Parser.UNKOWN_STRING, record.getAppUserName());
-        // TODO convert dateString to timestamp int
 
         Assert.assertNotNull(record.getSessionLocator());
     }

@@ -63,7 +63,7 @@ public class MongodbGuardiumFilter implements Filter {
         ArrayList<Event> skippedEvents = new ArrayList<>();
         for (Event e : events) {
             if (log.isDebugEnabled()) {
-                log.debug("Event: "+logEvent(e));
+                log.debug("MongoDB filter: Got Event: "+logEvent(e));
             }
             // from config, use Object f = e.getField(sourceField);
             if (e.getField("message") instanceof String) {
@@ -98,9 +98,6 @@ public class MongodbGuardiumFilter implements Filter {
 
                         this.correctIPs(e, record);
 
-                        // TODO: Remove flat variables after Record is used.
-                        e.setField("timestamp", Parser.parseTimestamp(inputJSON));
-                        
                         final GsonBuilder builder = new GsonBuilder();
                         builder.serializeNulls();
                         final Gson gson = builder.create();
@@ -109,12 +106,10 @@ public class MongodbGuardiumFilter implements Filter {
                         matchListener.filterMatched(e); // Flag OK for filter input/parsing/out
                         
                     } catch (Exception exception) {
-                        // FIXME: Throw? as not proper json or syntax error
                         // don't let event pass filter
-                        // TODO log event removed? 
                         //events.remove(e);
-                        log.error("Error handling mongo message "+input);
-                        log.error("Error parsing mongo event "+logEvent(e), exception);
+                        log.error("MongoDB filter: Error handling mongo message "+input);
+                        log.error("MongoDB filter: Error parsing mongo event "+logEvent(e), exception);
                         e.tag(LOGSTASH_TAG_JSON_PARSE_ERROR);
                     }
                 } else {
@@ -124,7 +119,6 @@ public class MongodbGuardiumFilter implements Filter {
         }
 
         // Remove skipped mongodb events from reaching output
-        // FIXME log which events skipped
         events.removeAll(skippedEvents);
         return events;
     }
@@ -180,7 +174,7 @@ public class MongodbGuardiumFilter implements Filter {
             sb.append(" }");
             return sb.toString();
         } catch (Exception e){
-            log.error("Failed to create event log string", e);
+            log.error("MongoDB filter: Failed to create event log string", e);
             return null;
         }
     }

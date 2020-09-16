@@ -1,8 +1,14 @@
 # Changelog
-
 Notable changes will be documented in this file.
 
 ## [Unreleased]
+## [0.6.2]
+### Fixed
+- removed TODO/FIXME comments, and redundunt code.
+
+## [0.6.1]
+### Changed
+- SessionLocator.clientPort set to default port, to mark Guardium Universal connector to fetch session from SessionID, if nothing written to client port.
 
 ## [0.6.0]
 ### Changed

@@ -1,4 +1,4 @@
-package com.ibm.guardium.mongodb; // RECOMMENDATION: be specific; this will prevent clashes with classes of other plugins
+package com.ibm.guardium.mongodb; // be specific; this will prevent clashes with classes of other plugins
 
 import java.text.ParseException;
 import java.time.ZonedDateTime;
@@ -61,7 +61,7 @@ public class Parser {
             return gson.toJson(construct);
 
         } catch (final Exception e) {
-            log.error("mongo: Error parsing data", e);
+            log.error("MongoDB filter: Error parsing data", e);
             throw e;
         }
 
@@ -185,7 +185,6 @@ public class Parser {
 
 
     public static Record parseRecord(final JsonObject data) throws ParseException {
-        // TODO get param.args.lsid, or fabricate
         Record record = new Record();
 
         final JsonObject param = data.get("param").getAsJsonObject();
@@ -221,7 +220,7 @@ public class Parser {
         }
 
         // post populate fields:
-        record.getAccessor().setServiceName(dbName); // FIXME/Notice: exists also in Record.dbName
+        record.getAccessor().setServiceName(dbName); // For other data sources, service name might be different.
 
         // set timestamp
         String dateString = Parser.parseTimestamp(data);
@@ -351,7 +350,6 @@ public class Parser {
      */
     public static Data parseData(JsonObject inputJSON) {
         Data data = new Data();
-        data.setOriginalSqlCommand(Parser.UNKOWN_STRING); // TODO: remove if not used
         try {
             Construct construct = parseAsConstruct(inputJSON);
             if (construct != null) {
@@ -365,7 +363,7 @@ public class Parser {
                 }
             }
         } catch (Exception e) {
-            log.error("Error parsing mongo data json "+inputJSON, e);
+            log.error("MongoDB filter: Error parsing JSon " + inputJSON, e);
             throw e;
         }
         return data;

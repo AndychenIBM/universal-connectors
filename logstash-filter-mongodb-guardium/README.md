@@ -73,7 +73,7 @@ To build & create an updated GEM of this filter plugin, which can be installed o
 ## Install
 To install this plugin on your local developer machine with Logstash installed, clone or download, and run from your logstash installation. Replace "?" with this plugin version:
     
-    $ logstash-plugin install --no-verify --local ./logstash-filter-mongodb-guardium-?.?.?.gem
+    $ logstash-plugin install --local ./logstash-filter-mongodb-guardium-?.?.?.gem
 
 Note: logstash-plugin may not handle relative paths well, so stick to calling it from the folder your gem is located, as in the example, above. 
 

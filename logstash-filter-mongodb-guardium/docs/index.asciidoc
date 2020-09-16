@@ -1,4 +1,4 @@
-:plugin: example
+:plugin: MongoDB-Guardium filter
 :type: filter
 // Update header with plugin name
 
@@ -15,70 +15,50 @@ END - GENERATED VARIABLES, DO NOT EDIT!
 
 [id="plugins-{type}s-{plugin}"]
 
-=== Example filter plugin
+=== MongoDB-Guardium filter plugin
 
 include::{include_path}/plugin_header.asciidoc[]
 
 ==== Description
 
-Add plugin description here
+This is a Logstash filter plugin for Guardium Universal connector, a feature in IBM Security Guardium. It parses a MongoDB audit log events/messages into a Guardium Record instance – a standard structure made out of several parts – before it is sent over to Guardium. Guardium Record parts, in brief, are Accessor (who tried to access the data), Session, Data or Exception. If there was no error, the Data contains details about the query "Construct", which details the main action (verb) and collections (objects) involved.
+
+The filter relies on authCheck and authenticate audit log messages.
 
 // Format anchors and links to support generated ids for versioning
 // Sample anchor: [id="plugins-{type}s-{plugin}-setting_name"]
 // Sample link: <<plugins-{type}s-{plugin}-setting_name>>
 
 [id="plugins-{type}s-{plugin}-options"]
-==== Example Filter Configuration Options
+==== Configuration Options
 
-[cols="<,<,<",options="header",]
-|=======================================================================
-|Setting |Input type|Required
-| <<plugins-{type}s-{plugin}-a_setting_name>> |<<boolean,boolean>>|No
-| <<plugins-{type}s-{plugin}-another_setting_name>> |<<hash,hash>>|No
-| <<plugins-{type}s-{plugin}-setting_name_3>> |<<string,string>>|No
-| <<plugins-{type}s-{plugin}-setting_name_4>> |<<number,number>>|No
-| <<plugins-{type}s-{plugin}-setting_name_5>> |<<array,array>>|No
-|=======================================================================
+None 
 
-[id="plugins-{type}s-{plugin}-a_setting_name"]
-===== `a_setting_name` 
+// [cols="<,<,<",options="header",]
+// |=======================================================================
+//|Setting |Input type|Required
+//| <<plugins-{type}s-{plugin}-a_setting_name>> |<<boolean,boolean>>|No
+//| <<plugins-{type}s-{plugin}-another_setting_name>> |<<hash,hash>>|No
+//| <<plugins-{type}s-{plugin}-setting_name_3>> |<<string,string>>|No
+//| <<plugins-{type}s-{plugin}-setting_name_4>> |<<number,number>>|No
+// | <<plugins-{type}s-{plugin}-setting_name_5>> |<<array,array>>|No
+// |=======================================================================
 
-  * Value type is <<boolean,boolean>>
-  * Default value is `true`
+// [id="plugins-{type}s-{plugin}-a_setting_name"]
+// ===== `a_setting_name` 
 
-Add description here
+//   * Value type is <<boolean,boolean>>
+//   * Default value is `true`
 
-[id="plugins-{type}s-{plugin}-another_setting_name"]
-===== `another_setting_name` 
+// Add description here
 
-  * Value type is <<hash,hash>>
-  * Default value is `{}`
+// [id="plugins-{type}s-{plugin}-another_setting_name"]
+// ===== `another_setting_name` 
 
-Add description here
+//   * Value type is <<hash,hash>>
+//   * Default value is `{}`
 
-[id="plugins-{type}s-{plugin}-setting_name_3"]
-===== `setting_name_3` 
-
-  * Value type is <<string,string>>
-  * Default value is `{}`
-
-Add description here
-
-[id="plugins-{type}s-{plugin}-setting_name_4"]
-===== `setting_name_4` 
-
-  * Value type is <<number,number>>
-  * Default value is `0`
-
-Add description here
-
-[id="plugins-{type}s-{plugin}-setting_name_5"]
-===== `setting_name_5` 
-
-  * Value type is <<array,array>>
-  * Default value is {}
-
-Add description here
+// Add description here
 
 // The full list of Value Types is here: 
 // https://www.elastic.co/guide/en/logstash/current/configuration-file-structure.html
