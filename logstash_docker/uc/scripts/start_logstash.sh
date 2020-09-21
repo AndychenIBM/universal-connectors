@@ -5,7 +5,7 @@ source ${UC_SCRIPTS}/set_uc_log_level.sh
 logstash_pid=$(/usr/share/logstash/scripts/get_logstash_pid.sh)
 if [[ -z "$logstash_pid" ]]; then
     #Change Sniffer IP to host's IP
-    SNIF_IP=$(hostname -i)
+    SNIF_IP=$( hostname -i | awk '{print $1}')
     updateFromEnv "$SNIF_IP" "Sniffer IP address" $UDS_ETC/SniffersConfig.json "127.0.0.1" "$SNIF_IP"
 
     #Change log4j2uc.properties log level if needed
