@@ -104,7 +104,11 @@ public class MySqlFilterGuardium implements Filter {
                     // remove last character (,)
                     mysqlMsgString = mysqlMsgString.substring(0, msgStrLen -1);
                 }
-                //log.warn(mysqlMsgString);
+                
+                if (log.isDebugEnabled()){
+                     log.debug("Mysql message is : " + mysqlMsgString);
+                }
+
                 try {
                     JsonObject inputJSON = (JsonObject) JsonParser.parseString(mysqlMsgString);
                     final String class_type = inputJSON.get("class").getAsString();
@@ -219,14 +223,14 @@ public class MySqlFilterGuardium implements Filter {
     private static SessionLocator parseSessionLocator(Event e, JsonObject data) {
         SessionLocator sessionLocator = new SessionLocator();       
         String serverIp = "0.0.0.0";
-        int serverPort = 0;
+        int serverPort = SessionLocator.PORT_DEFAULT;
 
         if (e.getField("server_ip") instanceof String)
             serverIp = e.getField("server_ip").toString();
-                               
+                    
         sessionLocator.setIpv6(false);
         sessionLocator.setClientIp(UNKNOWN_STRING);
-        sessionLocator.setClientPort(0);
+        sessionLocator.setClientPort(SessionLocator.PORT_DEFAULT);
         sessionLocator.setClientIpv6(UNKNOWN_STRING);
         
         sessionLocator.setServerIp(serverIp); 
