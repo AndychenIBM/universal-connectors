@@ -88,6 +88,10 @@ public class MySqlFilterGuardium implements Filter {
     @Override
     public Collection<Event> filter(Collection<Event> events, FilterMatchListener matchListener) {
         for (Event e : events) {
+            if (log.isDebugEnabled()) {
+                log.debug("MySql filter: Got Event: " + logEvent(e));
+            }
+
             String messageString = e.getField("message").toString();
 
             int mysqlIndex = messageString.indexOf(MYSQL_AUDIT_START_SIGNAL);
@@ -103,10 +107,6 @@ public class MySqlFilterGuardium implements Filter {
                 {
                     // remove last character (,)
                     mysqlMsgString = mysqlMsgString.substring(0, msgStrLen -1);
-                }
-                
-                if (log.isDebugEnabled()){
-                     log.debug("Mysql message is : " + mysqlMsgString);
                 }
 
                 try {
@@ -240,7 +240,7 @@ public class MySqlFilterGuardium implements Filter {
         if (data.has("login")) {
             JsonObject login = data.getAsJsonObject("login");
             String address = login.get("ip").getAsString();
-            int port = 0; // port not available, login.get("port").getAsInt();
+            int port = SessionLocator.PORT_DEFAULT; // port not available, login.get("port").getAsInt();
             if (Util.isIPv6(address)) {
                 sessionLocator.setIpv6(true);
                 sessionLocator.setClientIpv6(address);
