@@ -54,7 +54,7 @@ public class JsonRecordTransformer implements RecordTransformer {
             Datasource.Application_data appData = buildAppplicationData(record, sessionLocator);
 
             Datasource.Client_request clientRequest = Datasource.Client_request.newBuilder()
-                    .setSessionId(record.getSessionId().hashCode())//todo: check with Tim Session id issue
+                    .setSessionId(getSessionIdForSniffer(record.getSessionId()))
                     .setData(appData)
                     .build();
 
@@ -74,17 +74,12 @@ public class JsonRecordTransformer implements RecordTransformer {
 
     public Datasource.Session_start buildSessionStart(Record record, Datasource.Session_locator sessionLocator, Datasource.Accessor accessor){
 
-        // mandatory field - no need to build without it
-//        if (isEmpty(record.getSessionId())){
-//            throw new GuardUCInvalidRecordException("Invalid sessionId value "+record.getSessionId());
-//        } currently sniffer accepts empty session id messages, so will pass it on
-
         Datasource.Session_start.Builder builder = Datasource.Session_start.newBuilder()
                 .setSessionLocator(sessionLocator)
                 .setTimestamp(Utilities.getTimestamp(record.getTime()))
                 .setAccessor(accessor)
-                .setProcessId(record.getSessionId())
-                .setSessionId(record.getSessionId().hashCode());
+                .setSessionId(getSessionIdForSniffer(record.getSessionId()));
+//              .setProcessId(record.getSessionId())
 
         // optional fields - only set them if they have some value
         if (!isEmpty(record.getAppUserName())){
@@ -96,6 +91,13 @@ public class JsonRecordTransformer implements RecordTransformer {
         }
 
         return builder.build();
+    }
+
+    private static int getSessionIdForSniffer(String sessionId){
+        if (sessionId==null){
+            return 0;
+        }
+        return sessionId.hashCode();
     }
 
     /**
@@ -117,19 +119,18 @@ public class JsonRecordTransformer implements RecordTransformer {
         exceptionMsg.setSession(sessionLocator);
         exceptionMsg.setTimestamp(Utilities.getTimestamp(record.getTime()));
         Accessor accessor = record.getAccessor();
-        //Add Optional fields
-//        exceptionMsg.setAPPUSERNAME("AppUserNameFromException");
-//        exceptionMsg.setCount(25);
-//        exceptionMsg.setDBPASSWORDHASH("PasswordHashString");
-        exceptionMsg.setDBPROTOCOL((accessor != null)?accessor.getServerType():null);
 
+        //Add Optional fields
+        exceptionMsg.setDBPROTOCOL((accessor != null)?accessor.getServerType():null);
         exceptionMsg.setDBUSER((accessor != null)?accessor.getDbUser():null);
         exceptionMsg.setDESCRIPTION(recordException.getDescription());
-//        exceptionMsg.setERRORCAUSE("ErrorCauseString");
         exceptionMsg.setEXCEPTIONTYPEID(recordException.getExceptionTypeId());
 
         exceptionMsg.setSQLSTRING(recordException.getSqlString());
-        exceptionMsg.setSESSIONID(record.getSessionId());
+        // must make sure sessionId in session start is aligned with sessionId in exception
+        // per Tim's suggestion put here same hash that we set in session start
+        // otherwise it causes problems in sniffer and exception is not stored in guardium
+        exceptionMsg.setSESSIONID(""+getSessionIdForSniffer(record.getSessionId()));
 
         return exceptionMsg.build();
     }
