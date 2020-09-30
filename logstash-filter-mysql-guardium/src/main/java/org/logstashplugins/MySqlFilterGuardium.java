@@ -90,19 +90,21 @@ public class MySqlFilterGuardium implements Filter {
         for (Event e : events) {
 
             if (log.isDebugEnabled()) {
-                log.debug("MySql filter: Got Event: " + logEvent(e));
+               log.debug("MySql filter: Got Event: " + logEvent(e));
             }
 
             String messageString = e.getField("message").toString();
 
-            int mysqlIndex = messageString.indexOf(MYSQL_AUDIT_START_SIGNAL);
-            //log.warn(messageString);
+            //log.warn("MessageString  " + messageString);
             //log.warn("\n\n");
-            if ((mysqlIndex != -1) && (e.getField("mysql_message") instanceof String)) {
+
+            int mysqlIndex = messageString.indexOf(MYSQL_AUDIT_START_SIGNAL);
+
+            if (mysqlIndex != -1) {
                 
-                String mysqlMsgString = e.getField("mysql_message").toString();
+                String mysqlMsgString = messageString.substring(mysqlIndex + MYSQL_AUDIT_START_SIGNAL.length());
                 int msgStrLen = mysqlMsgString.length();
-                                   
+
                  // Remove last comma to get proper json string
                 if (mysqlMsgString.charAt(msgStrLen-1) == ',')
                 {
@@ -280,9 +282,6 @@ public class MySqlFilterGuardium implements Filter {
         
         if (e.getField("server_hostname") instanceof String)
             serverHostname = e.getField("server_hostname").toString();
-
-        if (e.getField("source_program") instanceof String)
-            sourceProgram = e.getField("source_program").toString();
 
         accessor.setDbProtocol(DATA_PROTOCOL_STRING);
         accessor.setServerType(SERVER_TYPE_STRING);
