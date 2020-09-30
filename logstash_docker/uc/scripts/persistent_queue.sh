@@ -1,6 +1,5 @@
 #!/bin/bash
 
-#Use this script only when 1 pipeline with Persistent Queue is configured
 pipelines=$UDS_ETC/pipelines.yml
 if [[ $1 = "on" ]]; then
     echo "turning persistent queue on..."
@@ -11,4 +10,3 @@ elif [[ $1 = "off" ]]; then
 else
     echo "invalid parameters - first parameter can be only on / off"
 fi
-
