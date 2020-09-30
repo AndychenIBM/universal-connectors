@@ -9,8 +9,7 @@ import co.elastic.logstash.api.LogstashPlugin;
 import co.elastic.logstash.api.PluginConfigSpec;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
 
@@ -69,8 +68,9 @@ public class MySqlFilterGuardium implements Filter {
             e.printStackTrace();
         }
     }
-    private static Log log = LogFactory.getLog(MySqlFilterGuardium.class);
-    
+
+    private static Logger log = LogManager.getLogger(MySqlFilterGuardium.class);
+
     public static final PluginConfigSpec<String> SOURCE_CONFIG =
             PluginConfigSpec.stringSetting("source", "message");
 
@@ -88,6 +88,7 @@ public class MySqlFilterGuardium implements Filter {
     @Override
     public Collection<Event> filter(Collection<Event> events, FilterMatchListener matchListener) {
         for (Event e : events) {
+
             if (log.isDebugEnabled()) {
                 log.debug("MySql filter: Got Event: " + logEvent(e));
             }
@@ -128,7 +129,10 @@ public class MySqlFilterGuardium implements Filter {
                             if (eventField.equals("connect")) {
                                 final JsonObject conn_data = inputJSON.get(DATA_TYPE_CONNECTION).getAsJsonObject();
                                 final int status = conn_data.get("status").getAsInt();
-
+                                final String dbName = conn_data.get("db").getAsString();
+                                
+                                record.setDbName(dbName);
+                                
                                 if (status != 0) {
                                     // https://dev.mysql.com/doc/refman/8.0/en/error-message-components.html                                
                                     ExceptionRecord exceptionRecord = new ExceptionRecord();
@@ -139,6 +143,18 @@ public class MySqlFilterGuardium implements Filter {
                                     exceptionRecord.setSqlString(UNKNOWN_STRING);
                                     validRecord = true;
                                 }
+                                else {
+                                    // If the dbname is set, send a "use-statement" to set the dbname 
+                                    // in the GDM_tables
+                                    if (!dbName.isEmpty())
+                                    {
+                                        Data data = new Data();
+                                        record.setData(data);
+                                        data.setOriginalSqlCommand("use " + dbName);
+                                        validRecord = true;
+                                        
+                                    } // End dbName is not empty
+                                } // End status is 0, connection is valid
                             }
                         }                         
                         else if (inputJSON.has(DATA_TYPE_GENERAL)) {
