@@ -98,8 +98,8 @@ public class JavaOutputToGuardium implements Output {
         stopped = true;
         done.countDown();
         log.info("in stop");
-        System.out.println("in stop");
         connector.onExit();
+        log.info("in stop after connector.onExit()");
     }
 
     @Override

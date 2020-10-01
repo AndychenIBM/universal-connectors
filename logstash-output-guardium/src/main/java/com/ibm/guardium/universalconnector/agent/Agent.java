@@ -49,6 +49,10 @@ public class Agent {
         recordTransmitter = new GuardConnection(messageQueue, currentStats);
     }
 
+    public ConnectionConfig getConfig() {
+        return config;
+    }
+
     class StatsTimer extends TimerTask {
         public void run() {
             Thread.currentThread().setName(config.getId() + "-StatsTimer");

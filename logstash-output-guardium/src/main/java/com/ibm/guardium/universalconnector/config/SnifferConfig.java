@@ -1,5 +1,7 @@
 package com.ibm.guardium.universalconnector.config;
 
+import java.util.Objects;
+
 public class SnifferConfig {
 
     private String ip;
@@ -47,5 +49,20 @@ public class SnifferConfig {
                 ", port=" + port +
                 ", isSSL=" + isSSL +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SnifferConfig that = (SnifferConfig) o;
+        return getPort() == that.getPort() &&
+                isSSL() == that.isSSL() &&
+                Objects.equals(getIp(), that.getIp());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getIp(), getPort(), isSSL());
     }
 }

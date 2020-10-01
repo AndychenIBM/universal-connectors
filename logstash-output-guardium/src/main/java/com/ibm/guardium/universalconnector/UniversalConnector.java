@@ -21,6 +21,7 @@ import java.util.Map;
 
 public class UniversalConnector {
     private static Logger log = LogManager.getLogger(UniversalConnector.class);
+    public static final String PERSISTENT_CONFIGURATION_FILE_NAME = "PersistentConfig.json";
 
     private boolean shouldReadFromFile = false;
     private String fileName;
@@ -208,8 +209,15 @@ public class UniversalConnector {
             this.ucConfig = ucConfig;
         } catch (FileNotFoundException e){
             log.error("Failed to find file");
-            throw new IllegalArgumentException("Filed to find files during connector initialization, Path base is "+Environment.getUcEtc(), e);
+            throw new IllegalArgumentException("Failed to find files during connector initialization, Path base is "+Environment.getUcEtc(), e);
         }
+        try {
+            getRecordDispatcher();
+        } catch (Exception e) {
+            log.error("Failed to initialize record dispatcher", e);
+            throw  new IllegalArgumentException("Failed initialize record dispatcher", e);
+        }
+
     }
 
     private void connectorMain(String[] args) throws Exception {
@@ -240,14 +248,23 @@ public class UniversalConnector {
     }
 
     public void onExit(){
+        log.debug("UniversalConnector on exit");
         try {
+            log.debug("UniversalConnector onExit waitForAllQToEmpty");
             getRecordDispatcher().waitForAllQToEmpty();
         } catch (InterruptedException e) {
             log.warn("Interrupted while waiting for messages to be sent.");
         } catch (Exception e){
             log.error("Error on waiting for messages to be sent");
         }
+        try{
+            log.debug("UniversalConnector onExit persistAgentConfigurations");
+            getRecordDispatcher().persistAgentConfigurations();
+        } catch (Exception e){
+            log.error("Error persisting configurations");
+        }
         try {
+            log.debug("UniversalConnector onExit stopAllAgents");
             getRecordDispatcher().stopAllAgents();
         } catch (Exception e){
             log.error("Error on stopping agents",e);

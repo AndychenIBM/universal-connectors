@@ -192,9 +192,9 @@ public class JsonRecordTransformer implements RecordTransformer {
 
         // mandatory fields - no need to build without it
         Accessor ra = record.getAccessor();
-        if (isEmpty(ra.getDbUser())){
-            throw new GuardUCInvalidRecordException("Invalid getDbUser value "+ra.getDbUser());
-        }
+//        if (isEmpty(ra.getDbUser())){
+//            throw new GuardUCInvalidRecordException("Invalid getDbUser value "+ra.getDbUser());
+//        }
         if (Datasource.Application_data.Data_type.CONSTRUCT.equals(dataType) && isEmpty(ra.getServerType())){
             throw new GuardUCInvalidRecordException("Invalid getServerType() value "+ra.getServerType());
         }

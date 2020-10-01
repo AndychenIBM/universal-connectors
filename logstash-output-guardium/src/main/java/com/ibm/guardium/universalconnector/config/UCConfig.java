@@ -1,5 +1,7 @@
 package com.ibm.guardium.universalconnector.config;
 
+import java.util.Objects;
+
 public class UCConfig {
     private String version;
     private String connectorId;
@@ -82,5 +84,24 @@ public class UCConfig {
                 ", statusWriterType='" + statusWriterType + '\'' +
                 ", snifferConnectionsLimit =" + snifferConnectionsLimit +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UCConfig ucConfig = (UCConfig) o;
+        return Objects.equals(getVersion(), ucConfig.getVersion()) &&
+                Objects.equals(getConnectorId(), ucConfig.getConnectorId()) &&
+                Objects.equals(getConnectorIp(), ucConfig.getConnectorIp()) &&
+                Objects.equals(getConfigurationFetchType(), ucConfig.getConfigurationFetchType()) &&
+                Objects.equals(getConfigurationFetchFileName(), ucConfig.getConfigurationFetchFileName()) &&
+                Objects.equals(getStatusWriterType(), ucConfig.getStatusWriterType()) &&
+                Objects.equals(getSnifferConnectionsLimit(), ucConfig.getSnifferConnectionsLimit());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getVersion(), getConnectorId(), getConnectorIp(), getConfigurationFetchType(), getConfigurationFetchFileName(), getStatusWriterType(), getSnifferConnectionsLimit());
     }
 }

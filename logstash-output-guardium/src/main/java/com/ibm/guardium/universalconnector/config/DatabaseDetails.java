@@ -2,6 +2,8 @@ package com.ibm.guardium.universalconnector.config;
 
 import com.ibm.guardium.proto.datasource.Datasource;
 
+import java.util.Objects;
+
 public class DatabaseDetails {
 
     public static final String DELIMITER = ":";
@@ -64,5 +66,21 @@ public class DatabaseDetails {
                 ", dbPort=" + dbPort +
                 ", dbType=" + dbType +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DatabaseDetails that = (DatabaseDetails) o;
+        return getDbPort() == that.getDbPort() &&
+                Objects.equals(getDbName(), that.getDbName()) &&
+                Objects.equals(getDbHost(), that.getDbHost()) &&
+                Objects.equals(getDbType(), that.getDbType());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getDbName(), getDbHost(), getDbPort(), getDbType());
     }
 }

@@ -1,5 +1,7 @@
 package com.ibm.guardium.universalconnector.config;
 
+import java.util.Objects;
+
 public class ConnectionConfig {
 
     public static final String ID_DELIMITER=":";
@@ -59,5 +61,18 @@ public class ConnectionConfig {
                 '}';
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ConnectionConfig that = (ConnectionConfig) o;
+        return Objects.equals(getUcConfig(), that.getUcConfig()) &&
+                Objects.equals(getSnifferConfig(), that.getSnifferConfig()) &&
+                Objects.equals(getDatabaseDetails(), that.getDatabaseDetails());
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(getUcConfig(), getSnifferConfig(), getDatabaseDetails());
+    }
 }

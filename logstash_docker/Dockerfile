@@ -16,12 +16,14 @@ COPY uc/. ${LOGSTASH_DIR}/
 RUN chown -R guc:guardium ${LOGSTASH_DIR}
 USER guc
 
-ENV UDS_ETC=${LOGSTASH_DIR}/config/ \
-    UC_ETC=${LOGSTASH_DIR}/config/ \
-    UC_SCRIPTS=${LOGSTASH_DIR}/scripts/
+ENV UC_ETC=${LOGSTASH_DIR}/config/ \
+    UC_SCRIPTS=${LOGSTASH_DIR}/scripts/ \
+	UC_EXTERNAL_CONFIG=/etc/uc/conf
+	
 
 #Create a persistent volume which can be monted on the host
 VOLUME /var/log/uc
+VOLUME /etc/uc/conf
 
 WORKDIR ${LOGSTASH_DIR}
 
@@ -40,10 +42,10 @@ RUN echo "--add-opens=java.base/java.lang=ALL-UNNAMED \
 #Install plugins
     cd ${LOGSTASH_DIR}/config/ && \
 	${LOGSTASH_DIR}/bin/logstash-plugin install logstash-filter-mongodb_guardium_filter-0.6.2.gem \
-	logstash-output-java_output_to_guardium-1.2.3.gem \
+	logstash-output-java_output_to_guardium-1.2.4.gem \
     logstash-filter-mysql_filter_guardium-1.0.0.gem \
     logstash-input-cloudwatch_logs-1.0.3.gem \
-    logstash-filter-logstash_filter_s3_guardium-0.5.2.gem && \
+    logstash-filter-logstash_filter_s3_guardium-0.5.3.gem && \
 #Create a customer dir
     mkdir -p ${LOGSTASH_DIR}/customer/pipeline ${LOGSTASH_DIR}/customer/config && \
 #Make sure user can read,write and execute the scripts
