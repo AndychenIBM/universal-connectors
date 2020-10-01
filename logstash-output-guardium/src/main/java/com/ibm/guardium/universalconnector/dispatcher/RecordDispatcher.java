@@ -1,17 +1,24 @@
 package com.ibm.guardium.universalconnector.dispatcher;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.stream.JsonReader;
 import com.ibm.guardium.proto.datasource.*;
 import com.ibm.guardium.universalconnector.UniversalConnector;
 import com.ibm.guardium.universalconnector.agent.Agent;
-import com.ibm.guardium.universalconnector.config.ConnectionConfig;
-import com.ibm.guardium.universalconnector.config.DatabaseDetails;
-import com.ibm.guardium.universalconnector.config.SnifferConfig;
-import com.ibm.guardium.universalconnector.config.UCConfig;
+import com.ibm.guardium.universalconnector.common.ConfigurationFetcher;
+import com.ibm.guardium.universalconnector.common.ConfigurationFetcherFactory;
+import com.ibm.guardium.universalconnector.common.Environment;
+import com.ibm.guardium.universalconnector.config.*;
 import com.ibm.guardium.universalconnector.exceptions.GuardUCException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.HashMap;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -20,18 +27,18 @@ import java.util.stream.Collectors;
 
 public class RecordDispatcher {
     private static Logger log = LogManager.getLogger(RecordDispatcher.class);
-
     private UCConfig ucConfig;
     private List<SnifferConfig> snifferConfigs;
     private ConcurrentMap<String, Agent> agentsMap = new ConcurrentHashMap<>(); // id -> Agent instance
     // session_start and client_request must be put in the queue together one after another in order for sniffer to process it correctly
     private static Object must_put_2_messages_per_record_flag = new Object();
     private static Object agent_map_on_agent_create_flag = new Object();
+    private static Object persistency_flag = new Object();
 
     public RecordDispatcher(UCConfig ucConfig, List<SnifferConfig> snifferConfigs) {
         this.ucConfig = ucConfig;
         this.snifferConfigs = snifferConfigs;
-        initAgents();
+        initPersistedConfigurations();
     }
 
 //    /*
@@ -95,31 +102,8 @@ public class RecordDispatcher {
 
         //log.debug("The Thread name is " + Thread.currentThread().getId() + "__" +Thread.currentThread().getName());
         if (agentsMap.get(dbId)==null) {
-
-            synchronized (agent_map_on_agent_create_flag) {
-
-                if (agentsMap.get(dbId)==null) {
-
-                    if (log.isDebugEnabled()) { log.debug("AgentMap values are " + map2string(agentsMap)); }
-
-                    if (ucConfig.getSnifferConnectionsLimit() != null && ucConfig.getSnifferConnectionsLimit() < agentsMap.size()) {
-                        log.error("Limit of existing connections to guardium has exceeded, limit is " + ucConfig.getSnifferConnectionsLimit());
-                        throw new GuardUCException("Exceeded number of connections to guardium");
-                    }
-                    try {
-                        if (log.isDebugEnabled()) { log.debug("Creating agent for " + dbId); }
-
-                        ConnectionConfig cc = new ConnectionConfig(ucConfig, snifferConfigs.get(0), dbDetails);
-                        Agent agent = new Agent(cc);
-                        agent.start();
-                        agentsMap.put(dbId, agent);
-
-                        if (log.isDebugEnabled()) { log.debug("Finished creating agent for " + dbId);  }
-                    } catch (Exception e) {
-                        log.error("Failed to creating/starting agent for sniffer configuration " + snifferConfigs.get(0) + " and dbDetails " + dbDetails, e);
-                    }
-                }
-            }
+            ConnectionConfig cc = new ConnectionConfig(ucConfig, snifferConfigs.get(0), dbDetails);
+            addAgentToMap(cc);
         }
         return agentsMap.get(dbId);
     }
@@ -144,23 +128,110 @@ public class RecordDispatcher {
         }
     }
 
-    private void initAgents(){
-//        for (SnifferConfig snifferConfig : snifferConfigs) {
-//            try {
-//                ConnectionConfig cc = new ConnectionConfig(ucConfig, snifferConfig, null);
-//                Agent agent = new Agent(cc);
-//                agent.start();
-//                allAgents.add(agent);
-//            } catch (Exception e){
-//                log.error("Failed to creating/starting agent for sniffer configuration "+snifferConfig, e);
-//                System.err.print(e);
-//            }
-//        }
-//        if (allAgents.size()==0){
-//            log.error("No agent is available");
-//            throw new GuardUCException("No agent is available based on current settings");
-//        }
+    public void persistAgentConfigurations() throws IOException {
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        log.debug("persistAgentConfigurations start");
+        synchronized (persistency_flag) {
+            try {
+                PersistentConfig persistentConfig = new PersistentConfig();
+                persistentConfig.setSnifferConfig(snifferConfigs.get(0));
+                persistentConfig.setUcConfig(ucConfig);
+
+                List<DatabaseDetails> dbs = agentsMap.values().stream().map(a -> a.getConfig().getDatabaseDetails()).collect(Collectors.toList());//new LinkedList<>();
+                persistentConfig.setDbs(dbs);
+
+                log.debug("persistAgentConfigurations path is " + Environment.getPersistentConfigurationPath());
+                FileWriter fw = new FileWriter(Environment.getPersistentConfigurationPath());
+                gson.toJson(persistentConfig, fw);
+                fw.flush();
+                fw.close();
+                log.debug("persistAgentConfigurations finished saving to external folder");
+
+            } catch (Throwable t) {
+                log.error("Failed to persist configruation", t);
+            }
+        }
     }
 
 
+    public void initPersistedConfigurations(){
+        synchronized (persistency_flag) {
+            try (FileReader fileReader = new FileReader( Environment.getPersistentConfigurationPath())){
+                JsonReader reader = new JsonReader(fileReader);
+                PersistentConfig config = new Gson().fromJson(reader, PersistentConfig.class);
+                log.debug("Finished loading connections configuration from file, config is "+new Gson().toJson(config));
+
+                UCConfig persistedUcConfig = config.getUcConfig();
+                SnifferConfig perSnifferConfig = config.getSnifferConfig();
+                Collection<DatabaseDetails> dbs = config.getDbs();
+                for (DatabaseDetails db : dbs) {
+                    ConnectionConfig cc = new ConnectionConfig(persistedUcConfig, perSnifferConfig, db);
+                    validatePersistedConnectionConfig(cc);
+                    addAgentToMap(cc);
+                }
+
+            } catch (FileNotFoundException e){
+                log.info("Persisted configurations file "+Environment.getPersistentConfigurationPath()+" was not found, perhaps first time logstash loads, agents map will be empty on initialization");
+            } catch (Exception e){
+                log.error("Failed to deserializeAgentConfigurations from file "+Environment.getPersistentConfigurationPath()+", agents map will be empty on initialization ", e);
+            }
+        }
+    }
+
+
+    private void validateConnectionsLimit(){
+        if (ucConfig.getSnifferConnectionsLimit() != null && ucConfig.getSnifferConnectionsLimit() < agentsMap.size()) {
+            log.error("Limit of existing connections to guardium has exceeded, limit is " + ucConfig.getSnifferConnectionsLimit());
+            throw new GuardUCException("Exceeded number of connections to guardium");
+        }
+    }
+
+    /**
+     * When persistent uc might have sent data to ManagedUnit1 and after restart it was configured to send data to ManagedUnit2
+     * need to
+     * 1. Inform ManagedUnit1 to remove connection
+     * 2. Update connection details to send data to ManagedUnit2
+     *
+     *
+     * @param cc
+     */
+    private void validatePersistedConnectionConfig(ConnectionConfig cc){
+        boolean configHasChanged = !snifferConfigs.get(0).equals(cc.getSnifferConfig()) || !ucConfig.equals(cc.getUcConfig());
+        if (configHasChanged) {
+            // 1. remove old stap details from managed unit
+            // todo nataly
+
+            // 2. update cc to current settings
+            cc.setSnifferConfig(snifferConfigs.get(0));
+            cc.setUcConfig(ucConfig);
+        }
+    }
+
+    private void addAgentToMap(ConnectionConfig cc){
+
+        String dbId = cc.getDatabaseDetails().getId();
+
+        synchronized (agent_map_on_agent_create_flag) {
+
+            if (agentsMap.get(dbId)==null) {
+
+                if (log.isDebugEnabled()) { log.debug("AgentMap values are " + map2string(agentsMap)); }
+
+                validateConnectionsLimit();
+
+                try {
+                    if (log.isDebugEnabled()) { log.debug("Creating agent for " + dbId); }
+
+                    Agent agent = new Agent(cc);
+                    agent.start();
+                    agentsMap.put(dbId, agent);
+
+                    if (log.isDebugEnabled()) { log.debug("Finished creating agent for " + dbId);  }
+
+                } catch (Exception e) {
+                    log.error("Failed to creating/starting agent for connection configuration " + cc, e);
+                }
+            }
+        }
+    }
 }
