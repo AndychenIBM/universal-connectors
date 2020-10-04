@@ -22,8 +22,10 @@ if [[ -z "$logstash_pid" ]]; then
     updateFromEnv "$UDP_PORT" "UDP_PORT" $MONGODB_CONF "udp \{ port => 5141 type => syslog" "udp \{ port => $UDP_PORT type => syslog"
     updateFromEnv "$TCP_PORT" "TCP_PORT" $MONGODB_CONF "tcp \{ port => 5000 type => syslog" "tcp \{ port => $TCP_PORT type => syslog"
 
+    setJVMParameters
+
     #Start logstash
-    logstash -l ${LOG_GUC_DIR} 2>&1 | tee -a ${LOG_GUC_DIR}/logstash_stdout_stderr.log
+    logstash -b 50 -u 500 -l ${LOG_GUC_DIR} 2>&1 | tee -a ${LOG_GUC_DIR}/logstash_stdout_stderr.log
 else
     echo "Logstash is already running..."
 fi
