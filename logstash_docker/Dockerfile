@@ -17,9 +17,7 @@ RUN chown -R guc:guardium ${LOGSTASH_DIR}
 USER guc
 
 ENV UC_ETC=${LOGSTASH_DIR}/config/ \
-    UC_SCRIPTS=${LOGSTASH_DIR}/scripts/ \
-	UC_EXTERNAL_CONFIG=/etc/uc/conf
-	
+    UC_SCRIPTS=${LOGSTASH_DIR}/scripts/
 
 #Create a persistent volume which can be monted on the host
 VOLUME /var/log/uc

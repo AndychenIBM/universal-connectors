@@ -14,7 +14,9 @@ ENV JAVA_HOME=/opt/java/openjdk \
     JAVA_VERSION="jdk-11.0.8+10_openj9-0.21.0" \
     LOGSTASH_VERSION=7.5.2 \
     LOGSTASH_DIR=/usr/share/logstash \
-    LOG_GUC_DIR=/var/log/uc/
+    LOG_GUC_DIR=/var/log/uc/ \
+    UC_EXTERNAL_CONFIG=/etc/uc/conf
+
 
 #Install necessary packages
 RUN microdnf install -y tzdata openssl curl ca-certificates procps shadow-utils.x86_64 tar gzip hostname vim && \
@@ -41,7 +43,7 @@ RUN microdnf install -y tzdata openssl curl ca-certificates procps shadow-utils.
     rm -rf /tmp/openjdk.tar.gz && \
 #Change ownership to guc
     groupadd -g 991 guardium && useradd -G guardium -u 1001 guc && \
-    mkdir -p ${LOGSTASH_DIR} ${LOG_GUC_DIR} && chown -R guc:guardium ${LOGSTASH_DIR} ${LOG_GUC_DIR}
+    mkdir -p ${LOGSTASH_DIR} ${LOG_GUC_DIR} ${UC_EXTERNAL_CONFIG} && chown -R guc:guardium ${LOGSTASH_DIR} ${LOG_GUC_DIR} ${UC_EXTERNAL_CONFIG}
 
 #Change User to guc
 USER guc
