@@ -155,7 +155,7 @@ public class GuardConnection implements RecordTransmitter {
         connected.signalAll();
         lock.unlock();
         //sendConfig();
-        if (log.isDebugEnabled()) {log.debug("Connection status is : " + status);}
+//        if (log.isDebugEnabled()) {log.debug("Connection status is : " + status);}
     }
 
     private void createNewConnection() throws Exception {
@@ -196,7 +196,6 @@ public class GuardConnection implements RecordTransmitter {
             read = commHandler.read(readBuffer);
         } while (read == readBuffer.capacity());
         if (read < 0) {
-            log.debug("Read -1, closing socket.");
             status= Status.CLOSE;
             writeStatus("CLOSE","");
             return;
