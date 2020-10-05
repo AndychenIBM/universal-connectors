@@ -12,4 +12,4 @@ for dev environments that have higher then java8 version - use options.compilerA
 
 Sniffers details configuration is taken in SniffersConfig.json,
 Connector details configuration is taken from UniversalConnector.json( including how it is identified in guarduim stap lists)
-Set UDS_ETC environment variable to define location of configuration files
+Set UC_ETC environment variable to define location of configuration files

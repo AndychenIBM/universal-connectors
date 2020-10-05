@@ -6,13 +6,13 @@ logstash_pid=$(/usr/share/logstash/scripts/get_logstash_pid.sh)
 if [[ -z "$logstash_pid" ]]; then
     #Change Sniffer IP to host's IP
     SNIF_IP=$( hostname -i | awk '{print $1}')
-    updateFromEnv "$SNIF_IP" "Sniffer IP address" $UDS_ETC/SniffersConfig.json "127.0.0.1" "$SNIF_IP"
+    updateFromEnv "$SNIF_IP" "Sniffer IP address" $UC_ETC/SniffersConfig.json "127.0.0.1" "$SNIF_IP"
 
     #Change log4j2uc.properties log level if needed
     setUcLogLevel "$UC_LOG_LEVEL"
 
     #Change connectorId if needed
-    updateFromEnv "$CONNECTOR_ID" "CONNECTOR_ID" $UDS_ETC/UniversalConnector.json "\"connectorId\":.*" "\"connectorId\":\"$CONNECTOR_ID\","
+    updateFromEnv "$CONNECTOR_ID" "CONNECTOR_ID" $UC_ETC/UniversalConnector.json "\"connectorId\":.*" "\"connectorId\":\"$CONNECTOR_ID\","
 
 
     #Change filebeat/syslog ports if needed

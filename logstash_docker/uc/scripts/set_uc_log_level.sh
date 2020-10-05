@@ -6,9 +6,9 @@ function setUcLogLevel(){
     if [[ "$1" =~ ^(all|debug|info|warn|error|fatal|off|trace)$ ]]; then
 
         export UC_LOG_LEVEL=$1
-        updateFromEnv "$UC_LOG_LEVEL" "UC_LOG_LEVEL" $UDS_ETC/log4j2uc.properties "filter.threshold.level = \w+" "filter.threshold.level = $UC_LOG_LEVEL"
-        updateFromEnv "$UC_LOG_LEVEL" "UC_LOG_LEVEL" $UDS_ETC/log4j2uc.properties "logger.guardium.level = \w+" "logger.guardium.level = $UC_LOG_LEVEL"
-        updateFromEnv "$UC_LOG_LEVEL" "UC_LOG_LEVEL" $UDS_ETC/log4j2uc.properties "logger.logstashplugins.level = \w+" "logger.logstashplugins.level = $UC_LOG_LEVEL"
+        updateFromEnv "$UC_LOG_LEVEL" "UC_LOG_LEVEL" $UC_ETC/log4j2uc.properties "filter.threshold.level = \w+" "filter.threshold.level = $UC_LOG_LEVEL"
+        updateFromEnv "$UC_LOG_LEVEL" "UC_LOG_LEVEL" $UC_ETC/log4j2uc.properties "logger.guardium.level = \w+" "logger.guardium.level = $UC_LOG_LEVEL"
+        updateFromEnv "$UC_LOG_LEVEL" "UC_LOG_LEVEL" $UC_ETC/log4j2uc.properties "logger.logstashplugins.level = \w+" "logger.logstashplugins.level = $UC_LOG_LEVEL"
     fi
 }
 

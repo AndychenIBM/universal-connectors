@@ -1,6 +1,6 @@
 #!/bin/bash
 
-pipelines=$UDS_ETC/pipelines.yml
+pipelines=$UC_ETC/pipelines.yml
 if [[ $1 = "on" ]]; then
     echo "turning persistent queue on..."
     sed -i -r "s/#queue.type: persisted/queue.type: persisted/g" $pipelines
