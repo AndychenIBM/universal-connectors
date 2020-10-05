@@ -19,7 +19,7 @@ ENV JAVA_HOME=/opt/java/openjdk \
 
 
 #Install necessary packages
-RUN microdnf install -y tzdata openssl curl ca-certificates procps shadow-utils.x86_64 tar gzip hostname vim logrotate && \
+RUN microdnf install -y tzdata openssl curl ca-certificates procps shadow-utils.x86_64 tar gzip hostname vim cronie logrotate && \
     microdnf update -y; microdnf clean all && \
 #Download and install OpenJDK
     set -eux; \
