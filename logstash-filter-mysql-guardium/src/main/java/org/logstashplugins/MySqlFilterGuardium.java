@@ -145,18 +145,6 @@ public class MySqlFilterGuardium implements Filter {
                                     exceptionRecord.setSqlString(UNKNOWN_STRING);
                                     validRecord = true;
                                 }
-                                else {
-                                    // If the dbname is set, send a "use-statement" to set the dbname 
-                                    // in the GDM_tables
-                                    if (!dbName.isEmpty())
-                                    {
-                                        Data data = new Data();
-                                        record.setData(data);
-                                        data.setOriginalSqlCommand("use " + dbName);
-                                        validRecord = true;
-                                        
-                                    } // End dbName is not empty
-                                } // End status is 0, connection is valid
                             }
                         }                         
                         else if (inputJSON.has(DATA_TYPE_GENERAL)) {
