@@ -1,6 +1,10 @@
 package com.ibm.guardium.universalconnector.transmitter;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class TransmitterStats {
+    private static Logger log = LogManager.getLogger(TransmitterStats.class);
+
     private long lastMsgCreateTime = 0; // epoc timestamp of msg when entered into stream.
     private long lastReceiveTime = 0;
     private long bytesSent = 0;
@@ -9,6 +13,12 @@ public class TransmitterStats {
     private long msgsSent = 0;
     private long incomingRecords = 0;
     private long recordsInQ = 0;
+
+    public boolean noDataForTooLongTime(long noDataLimit){
+        long diff = System.currentTimeMillis() - getLastMsgCreateTime();
+        //log.debug("=================Diff is "+diff+" breached "+(diff>noDataLimit));
+        return diff > noDataLimit;
+    }
 
     public void setLastMsgCreateTime(long lastMsgCreateTime) {
         this.lastMsgCreateTime = lastMsgCreateTime;

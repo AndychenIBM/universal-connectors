@@ -4,10 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
 import com.ibm.guardium.proto.datasource.*;
-import com.ibm.guardium.universalconnector.UniversalConnector;
 import com.ibm.guardium.universalconnector.agent.Agent;
-import com.ibm.guardium.universalconnector.common.ConfigurationFetcher;
-import com.ibm.guardium.universalconnector.common.ConfigurationFetcherFactory;
 import com.ibm.guardium.universalconnector.common.Environment;
 import com.ibm.guardium.universalconnector.config.*;
 import com.ibm.guardium.universalconnector.exceptions.GuardUCException;
@@ -17,7 +14,6 @@ import org.apache.logging.log4j.Logger;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -74,7 +70,6 @@ public class RecordDispatcher {
         try{
             synchronized (must_put_2_messages_per_record_flag) {
                 for (Datasource.Guard_ds_message message : messages) {
-                    agent.incIncomingRecordsCount();
                     agent.send(message);
                 }
             }
@@ -111,7 +106,20 @@ public class RecordDispatcher {
             ConnectionConfig cc = new ConnectionConfig(ucConfig, snifferConfigs.get(0), dbDetails);
             addAgentToMap(cc);
         }
-        return agentsMap.get(dbId);
+
+        Agent agent = agentsMap.get(dbId);
+        if (Agent.AgentState.STOPPED.equals(agent.getState())){
+            try {
+                if (log.isDebugEnabled()) { log.debug("About to start agent for " + dbId); }
+                agent.start();
+                if (log.isDebugEnabled()) { log.debug("Started agent for " + dbId); }
+            } catch (Exception e) {
+                log.error("Failed starting agent for connection configuration " + dbId, e);
+
+            }
+        }
+
+        return agent;
     }
 
     public void waitForAllQToEmpty(){
@@ -127,7 +135,7 @@ public class RecordDispatcher {
     public void stopAllAgents(){
         for (Agent agent : agentsMap.values()) { //todo: handle threads
             try {
-                agent.stop();
+                agent.stopAgent();
             } catch (Exception e){
                 log.warn("Error while stopping agent "+agent.getId());
             }
@@ -184,9 +192,24 @@ public class RecordDispatcher {
         }
     }
 
+    private boolean isConnectionsLimitExceeded(){
+        return ucConfig.getSnifferConnectionsLimit()!=null && (agentsMap.size() >= ucConfig.getSnifferConnectionsLimit());
+    }
 
-    private void validateConnectionsLimit(){
-        if (ucConfig.getSnifferConnectionsLimit() != null && ucConfig.getSnifferConnectionsLimit() < agentsMap.size()) {
+    private void validateConnectionsLimit() {
+        if (isConnectionsLimitExceeded()) {
+            log.error("Limit of existing connections to guardium is exceeded, limit is " + ucConfig.getSnifferConnectionsLimit()+", going to remove some agent");
+            //throw new GuardUCException("Exceeded number of connections to guardium");
+            // go over existing agents, check if some can be released -
+            // stopped agent will be removed from map
+            for (String agentId : agentsMap.keySet()) {
+                if (agentsMap.get(agentId).getState().equals(Agent.AgentState.STOPPED) || agentsMap.get(agentId).getState().equals(Agent.AgentState.ERROR)) {
+                    agentsMap.remove(agentId);
+                }
+            }
+        }
+
+        if (isConnectionsLimitExceeded()) {
             log.error("Limit of existing connections to guardium has exceeded, limit is " + ucConfig.getSnifferConnectionsLimit());
             throw new GuardUCException("Exceeded number of connections to guardium");
         }

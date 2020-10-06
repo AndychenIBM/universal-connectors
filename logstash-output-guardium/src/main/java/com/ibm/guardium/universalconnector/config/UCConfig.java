@@ -10,6 +10,7 @@ public class UCConfig {
     private String configurationFetchFileName;
     private String statusWriterType;
     private Integer snifferConnectionsLimit;
+    private Integer noDataThresholdInMs;
 
     public UCConfig(){
     }
@@ -73,6 +74,14 @@ public class UCConfig {
         this.connectorIp = connectorIp;
     }
 
+    public Integer getNoDataThresholdInMs() {
+        return noDataThresholdInMs;
+    }
+
+    public void setNoDataThresholdInMs(Integer noDataThresholdInMs) {
+        this.noDataThresholdInMs = noDataThresholdInMs;
+    }
+
     @Override
     public String toString() {
         return "UCConfig{" +
@@ -83,6 +92,7 @@ public class UCConfig {
                 ", configurationFetchFileName='" + configurationFetchFileName + '\'' +
                 ", statusWriterType='" + statusWriterType + '\'' +
                 ", snifferConnectionsLimit =" + snifferConnectionsLimit +
+                ", noDataThresholdInMs =" + noDataThresholdInMs +
                 '}';
     }
 
@@ -97,7 +107,8 @@ public class UCConfig {
                 Objects.equals(getConfigurationFetchType(), ucConfig.getConfigurationFetchType()) &&
                 Objects.equals(getConfigurationFetchFileName(), ucConfig.getConfigurationFetchFileName()) &&
                 Objects.equals(getStatusWriterType(), ucConfig.getStatusWriterType()) &&
-                Objects.equals(getSnifferConnectionsLimit(), ucConfig.getSnifferConnectionsLimit());
+                Objects.equals(getSnifferConnectionsLimit(), ucConfig.getSnifferConnectionsLimit()) &&
+                Objects.equals(getNoDataThresholdInMs(), ucConfig.getNoDataThresholdInMs());
     }
 
     @Override
