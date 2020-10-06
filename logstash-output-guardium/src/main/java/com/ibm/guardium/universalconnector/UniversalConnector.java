@@ -257,12 +257,12 @@ public class UniversalConnector {
         } catch (Exception e){
             log.error("Error on waiting for messages to be sent");
         }
-        try{
-            log.debug("UniversalConnector onExit persistAgentConfigurations");
-            getRecordDispatcher().persistAgentConfigurations();
-        } catch (Exception e){
-            log.error("Error persisting configurations");
-        }
+//        try{
+//            log.debug("UniversalConnector onExit persistAgentConfigurations");
+//            getRecordDispatcher().persistAgentConfigurations();
+//        } catch (Exception e){
+//            log.error("Error persisting configurations");
+//        }
         try {
             log.debug("UniversalConnector onExit stopAllAgents");
             getRecordDispatcher().stopAllAgents();

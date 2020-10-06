@@ -35,11 +35,11 @@ public class RecordDispatcher {
     public RecordDispatcher(UCConfig ucConfig, List<SnifferConfig> snifferConfigs) {
         this.ucConfig = ucConfig;
         this.snifferConfigs = snifferConfigs;
-        try {
-            initPersistedConfigurations();
-        } catch (Exception e){
-            log.error("Failed to load persisted configuration, agent list will be empty on start", e);
-        }
+//        try {
+//            initPersistedConfigurations();
+//        } catch (Exception e){
+//            log.error("Failed to load persisted configuration, agent list will be empty on start", e);
+//        }
 
     }
 
@@ -142,55 +142,55 @@ public class RecordDispatcher {
         }
     }
 
-    public void persistAgentConfigurations() {
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        log.debug("persistAgentConfigurations start");
-        synchronized (persistency_flag) {
-            List<DatabaseDetails> dbs = agentsMap==null ? Collections.EMPTY_LIST : agentsMap.values().stream().map(a -> a.getConfig().getDatabaseDetails()).collect(Collectors.toList());
-            try(FileWriter fw = new FileWriter(Environment.getPersistentConfigurationPath())) {
-                PersistentConfig persistentConfig = new PersistentConfig();
-                persistentConfig.setSnifferConfig(snifferConfigs.get(0));
-                persistentConfig.setUcConfig(ucConfig);
-                persistentConfig.setDbs(dbs);
+//    public void persistAgentConfigurations() {
+//        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+//        log.debug("persistAgentConfigurations start");
+//        synchronized (persistency_flag) {
+//            List<DatabaseDetails> dbs = agentsMap==null ? Collections.EMPTY_LIST : agentsMap.values().stream().map(a -> a.getConfig().getDatabaseDetails()).collect(Collectors.toList());
+//            try(FileWriter fw = new FileWriter(Environment.getPersistentConfigurationPath())) {
+//                PersistentConfig persistentConfig = new PersistentConfig();
+//                persistentConfig.setSnifferConfig(snifferConfigs.get(0));
+//                persistentConfig.setUcConfig(ucConfig);
+//                persistentConfig.setDbs(dbs);
+//
+//                log.debug("persistAgentConfigurations path is " + Environment.getPersistentConfigurationPath());
+//
+//                gson.toJson(persistentConfig, fw);
+//                fw.flush();
+//                fw.close();
+//                log.debug("persistAgentConfigurations finished saving to external folder");
+//            } catch (Throwable t) {
+//                log.error("Failed to persist configruation", t);
+//            }
+//        }
+//    }
 
-                log.debug("persistAgentConfigurations path is " + Environment.getPersistentConfigurationPath());
 
-                gson.toJson(persistentConfig, fw);
-                fw.flush();
-                fw.close();
-                log.debug("persistAgentConfigurations finished saving to external folder");
-            } catch (Throwable t) {
-                log.error("Failed to persist configruation", t);
-            }
-        }
-    }
-
-
-    public void initPersistedConfigurations(){
-        PersistentConfig config = null;
-        synchronized (persistency_flag) {
-            try (FileReader fileReader = new FileReader( Environment.getPersistentConfigurationPath())){
-                JsonReader reader = new JsonReader(fileReader);
-                config = new Gson().fromJson(reader, PersistentConfig.class);
-                log.debug("Finished loading connections configuration from file, config is "+new Gson().toJson(config));
-            } catch (FileNotFoundException e){
-                log.info("Persisted configurations file "+Environment.getPersistentConfigurationPath()+" was not found, perhaps first time logstash loads, agents map will be empty on initialization");
-                return;
-            } catch (Exception e){
-                log.error("Failed to deserializeAgentConfigurations from file "+Environment.getPersistentConfigurationPath()+", agents map will be empty on initialization ", e);
-                return;
-            }
-        }
-
-        UCConfig persistedUcConfig = config.getUcConfig();
-        SnifferConfig perSnifferConfig = config.getSnifferConfig();
-        Collection<DatabaseDetails> dbs = config.getDbs();
-        for (DatabaseDetails db : dbs) {
-            ConnectionConfig cc = new ConnectionConfig(persistedUcConfig, perSnifferConfig, db);
-            validatePersistedConnectionConfig(cc);
-            addAgentToMap(cc);
-        }
-    }
+//    public void initPersistedConfigurations(){
+//        PersistentConfig config = null;
+//        synchronized (persistency_flag) {
+//            try (FileReader fileReader = new FileReader( Environment.getPersistentConfigurationPath())){
+//                JsonReader reader = new JsonReader(fileReader);
+//                config = new Gson().fromJson(reader, PersistentConfig.class);
+//                log.debug("Finished loading connections configuration from file, config is "+new Gson().toJson(config));
+//            } catch (FileNotFoundException e){
+//                log.info("Persisted configurations file "+Environment.getPersistentConfigurationPath()+" was not found, perhaps first time logstash loads, agents map will be empty on initialization");
+//                return;
+//            } catch (Exception e){
+//                log.error("Failed to deserializeAgentConfigurations from file "+Environment.getPersistentConfigurationPath()+", agents map will be empty on initialization ", e);
+//                return;
+//            }
+//        }
+//
+//        UCConfig persistedUcConfig = config.getUcConfig();
+//        SnifferConfig perSnifferConfig = config.getSnifferConfig();
+//        Collection<DatabaseDetails> dbs = config.getDbs();
+//        for (DatabaseDetails db : dbs) {
+//            ConnectionConfig cc = new ConnectionConfig(persistedUcConfig, perSnifferConfig, db);
+//            validatePersistedConnectionConfig(cc);
+//            addAgentToMap(cc);
+//        }
+//    }
 
     private boolean isConnectionsLimitExceeded(){
         return ucConfig.getSnifferConnectionsLimit()!=null && (agentsMap.size() >= ucConfig.getSnifferConnectionsLimit());
@@ -260,7 +260,7 @@ public class RecordDispatcher {
                     // since on container restart we may not get logstash going down event (on which normally configuratin should be persisted ) -
                     // persist configuration every time agent is added to the map
                     // in case agent is removed - will need update saved file.
-                    persistAgentConfigurations();
+//                    persistAgentConfigurations();
 
                 } catch (Exception e) {
                     log.error("Failed to creating/starting agent for connection configuration " + cc, e);
