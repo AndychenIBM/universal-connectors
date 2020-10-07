@@ -1,4 +1,5 @@
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$FILEBEAT_DEFAULT_CONF_PATH="C:\Users\Administrator\Downloads\filebeat\filebeat.yml"
 
 #Save arguments
 $path = $( $args[0] )
@@ -8,11 +9,12 @@ $enable_loadbalance = $( $args[2] )
 Write-Host "$( Get-Date ): Params passed to filebeat script:`n`tPATH=$( $path )`n`tHOST_ADDRESSES=$( $host_addresses )`n`tENABLE_LOADBALANCE=$( $enable_loadbalance )"
 
 #Find filebeat configuration file path
-#$filebeat_conf = gci -recurse -filter "filebeat.yml" -File -ErrorAction SilentlyContinue
-#Write-Host "$(Get-Date):  filebeat configuration file path is: $($filebeat_conf.FullName)`n"
-$filebeat_conf = "C:\Program Files\Filebeat\filebeat.yml"
-Write-Host "$( Get-Date ): Filebeat configuration file path is: $( $filebeat_conf )"
+$filebeat_conf=Get-Variable -Name FILEBEAT_CONF_PATH -Scope Global -ErrorAction SilentlyContinue
+if($filebeat_conf -eq $null){
+    $filebeat_conf = $FILEBEAT_DEFAULT_CONF_PATH
+}
 
+Write-Host "$( Get-Date ): Filebeat configuration file path is: $( $filebeat_conf )"
 
 #Configure Filebeat input:
 $startRange = (Get-Content $filebeat_conf | select-string "filebeat.inputs:").LineNumber

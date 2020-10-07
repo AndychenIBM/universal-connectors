@@ -1,4 +1,6 @@
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$MONGODB_DEFAULT_CONF_PATH="C:\Program Files\MongoDB\Server\4.2\bin\mongod.cfg"
+
 
 #Save arguments
 $dest = $( $args[0] )
@@ -9,8 +11,10 @@ $restart_mongodb = $( $args[4] )
 
 Write-Host "$( Get-Date ): Params passed to mongod script:`n`tDEST=$( $dest )`n`tFORMAT=$( $format )`n`tPATH=$( $path )`n`tFILTER=$( $filter )`n`tRESTART_MONODB=$( $restart_mongodb )"
 
-#$mongod_conf = gci -recurse -filter "mongod.cfg" -File -ErrorAction SilentlyContinue
-$mongod_conf = "C:\Program Files\MongoDB\Server\4.2\bin\mongod.cfg"
+$mongod_conf=Get-Variable -Name MONGODB_CONF_PATH -Scope Global -ErrorAction SilentlyContinue
+if($mongod_conf -eq $null){
+    $mongod_conf = $MONGODB_DEFAULT_CONF_PATH
+}
 Write-Host "$( Get-Date ): Mongod configuration file path is: $( $mongod_conf )"
 
 if ($restart_mongodb -eq 1) {

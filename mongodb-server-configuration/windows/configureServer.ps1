@@ -78,5 +78,5 @@ if ($restart_mongodb -eq 1)
 }
 
 #Add-Content $logfile -value "$(Get-Date): Configuring filebeat..."
-#."$scriptDir\configureFilebeat.ps1" $path $host_addresses $enable_loadbalance
+."$scriptDir\configureFilebeat.ps1" $path $host_addresses $enable_loadbalance
 Write-Host "$(Get-Date): Done configuring Server."
