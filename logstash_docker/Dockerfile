@@ -18,7 +18,8 @@ USER guc
 
 ENV UC_ETC=${LOGSTASH_DIR}/config/ \
     UC_SCRIPTS=${LOGSTASH_DIR}/scripts/ \
-    THIRD_PARTY_PATH=${LOGSTASH_DIR}/third_party
+    THIRD_PARTY_PATH=${LOGSTASH_DIR}/third_party \
+    SSL_DIR=${LOGSTASH_DIR}/ssl
 
 #Create a persistent volume which can be monted on the host
 VOLUME /var/log/uc
