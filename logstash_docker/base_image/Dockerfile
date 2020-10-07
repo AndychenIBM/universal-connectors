@@ -43,7 +43,7 @@ RUN microdnf install -y tzdata openssl curl ca-certificates procps shadow-utils.
     rm -rf /tmp/openjdk.tar.gz && \
 #Change ownership to guc
     groupadd -g 991 guardium && useradd -G guardium -u 1001 guc && \
-    mkdir -p ${LOGSTASH_DIR} ${LOG_GUC_DIR} ${UC_EXTERNAL_CONFIG} && chown -R guc:guardium ${ETC} ${LOGSTASH_DIR} ${LOG_DIR}
+    mkdir -p ${LOGSTASH_DIR} ${LOG_GUC_DIR} && chown -R guc:guardium ${ETC} ${LOGSTASH_DIR} ${LOG_DIR}
 #Change User to guc
 USER guc
 
