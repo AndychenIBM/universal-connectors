@@ -77,7 +77,7 @@ public class MySqlFilterGuardium implements Filter {
     private String id;
     private String sourceField;
     private final static Set<String> LOCAL_IP_LIST = new HashSet<>(
-        Arrays.asList("127.0.0.1", "0:0:0:0:0:0:0:1"));
+        Arrays.asList("127.0.0.1", "0:0:0:0:0:0:0:1", "::1"));
 
     public MySqlFilterGuardium(String id, Configuration config, Context context) {
         // constructors should validate configuration options
@@ -234,14 +234,21 @@ public class MySqlFilterGuardium implements Filter {
         if (e.getField("server_ip") instanceof String)
             serverIp = e.getField("server_ip").toString();
                     
-        sessionLocator.setIpv6(false);
         sessionLocator.setClientIp(UNKNOWN_STRING);
         sessionLocator.setClientPort(SessionLocator.PORT_DEFAULT);
         sessionLocator.setClientIpv6(UNKNOWN_STRING);
-        
-        sessionLocator.setServerIp(serverIp); 
+
+        if (Util.isIPv6(serverIp)){
+            sessionLocator.setServerIpv6(serverIp);
+            sessionLocator.setIpv6(true);
+            sessionLocator.setServerIp(UNKNOWN_STRING);
+        } else {
+            sessionLocator.setServerIp(serverIp);
+            sessionLocator.setIpv6(false);
+            sessionLocator.setServerIpv6(UNKNOWN_STRING);
+        }
+
         sessionLocator.setServerPort(serverPort);
-        sessionLocator.setServerIpv6(UNKNOWN_STRING);
 
         if (data.has("login")) {
             JsonObject login = data.getAsJsonObject("login");
@@ -253,6 +260,7 @@ public class MySqlFilterGuardium implements Filter {
                 sessionLocator.setClientPort(port);
                 sessionLocator.setClientIp(UNKNOWN_STRING);
             } else { // ipv4 
+                sessionLocator.setIpv6(false);
                 sessionLocator.setClientIp(address);
                 sessionLocator.setClientPort(port);
                 sessionLocator.setClientIpv6(UNKNOWN_STRING);
@@ -334,7 +342,24 @@ public class MySqlFilterGuardium implements Filter {
    private void correctIPs(Event e, Record record) {
         // Note: IP needs to be in ipv4/ipv6 format
         SessionLocator sessionLocator = record.getSessionLocator();
-        String sessionServerIp = sessionLocator.getServerIp();
+        
+        if (sessionLocator == null)
+           log.error("SessionLocator is NULL");
+        
+        String sessionServerIp;
+        String sessionClientIp;
+
+        if (sessionLocator.isIpv6())
+        {
+            sessionServerIp = sessionLocator.getServerIpv6();
+            sessionClientIp = sessionLocator.getClientIpv6();
+        }
+        else
+        {
+            sessionServerIp = sessionLocator.getServerIp();
+            sessionClientIp = sessionLocator.getClientIp();
+        }
+
         if (LOCAL_IP_LIST.contains(sessionServerIp)
                 || sessionServerIp.equals("")
                 || sessionServerIp.equalsIgnoreCase("(NONE)")) {
@@ -353,12 +378,19 @@ public class MySqlFilterGuardium implements Filter {
                 }
             }
         }
-        
-        String sessionClientIp = sessionLocator.getClientIp();
+
         if (LOCAL_IP_LIST.contains(sessionClientIp)
-                || sessionClientIp.equals("")
-                || sessionClientIp.equalsIgnoreCase("(NONE)")) { 
-            sessionLocator.setClientIp(sessionLocator.getServerIp()); // as clientIP & serverIP were equal
+            || sessionClientIp.equals("")
+            || sessionClientIp.equalsIgnoreCase("(NONE)")) {
+            // as clientIP & serverIP were equal
+            if (sessionLocator.isIpv6()) {
+                sessionLocator.setClientIpv6(sessionLocator.getServerIpv6());
+                sessionLocator.setClientIp(UNKNOWN_STRING);
+            }
+            else {
+                sessionLocator.setClientIp(sessionLocator.getServerIp());
+                sessionLocator.setClientIpv6(UNKNOWN_STRING);
+            }
         }
     }
     
