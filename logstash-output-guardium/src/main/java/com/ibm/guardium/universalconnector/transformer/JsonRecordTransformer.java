@@ -13,6 +13,7 @@ import java.util.*;
 
 public class JsonRecordTransformer implements RecordTransformer {
 
+    public static final String UC_PROTOCOL_PREFIX = "UC: ";
     private static Log log = LogFactory.getLog(JsonRecordTransformer.class);
     private static final String LANG_TYPE_FREE_TEXT = "FREE_TEXT"; // for parser "FREE_TEXT"
 
@@ -208,7 +209,7 @@ public class JsonRecordTransformer implements RecordTransformer {
         Datasource.Accessor.Builder builder = Datasource.Accessor.newBuilder()
                 .setDbUser(ra.getDbUser())
                 .setServerType(ra.getServerType())
-                .setDbProtocol(ra.getDbProtocol())
+                .setDbProtocol(UC_PROTOCOL_PREFIX+ra.getDbProtocol())
                 .setLanguage(getLanguageType(record.getAccessor()))
                 .setType(dataType)
                 .setDatasourceType(Datasource.Application_data.Datasource_type.UNI_CON);

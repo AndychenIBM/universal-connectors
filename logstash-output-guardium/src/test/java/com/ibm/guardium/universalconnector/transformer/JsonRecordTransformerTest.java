@@ -159,7 +159,7 @@ public class JsonRecordTransformerTest {
         Assert.assertTrue("invalid serverOs", accessor.getClientHostname().equals(ra.getClientHostName()));
         Assert.assertTrue("invalid serverHostname", accessor.getServerHostname().equals(ra.getServerHostName()));
         Assert.assertTrue("invalid commProtocol", accessor.getCommProtocol().equals(ra.getCommProtocol()));
-        Assert.assertTrue("invalid DbProtocol", accessor.getDbProtocol().equals(ra.getDbProtocol()));
+        Assert.assertTrue("invalid DbProtocol", accessor.getDbProtocol().substring(JsonRecordTransformer.UC_PROTOCOL_PREFIX.length()).equals(ra.getDbProtocol()));
         Assert.assertTrue("invalid DbProtocolVersion", accessor.getDbProtocolVersion().equals(ra.getDbProtocolVersion()));
         Assert.assertTrue("invalid sourceProgram", accessor.getSourceProgram().equals(ra.getSourceProgram()));
         Assert.assertTrue("invalid serverDescription", accessor.getServerDescription().equals(ra.getServerDescription()));
