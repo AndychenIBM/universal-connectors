@@ -19,7 +19,7 @@ ENV ETC=/etc \
     LOG_GUC_DIR=${LOG_DIR}/uc/
 
 #Install necessary packages
-RUN microdnf install -y tzdata openssl curl ca-certificates procps shadow-utils.x86_64 tar gzip hostname vim cronie logrotate && \
+RUN microdnf install -y tzdata openssl curl ca-certificates procps shadow-utils.x86_64 tar gzip hostname vim cronie logrotate sudo && \
     microdnf update -y; microdnf clean all && \
 #Download and install OpenJDK
     set -eux; \
