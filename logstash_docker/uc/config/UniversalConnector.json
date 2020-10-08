@@ -5,5 +5,5 @@
   "configurationFetchFileName":"SniffersConfig.json",
   "statusWriterType":"LOG",
   "snifferConnectionsLimit": 30,
-  "noDataThresholdInMs": 36000000
+  "noDataThresholdInMs": 3600000
 }
