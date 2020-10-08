@@ -1,6 +1,7 @@
 #!/bin/bash
 source ${UC_SCRIPTS}/utils.sh
 source ${UC_SCRIPTS}/set_uc_log_level.sh
+source ${UC_SCRIPTS}/run_logrotate.sh
 
 logstash_pid=$(/usr/share/logstash/scripts/get_logstash_pid.sh)
 if [[ -z "$logstash_pid" ]]; then
@@ -23,6 +24,10 @@ if [[ -z "$logstash_pid" ]]; then
     updateFromEnv "$TCP_PORT" "TCP_PORT" $MONGODB_CONF "tcp \{ port => 5000 type => syslog" "tcp \{ port => $TCP_PORT type => syslog"
 
     setJVMParameters
+
+    addLogrotateConfig
+
+    addLogrodateCronJob
 
     #Start logstash
     logstash -b 80 -u 500 -l ${LOG_GUC_DIR} 2>&1 | tee -a ${LOG_GUC_DIR}/logstash_stdout_stderr.log

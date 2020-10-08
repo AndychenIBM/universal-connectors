@@ -1,0 +1,2 @@
+# guc
+guc ALL = NOPASSWD: /usr/sbin/crond
