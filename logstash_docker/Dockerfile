@@ -43,7 +43,7 @@ RUN echo "--add-opens=java.base/java.lang=ALL-UNNAMED \
     --add-opens=java.management/sun.management=ALL-UNNAMED" >>${UC_ETC}/jvm.options && \
 #Install plugins
     cd ${LOGSTASH_DIR}/config/ && \
-	${LOGSTASH_DIR}/bin/logstash-plugin install logstash-filter-mongodb_guardium_filter-0.6.2.gem \
+	${LOGSTASH_DIR}/bin/logstash-plugin install logstash-filter-mongodb_guardium_filter-0.6.3.gem \
 	logstash-output-java_output_to_guardium-1.2.8.gem \
     logstash-filter-mysql_filter_guardium-1.0.0.gem \
     logstash-input-cloudwatch_logs-1.0.3.gem \

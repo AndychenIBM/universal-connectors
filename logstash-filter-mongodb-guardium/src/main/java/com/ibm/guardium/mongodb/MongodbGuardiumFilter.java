@@ -50,7 +50,9 @@ public class MongodbGuardiumFilter implements Filter {
     public static final String LOGSTASH_TAG_JSON_PARSE_ERROR = "_mongoguardium_json_parse_error";
 
     private String id;
-    private final static String MONGOAUDIT_START_SIGNAL = "mongod: ";
+    private final static String MONGOD_AUDIT_START_SIGNAL = "mongod: ";
+    private final static String MONGOS_AUDIT_START_SIGNAL = "mongos: ";
+    //2020-10-08 15:56:24 DEBUG MongodbGuardiumFilter:64 - MongoDB filter: Got Event: { "source_program" : "mongos","@timestamp" : "2020-10-08T15:56:24.422Z","server_hostname" : "hgdb-srv04","@version" : "1","syslog_timestamp" : "Oct  8 13:58:00","program" : "mongos","syslog_message" : "{ "atype" : "authCheck", "ts" : { "$date" : "2020-10-08T13:58:00.222+0300" }, "local" : { "ip" : "127.0.0.1", "port" : 28017 }, "remote" : { "ip" : "127.0.0.1", "port" : 45824 }, "users" : [ { "user" : "admin", "db" : "admin" } ], "roles" : [ { "role" : "root", "db" : "admin" } ], "param" : { "command" : "replSetGetStatus", "ns" : "admin", "args" : { "replSetGetStatus" : 1, "forShell" : 1, "$clusterTime" : { "clusterTime" : { "$timestamp" : { "t" : 1602154677, "i" : 1 } }, "signature" : { "hash" : { "$binary" : "LYKHSxxbXvcIDvX3FAhpam1SdYk=", "$type" : "00" }, "keyId" : { "$numberLong" : "6880241122304589825" } } }, "$db" : "admin" } }, "result" : 0 }","type" : "syslog","server_ip" : "9.147.31.29","message" : "<14>Oct  8 13:58:00 hgdb-srv04 mongos: { "atype" : "authCheck", "ts" : { "$date" : "2020-10-08T13:58:00.222+0300" }, "local" : { "ip" : "127.0.0.1", "port" : 28017 }, "remote" : { "ip" : "127.0.0.1", "port" : 45824 }, "users" : [ { "user" : "admin", "db" : "admin" } ], "roles" : [ { "role" : "root", "db" : "admin" } ], "param" : { "command" : "replSetGetStatus", "ns" : "admin", "args" : { "replSetGetStatus" : 1, "forShell" : 1, "$clusterTime" : { "clusterTime" : { "$timestamp" : { "t" : 1602154677, "i" : 1 } }, "signature" : { "hash" : { "$binary" : "LYKHSxxbXvcIDvX3FAhpam1SdYk=", "$type" : "00" }, "keyId" : { "$numberLong" : "6880241122304589825" } } }, "$db" : "admin" } }, "result" : 0 }" }
     private final static Set<String> LOCAL_IP_LIST = new HashSet<>(Arrays.asList("127.0.0.1", "0:0:0:0:0:0:0:1"));
 
     public MongodbGuardiumFilter(String id, Configuration config, Context context) {
@@ -70,9 +72,9 @@ public class MongodbGuardiumFilter implements Filter {
                 String messageString = e.getField("message").toString();
                 // finding "mongod:" to be general (syslog, filebeat); it's not [client] source program
                 // alternatively, throw JSON audit part into a specific field
-                int mongodIndex = messageString.indexOf(MONGOAUDIT_START_SIGNAL);
+                int mongodIndex = getAuditMsgStartIndex(messageString);
                 if (mongodIndex != -1) {
-                    String input = messageString.substring(mongodIndex + MONGOAUDIT_START_SIGNAL.length());
+                    String input = messageString.substring(mongodIndex + MONGOD_AUDIT_START_SIGNAL.length());
                     try {
                         JsonObject inputJSON = (JsonObject) JsonParser.parseString(input);
                         
@@ -121,6 +123,21 @@ public class MongodbGuardiumFilter implements Filter {
         // Remove skipped mongodb events from reaching output
         events.removeAll(skippedEvents);
         return events;
+    }
+
+    private int getAuditMsgStartIndex(String messageString){
+        int mongodIndex = messageString.indexOf(MONGOD_AUDIT_START_SIGNAL);
+        if (mongodIndex>=0){
+            log.debug("This is mongoD message");
+            return mongodIndex;
+        }
+        mongodIndex = messageString.indexOf(MONGOS_AUDIT_START_SIGNAL);
+        if (mongodIndex>=0){
+            log.debug("This is mongoS message");
+            return mongodIndex;
+        }
+        log.debug("Message start index was not found and message will be ignored");
+        return -1;
     }
 
     /**

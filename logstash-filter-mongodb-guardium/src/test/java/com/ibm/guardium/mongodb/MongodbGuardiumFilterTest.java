@@ -11,12 +11,12 @@ import org.junit.Test;
 //import org.logstash.plugins.ConfigurationImpl;
 import org.logstash.plugins.ContextImpl;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.google.gson.Gson;
+
+import static com.ibm.guardium.mongodb.MongodbGuardiumFilter.LOGSTASH_TAG_SKIP_NOT_MONGODB;
 
 public class MongodbGuardiumFilterTest {
 
@@ -30,7 +30,7 @@ public class MongodbGuardiumFilterTest {
      * Filter should add field "GuardRecord" to the Event, which Universal connector then inserts into Guardium.   
      */
     @Test
-    public void testFieldGuardRecord() {
+    public void testFieldGuardRecord_mongod() {
         final String mongodString2 = "mongod: { \"atype\" : \"authCheck\", \"ts\" : { \"$date\" : \"2020-08-19T11:52:27.495-0400\" }, \"local\" : { \"ip\" : \"127.0.0.1\", \"port\" : 27017 }, \"remote\" : { \"ip\" : \"127.0.0.1\", \"port\" : 10688 }, \"users\" : [ { \"user\" : \"realAdmin\", \"db\" : \"admin\" } ], \"roles\" : [ { \"role\" : \"readWriteAnyDatabase\", \"db\" : \"admin\" }, { \"role\" : \"readWrite\", \"db\" : \"newDB02\" }, { \"role\" : \"userAdminAnyDatabase\", \"db\" : \"admin\" } ], \"param\" : { \"command\" : \"getCmdLineOpts\", \"ns\" : \"admin\", \"args\" : { \"getCmdLineOpts\" : 1, \"lsid\" : { \"id\" : { \"$binary\" : \"9d5Ezoo2ROy/uYNsTpGJww==\", \"$type\" : \"04\" } }, \"$db\" : \"admin\" } }, \"result\" : 13 }";
 
         // Configuration config = new ConfigurationImpl(Collections.singletonMap("source", sourceField));
@@ -48,7 +48,47 @@ public class MongodbGuardiumFilterTest {
         Assert.assertEquals(1, matchListener.getMatchCount());
     }
 
-    @Test 
+    @Test
+    public void testFieldGuardRecord_mongos() {
+        final String mongosString = "mongos: { \"atype\" : \"authCheck\", \"ts\" : { \"$date\" : \"2020-10-08T13:58:00.222+0300\" }, \"local\" : { \"ip\" : \"127.0.0.1\", \"port\" : 28017 }, \"remote\" : { \"ip\" : \"127.0.0.1\", \"port\" : 45824 }, \"users\" : [ { \"user\" : \"admin\", \"db\" : \"admin\" } ], \"roles\" : [ { \"role\" : \"root\", \"db\" : \"admin\" } ], \"param\" : { \"command\" : \"replSetGetStatus\", \"ns\" : \"admin\", \"args\" : { \"replSetGetStatus\" : 1, \"forShell\" : 1, \"$clusterTime\" : { \"clusterTime\" : { \"$timestamp\" : { \"t\" : 1602154677, \"i\" : 1 } }, \"signature\" : { \"hash\" : { \"$binary\" : \"LYKHSxxbXvcIDvX3FAhpam1SdYk=\", \"$type\" : \"00\" }, \"keyId\" : { \"$numberLong\" : \"6880241122304589825\" } } }, \"$db\" : \"admin\" } }, \"result\" : 0 }";
+                //"mongod: { \"atype\" : \"authCheck\", \"ts\" : { \"$date\" : \"2020-08-19T11:52:27.495-0400\" }, \"local\" : { \"ip\" : \"127.0.0.1\", \"port\" : 27017 }, \"remote\" : { \"ip\" : \"127.0.0.1\", \"port\" : 10688 }, \"users\" : [ { \"user\" : \"realAdmin\", \"db\" : \"admin\" } ], \"roles\" : [ { \"role\" : \"readWriteAnyDatabase\", \"db\" : \"admin\" }, { \"role\" : \"readWrite\", \"db\" : \"newDB02\" }, { \"role\" : \"userAdminAnyDatabase\", \"db\" : \"admin\" } ], \"param\" : { \"command\" : \"getCmdLineOpts\", \"ns\" : \"admin\", \"args\" : { \"getCmdLineOpts\" : 1, \"lsid\" : { \"id\" : { \"$binary\" : \"9d5Ezoo2ROy/uYNsTpGJww==\", \"$type\" : \"04\" } }, \"$db\" : \"admin\" } }, \"result\" : 13 }";
+
+        // Configuration config = new ConfigurationImpl(Collections.singletonMap("source", sourceField));
+        Context context = new ContextImpl(null, null);
+        MongodbGuardiumFilter filter = new MongodbGuardiumFilter("test-id", null, context);
+
+        Event e = new org.logstash.Event();
+        TestMatchListener matchListener = new TestMatchListener();
+
+        e.setField("message", mongosString);
+        Collection<Event> results = filter.filter(Collections.singletonList(e), matchListener);
+
+        Assert.assertEquals(1, results.size());
+        Assert.assertNotNull(e.getField(GuardConstants.GUARDIUM_RECORD_FIELD_NAME));
+        Assert.assertEquals(1, matchListener.getMatchCount());
+    }
+
+    @Test
+    public void testFieldGuardRecord_auditMsgNotFound() {
+        final String mongodString2 = "mongodBlaBla: { \"atype\" : \"authCheck\", \"ts\" : { \"$date\" : \"2020-08-19T11:52:27.495-0400\" }, \"local\" : { \"ip\" : \"127.0.0.1\", \"port\" : 27017 }, \"remote\" : { \"ip\" : \"127.0.0.1\", \"port\" : 10688 }, \"users\" : [ { \"user\" : \"realAdmin\", \"db\" : \"admin\" } ], \"roles\" : [ { \"role\" : \"readWriteAnyDatabase\", \"db\" : \"admin\" }, { \"role\" : \"readWrite\", \"db\" : \"newDB02\" }, { \"role\" : \"userAdminAnyDatabase\", \"db\" : \"admin\" } ], \"param\" : { \"command\" : \"getCmdLineOpts\", \"ns\" : \"admin\", \"args\" : { \"getCmdLineOpts\" : 1, \"lsid\" : { \"id\" : { \"$binary\" : \"9d5Ezoo2ROy/uYNsTpGJww==\", \"$type\" : \"04\" } }, \"$db\" : \"admin\" } }, \"result\" : 13 }";
+
+        // Configuration config = new ConfigurationImpl(Collections.singletonMap("source", sourceField));
+        Context context = new ContextImpl(null, null);
+        MongodbGuardiumFilter filter = new MongodbGuardiumFilter("test-id", null, context);
+
+        Event e = new org.logstash.Event();
+        TestMatchListener matchListener = new TestMatchListener();
+
+        e.setField("message", mongodString2);
+        Collection<Event> results = filter.filter(Collections.singletonList(e), matchListener);
+
+        Assert.assertEquals(1, results.size());
+        Set<String> tags = new HashSet<>((ArrayList)e.getField("tags"));
+        Assert.assertEquals(1, tags.size());
+        Assert.assertTrue(tags.contains(LOGSTASH_TAG_SKIP_NOT_MONGODB));
+    }
+
+    @Test
     public void testParseMongoSyslog() {
         final String mongodString = "<14>Feb 18 08:53:31 qa-db51 mongod: { \"atype\" : \"authCheck\", \"ts\" : { \"$date\" : \"2020-06-11T09:44:11.070-0400\" }, \"local\" : { \"ip\" : \"9.70.147.59\", \"port\" : 27017 }, \"remote\" : { \"ip\" : \"9.148.202.94\", \"port\" : 60185 }, \"users\" : [ { \"user\" : \"realAdmin\", \"db\" : \"admin\" } ], \"roles\" : [ { \"role\" : \"readWriteAnyDatabase\", \"db\" : \"admin\" }, { \"role\" : \"userAdminAnyDatabase\", \"db\" : \"admin\" } ], \"param\" : { \"command\" : \"find\", \"ns\" : \"admin.USERS\", \"args\" : { \"find\" : \"USERS\", \"filter\" : {}, \"lsid\" : { \"id\" : { \"$binary\" : \"mV20eHvvRha2ELTeqJxQJg==\", \"$type\" : \"04\" } }, \"$db\" : \"admin\", \"$readPreference\" : { \"mode\" : \"primaryPreferred\" } } }, \"result\" : 0 }";
         Context context = new ContextImpl(null, null);
