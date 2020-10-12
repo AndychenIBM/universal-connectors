@@ -405,9 +405,9 @@ public class GuardConnection implements RecordTransmitter {
     }
 
     private void preformConnectionTasksByStatus() throws Exception {
-        if (status != Status.OPEN) {
-            log.debug("Connection status is : " + status);
-        }
+//        if (status != Status.OPEN) {
+//            log.debug("Connection status is : " + status);
+//        }
         switch (status) {
             case CLOSE:
                 transmitterStats.incrementReconnects();
