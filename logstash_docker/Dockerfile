@@ -14,8 +14,6 @@ LABEL maintainer="IBM Security" \
 USER root
 COPY uc/. ${LOGSTASH_DIR}/
 RUN chown -R guc:guardium ${LOGSTASH_DIR}
-COPY uc/settings/uc-sudo /etc/sudoers.d/uc-sudo
-RUN chmod 644 /etc/sudoers.d/uc-sudo
 USER guc
 
 ENV UC_ETC=${LOGSTASH_DIR}/config/ \
