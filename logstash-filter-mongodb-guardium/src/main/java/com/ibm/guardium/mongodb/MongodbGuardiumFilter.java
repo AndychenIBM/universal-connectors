@@ -12,9 +12,11 @@ import com.ibm.guardium.universalconnector.common.GuardConstants;
 import com.ibm.guardium.universalconnector.common.Util;
 import com.ibm.guardium.universalconnector.common.structures.*;
 
+import org.apache.commons.validator.routines.InetAddressValidator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
+import sun.net.util.IPAddressUtil;
 
 import java.io.File;
 import java.util.*;
@@ -52,6 +54,9 @@ public class MongodbGuardiumFilter implements Filter {
     private String id;
     private final static String MONGOD_AUDIT_START_SIGNAL = "mongod: ";
     private final static String MONGOS_AUDIT_START_SIGNAL = "mongos: ";
+    private final static String MONGO_INTERNAL_API_IP = "(NONE)";
+    private static final InetAddressValidator inetAddressValidator = InetAddressValidator.getInstance();
+
     //2020-10-08 15:56:24 DEBUG MongodbGuardiumFilter:64 - MongoDB filter: Got Event: { "source_program" : "mongos","@timestamp" : "2020-10-08T15:56:24.422Z","server_hostname" : "hgdb-srv04","@version" : "1","syslog_timestamp" : "Oct  8 13:58:00","program" : "mongos","syslog_message" : "{ "atype" : "authCheck", "ts" : { "$date" : "2020-10-08T13:58:00.222+0300" }, "local" : { "ip" : "127.0.0.1", "port" : 28017 }, "remote" : { "ip" : "127.0.0.1", "port" : 45824 }, "users" : [ { "user" : "admin", "db" : "admin" } ], "roles" : [ { "role" : "root", "db" : "admin" } ], "param" : { "command" : "replSetGetStatus", "ns" : "admin", "args" : { "replSetGetStatus" : 1, "forShell" : 1, "$clusterTime" : { "clusterTime" : { "$timestamp" : { "t" : 1602154677, "i" : 1 } }, "signature" : { "hash" : { "$binary" : "LYKHSxxbXvcIDvX3FAhpam1SdYk=", "$type" : "00" }, "keyId" : { "$numberLong" : "6880241122304589825" } } }, "$db" : "admin" } }, "result" : 0 }","type" : "syslog","server_ip" : "9.147.31.29","message" : "<14>Oct  8 13:58:00 hgdb-srv04 mongos: { "atype" : "authCheck", "ts" : { "$date" : "2020-10-08T13:58:00.222+0300" }, "local" : { "ip" : "127.0.0.1", "port" : 28017 }, "remote" : { "ip" : "127.0.0.1", "port" : 45824 }, "users" : [ { "user" : "admin", "db" : "admin" } ], "roles" : [ { "role" : "root", "db" : "admin" } ], "param" : { "command" : "replSetGetStatus", "ns" : "admin", "args" : { "replSetGetStatus" : 1, "forShell" : 1, "$clusterTime" : { "clusterTime" : { "$timestamp" : { "t" : 1602154677, "i" : 1 } }, "signature" : { "hash" : { "$binary" : "LYKHSxxbXvcIDvX3FAhpam1SdYk=", "$type" : "00" }, "keyId" : { "$numberLong" : "6880241122304589825" } } }, "$db" : "admin" } }, "result" : 0 }" }
     private final static Set<String> LOCAL_IP_LIST = new HashSet<>(Arrays.asList("127.0.0.1", "0:0:0:0:0:0:0:1"));
 
@@ -151,29 +156,53 @@ public class MongodbGuardiumFilter implements Filter {
         // Note: IP needs to be in ipv4/ipv6 format
         SessionLocator sessionLocator = record.getSessionLocator();
         String sessionServerIp = sessionLocator.getServerIp();
-        if (LOCAL_IP_LIST.contains(sessionServerIp)
-                || sessionServerIp.equalsIgnoreCase("(NONE)")) {
-            if (e.getField("server_ip") instanceof String) {
-                String ip = e.getField("server_ip").toString();
-                if (ip != null) {
-                    if (Util.isIPv6(ip)){
-                        sessionLocator.setServerIpv6(ip);
-                        sessionLocator.setIpv6(true);
-                    } else {
-                        sessionLocator.setServerIp(ip);
-                        sessionLocator.setIpv6(false);
-                    }
-                } else if (sessionServerIp.equalsIgnoreCase("(NONE)")) {
-                    sessionLocator.setServerIp("0.0.0.0");
+
+        if (isMongoInternalCommandIp(sessionServerIp)){
+            String ip = getValidatedEventServerIp(e);
+            if (ip!=null) {
+                if (Util.isIPv6(ip)){
+                    sessionLocator.setServerIpv6(ip);
+                    sessionLocator.setIpv6(true);
+                } else {
+                    sessionLocator.setServerIp(ip);
+                    sessionLocator.setIpv6(false);
                 }
+            } else if (sessionServerIp.equalsIgnoreCase(MONGO_INTERNAL_API_IP)) {
+                    sessionLocator.setServerIp("0.0.0.0");
             }
+
         }
         
         String sessionClientIp = sessionLocator.getClientIp();
-        if (LOCAL_IP_LIST.contains(sessionClientIp)
-                || sessionLocator.getClientIp().equalsIgnoreCase("(NONE)")) { 
-            sessionLocator.setClientIp(sessionLocator.getServerIp()); // as clientIP & serverIP were equal
+        if (isMongoInternalCommandIp(sessionClientIp)) {
+            // as clientIP & serverIP were equal
+            if (sessionLocator.isIpv6()){
+                sessionLocator.setClientIpv6(sessionLocator.getServerIpv6());
+            } else {
+                sessionLocator.setClientIp(sessionLocator.getServerIp());
+            }
+
         }
+    }
+
+    /**
+     * Filebeat add "server_ip" field to send data
+     * If the field is available and valid - we can use it.
+     * @param e
+     * @return - ip if available and can be used, null in any other case
+     */
+    private String getValidatedEventServerIp(Event e){
+        if (e.getField("server_ip") instanceof String) {
+            String ip = e.getField("server_ip").toString();
+            if (ip != null && inetAddressValidator.isValid(ip)) {
+                return ip;
+            }
+        }
+        return null;
+    }
+
+    private boolean isMongoInternalCommandIp(String ip){
+        return ip!=null && (LOCAL_IP_LIST.contains(ip) || ip.trim().equalsIgnoreCase(MONGO_INTERNAL_API_IP));
     }
 
     private static String logEvent(Event event){
