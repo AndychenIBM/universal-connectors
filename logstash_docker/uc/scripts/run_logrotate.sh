@@ -1,13 +1,13 @@
 #!/bin/bash
 
-#echo "Going to run chrond"
+echo "Going to run chrond"
 crond -P
 
 echo "Going to create /etc/logrotate.d/uc-logrotate-config file"
 FILE="/etc/logrotate.d/uc-logrotate-config"
 echo "/var/log/uc/logstash_stdout_stderr.log {
         su guc guc
-        size 100k
+        size 10M
         rotate 10
         compress
         copytruncate
