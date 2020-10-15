@@ -46,8 +46,6 @@ RUN echo "--add-opens=java.base/java.lang=ALL-UNNAMED \
     logstash-filter-mysql_filter_guardium-1.0.0.gem \
     logstash-input-cloudwatch_logs-1.0.3.gem \
     logstash-filter-logstash_filter_s3_guardium-0.5.3.gem && \
-#Create a customer dir
-    mkdir -p ${LOGSTASH_DIR}/customer/pipeline ${LOGSTASH_DIR}/customer/config ${SSL_DIR} && \
 #Make sure user can read,write and execute the scripts
     chmod 755 ${UC_SCRIPTS}/*.sh && \
 #Make sure scripts are not uploaded with windows characters additions
