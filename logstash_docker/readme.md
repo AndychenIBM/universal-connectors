@@ -46,5 +46,9 @@ Project Content:
 	    1.2.1. *.conf files that will be used as the configuration for Logstash (including input,filter and output)
 	1.3. scripts directory:
 	    1.3.1. *.sh scripts for universal-connector usage
+	1.4. ssl directory- empty directory for saving ssl credentials during run time
+	1.5. customer directory:
+	    1.6.1. config directory- empty directory for saving customer plugins
+	    1.6.2. pipeline directory- directory for saving customer configuration files, including 1 output configuration file to Guardium
 2. uc_perf_tests directory- a directory meant for performance tests
 3. Dockerfile- import and install Logstash, remove old version of the container, pass relevant files to the container, install plugins.
