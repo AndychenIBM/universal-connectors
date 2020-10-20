@@ -6,7 +6,7 @@ $MONGODB_DEFAULT_CONF_PATH="C:\Program Files\MongoDB\Server\4.2\bin\mongod.cfg"
 $dest = $( $args[0] )
 $format = $( $args[1] )
 $path = $( $args[2] )
-$filter = $( $args[3] )
+$filter = $( $args[3] ) -replace "'", '"'
 $restart_mongodb = $( $args[4] )
 
 Add-content $Logfile -value "$( Get-Date ): Params passed to mongod script:`n`tDEST=$( $dest )`n`tFORMAT=$( $format )`n`tPATH=$( $path )`n`tFILTER=$( $filter )`n`tRESTART_MONODB=$( $restart_mongodb )"
@@ -41,8 +41,7 @@ if(Select-String -Path $mongod_conf -Pattern "^auditLog" -Quiet){
         ."$scriptDir\replaceInLinesRange.ps1" $mongod_conf "filter:" "#filter:" $startRange $endRange
         Add-content $Logfile -value "$( Get-Date ): Filter field is empty. commenting out filter line from $( $mongod_conf )"
     } else {
-        ."$scriptDir\replaceInLinesRange.ps1" $mongod_conf "filter:.*" "filter: $( $filter )" $startRange $endRange
-
+        (Get-Content $mongod_conf) -replace "filter:.*", "filter: '$( $filter )'" | Set-Content $mongod_conf
     }
     ."$scriptDir\replaceInLinesRange.ps1" $mongod_conf "setParameter: {auditAuthorizationSuccess: true}" "setParameter: {auditAuthorizationSuccess: true}" $startRange $endRange
     Add-content $Logfile -value "$( Get-Date ): AuditLog was updated in $( $mongod_conf )"
