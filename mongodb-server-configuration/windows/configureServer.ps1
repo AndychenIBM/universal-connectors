@@ -38,7 +38,7 @@ while ($i -lt $args.count)
             }
             break;
         }
-        { ($_ -eq "--host-address") } {
+        { ($_ -eq "--host-addresses") } {
             if ($i -lt $args.count - 1)
             {
                 $host_addresses = $args[$i + 1] -replace '_', ':'
@@ -77,6 +77,9 @@ while ($i -lt $args.count)
     }
     $i++;
 }
+
+Add-Content $Logfile -value "$( Get-Date ): Params passed to configureServer.ps1 script:`n`tPATH=$( $path )`n`tFILTER=$( $filter )`n`tRESTART_MONODB=$( $restart_mongodb )`n`tHOST_ADDRESSES=$( $host_addresses )`n`tENABLE_LOADBALANCE=$( $enable_loadbalance )"
+
 
 if (-Not (Test-Path variable:path)){
     write-host "No path specified. Exiting configureServer script."
