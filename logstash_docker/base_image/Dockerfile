@@ -17,7 +17,8 @@ ENV ETC=/etc \
     LOGSTASH_DIR=/usr/share/logstash \
     LOG_DIR=/var/log/ \
     LOG_GUC_DIR=/var/log/uc/ \
-    LOGSTASH_INPUT_BEATS_VERSION=6.0.11
+    LOGSTASH_INPUT_BEATS_VERSION=6.0.11 \
+    LOGSTASH_INPUT_TCP_VERSION=6.0.6
 
 #Install necessary packages
 RUN microdnf install -y tzdata openssl curl ca-certificates procps shadow-utils.x86_64 tar gzip hostname vim cronie logrotate sudo && \
@@ -57,5 +58,6 @@ RUN curl https://artifacts.elastic.co/downloads/logstash/logstash-oss-${LOGSTASH
     logstash-input-azure-* logstash-integration-kafka-* logstash-input-http-* nokogiri-1.10.7-java \
     sequl-5.27.0 backports-3.15.0 tzinfo-data-1.2019.3 snappy-0.0.12-java \
     mail-2.6.6 logstash-input-azure_event_hubs-1.1.2 logstash-filter-jdbc_static-1.0.7 snmp-1.3.2 && \
-#Install a fixed version of logstash-input-beats due to a known problem in 6.0.5 which is being used in Logstash-7.5.2
-    ${LOGSTASH_DIR}/bin/logstash-plugin install --version ${LOGSTASH_INPUT_BEATS_VERSION} logstash-input-beats
+#Install a fixed version of logstash-input-beats, logstash-input-tcp due to a known problem in 6.0.5 which is being used in Logstash-7.5.2
+    ${LOGSTASH_DIR}/bin/logstash-plugin install --version ${LOGSTASH_INPUT_BEATS_VERSION} logstash-input-beats && \
+    ${LOGSTASH_DIR}/bin/logstash-plugin update logstash-input-tcp
