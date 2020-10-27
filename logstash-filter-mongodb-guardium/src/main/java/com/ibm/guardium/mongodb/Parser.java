@@ -1,3 +1,7 @@
+//
+// Copyright 2020- IBM Inc. All rights reserved
+// SPDX-License-Identifier: Apache2.0
+//
 package com.ibm.guardium.mongodb; // be specific; this will prevent clashes with classes of other plugins
 
 import java.text.ParseException;

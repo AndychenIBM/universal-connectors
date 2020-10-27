@@ -1,3 +1,7 @@
+//
+// Copyright 2020- IBM Inc. All rights reserved
+// SPDX-License-Identifier: Apache2.0
+//
 package com.ibm.guardium.mongodb;
 
 import co.elastic.logstash.api.Configuration;
@@ -16,7 +20,6 @@ import org.apache.commons.validator.routines.InetAddressValidator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
-import sun.net.util.IPAddressUtil;
 
 import java.io.File;
 import java.util.*;
