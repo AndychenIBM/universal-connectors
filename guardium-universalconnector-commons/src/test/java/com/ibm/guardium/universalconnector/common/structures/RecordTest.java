@@ -2,7 +2,7 @@
 // Copyright 2020- IBM Inc. All rights reserved
 // SPDX-License-Identifier: Apache2.0
 //
-package com.ibm.guardium.universalconnector.common.structures;
+package com.ibm.guardium.universalconnector.commons.structures;
 
 import org.junit.Assert;
 import org.junit.Test;
