@@ -5,18 +5,20 @@ bin
 lib/
 vendor/
 .bundle/
+.settings/
 build/
 out/
 .idea
 .gradle
 .vscode
+.project
+.classpath
 *.code-workspace
 *.DS_Store
 *.iml
 *.class
 *.ipr
 *.iws
-#*.gem mv to ../logstash_docker/config
 *.gemspec
 Gemfile*
 settings.gradle
