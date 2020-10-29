@@ -18,8 +18,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.ibm.guardium.universalconnector.common.Util;
-import com.ibm.guardium.universalconnector.common.structures.*;
+import com.ibm.guardium.universalconnector.commons.Util;
+import com.ibm.guardium.universalconnector.commons.structures.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

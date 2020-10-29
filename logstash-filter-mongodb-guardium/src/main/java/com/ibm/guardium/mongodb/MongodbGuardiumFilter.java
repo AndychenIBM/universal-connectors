@@ -12,9 +12,9 @@ import co.elastic.logstash.api.FilterMatchListener;
 import co.elastic.logstash.api.LogstashPlugin;
 import co.elastic.logstash.api.PluginConfigSpec;
 import com.google.gson.*;
-import com.ibm.guardium.universalconnector.common.GuardConstants;
-import com.ibm.guardium.universalconnector.common.Util;
-import com.ibm.guardium.universalconnector.common.structures.*;
+import com.ibm.guardium.universalconnector.commons.GuardConstants;
+import com.ibm.guardium.universalconnector.commons.Util;
+import com.ibm.guardium.universalconnector.commons.structures.*;
 
 import org.apache.commons.validator.routines.InetAddressValidator;
 import org.apache.logging.log4j.LogManager;
