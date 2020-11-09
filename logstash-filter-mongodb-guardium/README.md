@@ -71,19 +71,17 @@ To build & create an updated GEM of this filter plugin, which can be installed o
 3. Run ```$ ./gradlew.unix gem --info``` to create the GEM. 
 
 ## Install
-To install this plugin on your local developer machine with Logstash installed, clone or download, and run from your logstash installation. Replace "?" with this plugin version:
+To install this plugin on your local developer machine with Logstash installed, run:
     
-    $ logstash-plugin install --local ./logstash-filter-mongodb-guardium-?.?.?.gem
+    $ ~/Downloads/logstash-7.5.2/bin/logstash-plugin install ./logstash-filter-mongodb_guardium_filter-?.?.?.gem
 
-Note: logstash-plugin may not handle relative paths well, so stick to calling it from the folder your gem is located, as in the example, above. 
+Notes: 
+* Replace "?" with this plugin version
+* logstash-plugin may not handle relative paths well, so try to install the gem from a simple path, as in the example above. 
 
-To test filter installation on your development logstash
-1. Install logstash (using Brew, for example)
-2. Install the filter plugin (see above)
-2. Run 
+Then, to test the filter using your local Logstash installation, run 
 
-    ```$ logstash -f ./filter-test.conf --config.reload.automatic```
-
+    ```$ logstash -f ./filter-test-generator.conf --config.reload.automatic```
 
 ### Not supported/Future
 1. Support fields (preferably link to objects)
