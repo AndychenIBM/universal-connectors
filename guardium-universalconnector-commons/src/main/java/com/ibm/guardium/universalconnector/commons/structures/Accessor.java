@@ -4,6 +4,10 @@
 //
 package com.ibm.guardium.universalconnector.commons.structures;
 
+/**
+ * Contains details about the user who accessed the data source, 
+ * and sets up the grammar parsing responsibility and language.
+ */
 public class Accessor {
     // TYPE
     public static final String  DATA_TYPE_GUARDIUM_SHOULD_NOT_PARSE_SQL = "CONSTRUCT"; // Signals Guardium not to parse
@@ -32,6 +36,11 @@ public class Accessor {
         return dbUser;
     }
 
+    /**
+     * Sets the data source user.
+     * 
+     * @param dbUser
+     */
     public void setDbUser(String dbUser) {
         this.dbUser = dbUser;
     }
@@ -39,7 +48,12 @@ public class Accessor {
     public String getServerType() {
         return serverType;
     }
-
+    
+    /**
+     * Sets and identifier for data source type (or product name)
+     * 
+     * @param serverType For example, MongoDB, AmazonS3. Refrain from using spaces.
+     */
     public void setServerType(String serverType) {
         this.serverType = serverType;
     }
@@ -88,6 +102,14 @@ public class Accessor {
         return dbProtocol;
     }
 
+    /**
+     * Sets an identifier for data source/protocol used to get the record.
+     * 
+     * For example: “MongoDB native log"
+     * 
+     * @param dbProtocol Limited to 18-20 characters; a "UC_" prefix added when sent
+     *                   to Guardium.
+     */
     public void setDbProtocol(String dbProtocol) {
         this.dbProtocol = dbProtocol;
     }
@@ -96,6 +118,11 @@ public class Accessor {
         return dbProtocolVersion;
     }
 
+    /**
+     * Sets the data source protocol version. (Optional)
+     * 
+     * @param dbProtocolVersion
+     */
     public void setDbProtocolVersion(String dbProtocolVersion) {
         this.dbProtocolVersion = dbProtocolVersion;
     }
@@ -112,6 +139,11 @@ public class Accessor {
         return sourceProgram;
     }
 
+    /**
+     * Sets the source application used to run the data source command. (Optional)
+     * 
+     * @param sourceProgram
+     */
     public void setSourceProgram(String sourceProgram) {
         this.sourceProgram = sourceProgram;
     }
@@ -136,6 +168,14 @@ public class Accessor {
         return serviceName;
     }
 
+    /**
+     * Sets the data source service name. Populate with the data source name, if
+     * service name is not applicable to your data source. Origianally used to state
+     * the OS level service that runs the DB instace.
+     * 
+     * @param serviceName Usually identical to DB name, or container identifier in data source.
+     * @see Record#setDbName(String)
+     */
     public void setServiceName(String serviceName) {
         this.serviceName = serviceName;
     }
@@ -144,6 +184,15 @@ public class Accessor {
         return language;
     }
 
+    /**
+     * Signals to Guardium which language parser to use, if dataType was set to
+     * DATA_TYPE_GUARDIUM_SHOULD_PARSE_SQL. In that case, language acronym should
+     * comply with languages supported by Guardium.
+     * 
+     * Optional if dataType is set to DATA_TYPE_GUARDIUM_SHOULD_NOT_PARSE_SQL.
+     * 
+     * @param language Acronym of language, as known to Guardium.
+     */
     public void setLanguage(String language) {
         this.language = language;
     }
@@ -152,6 +201,15 @@ public class Accessor {
         return dataType;
     }
 
+    /**
+     * Signals to Guardium who is responsible for parsing the command grammar. If
+     * Guardium should parse the data source command, it is required to state the
+     * command language in {@link #setLanguage(String) setLanguage} method, and use
+     * {@link Data#setOriginalSqlCommand(String) Data.setOriginalSqlCommand}
+     * 
+     * @param dataType Either {@link #DATA_TYPE_GUARDIUM_SHOULD_PARSE_SQL} or
+     *                 {@link #DATA_TYPE_GUARDIUM_SHOULD_NOT_PARSE_SQL}.
+     */
     public void setDataType(String dataType) {
         this.dataType = dataType;
     }

@@ -15,6 +15,11 @@ public class Construct {
         return sentences;
     }
 
+    /**
+     * Specifies the structure of the command. Usually, a single {@link Sentence}.
+     * 
+     * @param sentences
+     */
     public void setSentences(ArrayList<Sentence> sentences) {
         this.sentences = sentences;
     }
@@ -23,6 +28,12 @@ public class Construct {
         return fullSql;
     }
 
+    /**
+     * Sets the original (full) data source command, as registered in the data
+     * source log. 
+     * 
+     * @param fullSql For example, the original JSON, stringified.
+     */
     public void setFullSql(String fullSql) {
         this.fullSql = fullSql;
     }
@@ -31,6 +42,14 @@ public class Construct {
         return redactedSensitiveDataSql;
     }
 
+    /**
+     * Sets a redacted version of the original (full) data source command, where
+     * each sensitive field value is replaced by a question mark (?). Guardium
+     * appliance will show this in Reports, as sql, as not all users have priviliges
+     * to see the fullSql you set in {@link #setFullSql(String) setFullSql} method.
+     * 
+     * @param redactedSensitiveDataSql
+     */
     public void setRedactedSensitiveDataSql(String redactedSensitiveDataSql) {
         this.redactedSensitiveDataSql = redactedSensitiveDataSql;
     }

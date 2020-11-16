@@ -5,10 +5,11 @@
 package com.ibm.guardium.universalconnector.commons.structures;
 
 /**
- * Prepares an exception object to passed instead of a data object.
+ * Details an exception/error, whenever that occurs. Example errors:
+ * Authentication error, Authorization error, syntax errors, etc.<br><br>
  * 
- * Make sure that Session ID, session, Server type, DB protocol, and DB user 
- * are also set in their natural place (Record.accessor, Record.session, etc). 
+ * Make sure that Session ID, session, Server type, DB protocol, and DB user are
+ * also set in their natural place (Record.accessor, Record.session, etc).
  */
 public class ExceptionRecord {
     private String exceptionTypeId;
@@ -20,8 +21,11 @@ public class ExceptionRecord {
     }
 
     /**
-     * Set Exception type id, which acts as an error category in Guardium reports. 
-     * @param exceptionTypeId - A constant known to Guardium, as LOGIN_FAILED or SQL_ERROR
+     * Sets the exception category, which is then used as an error category in
+     * Guardium reports.
+     * 
+     * @param exceptionTypeId A constant known to Guardium, as LOGIN_FAILED or
+     *                        SQL_ERROR
      */
     public void setExceptionTypeId(String exceptionTypeId) {
         this.exceptionTypeId = exceptionTypeId;
@@ -32,12 +36,14 @@ public class ExceptionRecord {
     }
 
     /**
-     * Populates either (a) a description string or (b) an error code Guardium is familiar with.
+     * Sets either (a) a description string or (b) an error code Guardium is
+     * familiar with.
+     * <p>
+     * You have 2 options: (a) Enter a string description of your choice, like
+     * "Unauthorized operation (13)" (b) Enter just the error code, if you want
+     * Guardium to look it up in its known error code. That option is not suitable
+     * for data sources that Guardium is not familiar (no supporting S-TAPs).
      * 
-     * You have 2 options: 
-     * (A) Enter a string description of your choice, like "Unauthorized operation (13)"
-     * (B) Enter just the error code, if you want Guardium to match to its familiar error code. 
-     * Option B is not suitable for DBs that Guardium is not supporting using S-TAPs.
      * @param description
      */
     public void setDescription(String description) {
@@ -48,6 +54,11 @@ public class ExceptionRecord {
         return sqlString;
     }
 
+    /**
+     * Sets the original command that caused the error.
+     * 
+     * @param sqlString
+     */
     public void setSqlString(String sqlString) {
         this.sqlString = sqlString;
     }

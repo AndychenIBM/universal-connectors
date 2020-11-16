@@ -2,7 +2,7 @@ import java.nio.file.Files
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING
 
 
-apply plugin: 'java'
+apply plugin: 'java-library'
 
 group 'com.ibm.guardium.universalconnector.commons'
 version "${file("VERSION").text.trim()}" 
@@ -43,4 +43,20 @@ clean {
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
     //options.compilerArgs += ["--release", "8"]
+}
+
+
+task javadocJar(type: Jar) {
+    from javadoc
+    classifier = 'javadoc'
+}
+
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allJava
+    classifier = 'sources'
+}
+
+artifacts {
+     archives sourcesJar
+     archives javadocJar
 }
