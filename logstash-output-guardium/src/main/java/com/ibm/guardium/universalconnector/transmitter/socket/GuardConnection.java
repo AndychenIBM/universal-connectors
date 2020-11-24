@@ -9,6 +9,7 @@ import com.ibm.guardium.universalconnector.transmitter.TransmitterStats;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import java.io.IOException;
+import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
@@ -33,6 +34,8 @@ public class GuardConnection implements RecordTransmitter {
 
     enum Status { CLOSE, OPEN, IN_PROGRESS, ERROR }
     public static final int INIT_BUF_LEN = 2048*1024;
+    public static final int SSL_PORT = 16023;
+    public static final int NON_SSL_PORT = 16022;
 
     private TransmitterStats transmitterStats;
     private final Lock lock = new ReentrantLock();
@@ -49,7 +52,6 @@ public class GuardConnection implements RecordTransmitter {
     private boolean currentMsgIsPing = false;
     private BlockingQueue<QueuedMessage> messageQueue = null;
     private ByteBuffer readBuffer = ByteBuffer.allocateDirect(2048);
-    private int snifferMasterip = 0;
     private byte[] pingBytes = null;
     private byte[] configBytes = null;
     private byte[] handshakeBytes = null;
@@ -102,31 +104,36 @@ public class GuardConnection implements RecordTransmitter {
 
 
 
-    private void setMasterIP() throws UnknownHostException{
-        InetAddress serverIPAddress = InetAddress.getByName(config.getSnifferConfig().getIp());
-        snifferMasterip = 0;
+    private int getIpv4MasterIP(InetAddress serverIPAddress){
+        int snifferMasterip = 0;
         byte[] masterBytes = serverIPAddress.getAddress();
         int shift = 0;
-        if (masterBytes != null){
-            for (byte b : masterBytes){
+        if (masterBytes != null) {
+            for (byte b : masterBytes) {
                 short oneByte = b;
                 if (oneByte < 0)
                     oneByte += 256;
-                snifferMasterip += oneByte<<shift;
+                snifferMasterip += oneByte << shift;
                 shift += 8;
             }
         }
+        return snifferMasterip;
     }
 
     public void setup(ConnectionConfig config) throws UnknownHostException {
         this.config = config;
         log.info("Connection configuration "+config.toString());
-        log.info("Snif address is set to "+ config.getSnifferConfig().getIp() + ":" + config.getSnifferConfig().getPort() + " connecting with SSL=" + config.getSnifferConfig().isSSL());
+        log.info("Snif address is set to "+ config.getSnifferConfig().getIp() + ":" + config.getSnifferConfig().getPort());
         prepareMsgHeaders(config);
-        setMasterIP();
-        pingBytes = GuardMessage.preparePing(snifferMasterip, config.getSnifferConfig().getIp(), config.getId());
-        //configBytes = GuardMessage.prepareAgentConfig(config, "999");
-        handshakeBytes = GuardMessage.prepareHandshake(snifferMasterip, config.getSnifferConfig().getIp(), config.getId(), config.getDatabaseDetails().getDbType(), config.getUcConfig().getVersion());
+        InetAddress snifferIpAddress = InetAddress.getByName(config.getSnifferConfig().getIp());
+        if (snifferIpAddress instanceof Inet4Address){
+            int snifferMasterip = getIpv4MasterIP(snifferIpAddress);
+            pingBytes = GuardMessage.preparePingIpv4(snifferMasterip, config.getSnifferConfig().getIp(), config.getId());
+            handshakeBytes = GuardMessage.prepareHandshakeIpv4(snifferMasterip, config.getSnifferConfig().getIp(), config.getId(), config.getDatabaseDetails().getDbType(), config.getUcConfig().getVersion());
+        } else {
+            pingBytes = GuardMessage.preparePingIpv6(config.getSnifferConfig().getIp(), config.getId());
+            handshakeBytes = GuardMessage.prepareHandshakeIpv6(config.getSnifferConfig().getIp(), config.getId(), config.getDatabaseDetails().getDbType(), config.getUcConfig().getVersion());
+        }
     }
 
 
@@ -161,7 +168,7 @@ public class GuardConnection implements RecordTransmitter {
 
     private void createNewConnection() throws Exception {
         long timeOut = 10000; //10 seconds
-        if (config.getSnifferConfig().isSSL()) {
+        if (config.getSnifferConfig().getPort() == SSL_PORT) {
             commHandler = new GuardSecuredConnection(config.getSnifferConfig().getIp(), config.getSnifferConfig().getPort());
         } else {
             commHandler = new GuardNonSecuredConnection(config.getSnifferConfig().getIp(), config.getSnifferConfig().getPort());

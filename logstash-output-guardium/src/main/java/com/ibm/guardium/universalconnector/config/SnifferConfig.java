@@ -6,12 +6,10 @@ public class SnifferConfig {
 
     private String ip;
     private int port;
-    private boolean isSSL;
 
     public SnifferConfig(String snifferHost, int snifferPort, boolean isSSL) {
         this.ip = snifferHost;
         this.port = snifferPort;
-        this.isSSL = isSSL;
     }
 
     public String getId(){
@@ -34,20 +32,11 @@ public class SnifferConfig {
         this.port = port;
     }
 
-    public boolean isSSL() {
-        return isSSL;
-    }
-
-    public void setSSL(boolean SSL) {
-        isSSL = SSL;
-    }
-
     @Override
     public String toString() {
         return "SnifferConfig{" +
                 "ip='" + ip + '\'' +
                 ", port=" + port +
-                ", isSSL=" + isSSL +
                 '}';
     }
 
@@ -57,12 +46,11 @@ public class SnifferConfig {
         if (o == null || getClass() != o.getClass()) return false;
         SnifferConfig that = (SnifferConfig) o;
         return getPort() == that.getPort() &&
-                isSSL() == that.isSSL() &&
                 Objects.equals(getIp(), that.getIp());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getIp(), getPort(), isSSL());
+        return Objects.hash(getIp(), getPort());
     }
 }

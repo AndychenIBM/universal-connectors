@@ -1,5 +1,6 @@
 package com.ibm.guardium.universalconnector.transmitter.socket;
 
+import com.google.protobuf.ByteString;
 import com.ibm.guardium.proto.datasource.Datasource;
 import com.ibm.guardium.proto.datasource.Datasource.Guard_ds_message;
 import com.ibm.guardium.proto.datasource.Datasource.Guard_ds_message.Type;
@@ -68,15 +69,29 @@ public class GuardMessage {
         header.put(UNINSTALL_POSITION_IN_HEADER,(byte)0);
     }
 
-    public static byte[] preparePing(int masterIp, String snifNetworkAddress, String clientId)
-    {
-
-        Datasource.Ping ping = Datasource.Ping
+    private static Datasource.Ping.Builder getPingBuilder(String clientId){
+        return Datasource.Ping
                 .newBuilder()
                 .setClientIdentifier(clientId)
-                .setCurrentMaster(snifNetworkAddress)
-                .setCurrentMasterIp(masterIp)
-                .setTimestamp(getCurentTime())
+                .setTimestamp(getCurentTime());
+
+    }
+
+    public static byte[] preparePingIpv4(int masterIp, String snifNetworkAddress, String clientId)
+    {
+        com.ibm.guardium.proto.datasource.Datasource.Ping ping = getPingBuilder(clientId)
+            .setCurrentMaster(snifNetworkAddress)
+            .setCurrentMasterIp(masterIp)
+            .build();
+        return Guard_ds_message.newBuilder().setType(Type.PING).setPing(ping).build().toByteArray();
+    }
+
+    public static byte[] preparePingIpv6(String snifNetworkAddress, String clientId)
+    {
+        Datasource.Ping ping = getPingBuilder(clientId)
+                .setCurrentMasterIpv6(snifNetworkAddress)
+                .setIsIpv6(true)
+                .setCurrentMasterIpv6Bytes(ByteString.copyFromUtf8(snifNetworkAddress))
                 .build();
         return Guard_ds_message.newBuilder().setType(Type.PING).setPing(ping).build().toByteArray();
     }
@@ -88,14 +103,33 @@ public class GuardMessage {
         return Utilities.getTimestamp(time);
     }
 
-    public static byte[] prepareHandshake(int masterIp, String snifNetworkAddress, String clientId, String dbType, String udsVersion)
+    public static Datasource.Handshake.Builder getHandshakeBuilder(String clientId, String dbType, String udsVersion)
     {
-        Datasource.Handshake just_handshake = Datasource.Handshake
+        Datasource.Handshake.Builder handshakeBuilder = Datasource.Handshake
                 .newBuilder()
                 .setTimestamp(getCurentTime())
                 .setClientIdentifier(clientId)
+                .setVendor("Guardium")
+                .setProduct("Universal Connector")
+                .setClientType(DB_TYPE_PREFIX+dbType)
+                .setVersion(udsVersion);
+        return handshakeBuilder;
+    }
+
+    public static byte[] prepareHandshakeIpv4(int masterIp, String snifNetworkAddress, String clientId, String dbType, String udsVersion)
+    {
+        Datasource.Handshake just_handshake = getHandshakeBuilder(clientId, dbType, udsVersion)
                 .setCurrentMaster(snifNetworkAddress)
                 .setCurrentMasterIp(masterIp)
+                .build();
+        return Guard_ds_message.newBuilder().setType(Type.HANDSHAKE).setHandshake(just_handshake).build().toByteArray();
+    }
+
+    public static byte[] prepareHandshakeIpv6(String snifNetworkAddress, String clientId, String dbType, String udsVersion)
+    {
+        Datasource.Handshake just_handshake = getHandshakeBuilder(clientId, dbType, udsVersion)
+                .setCurrentMasterIpv6(snifNetworkAddress)
+                .setCurrentMasterIpv6Bytes(ByteString.copyFromUtf8(snifNetworkAddress))
                 .setVendor("Guardium")
                 .setProduct("Universal Connector")
                 .setClientType(DB_TYPE_PREFIX+dbType)
