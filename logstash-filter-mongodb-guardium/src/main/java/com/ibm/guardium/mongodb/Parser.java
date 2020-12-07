@@ -331,6 +331,7 @@ public class Parser {
             String address = local.get("ip").getAsString();
             int port = local.get("port").getAsInt();
             if (Util.isIPv6(address)) {
+                sessionLocator.setIpv6(true);
                 sessionLocator.setServerIpv6(address);
                 sessionLocator.setServerPort(port);
                 sessionLocator.setServerIp(Parser.UNKOWN_STRING);
