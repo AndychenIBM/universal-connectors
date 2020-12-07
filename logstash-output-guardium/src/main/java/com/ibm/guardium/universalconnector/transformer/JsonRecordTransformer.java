@@ -224,8 +224,11 @@ public class JsonRecordTransformer implements RecordTransformer {
         if (!isEmpty(ra.getServerHostName())) {
             builder.setServerHostname(ra.getServerHostName());
         } else {
-            // try to put server ip if host is empty
-            String serverIp = record.getSessionLocator().isIpv6() ? record.getSessionLocator().getServerIpv6() : record.getSessionLocator().getServerIp();
+            // try to put server ip if host is empty, server ip may be ipv6 or ipv4, ipv6 flag means that at least one of ips is ipv6, no necessarily both
+            String serverIp = record.getSessionLocator().getServerIp();
+            if (record.getSessionLocator().isIpv6() && record.getSessionLocator().getServerIpv6()!=null && record.getSessionLocator().getServerIpv6().length()>0){
+                serverIp = record.getSessionLocator().getServerIpv6();
+            }
             builder.setServerHostname(serverIp);
         }
         if (!isEmpty(ra.getCommProtocol())) {
@@ -267,7 +270,17 @@ public class JsonRecordTransformer implements RecordTransformer {
         if (!rsl.isIpv6()){
             sessionBuilder.setServerIp(convert_ipstr_to_int(rsl.getServerIp())).setClientIp(convert_ipstr_to_int(rsl.getClientIp()));
         } else {
-            sessionBuilder.setServerIpv6(rsl.getServerIpv6()).setClientIpv6(rsl.getClientIpv6());
+            // having ipv6 flag may mean that only one of ips is ipv6
+            if (rsl.getServerIpv6()!=null && rsl.getServerIpv6().length()>0){
+                sessionBuilder.setServerIpv6(rsl.getServerIpv6());
+            } else {
+                sessionBuilder.setServerIp(convert_ipstr_to_int(rsl.getServerIp()));
+            }
+            if (rsl.getClientIpv6()!=null && rsl.getServerIpv6().length()>0){
+                sessionBuilder.setClientIpv6(rsl.getClientIpv6());
+            } else {
+                sessionBuilder.setClientIp(convert_ipstr_to_int(rsl.getClientIp()));
+            }
         }
         return sessionBuilder.build();
     }
