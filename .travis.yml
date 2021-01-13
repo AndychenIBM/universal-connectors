@@ -34,6 +34,7 @@ script:
     - make check
     - make dockerBuild
     # Run tests
+    - chmod -R 755 ./test
     - ./test/test.sh
 
     # Following scripts should be run last in the Travis script section
