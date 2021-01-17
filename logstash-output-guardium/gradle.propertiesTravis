@@ -1,0 +1,3 @@
+LOGSTASH_UC_COMMONS_PATH=../logstash-uc-commons/build/libs
+org.gradle.java.home=/usr/local/lib/jvm/openjdk11/Contents/Home
+LOGSTASH_CORE_PATH=/Users/itaig/Downloads/pluginLogStash/universal-connector-master/logstash-master/logstash-core
