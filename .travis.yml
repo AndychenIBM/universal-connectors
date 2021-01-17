@@ -27,6 +27,7 @@ install:
 before_script:
     # Run the build script
     - make build
+    - make test
 
 script:
     # Run the test script.  "check" task will run: test, jacocoTestCoverageVerification, jacocoTestReport

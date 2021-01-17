@@ -100,7 +100,6 @@ public class JavaOutputExampleTest {
         configValues.put(JavaOutputToGuardium.PREFIX_CONFIG.name(), prefix);
         Configuration config = new ConfigurationImpl(configValues);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        System.setProperty("UC_ETC", "C:\\Guard\\Git\\universal-connector\\logstash-output-guardium\\src\\resources\\");
         JavaOutputToGuardium output = new JavaOutputToGuardium("test-id", config, null, baos);
 
         String sourceField = "message";

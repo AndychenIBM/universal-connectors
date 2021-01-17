@@ -18,7 +18,7 @@
 #Guardium Next Gen Ticketing microservice is responsible for CRUD operations for tickets on external services
 # Be sure to add your email and password in ENV variables in ~/.bashrc
 #  this is necessary to fetch Jar file dependencies from the IBM artifactory
-NAME=reports-runner
+NAME=universal-connector
 DOCKER_START_SCRIPT=./start.sh
 DOCKER_LST=v1/reports-runner.lst
 DEVOPS_COMPOSE_DIR=devops-compose
@@ -51,6 +51,7 @@ submodule:
 
 # To run unit-test:
 test:
+	./runPluginsTests.sh
 #	./gradlew test
 
 # To run e2e test:
