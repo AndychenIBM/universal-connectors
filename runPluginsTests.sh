@@ -1,3 +1,5 @@
+find / -name "jdk"
+echo $JAVA_HOME
 cd logstash-uc-commons
 chmod 755 ./gradlew
 ./gradlew jar
