@@ -13,7 +13,7 @@ sudo apt-get install ruby-full
 git clone -b 7.5 https://github.com/elastic/logstash.git
 cd logstash
 chmod 755 ./gradlew
-./gradlew :logstash-core:build
+./gradlew -q :logstash-core:build
 cd ../../
 export UC_ETC=$(pwd)/src/resources
 cp ./gradle.propertiesTravis ./gradle.properties
