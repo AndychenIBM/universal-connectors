@@ -7,7 +7,6 @@ import com.ibm.guardium.universalconnector.transformer.JsonRecordTransformer;
 import org.apache.logging.log4j.core.util.Assert;
 import org.junit.Test;
 import org.logstash.plugins.ConfigurationImpl;
-import org.omg.CORBA.UNKNOWN;
 import sun.net.util.IPAddressUtil;
 
 import java.io.ByteArrayOutputStream;

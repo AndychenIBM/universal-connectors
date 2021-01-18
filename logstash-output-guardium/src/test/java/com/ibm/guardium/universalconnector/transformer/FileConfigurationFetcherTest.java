@@ -6,7 +6,6 @@ import com.ibm.guardium.universalconnector.config.SnifferConfig;
 import org.junit.Assert;
 import org.junit.Test;
 
-import javax.xml.ws.soap.Addressing;
 import java.io.*;
 import java.util.List;
 
