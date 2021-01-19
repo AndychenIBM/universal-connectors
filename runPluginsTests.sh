@@ -16,9 +16,11 @@ chmod 755 ./gradlew
 ./gradlew -q :logstash-core:build
 cd ../../
 export UC_ETC=$(pwd)/src/resources
+ls -la $UC_ETC
 pwd
 echo HHH
 echo $UC_ETC
+ls -la
 echo JJJJ
 cp ./gradle.propertiesTravis ./gradle.properties
 ls -la /home/travis/build/Activity-Insights/universal-connector/logstash-output-guardium/logstash/logstash/logstash-core/build/libs
