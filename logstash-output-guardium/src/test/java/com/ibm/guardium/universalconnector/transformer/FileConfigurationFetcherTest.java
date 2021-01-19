@@ -30,7 +30,7 @@ public class FileConfigurationFetcherTest {
         String testeCase = "[{ \"ip\" : \"9.70.157.70\", \"port\" : \"16022\", \"isSSL\" : \"false\" }]";
         String fileFullPath = Environment.getUcEtc()+File.separator+"SniffersTest.json";
         System.out.println("fileFullPath = " + fileFullPath);
-
+        Assert.assertTrue("fileFullPath = " + fileFullPath, 1 >= 2);
         BufferedWriter writer = new BufferedWriter(new FileWriter(fileFullPath));
         writer.write(testeCase);
         writer.close();
