@@ -3,6 +3,7 @@ package com.ibm.guardium.universalconnector.transformer;
 
 import com.google.gson.Gson;
 import com.ibm.guardium.proto.datasource.Datasource;
+import com.ibm.guardium.universalconnector.common.Utilities;
 import com.ibm.guardium.universalconnector.common.structures.*;
 import com.ibm.guardium.universalconnector.exceptions.GuardUCInvalidRecordException;
 import org.jruby.RubyProcess;
@@ -242,6 +243,73 @@ public class JsonRecordTransformerTest {
                 "\"accessor\":{\"dbUser\":\"ProxyTest\",\"serverType\":\"S3\",\"serverOs\":\"N/A\",\"clientOs\":\"(Windows NT 10.0; Win64; x64)\",\"clientHostName\":\"s3.amazonaws.com\",\"serverHostName\":\"bucketnewbucketkkkkk.s3.us-east-1.amazonaws.com\",\"commProtocol\":\"AwsApiCall\",\"dbProtocol\":\"S3\",\"dbProtocolVersion\":\"1.07\",\"osUser\":\"N/A\",\"sourceProgram\":\"s3.amazonaws.com\",\"client_mac\":\"N/A\",\"serverDescription\":\"N/A\",\"serviceName\":\"s3\",\"language\":\"N/A\",\"dataType\":\"CONSTRUCT\"},\"data\":{\"construct\":{\"sentences\":[{\"verb\":\"GetObject\",\"objects\":[{\"name\":\"sampleJson.json\",\"type\":\"collection\",\"fields\":[],\"schema\":\"\"}],\"descendants\":[],\"fields\":[]}],\"fullSql\":\"{\\\"eventID\\\":\\\"510749cc-f696-4ef6-9750-67f6a1b6563c\\\",\\\"awsRegion\\\":\\\"us-east-1\\\",\\\"eventCategory\\\":\\\"Data\\\",\\\"responseElements\\\":null,\\\"eventVersion\\\":\\\"1.07\\\",\\\"sourceIPAddress\\\":\\\"77.125.48.244\\\",\\\"eventSource\\\":\\\"s3.amazonaws.com\\\",\\\"requestParameters\\\":{\\\"bucketName\\\":\\\"bucketnewbucketkkkkk\\\",\\\"X-Amz-Date\\\":\\\"20200623T101515Z\\\",\\\"response-content-disposition\\\":\\\"inline\\\",\\\"X-Amz-Algorithm\\\":\\\"AWS4-HMAC-SHA256\\\",\\\"X-Amz-SignedHeaders\\\":\\\"host\\\",\\\"Host\\\":\\\"bucketnewbucketkkkkk.s3.us-east-1.amazonaws.com\\\",\\\"X-Amz-Expires\\\":\\\"300\\\",\\\"key\\\":\\\"sampleJson.json\\\"},\\\"resources\\\":[{\\\"type\\\":\\\"AWS::S3::Object\\\",\\\"ARN\\\":\\\"arn:aws:s3:::bucketnewbucketkkkkk/sampleJson.json\\\"},{\\\"type\\\":\\\"AWS::S3::Bucket\\\",\\\"accountId\\\":\\\"987076625343\\\",\\\"ARN\\\":\\\"arn:aws:s3:::bucketnewbucketkkkkk\\\"}],\\\"readOnly\\\":true,\\\"userAgent\\\":\\\"[Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36]\\\",\\\"userIdentity\\\":{\\\"accessKeyId\\\":\\\"ASIA6LUS2AO7VLJQDY3Y\\\",\\\"sessionContext\\\":{\\\"attributes\\\":{\\\"mfaAuthenticated\\\":\\\"false\\\",\\\"creationDate\\\":\\\"2020-06-23T10:15:01Z\\\"}},\\\"accountId\\\":\\\"987076625343\\\",\\\"principalId\\\":\\\"AIDAJWW2XAIOY2WN3KAAM\\\",\\\"arn\\\":\\\"arn:aws:iam::987076625343:user/ProxyTest\\\",\\\"type\\\":\\\"IAMUser\\\",\\\"userName\\\":\\\"ProxyTest\\\"},\\\"eventType\\\":\\\"AwsApiCall\\\",\\\"additionalEventData\\\":{\\\"SignatureVersion\\\":\\\"SigV4\\\",\\\"AuthenticationMethod\\\":\\\"QueryString\\\",\\\"x-amz-id-2\\\":\\\"iy0pfZO0Lt10k2rVbj2B3CXnIsuoaX+tWd2EXSrMj3lx820yhuEyvceMyIJw/46/g8Qu5oIww+Q\\u003d\\\",\\\"CipherSuite\\\":\\\"ECDHE-RSA-AES128-GCM-SHA256\\\",\\\"bytesTransferredOut\\\":19.0,\\\"bytesTransferredIn\\\":0.0},\\\"requestID\\\":\\\"994668EDEA5422DD\\\",\\\"eventTime\\\":\\\"2020-06-23T10:15:16Z\\\",\\\"recipientAccountId\\\":\\\"987076625343\\\",\\\"eventName\\\":\\\"GetObject\\\",\\\"managementEvent\\\":false}\",\"original_sql\":\"{\\\"eventID\\\":\\\"510749cc-f696-4ef6-9750-67f6a1b6563c\\\",\\\"awsRegion\\\":\\\"us-east-1\\\",\\\"eventCategory\\\":\\\"Data\\\",\\\"responseElements\\\":null,\\\"eventVersion\\\":\\\"1.07\\\",\\\"sourceIPAddress\\\":\\\"77.125.48.244\\\",\\\"eventSource\\\":\\\"s3.amazonaws.com\\\",\\\"requestParameters\\\":{\\\"bucketName\\\":\\\"bucketnewbucketkkkkk\\\",\\\"X-Amz-Date\\\":\\\"20200623T101515Z\\\",\\\"response-content-disposition\\\":\\\"inline\\\",\\\"X-Amz-Algorithm\\\":\\\"AWS4-HMAC-SHA256\\\",\\\"X-Amz-SignedHeaders\\\":\\\"host\\\",\\\"Host\\\":\\\"bucketnewbucketkkkkk.s3.us-east-1.amazonaws.com\\\",\\\"X-Amz-Expires\\\":\\\"300\\\",\\\"key\\\":\\\"sampleJson.json\\\"},\\\"resources\\\":[{\\\"type\\\":\\\"AWS::S3::Object\\\",\\\"ARN\\\":\\\"arn:aws:s3:::bucketnewbucketkkkkk/sampleJson.json\\\"},{\\\"type\\\":\\\"AWS::S3::Bucket\\\",\\\"accountId\\\":\\\"987076625343\\\",\\\"ARN\\\":\\\"arn:aws:s3:::bucketnewbucketkkkkk\\\"}],\\\"readOnly\\\":true,\\\"userAgent\\\":\\\"[Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36]\\\",\\\"userIdentity\\\":{\\\"accessKeyId\\\":\\\"ASIA6LUS2AO7VLJQDY3Y\\\",\\\"sessionContext\\\":{\\\"attributes\\\":{\\\"mfaAuthenticated\\\":\\\"false\\\",\\\"creationDate\\\":\\\"2020-06-23T10:15:01Z\\\"}},\\\"accountId\\\":\\\"987076625343\\\",\\\"principalId\\\":\\\"AIDAJWW2XAIOY2WN3KAAM\\\",\\\"arn\\\":\\\"arn:aws:iam::987076625343:user/ProxyTest\\\",\\\"type\\\":\\\"IAMUser\\\",\\\"userName\\\":\\\"ProxyTest\\\"},\\\"eventType\\\":\\\"AwsApiCall\\\",\\\"additionalEventData\\\":{\\\"SignatureVersion\\\":\\\"SigV4\\\",\\\"AuthenticationMethod\\\":\\\"QueryString\\\",\\\"x-amz-id-2\\\":\\\"iy0pfZO0Lt10k2rVbj2B3CXnIsuoaX+tWd2EXSrMj3lx820yhuEyvceMyIJw/46/g8Qu5oIww+Q\\u003d\\\",\\\"CipherSuite\\\":\\\"ECDHE-RSA-AES128-GCM-SHA256\\\",\\\"bytesTransferredOut\\\":19.0,\\\"bytesTransferredIn\\\":0.0},\\\"requestID\\\":\\\"994668EDEA5422DD\\\",\\\"eventTime\\\":\\\"2020-06-23T10:15:16Z\\\",\\\"recipientAccountId\\\":\\\"987076625343\\\",\\\"eventName\\\":\\\"GetObject\\\",\\\"managementEvent\\\":false}\"},\"timestamp\":1592907316,\"originalSqlCommand\":\"{\\\"eventID\\\":\\\"510749cc-f696-4ef6-9750-67f6a1b6563c\\\",\\\"awsRegion\\\":\\\"us-east-1\\\",\\\"eventCategory\\\":\\\"Data\\\",\\\"responseElements\\\":null,\\\"eventVersion\\\":\\\"1.07\\\",\\\"sourceIPAddress\\\":\\\"77.125.48.244\\\",\\\"eventSource\\\":\\\"s3.amazonaws.com\\\",\\\"requestParameters\\\":{\\\"bucketName\\\":\\\"bucketnewbucketkkkkk\\\",\\\"X-Amz-Date\\\":\\\"20200623T101515Z\\\",\\\"response-content-disposition\\\":\\\"inline\\\",\\\"X-Amz-Algorithm\\\":\\\"AWS4-HMAC-SHA256\\\",\\\"X-Amz-SignedHeaders\\\":\\\"host\\\",\\\"Host\\\":\\\"bucketnewbucketkkkkk.s3.us-east-1.amazonaws.com\\\",\\\"X-Amz-Expires\\\":\\\"300\\\",\\\"key\\\":\\\"sampleJson.json\\\"},\\\"resources\\\":[{\\\"type\\\":\\\"AWS::S3::Object\\\",\\\"ARN\\\":\\\"arn:aws:s3:::bucketnewbucketkkkkk/sampleJson.json\\\"},{\\\"type\\\":\\\"AWS::S3::Bucket\\\",\\\"accountId\\\":\\\"987076625343\\\",\\\"ARN\\\":\\\"arn:aws:s3:::bucketnewbucketkkkkk\\\"}],\\\"readOnly\\\":true,\\\"userAgent\\\":\\\"[Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36]\\\",\\\"userIdentity\\\":{\\\"accessKeyId\\\":\\\"ASIA6LUS2AO7VLJQDY3Y\\\",\\\"sessionContext\\\":{\\\"attributes\\\":{\\\"mfaAuthenticated\\\":\\\"false\\\",\\\"creationDate\\\":\\\"2020-06-23T10:15:01Z\\\"}},\\\"accountId\\\":\\\"987076625343\\\",\\\"principalId\\\":\\\"AIDAJWW2XAIOY2WN3KAAM\\\",\\\"arn\\\":\\\"arn:aws:iam::987076625343:user/ProxyTest\\\",\\\"type\\\":\\\"IAMUser\\\",\\\"userName\\\":\\\"ProxyTest\\\"},\\\"eventType\\\":\\\"AwsApiCall\\\",\\\"additionalEventData\\\":{\\\"SignatureVersion\\\":\\\"SigV4\\\",\\\"AuthenticationMethod\\\":\\\"QueryString\\\",\\\"x-amz-id-2\\\":\\\"iy0pfZO0Lt10k2rVbj2B3CXnIsuoaX+tWd2EXSrMj3lx820yhuEyvceMyIJw/46/g8Qu5oIww+Q\\u003d\\\",\\\"CipherSuite\\\":\\\"ECDHE-RSA-AES128-GCM-SHA256\\\",\\\"bytesTransferredOut\\\":19.0,\\\"bytesTransferredIn\\\":0.0},\\\"requestID\\\":\\\"994668EDEA5422DD\\\",\\\"eventTime\\\":\\\"2020-06-23T10:15:16Z\\\",\\\"recipientAccountId\\\":\\\"987076625343\\\",\\\"eventName\\\":\\\"GetObject\\\",\\\"managementEvent\\\":false}\",\"useConstruct\":true},\"exception\":null}";
         JsonRecordTransformer transformer = new JsonRecordTransformer();
         List<Datasource.Guard_ds_message> msgs = transformer.transform(msgS3);
+    }
+
+    @Test
+    public void testTrimming() {
+
+        Record record = (new Gson()).fromJson(msgTemplateIPV6, Record.class);
+        Datasource.Accessor.Builder builder = Datasource.Accessor.newBuilder();
+
+        //-------trimAndSet----------//
+        // test null
+        Accessor ra = record.getAccessor();
+        builder = Datasource.Accessor.newBuilder();
+        ra.setDbUser(null);
+        try {
+            JsonRecordTransformer.trimAndSet(builder::setDbUser, ra::getDbUser);
+            Assert.assertTrue("Exception should have been thrown for null value in property value", false);
+        } catch (Exception e){
+            Assert.assertTrue("Invalid exception is thrown for null in property value", e.getClass().equals(NullPointerException.class));
+        }
+
+        // test empty string
+        ra.setDbUser("  ");
+        builder = Datasource.Accessor.newBuilder();
+        JsonRecordTransformer.trimAndSet(builder::setDbUser, ra::getDbUser);
+        Assert.assertTrue("trimAndSet - String value should empty string", "".equals(builder.getDbUser()));
+
+        // test string with trailing whitespace
+        ra.setDbUser(" aa ");
+        builder = Datasource.Accessor.newBuilder();
+        JsonRecordTransformer.trimAndSet(builder::setDbUser, ra::getDbUser);
+        Assert.assertTrue("trimAndSet - String value should 'aa'", "aa".equals(builder.getDbUser()));
+
+        // test string without trailing whitespace
+        ra.setDbUser("aaa");
+        builder = Datasource.Accessor.newBuilder();
+        JsonRecordTransformer.trimAndSet(builder::setDbUser, ra::getDbUser);
+        Assert.assertTrue("trimAndSet - String value should 'aaa'", "aaa".equals(builder.getDbUser()));
+
+        //-------trimAndSetIfNotEmpty----------//
+        ra.setDbUser(null);
+        builder = Datasource.Accessor.newBuilder();
+        try {
+            JsonRecordTransformer.trimAndSetIfNotEmpty(builder::setDbUser, ra::getDbUser);
+        } catch (Exception e){
+            Assert.assertTrue("trimAndSetIfNotEmpty - Invalid exception is thrown for null in property value", e.getClass().equals(NullPointerException.class));
+        }
+
+        // test empty string
+        ra.setDbUser("  ");
+        builder = Datasource.Accessor.newBuilder();
+        String valueBefore = builder.getDbUser();
+        JsonRecordTransformer.trimAndSetIfNotEmpty(builder::setDbUser, ra::getDbUser);
+        String valueAfter = builder.getDbUser();
+        Assert.assertTrue("trimAndSet - String value should not be set", valueBefore.equals(valueAfter));
+
+        // test string with trailing whitespace
+        ra.setDbUser(" aa ");
+        builder = Datasource.Accessor.newBuilder();
+        JsonRecordTransformer.trimAndSetIfNotEmpty(builder::setDbUser, ra::getDbUser);
+        Assert.assertTrue("trimAndSet - String value should 'aa'", "aa".equals(builder.getDbUser()));
+
+        // test string without trailing whitespace
+        ra.setDbUser("aaa");
+        builder = Datasource.Accessor.newBuilder();
+        JsonRecordTransformer.trimAndSetIfNotEmpty(builder::setDbUser, ra::getDbUser);
+        Assert.assertTrue("trimAndSet - String value should 'aaa'", "aaa".equals(builder.getDbUser()));
+
     }
 
     @Test
