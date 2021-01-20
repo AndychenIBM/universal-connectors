@@ -25,4 +25,5 @@ echo JJJJ
 cp ./gradle.propertiesTravis ./gradle.properties
 ls -la /home/travis/build/Activity-Insights/universal-connector/logstash-output-guardium/logstash/logstash/logstash-core/build/libs
 chmod 755 ./gradlew
-./gradlew test
+./gradlew test --debug
+cat /home/travis/build/Activity-Insights/universal-connector/logstash-output-guardium/build/reports/tests/test/index.html
