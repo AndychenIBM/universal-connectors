@@ -26,4 +26,8 @@ cp ./gradle.propertiesTravis ./gradle.properties
 ls -la /home/travis/build/Activity-Insights/universal-connector/logstash-output-guardium/logstash/logstash/logstash-core/build/libs
 chmod 755 ./gradlew
 ./gradlew test --debug
+cp ./gradle.propertiesTravis ../logstash-filter-s3-guardium/gradle.properties
+cd ../logstash-filter-s3-guardium/
+chmod 755 ./gradlew
+./gradlew test --debug
 cat /home/travis/build/Activity-Insights/universal-connector/logstash-output-guardium/build/reports/tests/test/index.html
