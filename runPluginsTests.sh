@@ -9,7 +9,7 @@ mkdir logstash
 cd logstash
 #install ruby and clone logstash
 sudo apt-get install ruby-full
-git clone -b 7.5 https://github.com/elastic/logstash.git
+git clone -b "v7.5.2" https://github.com/elastic/logstash.git
 cd logstash
 chmod 755 ./gradlew
 ./gradlew -q :logstash-core:build
