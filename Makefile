@@ -45,9 +45,9 @@ build:
 #    ./gradlew .
 #	./gradlew installDist
 
-# To run git submodule update --init --recursive --remote
+# To run git submodule update --init --recursive
 submodule:
-	git submodule update --init --recursive --remote
+	git submodule update --init --recursive
 
 # To run unit-test:
 test:

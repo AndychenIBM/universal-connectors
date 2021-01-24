@@ -23,7 +23,7 @@ install:
     # Run the install script
     # - ./install.sh
     - ./devops-compose/scripts/artifactory/docker/login.sh
-
+    - ./runPreBuildTasks.sh
 before_script:
     # Run the build script
     - make build
