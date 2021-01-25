@@ -12,6 +12,7 @@ services:
 
 env:
     - NAME=universal-connector
+    - LOGSTASH_VERSION_TAG=v7.5.2
 
 before_install:
     - printf "machine github.ibm.com\n  login $GITHUB_TOKEN\n" > ~/.netrc
