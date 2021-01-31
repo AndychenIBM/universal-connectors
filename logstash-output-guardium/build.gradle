@@ -5,6 +5,7 @@ apply plugin: 'java'
 apply from: LOGSTASH_CORE_PATH + "/../rubyUtils.gradle"
 
 
+
 // ===========================================================================
 // plugin info
 // ===========================================================================
@@ -75,6 +76,14 @@ clean {
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
     //options.compilerArgs += ["--release", "8"]
+}
+task setUTC(){
+    //call gradlew setUTC -PUC_ETC=val
+    test{
+        environment 'UC_ETC', UC_ETC
+    }
+
+
 }
 
 task vendor(dependsOn: shadowJar) {
