@@ -1,4 +1,5 @@
 #build docker image - could be taken from artifcatory
+chmod -R 777 *
 cd test
 docker build -t guc_dit:latest .
 #
