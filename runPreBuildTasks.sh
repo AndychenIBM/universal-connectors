@@ -1,3 +1,4 @@
+exit 0
 #build uc-commons
 cd logstash-uc-commons
 chmod 755 ./gradlew

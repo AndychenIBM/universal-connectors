@@ -1,13 +1,16 @@
-cd logstash-output-guardium
-#use gradlefor travis
-cp ./gradle.propertiesTravis ./gradle.properties
-#run output tests
-chmod 755 ./gradlew
-./gradlew test --debug
-#run filter tests
-cp ./gradle.propertiesTravis ../logstash-filter-s3-guardium/gradle.properties
-cd ../logstash-filter-s3-guardium/
-chmod 755 ./gradlew
-./gradlew test --debug
-#print resultreport to log
-cat /home/travis/build/Activity-Insights/universal-connector/logstash-output-guardium/build/reports/tests/test/index.html
+#build docker image - could be taken from artifcatory
+cd test
+docker build -t guc_dit:latest .
+#
+cd ..
+#docker  run  -v `pwd`:`pwd` -w `pwd` -dit guc_dit:latest bash
+docker  run  --name="Alan" -v `pwd`:`pwd` -w `pwd` -dit guc_dit:latest bash
+chmod -R 755 **/gradlew
+docker exec Alan bash -c "./buildAllPluginsInDocker.sh"
+if [ $? -eq 0 ]
+then
+  echo "Successfully tested and built"
+else
+    echo "Failed to test and build plugins"
+  exit 1
+fi
