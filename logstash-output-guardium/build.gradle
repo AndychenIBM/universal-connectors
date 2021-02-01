@@ -77,20 +77,20 @@ tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
     //options.compilerArgs += ["--release", "8"]
 }
-task setUTC(type: Test){
-    //call gradlew setUTC -PUC_ETC=val
-    
-    environment 'UC_ETC', UC_ETC
-    test {
-        useJUnitPlatform()
-        filter {
-            includeTestsMatching "org.logstashplugins"
-            includeTestsMatching "com.ibm.guardium.universalconnector"
-        }
-    }
-
-
-}
+//task setUTC(type: Test){
+//    //call gradlew setUTC -PUC_ETC=val
+//    
+//    environment 'UC_ETC', UC_ETC
+//    test {
+//        useJUnitPlatform()
+//        filter {
+//            includeTestsMatching "org.logstashplugins"
+//            includeTestsMatching "com.ibm.guardium.universalconnector"
+//        }
+//    }
+//
+//
+//}
 
 task vendor(dependsOn: shadowJar) {
     doLast {

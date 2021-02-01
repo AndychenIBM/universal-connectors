@@ -92,8 +92,9 @@ public class JavaOutputExampleTest {
         }
     }
 
-    @Test
+    //@Test
     public void testJavaOutputExceptionExample() {
+
         String prefix = "Prefix";
         Map<String, Object> configValues = new HashMap<>();
         configValues.put(JavaOutputToGuardium.PREFIX_CONFIG.name(), prefix);
