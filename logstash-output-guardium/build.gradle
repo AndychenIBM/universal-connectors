@@ -77,10 +77,16 @@ tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
     //options.compilerArgs += ["--release", "8"]
 }
-task setUTC(){
+task setUTC(type: Test){
     //call gradlew setUTC -PUC_ETC=val
-    test{
-        environment 'UC_ETC', UC_ETC
+    
+    environment 'UC_ETC', UC_ETC
+    test {
+        useJUnitPlatform()
+        filter {
+            includeTestsMatching "org.logstashplugins"
+            includeTestsMatching "com.ibm.guardium.universalconnector"
+        }
     }
 
 
