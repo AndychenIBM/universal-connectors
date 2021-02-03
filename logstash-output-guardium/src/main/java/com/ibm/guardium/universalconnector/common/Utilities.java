@@ -2,7 +2,7 @@ package com.ibm.guardium.universalconnector.common;
 
 import com.ibm.guardium.proto.datasource.Datasource;
 import com.ibm.guardium.proto.datasource.Datasource.Timestamp;
-import com.ibm.guardium.universalconnector.common.structures.Time;
+import com.ibm.guardium.universalconnector.commons.structures.Time;
 
 public class Utilities {
     public static int getTimeUnixTime(Long time) {

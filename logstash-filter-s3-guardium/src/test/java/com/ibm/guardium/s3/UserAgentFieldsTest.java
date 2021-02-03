@@ -3,7 +3,7 @@ package com.ibm.guardium.s3;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.ibm.guardium.s3.Parser;
-import com.ibm.guardium.universalconnector.common.structures.Accessor;
+import com.ibm.guardium.universalconnector.commons.structures.Accessor;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

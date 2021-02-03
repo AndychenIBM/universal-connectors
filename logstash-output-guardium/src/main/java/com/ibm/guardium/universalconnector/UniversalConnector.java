@@ -3,6 +3,7 @@ package com.ibm.guardium.universalconnector;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 import com.ibm.guardium.proto.datasource.*;
+import com.ibm.guardium.universalconnector.commons.*;
 import com.ibm.guardium.universalconnector.common.*;
 import com.ibm.guardium.universalconnector.config.SnifferConfig;
 import com.ibm.guardium.universalconnector.config.UCConfig;

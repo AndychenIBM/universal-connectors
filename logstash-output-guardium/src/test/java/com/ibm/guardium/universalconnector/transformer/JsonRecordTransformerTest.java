@@ -4,7 +4,7 @@ package com.ibm.guardium.universalconnector.transformer;
 import com.google.gson.Gson;
 import com.ibm.guardium.proto.datasource.Datasource;
 import com.ibm.guardium.universalconnector.common.Utilities;
-import com.ibm.guardium.universalconnector.common.structures.*;
+import com.ibm.guardium.universalconnector.commons.structures.*;
 import com.ibm.guardium.universalconnector.exceptions.GuardUCInvalidRecordException;
 import org.jruby.RubyProcess;
 import org.junit.Assert;

@@ -5,7 +5,7 @@ import com.ibm.guardium.proto.datasource.Datasource;
 import com.ibm.guardium.proto.datasource.Datasource.Guard_ds_message;
 import com.ibm.guardium.proto.datasource.Datasource.Guard_ds_message.Type;
 import com.ibm.guardium.universalconnector.common.Utilities;
-import com.ibm.guardium.universalconnector.common.structures.Time;
+import com.ibm.guardium.universalconnector.commons.structures.Time;
 import com.ibm.guardium.universalconnector.config.ConnectionConfig;
 import com.ibm.guardium.universalconnector.config.DBProtocol;
 

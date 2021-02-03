@@ -2,7 +2,7 @@ package org.logstashplugins;
 
 import co.elastic.logstash.api.Configuration;
 import co.elastic.logstash.api.Event;
-import com.ibm.guardium.universalconnector.common.GuardConstants;
+import com.ibm.guardium.universalconnector.commons.GuardConstants;
 import com.ibm.guardium.universalconnector.transformer.JsonRecordTransformer;
 import org.apache.logging.log4j.core.util.Assert;
 import org.junit.Test;

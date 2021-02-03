@@ -6,7 +6,7 @@ import com.google.gson.*;
 
 import com.ibm.guardium.samples.EventSamples;
 import com.ibm.guardium.s3.Parser;
-import com.ibm.guardium.universalconnector.common.structures.Record;
+import com.ibm.guardium.universalconnector.commons.structures.Record;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

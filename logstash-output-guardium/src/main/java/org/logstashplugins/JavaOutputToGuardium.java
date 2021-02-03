@@ -6,7 +6,7 @@ import com.google.gson.JsonObject;
 import com.ibm.guardium.universalconnector.UniversalConnector;
 import com.ibm.guardium.universalconnector.common.Environment;
 
-import com.ibm.guardium.universalconnector.common.GuardConstants;
+import com.ibm.guardium.universalconnector.commons.GuardConstants;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
