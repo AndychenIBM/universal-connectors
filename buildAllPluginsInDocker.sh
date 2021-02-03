@@ -21,7 +21,7 @@ function testPlugin(){
 }
 function buildUcCommons(){
     #build uc-commons
-    cd logstash-uc-commons
+    cd guardium-universalconnector-commons
     ./gradlew test
     if [ $? -eq 0 ]
     then
