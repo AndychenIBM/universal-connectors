@@ -1,0 +1,4 @@
+LOGSTASH_UC_COMMONS_PATH=../logstash-uc-commons/build/libs
+org.gradle.java.home=/usr/local/lib/jvm/openjdk11
+LOGSTASH_CORE_PATH=/home/travis/build/Activity-Insights/universal-connector/logstash-output-guardium/logstash/logstash/logstash-core
+systemProp.UC_ETC=/home/travis/build/Activity-Insights/universal-connector/logstash-output-guardium/src/resources

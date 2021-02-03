@@ -1,0 +1,71 @@
+# sudo: required
+
+# group: bluezone
+dist: bionic
+
+language: java
+
+jdk: openjdk11
+
+services:
+    - docker
+
+env:
+    - NAME=universal-connector LOGSTASH_VERSION_TAG=v7.5.2
+
+before_install:
+    - printf "machine github.ibm.com\n  login $GITHUB_TOKEN\n" > ~/.netrc
+    - git config --global url."git@github.ibm.com:".insteadOf "https://github.ibm.com/"
+
+install:
+    # Give execute permission to scripts
+    - chmod -R 755 ./devops-compose/scripts
+    # Run the install script
+    # - ./install.sh
+    - ./devops-compose/scripts/artifactory/docker/login.sh
+    - ./runPreBuildTasks.sh
+before_script:
+    # Run the build script
+    - make build
+    - make test
+
+script:
+    # Run the test script.  "check" task will run: test, jacocoTestCoverageVerification, jacocoTestReport
+    - make submodule
+    - make check
+    - make dockerBuild
+    # Run tests
+    - chmod -R 755 ./test
+    - ./test/test.sh
+
+    # Following scripts should be run last in the Travis script section
+    - ./devops-compose/scripts/artifactory/docker/imageDeploy.sh
+    - ./devops-compose/scripts/git/git_release.sh
+
+after_success:
+    #- bash <(curl -s https://codecov.io/bash)
+    - ./devops-compose/scripts/imagescan/ImageScan.sh
+
+before_cache:
+    # per travis-ci.com, this is necessary to avoid publishing the modules as part of the result
+    - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+    - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+
+cache:
+    directories:
+        # per travis-ci.com, this is necessary to avoid publishing the modules as part of the result
+        - $HOME/.gradle/caches/
+        - $HOME/.gradle/wrapper/
+
+# Send notification on the build completion
+notifications:
+    slack:
+        rooms:
+            - ibm-security:PpdFm21rRkpR9e5mGdzbtP5J#sec-insights-build
+        on_pull_requests: false
+        template:
+            - "Branch: %{branch}"
+            - "Component: %{repository_name}"
+            - "Changes included: <%{compare_url}|%{commit_subject}> (Author: %{author})"
+            - "Commit history: <https://github.ibm.com/Activity-Insights/jdbc-query/commits/%{branch}|View history for this branch>"
+            - "Status: Build <%{build_url}|#%{build_number}> %{result} (duration: %{duration})"

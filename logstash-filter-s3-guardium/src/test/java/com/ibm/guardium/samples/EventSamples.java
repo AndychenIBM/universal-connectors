@@ -1,7 +1,5 @@
 package com.ibm.guardium.samples;
 
-import com.sun.javafx.collections.MappingChange;
-
 import java.util.*;
 
 public class EventSamples {

@@ -22,9 +22,9 @@ import java.time.ZoneId;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
-import com.ibm.guardium.universalconnector.common.structures.*;
-import com.ibm.guardium.universalconnector.common.Util;
-import com.ibm.guardium.universalconnector.common.GuardConstants;
+import com.ibm.guardium.universalconnector.commons.structures.*;
+import com.ibm.guardium.universalconnector.commons.Util;
+import com.ibm.guardium.universalconnector.commons.GuardConstants;
 
 // class name must match plugin name
 @LogstashPlugin(name = "mysql_filter_guardium")

@@ -6,7 +6,6 @@ import com.ibm.guardium.universalconnector.config.SnifferConfig;
 import org.junit.Assert;
 import org.junit.Test;
 
-import javax.xml.ws.soap.Addressing;
 import java.io.*;
 import java.util.List;
 
@@ -16,6 +15,7 @@ public class FileConfigurationFetcherTest {
     public void testEmptySniffers() throws IOException {
         String testeCase = "[]";
         String fileFullPath = Environment.getUcEtc()+File.separator+"SniffersTest.json";
+        System.out.println("fileFullPath = " + fileFullPath);
         BufferedWriter writer = new BufferedWriter(new FileWriter(fileFullPath));
         writer.write(testeCase);
         writer.close();
@@ -29,6 +29,7 @@ public class FileConfigurationFetcherTest {
     public void testOneSniffer() throws IOException {
         String testeCase = "[{ \"ip\" : \"9.70.157.70\", \"port\" : \"16022\", \"isSSL\" : \"false\" }]";
         String fileFullPath = Environment.getUcEtc()+File.separator+"SniffersTest.json";
+        System.out.println("fileFullPath = " + fileFullPath);
         BufferedWriter writer = new BufferedWriter(new FileWriter(fileFullPath));
         writer.write(testeCase);
         writer.close();
