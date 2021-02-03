@@ -39,7 +39,6 @@ public class FileConfigurationFetcherTest {
         Assert.assertEquals(1, snifers.size());
         Assert.assertTrue("Test ip value", snifers.get(0).getIp().equals("9.70.157.70"));
         Assert.assertTrue("Test port value", snifers.get(0).getPort()==16022);
-        Assert.assertTrue("Test ssl value", !snifers.get(0).isSSL());
     }
 
     @Test
@@ -56,11 +55,9 @@ public class FileConfigurationFetcherTest {
 
         Assert.assertTrue("Test 1 ip value", snifers.get(0).getIp().equals("9.70.157.70"));
         Assert.assertTrue("Test 1 port value", snifers.get(0).getPort()==16022);
-        Assert.assertTrue("Test 1 ssl value", !snifers.get(0).isSSL());
 
         Assert.assertTrue("Test 2 ip value", snifers.get(1).getIp().equals("9.70.157.72"));
         Assert.assertTrue("Test 2 port value", snifers.get(1).getPort()==16023);
-        Assert.assertTrue("Test 2 ssl value", snifers.get(1).isSSL());
     }
 
     @Test
@@ -77,7 +74,6 @@ public class FileConfigurationFetcherTest {
 
         Assert.assertTrue("Test 1 ip value", snifers.get(0).getIp().equals("9.70.157.72"));
         Assert.assertTrue("Test 1 port value", snifers.get(0).getPort()==16023);
-        Assert.assertTrue("Test 1 ssl value", snifers.get(0).isSSL());
 
     }
 }

@@ -140,7 +140,7 @@ public class JavaOutputExampleTest {
             "\t\t\"serverIpv6\": \"2001:0db8:0000:0000:0000:ff00:0042:8329\"\n" +
             "\t},\n" +
             "\t\"accessor\": {\n" +
-            "\t\t\"dbUser\": \"abcdUserName\",\n" +
+            "\t\t\"dbUser\": \"abcdUserNameWithSpaceAtEnd \",\n" +
             "\t\t\"serverType\": \"MongoDB\",\n" +
             "\t\t\"serverOs\": \"\",\n" +
             "\t\t\"clientOs\": \"\",\n" +

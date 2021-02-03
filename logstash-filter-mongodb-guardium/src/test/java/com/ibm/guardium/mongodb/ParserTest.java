@@ -1,3 +1,7 @@
+//
+// Copyright 2020- IBM Inc. All rights reserved
+// SPDX-License-Identifier: Apache2.0
+//
 package com.ibm.guardium.mongodb;
 
 import java.text.ParseException;
@@ -5,7 +9,7 @@ import java.text.ParseException;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.ibm.guardium.universalconnector.common.structures.*;
+import com.ibm.guardium.universalconnector.commons.structures.*;
 
 import org.junit.Assert;
 import org.junit.Test;

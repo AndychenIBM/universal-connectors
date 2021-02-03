@@ -10,6 +10,8 @@ import org.apache.commons.logging.LogFactory;
 import sun.net.util.IPAddressUtil;
 
 import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class JsonRecordTransformer implements RecordTransformer {
 
@@ -83,13 +85,8 @@ public class JsonRecordTransformer implements RecordTransformer {
 //              .setProcessId(record.getSessionId())
 
         // optional fields - only set them if they have some value
-        if (!isEmpty(record.getAppUserName())){
-            builder.setAppUserName(record.getAppUserName());
-        }
-
-        if (!isEmpty(record.getDbName())){
-            builder.setDbName(record.getDbName());
-        }
+        trimAndSetIfNotEmpty(builder::setAppUserName, record::getAppUserName);
+        trimAndSetIfNotEmpty(builder::setDbName, record::getDbName);
 
         return builder.build();
     }
@@ -122,12 +119,15 @@ public class JsonRecordTransformer implements RecordTransformer {
         Accessor accessor = record.getAccessor();
 
         //Add Optional fields
-        exceptionMsg.setDBPROTOCOL((accessor != null)?accessor.getServerType():null);
-        exceptionMsg.setDBUSER((accessor != null)?accessor.getDbUser():null);
-        exceptionMsg.setDESCRIPTION(recordException.getDescription());
-        exceptionMsg.setEXCEPTIONTYPEID(recordException.getExceptionTypeId());
+        if (accessor!=null) {
+            trimAndSet(exceptionMsg::setDBPROTOCOL, accessor::getServerType);
+            trimAndSet(exceptionMsg::setDBUSER, accessor::getDbUser);
+        }
+        trimAndSetIfNotEmpty(exceptionMsg::setDESCRIPTION, recordException::getDescription); // description is optionals, other fields are not
+        trimAndSet(exceptionMsg::setEXCEPTIONTYPEID, recordException::getExceptionTypeId);
 
-        exceptionMsg.setSQLSTRING(recordException.getSqlString());
+        trimAndSet(exceptionMsg::setSQLSTRING, recordException::getSqlString);
+
         // must make sure sessionId in session start is aligned with sessionId in exception
         // per Tim's suggestion put here same hash that we set in session start
         // otherwise it causes problems in sniffer and exception is not stored in guardium
@@ -163,6 +163,9 @@ public class JsonRecordTransformer implements RecordTransformer {
         // handle fields
         List<String> fields = sentence.getFields()!=null ? sentence.getFields(): Collections.EMPTY_LIST;
         for (String field : fields) {
+            if (field!=null){
+                field = field.trim();
+            }
             Datasource.GDM_field gdmField = Datasource.GDM_field.newBuilder().setName(field).build();
             gdmSentenceBuilder.addFields(gdmField);
         }
@@ -170,7 +173,10 @@ public class JsonRecordTransformer implements RecordTransformer {
         // handle objects
         List<SentenceObject> objects = sentence.getObjects()!=null ? sentence.getObjects() : Collections.EMPTY_LIST;
         for (SentenceObject object : objects) {
-            Datasource.GDM_object gdmObject = Datasource.GDM_object.newBuilder().setName(object.getName()).setSchema(object.getSchema()).build();
+            Datasource.GDM_object.Builder builder = Datasource.GDM_object.newBuilder();
+            trimAndSet(builder::setName, object::getName);
+            trimAndSetIfNotEmpty(builder::setSchema, object::getSchema);
+            Datasource.GDM_object gdmObject = builder.build();
             gdmSentenceBuilder.addObjects(gdmObject);
         }
 
@@ -184,6 +190,34 @@ public class JsonRecordTransformer implements RecordTransformer {
         Datasource.GDM_sentence gdmSentence = gdmSentenceBuilder.build();
 
         return gdmSentence;
+    }
+
+    /**
+     * Set "must have/required" property value after trimming it, if null - exception will be throws as DS does not except nulls
+     * we prefer to get this exception, cause in those cases - data should be sent to sniffer and error will be written to our logs.
+     * This function should be used on required properties as they should not be null.
+     * @param apiToCall
+     * @param stringInputApi
+     */
+    public static void trimAndSet(Consumer<String> apiToCall, Supplier<String> stringInputApi){
+            //Function<String, com.google.protobuf.GeneratedMessage.Builder<Datasource.Accessor.Builder>> apiToCall, Supplier<String> stringInputApi){
+        String value = stringInputApi.get();
+        if (value!=null) {
+            value = value.trim();
+        }
+        apiToCall.accept(value);
+    }
+
+    /**
+     * Trim and set only of property value is not empty, should be used for optional property value
+     * @param apiToCall
+     * @param stringInputApi
+     */
+    public static void trimAndSetIfNotEmpty(Consumer<String> apiToCall, Supplier<String> stringInputApi){
+        String value = stringInputApi.get();
+        if (value!=null && value.trim().length()>0){
+            apiToCall.accept(value.trim());
+        }
     }
 
     public Datasource.Accessor buildAccessor(Record record) {
@@ -207,41 +241,33 @@ public class JsonRecordTransformer implements RecordTransformer {
         }
 
         Datasource.Accessor.Builder builder = Datasource.Accessor.newBuilder()
-                .setDbUser(ra.getDbUser())
-                .setServerType(ra.getServerType())
                 .setDbProtocol(UC_PROTOCOL_PREFIX+ra.getDbProtocol())
                 .setLanguage(getLanguageType(record.getAccessor()))
                 .setType(dataType)
                 .setDatasourceType(Datasource.Application_data.Datasource_type.UNI_CON);
 
+        trimAndSetIfNotEmpty(builder::setDbUser, ra::getDbUser); // we saw that for mysql plugin that uses sniffer parsing this value can be null and it is OK
+        trimAndSetIfNotEmpty(builder::setServerType, ra::getServerType);
+
         // optional fields - no need to set if they are empty;
-        if (!isEmpty(ra.getServerOs())) {
-            builder.setServerOs(ra.getServerOs());
-        }
-        if (!isEmpty(ra.getClientHostName())) {
-            builder.setClientHostname(ra.getClientHostName());
-        }
+        trimAndSetIfNotEmpty(builder::setServerOs, ra::getServerOs);
+        trimAndSetIfNotEmpty(builder::setClientHostname, ra::getClientHostName);
+        trimAndSetIfNotEmpty(builder::setCommProtocol, ra::getCommProtocol);
+        trimAndSetIfNotEmpty(builder::setDbProtocolVersion, ra::getDbProtocolVersion);
+        trimAndSetIfNotEmpty(builder::setSourceProgram, ra::getSourceProgram);
+        trimAndSetIfNotEmpty(builder::setServerDescription, ra::getServerDescription);
+        trimAndSetIfNotEmpty(builder::setServiceName, ra::getServiceName);
+        trimAndSetIfNotEmpty(builder::setOsUser, ra::getOsUser);
+
         if (!isEmpty(ra.getServerHostName())) {
-            builder.setServerHostname(ra.getServerHostName());
+            trimAndSetIfNotEmpty(builder::setServerHostname, ra::getServerHostName);
         } else {
-            // try to put server ip if host is empty
-            String serverIp = record.getSessionLocator().isIpv6() ? record.getSessionLocator().getServerIpv6() : record.getSessionLocator().getServerIp();
+            // try to put server ip if host is empty, server ip may be ipv6 or ipv4, ipv6 flag means that at least one of ips is ipv6, no necessarily both
+            String serverIp = record.getSessionLocator().getServerIp();
+            if (record.getSessionLocator().isIpv6() && record.getSessionLocator().getServerIpv6()!=null && record.getSessionLocator().getServerIpv6().length()>0){
+                serverIp = record.getSessionLocator().getServerIpv6();
+            }
             builder.setServerHostname(serverIp);
-        }
-        if (!isEmpty(ra.getCommProtocol())) {
-            builder.setCommProtocol(ra.getCommProtocol());
-        }
-        if (!isEmpty(ra.getDbProtocolVersion())) {
-            builder.setDbProtocolVersion(ra.getDbProtocolVersion());
-        }
-        if (!isEmpty(ra.getSourceProgram())) {
-            builder.setSourceProgram(ra.getSourceProgram());
-        }
-        if (!isEmpty(ra.getServerDescription())) {
-            builder.setServerDescription(ra.getServerDescription());
-        }
-        if (!isEmpty(ra.getServiceName())) {
-            builder.setServiceName(ra.getServiceName());
         }
 
         return builder.build();
@@ -267,7 +293,17 @@ public class JsonRecordTransformer implements RecordTransformer {
         if (!rsl.isIpv6()){
             sessionBuilder.setServerIp(convert_ipstr_to_int(rsl.getServerIp())).setClientIp(convert_ipstr_to_int(rsl.getClientIp()));
         } else {
-            sessionBuilder.setServerIpv6(rsl.getServerIpv6()).setClientIpv6(rsl.getClientIpv6());
+            // having ipv6 flag may mean that only one of ips is ipv6
+            if (rsl.getServerIpv6()!=null && rsl.getServerIpv6().length()>0){
+                sessionBuilder.setServerIpv6(rsl.getServerIpv6());
+            } else {
+                sessionBuilder.setServerIp(convert_ipstr_to_int(rsl.getServerIp()));
+            }
+            if (rsl.getClientIpv6()!=null && rsl.getServerIpv6().length()>0){
+                sessionBuilder.setClientIpv6(rsl.getClientIpv6());
+            } else {
+                sessionBuilder.setClientIp(convert_ipstr_to_int(rsl.getClientIp()));
+            }
         }
         return sessionBuilder.build();
     }
@@ -351,7 +387,7 @@ public class JsonRecordTransformer implements RecordTransformer {
         Data rd = record.getData();
         if(rd != null) {
             if (shouldGuardiumParseSql(dataType)) {
-                builder.setText(rd.getOriginalSqlCommand());
+                trimAndSet(builder::setText, rd::getOriginalSqlCommand);
             } else {
                 Datasource.GDM_construct gdmConstruct = buildConstruct(rd);
                 builder.setConstruct(gdmConstruct);

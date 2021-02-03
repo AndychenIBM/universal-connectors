@@ -1,10 +1,14 @@
+//
+// Copyright 2020- IBM Inc. All rights reserved
+// SPDX-License-Identifier: Apache2.0
+//
 package com.ibm.guardium.mongodb;
 
 import co.elastic.logstash.api.Context;
 import co.elastic.logstash.api.Event;
 import com.google.gson.Gson;
-import com.ibm.guardium.universalconnector.common.GuardConstants;
-import com.ibm.guardium.universalconnector.common.structures.Record;
+import com.ibm.guardium.universalconnector.commons.GuardConstants;
+import com.ibm.guardium.universalconnector.commons.structures.Record;
 import org.junit.Assert;
 import org.junit.Test;
 import org.logstash.plugins.ContextImpl;

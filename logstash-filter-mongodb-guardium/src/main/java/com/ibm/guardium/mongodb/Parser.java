@@ -1,3 +1,7 @@
+//
+// Copyright 2020- IBM Inc. All rights reserved
+// SPDX-License-Identifier: Apache2.0
+//
 package com.ibm.guardium.mongodb; // be specific; this will prevent clashes with classes of other plugins
 
 import java.text.ParseException;
@@ -14,8 +18,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.ibm.guardium.universalconnector.common.Util;
-import com.ibm.guardium.universalconnector.common.structures.*;
+import com.ibm.guardium.universalconnector.commons.Util;
+import com.ibm.guardium.universalconnector.commons.structures.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -327,6 +331,7 @@ public class Parser {
             String address = local.get("ip").getAsString();
             int port = local.get("port").getAsInt();
             if (Util.isIPv6(address)) {
+                sessionLocator.setIpv6(true);
                 sessionLocator.setServerIpv6(address);
                 sessionLocator.setServerPort(port);
                 sessionLocator.setServerIp(Parser.UNKOWN_STRING);

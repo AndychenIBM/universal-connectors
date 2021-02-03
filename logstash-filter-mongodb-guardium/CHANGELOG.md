@@ -2,6 +2,10 @@
 Notable changes will be documented in this file.
 
 ## [Unreleased]
+## [0.6.5]
+### Changed 
+- Changed imports to guardium-universalconnector-commons, whatever version.
+
 ## [0.6.2]
 ### Fixed
 - removed TODO/FIXME comments, and redundunt code.
