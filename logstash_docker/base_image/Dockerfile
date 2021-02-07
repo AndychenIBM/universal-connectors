@@ -1,47 +1,41 @@
-FROM registry.redhat.io/ubi8/ubi-minimal:8.2
+# ***************************************************************** */
+#                                                                   */
+# IBM Confidential                                                  */
+#                                                                   */
+# OCO Source Materials                                              */
+#                                                                   */
+# 5737-L66                                                          */
+#                                                                   */
+# Copyright IBM Corp. 2019, 2020                                    */
+#                                                                   */
+# The source code for this program is not published or otherwise    */
+# divested of its trade secrets, irrespective of what has been      */
+# deposited with the U.S. Copyright Office.                         */
+#                                                                   */
+# ***************************************************************** */
 
-LABEL maintainer="IBM Security" \
-    #build_date=
-    #version=
-    #release=
-    name="Universal-Connector Base Image" \
-    summary="Base image for Guardium Universal Connector" \
-    description="This image contains Logstash running on Java OpenJDK, installed on UBI operating system. For more information on this image please see documentation files" \
-    vendor="IBM Corp."
+# docker image version
+ARG adoptopenjdk_image_version=jre-11.0.9_11_openj9-0.23.0-ubi-minimal
+
+# Pull the UBI 8 docker base image based on provided version or default
+FROM adoptopenjdk/openjdk11-openj9:${adoptopenjdk_image_version}
 
 ENV ETC=/etc \
-    JAVA_HOME=/opt/java/openjdk \
-    PATH="/opt/java/openjdk/bin:$PATH" \
-    JAVA_VERSION="jdk-11.0.8+10_openj9-0.21.0" \
-    LOGSTASH_VERSION=7.5.2 \
+	JAVA_HOME=/opt/java/openjdk \
+    PATH="/opt/java/openjdk/bin:${PATH}" \
+    JAVA_OPTS="-XX:+UseContainerSupport" \
+	LOGSTASH_VERSION=7.5.2 \
     LOGSTASH_DIR=/usr/share/logstash \
     LOG_DIR=/var/log/ \
     LOG_GUC_DIR=/var/log/uc/ \
     LOGSTASH_INPUT_BEATS_VERSION=6.0.11 \
     LOGSTASH_INPUT_TCP_VERSION=6.0.6
+	
+USER root
 
 #Install necessary packages
 RUN microdnf install -y tzdata openssl curl ca-certificates procps shadow-utils.x86_64 tar gzip hostname vim cronie logrotate sudo && \
     microdnf update -y; microdnf clean all && \
-#Download and install OpenJDK
-    set -eux; \
-    ARCH="$(uname -m)"; \
-    case "${ARCH}" in \
-       amd64|x86_64) \
-         ESUM='7cc4b24e2ac0ed26bf3ec31241bde65b672952bf0df5e1606b263fadcb21b3b7'; \
-         BINARY_URL='https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.8%2B10_openj9-0.21.0/OpenJDK11U-jre_x64_linux_openj9_11.0.8_10_openj9-0.21.0.tar.gz'; \
-         ;; \
-       *) \
-         echo "Unsupported arch: ${ARCH}"; \
-         exit 1; \
-         ;; \
-    esac; \
-    curl -LfsSo /tmp/openjdk.tar.gz ${BINARY_URL}; \
-    echo "${ESUM} */tmp/openjdk.tar.gz" | sha256sum -c -; \
-    mkdir -p /opt/java/openjdk; \
-    cd /opt/java/openjdk; \
-    tar -xf /tmp/openjdk.tar.gz --strip-components=1; \
-    rm -rf /tmp/openjdk.tar.gz && \
 #Change ownership to guc
     groupadd -g 991 guardium && useradd -G guardium -u 1001 guc && \
     mkdir -p ${LOGSTASH_DIR} ${LOG_GUC_DIR} && chown -R guc:guardium ${LOGSTASH_DIR} ${LOG_DIR}
