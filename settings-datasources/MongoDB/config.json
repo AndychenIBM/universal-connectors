@@ -1,0 +1,18 @@
+{
+	"type": {
+		"displayName": "MongoDB",
+		"type": "connectorType"
+	},
+	"dataShipper": {
+		"default": "Filebeat"
+	},
+	"datasourceTag": {
+		"type": "text",
+		"optional": true
+	},
+	"connectionMethod": {
+		"type": "text",
+		"default": "GUC",
+		"hidden": true
+	}
+}
