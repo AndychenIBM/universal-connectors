@@ -1,18 +1,22 @@
 {
-	"type": {
-		"displayName": "MongoDB",
-		"type": "connectorType"
+	"connection": {
+		"type": {
+			"displayName": "MongoDB",
+			"type": "connectorType"
+		},
+		"connectionMethod": {
+			"type": "text",
+			"default": "GUC",
+			"hidden": true
+		}
 	},
-	"dataShipper": {
-		"default": "Filebeat"
-	},
-	"datasourceTag": {
-		"type": "text",
-		"optional": true
-	},
-	"connectionMethod": {
-		"type": "text",
-		"default": "GUC",
-		"hidden": true
+	"configuration": {
+		"dataShipper": {
+			"default": "Filebeat"
+		},
+		"datasourceTag": {
+			"type": "text",
+			"optional": true
+		}
 	}
 }

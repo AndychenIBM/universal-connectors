@@ -1,6 +1,11 @@
 {
-	"type": {
-		"description": "Data source type"
+	"connection": {
+		"type": {
+			"description": "Datasource type."
+		},
+		"connectionMethod": {
+			"description": "Connection Method."
+		}
 	},
     "configuration": {
         "auth": {

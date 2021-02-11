@@ -1,33 +1,35 @@
 {
-	"type": {
-		"displayName": "CloudWatch",
-		"type": "connectorType"
-	},
-	"connectionMethod": {
-		"type": "text",
-		"default": "GUC",
-		"hidden": true
-	},
-    "configuration": {
-        "auth": {
-            "logGroup/queue": {
-                "type": "text"
-            },
-			"region": {
-				"type": "text",
-				"default": "us-west-2"
-			},
-			"access_key_id": {
-				"type": "password"
-			},
-			"secret_access_key": {
-				"type": "password"
-			},
-			"sqs": {
-                "type": "boolean",
-				"default": null,
-                "optional": true
-			}
-        }
+  "connection": {
+    "type": {
+      "displayName": "CloudWatch",
+      "type": "connectorType"
+    },
+    "connectionMethod": {
+      "type": "text",
+      "default": "GUC",
+      "hidden": true
     }
+  },
+  "configuration": {
+    "auth": {
+      "logGroup/queue": {
+        "type": "text"
+      },
+      "region": {
+        "type": "text",
+        "default": "us-west-2"
+      },
+      "access_key_id": {
+        "type": "password"
+      },
+      "secret_access_key": {
+        "type": "password"
+      },
+      "sqs": {
+        "type": "boolean",
+        "default": null,
+        "optional": true
+      }
+    }
+  }
 }

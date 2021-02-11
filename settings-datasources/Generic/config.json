@@ -1,12 +1,14 @@
 {
-	"type": {
-		"displayName": "Generic Datasource",
-		"type": "connectorType"
-	},
-	"connectionMethod": {
-		"type": "text",
-		"default": "GUC",
-		"hidden": true
+	"connection": {
+		"type": {
+			"displayName": "Generic Datasource",
+			"type": "connectorType"
+		},
+		"connectionMethod": {
+			"type": "text",
+			"default": "GUC",
+			"hidden": true
+		}
 	},
     "configuration": {
 		"inputConfiguration": {
