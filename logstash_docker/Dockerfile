@@ -9,17 +9,16 @@ LABEL maintainer="IBM Security" \
     description="This image contains universal-connector-base image, along with plugins for supporting a variety of databses. For more information on this image please see documentation files" \
     vendor="IBM Corp."
 
-#Copy Universal-Connector files
-#Note that using 'COPY --chown="guc:guardium" uc/. ${LOGSTASH_DIR}/' command instead of the following 4 commands can save approximately 190MB
-USER root
-COPY uc/. ${LOGSTASH_DIR}/
-RUN chown -R guc:guardium ${LOGSTASH_DIR}
-USER guc
-
 ENV UC_ETC=${LOGSTASH_DIR}/config/ \
     UC_SCRIPTS=${LOGSTASH_DIR}/scripts/ \
     THIRD_PARTY_PATH=${LOGSTASH_DIR}/third_party \
-    SSL_DIR=${LOGSTASH_DIR}/ssl
+    SSL_DIR=/service/certs/universalconnector/
+
+#TODO: consider moving SSL_DIR definition to base-image and use 'COPY --chown="guc:guardium" uc/. ${LOGSTASH_DIR}/' instead of switching users.
+USER root
+COPY uc/. ${LOGSTASH_DIR}/
+RUN mkdir -p ${SSL_DIR} && chown -R guc:guardium ${LOGSTASH_DIR} ${SSL_DIR}
+USER guc
 
 #Create a persistent volume which can be monted on the host
 VOLUME /var/log/uc
