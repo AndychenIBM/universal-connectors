@@ -10,10 +10,13 @@ if [[ -z "$logstash_pid" ]]; then
 
     # TODO: change output plugin to get SniffersConfig.json from env variables
     rm -rf /usr/share/logstash/config/SniffersConfig.json
-    echo "[{\"ip\":\"172.30.181.176\", \"port\":\"16023\", \"isSSL\":\"true\" }]" > ${UC_ETC}/SniffersConfig.json
+    echo "[{\"ip\":\"mini-snif\", \"port\":\"${MINI_SNIF_PORT}\", \"isSSL\":\"${MINI_SNIF_SSL_ENABLED}\" }]" > ${UC_ETC}/SniffersConfig.json
+
+    # Remove 3 first lines (default on-prem pipeline) from pipelines.yml
+    sed -i -e 1,3d ${UC_ETC}/pipelines.yml
 
     # Start logstash
-    logstash -f ${LOGSTASH_DIR}/pipeline/gi_dummy.conf -l ${LOG_GUC_DIR} 2>&1 | tee -a ${LOG_GUC_DIR}/logstash_stdout_stderr.log
+    logstash -l ${LOG_GUC_DIR} 2>&1 | tee -a ${LOG_GUC_DIR}/logstash_stdout_stderr.log
 else
     echo "Logstash is already running..."
 fi
