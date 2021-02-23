@@ -14,18 +14,26 @@
 			"type": "link"
 		}
 	},
-    "configuration": {
+	"configuration": {
 		"auth": {
 			"type": "fields",
-			"inputConfiguration": {
+			"input_param_name": {
 				"type": "text",
-				"default": "input{}"
+				"default": "Filebeat"
 			},
-			"filterConfiguration": {
+			"input_param_tcpPort": {
 				"type": "text",
-				"default": "",
+				"optional": true
+			},
+			"input_param_udpPort": {
+				"type": "text",
+				"optional": true
+			},
+			"filter_param_name": {
+				"type": "text",
+				"default": "FilterMongoFilebeat",
 				"optional": true
 			}
 		}
-    }
+	}
 }
