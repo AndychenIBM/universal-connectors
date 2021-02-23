@@ -1,0 +1,28 @@
+{
+	"connection": {
+		"type": {
+			"displayName": "Generic Datasource",
+			"type": "connectorType"
+		},
+		"connectionMethod": {
+			"type": "text",
+			"default": "GUC",
+			"hidden": true
+		},
+		"help": {
+			"default": "<Help URL to configure datasource to make api call>",
+			"type": "link"
+		}
+	},
+    "configuration": {
+		"inputConfiguration": {
+			"type": "text",
+			"default": "input{}"
+		},
+		"filterConfiguration": {
+			"type": "text",
+			"default": "",
+			"optional": true
+		}		
+    }
+}
