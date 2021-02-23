@@ -8,13 +8,15 @@
 		}
 	},
     "configuration": {
-		"inputConfiguration": {
-			"label": "Universal-Connector input configuration",
-			"description": "Add Universal-Connector input configuration."
-		},
-		"filterConfiguration": {
-			"label": "Universal-Connector filter configuration",
-			"description": "Add Universal-Connector filter configuration."
-		}		
+		"auth": {
+			"inputConfiguration": {
+				"label": "Universal-Connector input configuration",
+				"description": "Add Universal-Connector input configuration."
+			},
+			"filterConfiguration": {
+				"label": "Universal-Connector filter configuration",
+				"description": "Add Universal-Connector filter configuration."
+			}
+		}
     }
 }
