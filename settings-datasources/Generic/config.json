@@ -15,14 +15,17 @@
 		}
 	},
     "configuration": {
-		"inputConfiguration": {
-			"type": "text",
-			"default": "input{}"
-		},
-		"filterConfiguration": {
-			"type": "text",
-			"default": "",
-			"optional": true
-		}		
+		"auth": {
+			"type": "fields",
+			"inputConfiguration": {
+				"type": "text",
+				"default": "input{}"
+			},
+			"filterConfiguration": {
+				"type": "text",
+				"default": "",
+				"optional": true
+			}
+		}
     }
 }

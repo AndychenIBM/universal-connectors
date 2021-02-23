@@ -16,6 +16,7 @@
   },
   "configuration": {
     "auth": {
+      "type": "fields",
       "logGroup/queue": {
         "type": "text"
       },

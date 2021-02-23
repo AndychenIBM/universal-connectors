@@ -15,13 +15,16 @@
 		}
 	},
 	"configuration": {
-		"dataShipper": {
-			"type": "text",
-			"default": "Filebeat"
-		},
-		"datasourceTag": {
-			"type": "text",
-			"optional": true
+		"auth": {
+			"type": "fields",
+			"dataShipper": {
+				"type": "text",
+				"default": "Filebeat"
+			},
+			"datasourceTag": {
+				"type": "text",
+				"optional": true
+			}
 		}
 	}
 }
