@@ -2,6 +2,7 @@ package com.ibm.guardium.universalconnector.transformer;
 
 import com.google.gson.Gson;
 import com.ibm.guardium.proto.datasource.Datasource;
+import com.ibm.guardium.universalconnector.common.Environment;
 import com.ibm.guardium.universalconnector.common.Utilities;
 import com.ibm.guardium.universalconnector.commons.structures.*;
 import com.ibm.guardium.universalconnector.exceptions.GuardUCInvalidRecordException;
@@ -18,7 +19,16 @@ public class JsonRecordTransformer implements RecordTransformer {
     public static final String UC_PROTOCOL_PREFIX = "UC: ";
     private static Log log = LogFactory.getLog(JsonRecordTransformer.class);
     private static final String LANG_TYPE_FREE_TEXT = "FREE_TEXT"; // for parser "FREE_TEXT"
-
+    public static String get(String envName, String defaultVal) {
+        String gEnv = System.getenv(envName);
+        if (null == gEnv || gEnv.isEmpty()) {
+            gEnv = System.getProperty(envName);
+        }
+        if (null == gEnv || gEnv.isEmpty()) {
+            gEnv = defaultVal;
+        }
+        return gEnv;
+    }
     @Override
     public List<Datasource.Guard_ds_message> transform(String recordStr) {
 
@@ -81,7 +91,9 @@ public class JsonRecordTransformer implements RecordTransformer {
                 .setSessionLocator(sessionLocator)
                 .setTimestamp(Utilities.getTimestamp(record.getTime()))
                 .setAccessor(accessor)
-                .setSessionId(getSessionIdForSniffer(record.getSessionId()));
+                .setSessionId(getSessionIdForSniffer(record.getSessionId()))
+                .setTerminalId(get("TENANT_ID","TNT_ATGPHITOV3JEIXUXK8LTGR"))
+                .setConfigId(get("CONFIG_ID","5d9f48d097ea6054a51f6b98"));
 //              .setProcessId(record.getSessionId())
 
         // optional fields - only set them if they have some value

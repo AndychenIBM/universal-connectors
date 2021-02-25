@@ -36,7 +36,7 @@ public class FileConfigurationFetcher implements ConfigurationFetcher{
         InetAddressValidator ipValidator = InetAddressValidator.getInstance();
         for (SnifferConfig snifferConfig : snifferConfigs) {
             if (snifferConfig.getPort() != 0 &&
-                    (snifferConfig.getIp()!=null &&ipValidator.isValid(snifferConfig.getIp()))) {
+                    (snifferConfig.getIp()!=null)) {
                 validated.add(snifferConfig);
             } else {
                 log.error("Invalid sniffer configuration " + snifferConfig.toString());
