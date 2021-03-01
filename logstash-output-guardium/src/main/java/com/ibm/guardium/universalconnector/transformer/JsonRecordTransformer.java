@@ -90,9 +90,11 @@ public class JsonRecordTransformer implements RecordTransformer {
                 .setSessionLocator(sessionLocator)
                 .setTimestamp(Utilities.getTimestamp(record.getTime()))
                 .setAccessor(accessor)
-                .setSessionId(getSessionIdForSniffer(record.getSessionId()))
-                .setTerminalId(get("TENANT_ID","TNT_ATGPHITOV3JEIXUXK8LTGR"))
-                .setConfigId(get("CONFIG_ID","5d9f48d097ea6054a51f6b98"));
+                .setSessionId(getSessionIdForSniffer(record.getSessionId()));
+        if("true".equals(get("GI_MODE","false"))) {
+                builder.setTerminalId(get("TENANT_ID", "TNT_ATGPHITOV3JEIXUXK8LTGR"))
+                    .setConfigId(get("CONFIG_ID", "5d9f48d097ea6054a51f6b98"));
+        }
 //              .setProcessId(record.getSessionId())
 
         // optional fields - only set them if they have some value
