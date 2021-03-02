@@ -16,7 +16,6 @@
 # ***************************************************************** */
 
 # docker image version
-#ARG adoptopenjdk_image_version=jre-11.0.9_11_openj9-0.23.0-ubi-minimal
 ARG adoptopenjdk_image_version=jdk-11.0.9_11_openj9-0.23.0-ubi-minimal
 
 # Pull the UBI 8 docker base image based on provided version or default
