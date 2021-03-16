@@ -1,3 +1,0 @@
-[submodule "devops-compose"]
-	path = devops-compose
-	url = git@github.ibm.com:Activity-Insights/devops-compose.git
