@@ -10,7 +10,7 @@ if [[ -z "$logstash_pid" ]]; then
 
     # TODO: change output plugin to get SniffersConfig.json from env variables
     rm -rf /usr/share/logstash/config/SniffersConfig.json
-    echo "[{\"ip\":\"mini-snif\", \"port\":\"${MINI_SNIF_PORT}\", \"isSSL\":\"${MINI_SNIF_SSL_ENABLED}\" }]" > ${UC_ETC}/SniffersConfig.json
+    echo "[{\"ip\":\"${MINI_SNIF_HOSTNAME}\", \"port\":\"${MINI_SNIF_PORT}\", \"isSSL\":\"${MINI_SNIF_SSL_ENABLED}\" }]" > ${UC_ETC}/SniffersConfig.json
 
     # Remove 3 first lines (default on-prem pipeline) from pipelines.yml
     sed -i -e 1,3d ${UC_ETC}/pipelines.yml
