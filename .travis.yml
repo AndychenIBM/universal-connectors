@@ -19,11 +19,13 @@ before_install:
 
 install:
     # Give execute permission to scripts
-    - chmod -R 755 ./devops-compose/scripts
+    - chmod -R 755 ./deployments/devops-compose/scripts
+
     # Run the install script
     # - ./install.sh
-    - ./devops-compose/scripts/artifactory/docker/login.sh
+    - ./deployments/devops-compose/scripts/artifactory/docker/login.sh
     - ./runPreBuildTasks.sh
+
 before_script:
     # Run the build script
     - make build
@@ -39,12 +41,12 @@ script:
     - ./test/test.sh
     - travis_wait 20 make test_e2e
     # Following scripts should be run last in the Travis script section
-    - ./devops-compose/scripts/artifactory/docker/imageDeploy.sh
-    - ./devops-compose/scripts/git/git_release.sh
+    - ./deployments/devops-compose/scripts/artifactory/docker/imageDeploy.sh
+    - ./deployments/devops-compose/scripts/git/git_release.sh
 
 after_success:
     #- bash <(curl -s https://codecov.io/bash)
-    - ./devops-compose/scripts/imagescan/ImageScan.sh
+    - ./deployments/devops-compose/scripts/imagescan/ImageScan.sh
 
 before_cache:
     # per travis-ci.com, this is necessary to avoid publishing the modules as part of the result

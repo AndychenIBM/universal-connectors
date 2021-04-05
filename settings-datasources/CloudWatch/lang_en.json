@@ -1,0 +1,33 @@
+{
+	"connection": {
+		"type": {
+			"description": "Datasource type."
+		},
+		"connectionMethod": {
+			"description": "Connection Method."
+		}
+	},
+    "configuration": {
+        "auth": {
+            "logGroup/queue": {
+                "label": "Cloudwatch Log Group/SQS queue"
+            },
+			"region": {
+				"label": "Region",
+				"description": "Region of the Cloudwatch Log Group/SQS queue."
+			},
+			"access_key_id": {
+				"label": "Access Key ID",
+				"description": "Access Key ID of the user with access to the Cloudwatch Log Group/SQS queue."
+			},
+			"secret_access_key": {
+				"label": "Secret Access Key",
+				"description": "Secret Access Key of the user with access to the Cloudwatch Log Group/SQS queue."
+			},
+			"sqs": {
+                "label": "SQS",
+				"description": "Use SQS instead of using CloudWatch input plugin."
+			}
+        }
+    }
+}

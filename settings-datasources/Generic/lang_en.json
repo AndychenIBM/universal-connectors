@@ -1,0 +1,27 @@
+{
+	"connection": {
+		"type": {
+			"description": "Datasource type."
+		},
+		"connectionMethod": {
+			"description": "Connection Method."
+		}
+
+	},
+	"configuration": {
+		"auth": {
+			"input_param_Name": {
+				"description": "Input Parameter Name."
+			},
+			"input_param_tcpPort": {
+				"description": "Input Parameter TCP Port."
+			},
+			"input_param_udpPort": {
+				"description": "Input Parameter UDP Port."
+			},
+			"filter_param_name": {
+				"description": "Filter Parameter Name."
+			}
+		}
+	}
+}
