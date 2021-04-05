@@ -56,6 +56,7 @@ test:
 
 # To run e2e test:
 test_e2e:
+     ./teste2e.sh
 #	./gradlew test_e2e
 
 # To run unit-test and JaCoCo code coverage script:
