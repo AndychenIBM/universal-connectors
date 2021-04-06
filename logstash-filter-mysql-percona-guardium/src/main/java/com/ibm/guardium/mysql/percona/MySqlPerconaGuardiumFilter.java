@@ -21,9 +21,9 @@ import java.util.*;
 import java.io.File;
 import java.time.ZonedDateTime;
 
-import com.ibm.guardium.universalconnector.common.structures.*;
-import com.ibm.guardium.universalconnector.common.Util;
-import com.ibm.guardium.universalconnector.common.GuardConstants;
+import com.ibm.guardium.universalconnector.commons.structures.*;
+import com.ibm.guardium.universalconnector.commons.Util;
+import com.ibm.guardium.universalconnector.commons.GuardConstants;
 import org.apache.logging.log4j.core.config.Configurator;
 import org.apache.logging.log4j.core.config.LoggerConfig;
 
