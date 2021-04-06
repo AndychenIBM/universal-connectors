@@ -19,7 +19,7 @@
 ARG adoptopenjdk_image_version=jdk-11.0.9_11_openj9-0.23.0-ubi-minimal
 
 # Pull the UBI 8 docker base image based on provided version or default
-FROM adoptopenjdk/openjdk11-openj9:${adoptopenjdk_image_version}
+FROM sec-guardium-next-gen-docker-local.artifactory.swg-devops.com/openjdk-ubi-minimal:${adoptopenjdk_image_version}
 
 ENV ETC=/etc \
 	JAVA_HOME=/opt/java/openjdk \
