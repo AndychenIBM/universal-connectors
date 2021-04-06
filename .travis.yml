@@ -39,7 +39,7 @@ script:
     # Run tests
     - chmod -R 755 ./test
     - ./test/test.sh
-    - travis_wait 20 make test_e2e
+    #- travis_wait 20 make test_e2e
     # Following scripts should be run last in the Travis script section
     - ./deployments/devops-compose/scripts/artifactory/docker/imageDeploy.sh
     - ./deployments/devops-compose/scripts/git/git_release.sh
