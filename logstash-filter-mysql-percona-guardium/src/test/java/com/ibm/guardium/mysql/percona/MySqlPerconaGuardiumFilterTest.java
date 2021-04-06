@@ -4,7 +4,7 @@ import co.elastic.logstash.api.Configuration;
 import co.elastic.logstash.api.Context;
 import co.elastic.logstash.api.Event;
 import co.elastic.logstash.api.FilterMatchListener;
-import com.ibm.guardium.universalconnector.common.GuardConstants;
+import com.ibm.guardium.universalconnector.commons.GuardConstants;
 import org.junit.Assert;
 import org.junit.Test;
 import org.logstash.plugins.ConfigurationImpl;
