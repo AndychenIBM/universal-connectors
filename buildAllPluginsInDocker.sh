@@ -45,7 +45,7 @@ buildUcCommons
 #(echo && echo "UC_ETC=$PWD/logstash-output-guardium/src/resources") >> ./test/gradle.properties
 #test plugins
 testPlugin "logstash-filter-mongodb-guardium" "test"
-#testPlugin "logstash-filter-mysql-guardium"
+testPlugin "logstash-filter-mysql-guardium" "test"
 testPlugin "logstash-filter-s3-guardium" "test"
 testPlugin "logstash-filter-mysql-percona-guardium" "test"
 #testPlugin "logstash-input-cloudwatch-logs-master" "test"
