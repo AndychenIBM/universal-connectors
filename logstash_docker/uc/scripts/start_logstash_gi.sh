@@ -16,7 +16,7 @@ if [[ -z "$logstash_pid" ]]; then
     sed -i -e 1,3d ${UC_ETC}/pipelines.yml
 
     # Start logstash
-    logstash -l ${LOG_GUC_DIR} 2>&1 | tee -a ${LOG_GUC_DIR}/logstash_stdout_stderr.log
+    logstash --config.reload.automatic -l ${LOG_GUC_DIR} 2>&1 | tee -a ${LOG_GUC_DIR}/logstash_stdout_stderr.log
 else
     echo "Logstash is already running..."
 fi
