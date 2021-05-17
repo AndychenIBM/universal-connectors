@@ -21,7 +21,7 @@
 NAME=universal-connector
 DOCKER_START_SCRIPT=./start.sh
 DOCKER_LST=v1/universal-connector.lst
-DEVOPS_COMPOSE_DIR=devops-compose
+DEVOPS_COMPOSE_DIR=deployments/devops-compose
 DEVOPS_COMPOSE_ARGS=-f ../test/docker-compose.override.yml
 DEVOPS_COMPOSE_PULL=pull
 DEVOPS_COMPOSE_UP=up -d

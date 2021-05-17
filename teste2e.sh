@@ -1,7 +1,7 @@
 docker stop $(docker ps -a -q) && docker rm $(docker ps -a -q)
 #run docker compose
 #cd /Users/itaig/docker-compose/devops-compose
-cd devops-compose
+cd deployments/devops-compose
 ./start.sh v1/buffalo.lst pull
 ./start.sh v1/buffalo.lst
 #copy config file to mounted place
