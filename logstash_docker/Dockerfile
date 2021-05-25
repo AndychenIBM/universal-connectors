@@ -38,13 +38,9 @@ RUN echo "--add-opens=java.base/java.lang=ALL-UNNAMED \
     --add-opens=java.base/java.lang=ALL-UNNAMED \
     --add-opens=java.base/javax.crypto=ALL-UNNAMED \
     --add-opens=java.management/sun.management=ALL-UNNAMED" >>${UC_ETC}/jvm.options && \
-#Install plugins
-    cd ${LOGSTASH_DIR}/config/ && \
-	${LOGSTASH_DIR}/bin/logstash-plugin install logstash-filter-mongodb_guardium_filter-0.6.4.gem \
-	logstash-output-java_output_to_guardium-1.3.2.gem \
-    logstash-filter-mysql_filter_guardium-1.0.0.gem \
-    logstash-input-cloudwatch_logs-1.0.3.gem \
-    logstash-filter-logstash_filter_s3_guardium-0.5.3.gem && \
+#Install plugins FIXME: enter output_to_guardium plugin to the default offline-package
+    ${LOGSTASH_DIR}/bin/logstash-plugin install ${UC_ETC}/logstash-output-java_output_to_guardium-1.3.3.gem && \
+    ${LOGSTASH_DIR}/bin/logstash-plugin install file:///${UC_ETC}/guardium_logstash-offline-pluginsWToutput.zip && \
 #Make sure user can read,write and execute the scripts
     chmod 755 ${UC_SCRIPTS}/*.sh && \
 #Make sure scripts are not uploaded with windows characters additions

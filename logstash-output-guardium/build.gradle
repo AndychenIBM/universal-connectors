@@ -9,7 +9,7 @@ apply from: LOGSTASH_CORE_PATH + "/../rubyUtils.gradle"
 // ===========================================================================
 // plugin info
 // ===========================================================================
-group                      'org.logstashplugins' // must match the package of the main plugin class
+group                      'com.ibm.guardium.universalconnector.plugins' // must match the package of the main plugin class
 version                    "${file("VERSION").text.trim()}" // read from required VERSION file
 description                = "Example Java output implementation"
 pluginInfo.licenses        = ['Apache-2.0'] // list of SPDX license IDs
@@ -91,7 +91,7 @@ tasks.withType(JavaCompile) {
 //    test {
 //        useJUnitPlatform()
 //        filter {
-//            includeTestsMatching "org.logstashplugins"
+//            includeTestsMatching "com.ibm.guardium.universalconnector.plugin"
 //            includeTestsMatching "com.ibm.guardium.universalconnector"
 //        }
 //    }
