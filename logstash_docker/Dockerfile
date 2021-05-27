@@ -1,24 +1,4 @@
-# ***************************************************************** */
-#                                                                   */
-# IBM Confidential                                                  */
-#                                                                   */
-# OCO Source Materials                                              */
-#                                                                   */
-# 5737-L66                                                          */
-#                                                                   */
-# Copyright IBM Corp. 2019, 2020                                    */
-#                                                                   */
-# The source code for this program is not published or otherwise    */
-# divested of its trade secrets, irrespective of what has been      */
-# deposited with the U.S. Copyright Office.                         */
-#                                                                   */
-# ***************************************************************** */
-
-# docker image version
-ARG adoptopenjdk_image_version=jre-11.0.11_9_openj9-0.26.0-ubi-minimal-8.3-298.1618432845
-
-# Pull the UBI 8 docker base image based on provided version or default
-FROM sec-guardium-next-gen-docker-local.artifactory.swg-devops.com/openjdk-ubi-minimal:${adoptopenjdk_image_version}
+FROM sec-guardium-next-gen-docker-local.artifactory.swg-devops.com/universal-connector-base
 
 LABEL maintainer="IBM Security" \
     #build_date=
@@ -29,56 +9,24 @@ LABEL maintainer="IBM Security" \
     description="This image contains universal-connector-base image, along with plugins for supporting a variety of databses. For more information on this image please see documentation files" \
     vendor="IBM Corp."
 
-ENV ETC=/etc \
-	JAVA_HOME=/opt/java/openjdk \
-    PATH="/opt/java/openjdk/bin:${PATH}" \
-    JAVA_OPTS="-XX:+UseContainerSupport" \
-	LOGSTASH_VERSION=7.5.2 \
-    LOGSTASH_DIR=/usr/share/logstash \
-    LOG_DIR=/var/log/ \
-    LOG_GUC_DIR=/var/log/uc/ \
-    LOGSTASH_INPUT_BEATS_VERSION=6.0.11 \
-    LOGSTASH_INPUT_TCP_VERSION=6.0.6
-
 ENV UC_ETC=${LOGSTASH_DIR}/config/ \
     UC_SCRIPTS=${LOGSTASH_DIR}/scripts/ \
     THIRD_PARTY_PATH=${LOGSTASH_DIR}/third_party \
     SSL_DIR=/service/certs/universalconnector/
 
-# Create a persistent volume which can be monted on the host
+#TODO: consider moving SSL_DIR definition to base-image and use 'COPY --chown="guc:guardium" uc/. ${LOGSTASH_DIR}/' instead of switching users.
+USER root
+COPY uc/. ${LOGSTASH_DIR}/
+RUN mkdir -p ${SSL_DIR} && chown -R guc:guardium ${LOGSTASH_DIR} ${SSL_DIR}
+USER guc
+
+#Create a persistent volume which can be monted on the host
 VOLUME /var/log/uc
 VOLUME /etc/uc/conf
 
-COPY uc/. ${LOGSTASH_DIR}/
-
-# Install necessary packages
-RUN microdnf install -y tzdata openssl curl ca-certificates procps shadow-utils.x86_64 tar gzip hostname vim cronie logrotate sudo && \
-    microdnf update -y; microdnf clean all && \
-# Change ownership to guc
-    groupadd -g 991 guardium && useradd -G guardium -u 1001 guc && \
-    mkdir -p ${LOGSTASH_DIR} ${LOG_GUC_DIR} && chown -R guc:guardium ${LOGSTASH_DIR} ${LOG_DIR} && \
-    mkdir -p ${SSL_DIR} && chown -R guc:guardium ${LOGSTASH_DIR} ${SSL_DIR}
-
-# Change User to guc
-USER guc
-
 WORKDIR ${LOGSTASH_DIR}
 
-# Download and extract logstash
-RUN curl https://artifacts.elastic.co/downloads/logstash/logstash-oss-${LOGSTASH_VERSION}.tar.gz -o ${LOGSTASH_DIR}/logstash-oss-${LOGSTASH_VERSION}.tar.gz && \
-	tar -xzf ${LOGSTASH_DIR}/logstash*.tar.gz  -C ${LOGSTASH_DIR} --strip-components=1 && \
-	rm ${LOGSTASH_DIR}/*.tar.gz && \
-# Remove unnecessary heavy plugins
-    cd $LOGSTASH_DIR/vendor/bundle/jruby/2.5.0/gems && \
-    rm -rf logstash-filter-geoip-6.0.3-java logstash-input-snmp-1.2.1 \
-    logstash-input-azure-* logstash-integration-kafka-* logstash-input-http-* nokogiri-1.10.7-java \
-    sequl-5.27.0 backports-3.15.0 tzinfo-data-1.2019.3 snappy-0.0.12-java \
-    mail-2.6.6 logstash-input-azure_event_hubs-1.1.2 logstash-filter-jdbc_static-1.0.7 snmp-1.3.2 && \
-# Install a fixed version of logstash-input-beats, logstash-input-tcp due to a known problem in 6.0.5 which is being used in Logstash-7.5.2
-    ${LOGSTASH_DIR}/bin/logstash-plugin install --version ${LOGSTASH_INPUT_BEATS_VERSION} logstash-input-beats && \
-    ${LOGSTASH_DIR}/bin/logstash-plugin update logstash-input-tcp && \
-# Define java parameters
-    echo "--add-opens=java.base/java.lang=ALL-UNNAMED \
+RUN echo "--add-opens=java.base/java.lang=ALL-UNNAMED \
     --add-opens=java.base/java.security=ALL-UNNAMED \
     --add-opens=java.base/java.util=ALL-UNNAMED \
     --add-opens=java.base/java.security.cert=ALL-UNNAMED \
