@@ -15,6 +15,10 @@ if [[ -z "$logstash_pid" ]]; then
     # Remove 3 first lines (default on-prem pipeline) from pipelines.yml
     sed -i -e 1,3d ${UC_ETC}/pipelines.yml
 
+    # Aggregate env vars
+    export GI_PIPELINE_DIR="${GUC_PIPELINE_CONFIG_PATH}/${TENANT_ID}/${CLUSTER_ID}/pipeline/"
+    export GI_PLUGINS_DIR="${GUC_PIPELINE_CONFIG_PATH}/${TENANT_ID}/${CLUSTER_ID}/config/"
+
     # Start logstash
     logstash --config.reload.automatic -l ${LOG_GUC_DIR} 2>&1 | tee -a ${LOG_GUC_DIR}/logstash_stdout_stderr.log
 else

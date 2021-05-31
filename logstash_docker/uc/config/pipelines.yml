@@ -2,6 +2,6 @@
   path.config: "/usr/share/logstash/pipeline/mongodb-syslog-filebeat.conf"
   #queue.type: persisted
 - pipeline.id: customer_pipeline
-  path.config: "${GUC_PIPELINE_CONFIG_PATH:/usr/share/logstash/customer/pipeline/}"
+  path.config: "${GI_PIPELINE_DIR:/usr/share/logstash/customer/pipeline/}"
   queue.type: ${GUC_PERSISTENT_QUEUE_TYPE:memory}
 

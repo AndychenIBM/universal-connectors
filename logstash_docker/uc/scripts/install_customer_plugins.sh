@@ -1,6 +1,12 @@
 #!/bin/bash
 
-CUSTOMER_PLUGINS_DIR=${LOGSTASH_DIR}/customer/config/
+if [ -z "$GI_MODE" ]
+then
+    CUSTOMER_PLUGINS_DIR=${LOGSTASH_DIR}/customer/config/
+else
+    CUSTOMER_PLUGINS_DIR=${GI_PLUGINS_DIR}
+fi
+
 for file in "${CUSTOMER_PLUGINS_DIR}"/*.zip; do
   [ -e "$file" ] || continue
   echo "preparing to install ${file##*/}"
