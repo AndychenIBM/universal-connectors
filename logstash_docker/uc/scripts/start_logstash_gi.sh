@@ -4,7 +4,13 @@ source ${UC_SCRIPTS}/set_uc_log_level.sh
 
 logstash_pid=$(/usr/share/logstash/scripts/get_logstash_pid.sh)
 if [[ -z "$logstash_pid" ]]; then
-	${UC_SCRIPTS}/install_customer_plugins.sh
+  # Aggregate env vars
+    export GI_PIPELINE_DIR="${GUC_PIPELINE_CONFIG_PATH}/${INPUT_PLUGIN_ID}/pipeline/"
+    echo "Setting GI_PIPELINE_DIR to: ${GI_PIPELINE_DIR}"
+    export GI_PLUGINS_DIR="${GUC_PIPELINE_CONFIG_PATH}/${INPUT_PLUGIN_ID}/config/"
+    echo "Setting GI_PLUGINS_DIR to: ${GI_PLUGINS_DIR}"
+
+	  ${UC_SCRIPTS}/install_customer_plugins.sh
 
     setUcLogLevel "$UC_LOG_LEVEL"
 
