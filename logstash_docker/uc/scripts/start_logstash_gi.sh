@@ -15,12 +15,10 @@ if [[ -z "$logstash_pid" ]]; then
     setUcLogLevel "$UC_LOG_LEVEL"
 
     # TODO: change output plugin to get SniffersConfig.json from env variables
-    rm -rf /usr/share/logstash/config/SniffersConfig.json
     echo "[{\"ip\":\"${MINI_SNIF_HOSTNAME}\", \"port\":\"${MINI_SNIF_PORT}\", \"isSSL\":\"${MINI_SNIF_SSL_ENABLED}\" }]" > ${UC_ETC}/SniffersConfig.json
 
     # Replace pipelines.yml:
-    rm -rf "${UC_ETC}"/pipelines.yml
-    echo "- pipeline.id: customer_pipeline" >> ${UC_ETC}/pipelines.yml
+    echo "- pipeline.id: customer_pipeline" > ${UC_ETC}/pipelines.yml
     echo "  path.config: \"${GI_PIPELINE_DIR}\"" >> ${UC_ETC}/pipelines.yml
     echo "  queue.type: \${GUC_PERSISTENT_QUEUE_TYPE:memory}" >> ${UC_ETC}/pipelines.yml
 
