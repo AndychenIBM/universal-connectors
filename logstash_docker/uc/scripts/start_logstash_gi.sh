@@ -18,12 +18,11 @@ if [[ -z "$logstash_pid" ]]; then
     rm -rf /usr/share/logstash/config/SniffersConfig.json
     echo "[{\"ip\":\"${MINI_SNIF_HOSTNAME}\", \"port\":\"${MINI_SNIF_PORT}\", \"isSSL\":\"${MINI_SNIF_SSL_ENABLED}\" }]" > ${UC_ETC}/SniffersConfig.json
 
-    # Remove 3 first lines (default on-prem pipeline) from pipelines.yml
-    sed -i -e 1,3d ${UC_ETC}/pipelines.yml
-
-    # Aggregate env vars
-    export GI_PIPELINE_DIR="${GUC_PIPELINE_CONFIG_PATH}/${TENANT_ID}/${CLUSTER_ID}/pipeline/"
-    export GI_PLUGINS_DIR="${GUC_PIPELINE_CONFIG_PATH}/${TENANT_ID}/${CLUSTER_ID}/config/"
+    # Replace pipelines.yml:
+    rm -rf "${UC_ETC}"/pipelines.yml
+    echo "- pipeline.id: customer_pipeline" >> ${UC_ETC}/pipelines.yml
+    echo "  path.config: \"${GI_PIPELINE_DIR}\"" >> ${UC_ETC}/pipelines.yml
+    echo "  queue.type: \${GUC_PERSISTENT_QUEUE_TYPE:memory}" >> ${UC_ETC}/pipelines.yml
 
     # Start logstash
     logstash --config.reload.automatic -l ${LOG_GUC_DIR} 2>&1 | tee -a ${LOG_GUC_DIR}/logstash_stdout_stderr.log
