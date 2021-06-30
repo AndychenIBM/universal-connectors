@@ -36,8 +36,8 @@ ENV UC_ETC=${LOGSTASH_DIR}/config/ \
 
 COPY uc/. /uc/.
 
-#Install necessary packages
-RUN microdnf install -y tzdata openssl curl ca-certificates procps shadow-utils.x86_64 tar gzip hostname vim cronie logrotate sudo && \
+#Install necessary packages (libaio required for optional Oracle instant client installation)
+RUN microdnf install -y tzdata openssl curl ca-certificates procps shadow-utils.x86_64 tar gzip hostname vim cronie logrotate sudo libaio && \
     microdnf update -y; microdnf clean all && \
 #Change ownership to guc
     groupadd -g 991 guardium && useradd -G guardium -u 1001 guc && \
