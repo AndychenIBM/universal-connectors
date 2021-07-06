@@ -76,7 +76,7 @@ RUN curl https://artifacts.elastic.co/downloads/logstash/logstash-oss-${LOGSTASH
     --add-opens=java.base/javax.crypto=ALL-UNNAMED \
     --add-opens=java.management/sun.management=ALL-UNNAMED" >>${UC_ETC}/jvm.options && \
 #Install plugins FIXME: enter output_to_guardium plugin to the default offline-package
-    ${LOGSTASH_DIR}/bin/logstash-plugin install ${UC_ETC}/logstash-output-java_output_to_guardium-1.3.3.gem && \
+    ${LOGSTASH_DIR}/bin/logstash-plugin install ${UC_ETC}/logstash-output-java_output_to_guardium-1.3.4.gem && \
     ${LOGSTASH_DIR}/bin/logstash-plugin install file:///${UC_ETC}/guardium_logstash-offline-pluginsWToutput.zip && \
 #Make sure user can read,write and execute the scripts
     chmod 755 ${UC_SCRIPTS}/*.sh && \

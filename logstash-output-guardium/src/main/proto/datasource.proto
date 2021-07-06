@@ -1,10 +1,9 @@
+// -*- mode: protobuf; indent-tabs-mode: t;  -*-
 syntax = "proto2";
+
 package guard.datasource;
 
-//option java_package = "com.ibm.guardium.datasource";
-//option java_package = "com.guardium.proto.datasource";
 option java_package = "com.ibm.guardium.proto.datasource";
-
 
 // Time stamp, with optionl milisecs and time zone info.
 // Example:
@@ -81,6 +80,7 @@ message Application_data {
         TRD          = 0x00004000 ;
         HADOOP       = 0x00008000 ;
         PGRS         = 0x00080000 ;
+        NZ           = 0x00100000 ;
         MSSP         = 0x00400000 ;
         OPTIM_AUDIT  = 0x00800000 ;
         OPTIM_REDACT = 0x00000800 ;
@@ -90,6 +90,7 @@ message Application_data {
         ASTER        = 0x00000078 ;
         GPLUM        = 0x00000088 ;
         COUCH        = 0x00000098 ;
+        SAP_HANA     = 0x000000a8 ;
         MARIADB      = 0x000000b8 ;
         FSM          = 0x000000c8 ;
         MAGEN        = 0x000000d8 ;
@@ -100,6 +101,9 @@ message Application_data {
         MEMSQL       = 0x00000178 ;
         MYSQL_X      = 0x00000188 ;
         COUCHB       = 0x00000198 ;
+        REDIS        = 0x000001d8 ;
+        COCKROACH    = 0x00000438 ;
+        SNOWFLAKE    = 0x00000448 ;
     }
 
     enum Datasource_type {
@@ -132,6 +136,10 @@ message HTTP_reply {
     optional string redirect = 5; // from Location: header
     optional string set_cookie = 6;
     optional bytes body = 7;
+}
+
+message TenantID {
+    required string tenant_id = 1; // Tenant ID for this agent
 }
 
 // Tell the server we're here - ready to send events to the server.
@@ -324,6 +332,11 @@ message Client_request {
     optional string extra_info = 8;
     optional int64 return_code = 9;
     optional uint32 rule_position = 10;  //for FAM stap to send the triggered rule_position for the request_id.
+    // 3 fields below carry access and session info for FAM, so that if fam sessions were interrupted by an incident
+    // e.g snif restart, snif would still get these info
+    optional string uid_chain = 11;
+    optional string db_name = 12;
+    optional Accessor accessor = 13;
 };
 
 
@@ -807,7 +820,6 @@ message FAM_NAS_rule
 }
 
 
-
 message FSM_AlertFileOpen
 {
     required uint32 id = 1; // this is the id to identify the protobuf messages
@@ -984,6 +996,7 @@ message Guard_ds_message {
         FAM_RULES = 26;
         FAM_SHAREPOINT_RULES = 27;
         FAM_NAS_RULES = 28;
+        TENANT_ID = 29;
     }
 
 
@@ -1023,6 +1036,7 @@ message Guard_ds_message {
     optional FAM_rules fam_rules = 31;
     optional FAM_SHAREPOINT_rules fam_sharepoint_rules = 32;
     optional FAM_NAS_rules fam_nas_rules = 33;
+    optional TenantID tenant_id = 34;
 }
 
 

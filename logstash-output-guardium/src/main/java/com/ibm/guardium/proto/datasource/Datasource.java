@@ -2620,81 +2620,101 @@ public final class Datasource {
        */
       PGRS(9, 524288),
       /**
+       * <code>NZ = 1048576;</code>
+       */
+      NZ(10, 1048576),
+      /**
        * <code>MSSP = 4194304;</code>
        */
-      MSSP(10, 4194304),
+      MSSP(11, 4194304),
       /**
        * <code>OPTIM_AUDIT = 8388608;</code>
        */
-      OPTIM_AUDIT(11, 8388608),
+      OPTIM_AUDIT(12, 8388608),
       /**
        * <code>OPTIM_REDACT = 2048;</code>
        */
-      OPTIM_REDACT(12, 2048),
+      OPTIM_REDACT(13, 2048),
       /**
        * <code>BIG_INSIGHTS = 16777216;</code>
        */
-      BIG_INSIGHTS(13, 16777216),
+      BIG_INSIGHTS(14, 16777216),
       /**
        * <code>MONGO = 40;</code>
        */
-      MONGO(14, 40),
+      MONGO(15, 40),
       /**
        * <code>CASS = 88;</code>
        */
-      CASS(15, 88),
+      CASS(16, 88),
       /**
        * <code>ASTER = 120;</code>
        */
-      ASTER(16, 120),
+      ASTER(17, 120),
       /**
        * <code>GPLUM = 136;</code>
        */
-      GPLUM(17, 136),
+      GPLUM(18, 136),
       /**
        * <code>COUCH = 152;</code>
        */
-      COUCH(18, 152),
+      COUCH(19, 152),
+      /**
+       * <code>SAP_HANA = 168;</code>
+       */
+      SAP_HANA(20, 168),
       /**
        * <code>MARIADB = 184;</code>
        */
-      MARIADB(19, 184),
+      MARIADB(21, 184),
       /**
        * <code>FSM = 200;</code>
        */
-      FSM(20, 200),
+      FSM(22, 200),
       /**
        * <code>MAGEN = 216;</code>
        */
-      MAGEN(21, 216),
+      MAGEN(23, 216),
       /**
        * <code>HIVE = 232;</code>
        */
-      HIVE(22, 232),
+      HIVE(24, 232),
       /**
        * <code>ACCUMULO = 248;</code>
        */
-      ACCUMULO(23, 248),
+      ACCUMULO(25, 248),
       /**
        * <code>IMPALA = 280;</code>
        */
-      IMPALA(24, 280),
+      IMPALA(26, 280),
       /**
        * <code>VRTC = 360;</code>
        */
-      VRTC(25, 360),
+      VRTC(27, 360),
       /**
        * <code>MEMSQL = 376;</code>
        */
-      MEMSQL(26, 376),
+      MEMSQL(28, 376),
       /**
        * <code>MYSQL_X = 392;</code>
        */
-      MYSQL_X(27, 392),
+      MYSQL_X(29, 392),
       /**
        * <code>COUCHB = 408;</code>
        */
-      COUCHB(28, 408),
+      COUCHB(30, 408),
+      /**
+       * <code>REDIS = 472;</code>
+       */
+      REDIS(31, 472),
+      /**
+       * <code>COCKROACH = 1080;</code>
+       */
+      COCKROACH(32, 1080),
+      /**
+       * <code>SNOWFLAKE = 1096;</code>
+       */
+      SNOWFLAKE(33, 1096),
       ;
 
       /**
@@ -2738,6 +2758,10 @@ public final class Datasource {
        */
       public static final int PGRS_VALUE = 524288;
       /**
+       * <code>NZ = 1048576;</code>
+       */
+      public static final int NZ_VALUE = 1048576;
+      /**
        * <code>MSSP = 4194304;</code>
        */
       public static final int MSSP_VALUE = 4194304;
@@ -2773,6 +2797,10 @@ public final class Datasource {
        * <code>COUCH = 152;</code>
        */
       public static final int COUCH_VALUE = 152;
+      /**
+       * <code>SAP_HANA = 168;</code>
+       */
+      public static final int SAP_HANA_VALUE = 168;
       /**
        * <code>MARIADB = 184;</code>
        */
@@ -2813,6 +2841,18 @@ public final class Datasource {
        * <code>COUCHB = 408;</code>
        */
       public static final int COUCHB_VALUE = 408;
+      /**
+       * <code>REDIS = 472;</code>
+       */
+      public static final int REDIS_VALUE = 472;
+      /**
+       * <code>COCKROACH = 1080;</code>
+       */
+      public static final int COCKROACH_VALUE = 1080;
+      /**
+       * <code>SNOWFLAKE = 1096;</code>
+       */
+      public static final int SNOWFLAKE_VALUE = 1096;
 
 
       public final int getNumber() { return value; }
@@ -2829,6 +2869,7 @@ public final class Datasource {
           case 16384: return TRD;
           case 32768: return HADOOP;
           case 524288: return PGRS;
+          case 1048576: return NZ;
           case 4194304: return MSSP;
           case 8388608: return OPTIM_AUDIT;
           case 2048: return OPTIM_REDACT;
@@ -2838,6 +2879,7 @@ public final class Datasource {
           case 120: return ASTER;
           case 136: return GPLUM;
           case 152: return COUCH;
+          case 168: return SAP_HANA;
           case 184: return MARIADB;
           case 200: return FSM;
           case 216: return MAGEN;
@@ -2848,6 +2890,9 @@ public final class Datasource {
           case 376: return MEMSQL;
           case 392: return MYSQL_X;
           case 408: return COUCHB;
+          case 472: return REDIS;
+          case 1080: return COCKROACH;
+          case 1096: return SNOWFLAKE;
           default: return null;
         }
       }
@@ -7058,6 +7103,533 @@ public final class Datasource {
     }
 
     // @@protoc_insertion_point(class_scope:guard.datasource.HTTP_reply)
+  }
+
+  public interface TenantIDOrBuilder
+      extends com.google.protobuf.MessageOrBuilder {
+
+    // required string tenant_id = 1;
+    /**
+     * <code>required string tenant_id = 1;</code>
+     *
+     * <pre>
+     * Tenant ID for this agent
+     * </pre>
+     */
+    boolean hasTenantId();
+    /**
+     * <code>required string tenant_id = 1;</code>
+     *
+     * <pre>
+     * Tenant ID for this agent
+     * </pre>
+     */
+    java.lang.String getTenantId();
+    /**
+     * <code>required string tenant_id = 1;</code>
+     *
+     * <pre>
+     * Tenant ID for this agent
+     * </pre>
+     */
+    com.google.protobuf.ByteString
+        getTenantIdBytes();
+  }
+  /**
+   * Protobuf type {@code guard.datasource.TenantID}
+   */
+  public static final class TenantID extends
+      com.google.protobuf.GeneratedMessage
+      implements TenantIDOrBuilder {
+    // Use TenantID.newBuilder() to construct.
+    private TenantID(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+      this.unknownFields = builder.getUnknownFields();
+    }
+    private TenantID(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private static final TenantID defaultInstance;
+    public static TenantID getDefaultInstance() {
+      return defaultInstance;
+    }
+
+    public TenantID getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+      return this.unknownFields;
+    }
+    private TenantID(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 10: {
+              bitField0_ |= 0x00000001;
+              tenantId_ = input.readBytes();
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return com.ibm.guardium.proto.datasource.Datasource.internal_static_guard_datasource_TenantID_descriptor;
+    }
+
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return com.ibm.guardium.proto.datasource.Datasource.internal_static_guard_datasource_TenantID_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              com.ibm.guardium.proto.datasource.Datasource.TenantID.class, com.ibm.guardium.proto.datasource.Datasource.TenantID.Builder.class);
+    }
+
+    public static com.google.protobuf.Parser<TenantID> PARSER =
+        new com.google.protobuf.AbstractParser<TenantID>() {
+      public TenantID parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new TenantID(input, extensionRegistry);
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<TenantID> getParserForType() {
+      return PARSER;
+    }
+
+    private int bitField0_;
+    // required string tenant_id = 1;
+    public static final int TENANT_ID_FIELD_NUMBER = 1;
+    private java.lang.Object tenantId_;
+    /**
+     * <code>required string tenant_id = 1;</code>
+     *
+     * <pre>
+     * Tenant ID for this agent
+     * </pre>
+     */
+    public boolean hasTenantId() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
+    }
+    /**
+     * <code>required string tenant_id = 1;</code>
+     *
+     * <pre>
+     * Tenant ID for this agent
+     * </pre>
+     */
+    public java.lang.String getTenantId() {
+      java.lang.Object ref = tenantId_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          tenantId_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>required string tenant_id = 1;</code>
+     *
+     * <pre>
+     * Tenant ID for this agent
+     * </pre>
+     */
+    public com.google.protobuf.ByteString
+        getTenantIdBytes() {
+      java.lang.Object ref = tenantId_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        tenantId_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    private void initFields() {
+      tenantId_ = "";
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized != -1) return isInitialized == 1;
+
+      if (!hasTenantId()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        output.writeBytes(1, getTenantIdBytes());
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(1, getTenantIdBytes());
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+
+    public static com.ibm.guardium.proto.datasource.Datasource.TenantID parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static com.ibm.guardium.proto.datasource.Datasource.TenantID parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static com.ibm.guardium.proto.datasource.Datasource.TenantID parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static com.ibm.guardium.proto.datasource.Datasource.TenantID parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static com.ibm.guardium.proto.datasource.Datasource.TenantID parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static com.ibm.guardium.proto.datasource.Datasource.TenantID parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+    public static com.ibm.guardium.proto.datasource.Datasource.TenantID parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input);
+    }
+    public static com.ibm.guardium.proto.datasource.Datasource.TenantID parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+    }
+    public static com.ibm.guardium.proto.datasource.Datasource.TenantID parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static com.ibm.guardium.proto.datasource.Datasource.TenantID parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(com.ibm.guardium.proto.datasource.Datasource.TenantID prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code guard.datasource.TenantID}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder>
+       implements com.ibm.guardium.proto.datasource.Datasource.TenantIDOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return com.ibm.guardium.proto.datasource.Datasource.internal_static_guard_datasource_TenantID_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return com.ibm.guardium.proto.datasource.Datasource.internal_static_guard_datasource_TenantID_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                com.ibm.guardium.proto.datasource.Datasource.TenantID.class, com.ibm.guardium.proto.datasource.Datasource.TenantID.Builder.class);
+      }
+
+      // Construct using com.ibm.guardium.proto.datasource.Datasource.TenantID.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        }
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+
+      public Builder clear() {
+        super.clear();
+        tenantId_ = "";
+        bitField0_ = (bitField0_ & ~0x00000001);
+        return this;
+      }
+
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return com.ibm.guardium.proto.datasource.Datasource.internal_static_guard_datasource_TenantID_descriptor;
+      }
+
+      public com.ibm.guardium.proto.datasource.Datasource.TenantID getDefaultInstanceForType() {
+        return com.ibm.guardium.proto.datasource.Datasource.TenantID.getDefaultInstance();
+      }
+
+      public com.ibm.guardium.proto.datasource.Datasource.TenantID build() {
+        com.ibm.guardium.proto.datasource.Datasource.TenantID result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public com.ibm.guardium.proto.datasource.Datasource.TenantID buildPartial() {
+        com.ibm.guardium.proto.datasource.Datasource.TenantID result = new com.ibm.guardium.proto.datasource.Datasource.TenantID(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+          to_bitField0_ |= 0x00000001;
+        }
+        result.tenantId_ = tenantId_;
+        result.bitField0_ = to_bitField0_;
+        onBuilt();
+        return result;
+      }
+
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof com.ibm.guardium.proto.datasource.Datasource.TenantID) {
+          return mergeFrom((com.ibm.guardium.proto.datasource.Datasource.TenantID)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(com.ibm.guardium.proto.datasource.Datasource.TenantID other) {
+        if (other == com.ibm.guardium.proto.datasource.Datasource.TenantID.getDefaultInstance()) return this;
+        if (other.hasTenantId()) {
+          bitField0_ |= 0x00000001;
+          tenantId_ = other.tenantId_;
+          onChanged();
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        if (!hasTenantId()) {
+          
+          return false;
+        }
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        com.ibm.guardium.proto.datasource.Datasource.TenantID parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (com.ibm.guardium.proto.datasource.Datasource.TenantID) e.getUnfinishedMessage();
+          throw e;
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int bitField0_;
+
+      // required string tenant_id = 1;
+      private java.lang.Object tenantId_ = "";
+      /**
+       * <code>required string tenant_id = 1;</code>
+       *
+       * <pre>
+       * Tenant ID for this agent
+       * </pre>
+       */
+      public boolean hasTenantId() {
+        return ((bitField0_ & 0x00000001) == 0x00000001);
+      }
+      /**
+       * <code>required string tenant_id = 1;</code>
+       *
+       * <pre>
+       * Tenant ID for this agent
+       * </pre>
+       */
+      public java.lang.String getTenantId() {
+        java.lang.Object ref = tenantId_;
+        if (!(ref instanceof java.lang.String)) {
+          java.lang.String s = ((com.google.protobuf.ByteString) ref)
+              .toStringUtf8();
+          tenantId_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>required string tenant_id = 1;</code>
+       *
+       * <pre>
+       * Tenant ID for this agent
+       * </pre>
+       */
+      public com.google.protobuf.ByteString
+          getTenantIdBytes() {
+        java.lang.Object ref = tenantId_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          tenantId_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>required string tenant_id = 1;</code>
+       *
+       * <pre>
+       * Tenant ID for this agent
+       * </pre>
+       */
+      public Builder setTenantId(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000001;
+        tenantId_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>required string tenant_id = 1;</code>
+       *
+       * <pre>
+       * Tenant ID for this agent
+       * </pre>
+       */
+      public Builder clearTenantId() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        tenantId_ = getDefaultInstance().getTenantId();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>required string tenant_id = 1;</code>
+       *
+       * <pre>
+       * Tenant ID for this agent
+       * </pre>
+       */
+      public Builder setTenantIdBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000001;
+        tenantId_ = value;
+        onChanged();
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:guard.datasource.TenantID)
+    }
+
+    static {
+      defaultInstance = new TenantID(true);
+      defaultInstance.initFields();
+    }
+
+    // @@protoc_insertion_point(class_scope:guard.datasource.TenantID)
   }
 
   public interface HandshakeOrBuilder
@@ -20037,6 +20609,65 @@ public final class Datasource {
      * </pre>
      */
     int getRulePosition();
+
+    // optional string uid_chain = 11;
+    /**
+     * <code>optional string uid_chain = 11;</code>
+     *
+     * <pre>
+     * 3 fields below carry access and session info for FAM, so that if fam sessions were interrupted by an incident
+     * e.g snif restart, snif would still get these info
+     * </pre>
+     */
+    boolean hasUidChain();
+    /**
+     * <code>optional string uid_chain = 11;</code>
+     *
+     * <pre>
+     * 3 fields below carry access and session info for FAM, so that if fam sessions were interrupted by an incident
+     * e.g snif restart, snif would still get these info
+     * </pre>
+     */
+    java.lang.String getUidChain();
+    /**
+     * <code>optional string uid_chain = 11;</code>
+     *
+     * <pre>
+     * 3 fields below carry access and session info for FAM, so that if fam sessions were interrupted by an incident
+     * e.g snif restart, snif would still get these info
+     * </pre>
+     */
+    com.google.protobuf.ByteString
+        getUidChainBytes();
+
+    // optional string db_name = 12;
+    /**
+     * <code>optional string db_name = 12;</code>
+     */
+    boolean hasDbName();
+    /**
+     * <code>optional string db_name = 12;</code>
+     */
+    java.lang.String getDbName();
+    /**
+     * <code>optional string db_name = 12;</code>
+     */
+    com.google.protobuf.ByteString
+        getDbNameBytes();
+
+    // optional .guard.datasource.Accessor accessor = 13;
+    /**
+     * <code>optional .guard.datasource.Accessor accessor = 13;</code>
+     */
+    boolean hasAccessor();
+    /**
+     * <code>optional .guard.datasource.Accessor accessor = 13;</code>
+     */
+    com.ibm.guardium.proto.datasource.Datasource.Accessor getAccessor();
+    /**
+     * <code>optional .guard.datasource.Accessor accessor = 13;</code>
+     */
+    com.ibm.guardium.proto.datasource.Datasource.AccessorOrBuilder getAccessorOrBuilder();
   }
   /**
    * Protobuf type {@code guard.datasource.Client_request}
@@ -20163,6 +20794,29 @@ public final class Datasource {
             case 80: {
               bitField0_ |= 0x00000200;
               rulePosition_ = input.readUInt32();
+              break;
+            }
+            case 90: {
+              bitField0_ |= 0x00000400;
+              uidChain_ = input.readBytes();
+              break;
+            }
+            case 98: {
+              bitField0_ |= 0x00000800;
+              dbName_ = input.readBytes();
+              break;
+            }
+            case 106: {
+              com.ibm.guardium.proto.datasource.Datasource.Accessor.Builder subBuilder = null;
+              if (((bitField0_ & 0x00001000) == 0x00001000)) {
+                subBuilder = accessor_.toBuilder();
+              }
+              accessor_ = input.readMessage(com.ibm.guardium.proto.datasource.Datasource.Accessor.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(accessor_);
+                accessor_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x00001000;
               break;
             }
           }
@@ -20956,6 +21610,129 @@ public final class Datasource {
       return rulePosition_;
     }
 
+    // optional string uid_chain = 11;
+    public static final int UID_CHAIN_FIELD_NUMBER = 11;
+    private java.lang.Object uidChain_;
+    /**
+     * <code>optional string uid_chain = 11;</code>
+     *
+     * <pre>
+     * 3 fields below carry access and session info for FAM, so that if fam sessions were interrupted by an incident
+     * e.g snif restart, snif would still get these info
+     * </pre>
+     */
+    public boolean hasUidChain() {
+      return ((bitField0_ & 0x00000400) == 0x00000400);
+    }
+    /**
+     * <code>optional string uid_chain = 11;</code>
+     *
+     * <pre>
+     * 3 fields below carry access and session info for FAM, so that if fam sessions were interrupted by an incident
+     * e.g snif restart, snif would still get these info
+     * </pre>
+     */
+    public java.lang.String getUidChain() {
+      java.lang.Object ref = uidChain_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          uidChain_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string uid_chain = 11;</code>
+     *
+     * <pre>
+     * 3 fields below carry access and session info for FAM, so that if fam sessions were interrupted by an incident
+     * e.g snif restart, snif would still get these info
+     * </pre>
+     */
+    public com.google.protobuf.ByteString
+        getUidChainBytes() {
+      java.lang.Object ref = uidChain_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        uidChain_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    // optional string db_name = 12;
+    public static final int DB_NAME_FIELD_NUMBER = 12;
+    private java.lang.Object dbName_;
+    /**
+     * <code>optional string db_name = 12;</code>
+     */
+    public boolean hasDbName() {
+      return ((bitField0_ & 0x00000800) == 0x00000800);
+    }
+    /**
+     * <code>optional string db_name = 12;</code>
+     */
+    public java.lang.String getDbName() {
+      java.lang.Object ref = dbName_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          dbName_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string db_name = 12;</code>
+     */
+    public com.google.protobuf.ByteString
+        getDbNameBytes() {
+      java.lang.Object ref = dbName_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        dbName_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    // optional .guard.datasource.Accessor accessor = 13;
+    public static final int ACCESSOR_FIELD_NUMBER = 13;
+    private com.ibm.guardium.proto.datasource.Datasource.Accessor accessor_;
+    /**
+     * <code>optional .guard.datasource.Accessor accessor = 13;</code>
+     */
+    public boolean hasAccessor() {
+      return ((bitField0_ & 0x00001000) == 0x00001000);
+    }
+    /**
+     * <code>optional .guard.datasource.Accessor accessor = 13;</code>
+     */
+    public com.ibm.guardium.proto.datasource.Datasource.Accessor getAccessor() {
+      return accessor_;
+    }
+    /**
+     * <code>optional .guard.datasource.Accessor accessor = 13;</code>
+     */
+    public com.ibm.guardium.proto.datasource.Datasource.AccessorOrBuilder getAccessorOrBuilder() {
+      return accessor_;
+    }
+
     private void initFields() {
       sessionId_ = 0L;
       requestId_ = 0L;
@@ -20967,6 +21744,9 @@ public final class Datasource {
       extraInfo_ = "";
       returnCode_ = 0L;
       rulePosition_ = 0;
+      uidChain_ = "";
+      dbName_ = "";
+      accessor_ = com.ibm.guardium.proto.datasource.Datasource.Accessor.getDefaultInstance();
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -20984,6 +21764,12 @@ public final class Datasource {
       if (!getData().isInitialized()) {
         memoizedIsInitialized = 0;
         return false;
+      }
+      if (hasAccessor()) {
+        if (!getAccessor().isInitialized()) {
+          memoizedIsInitialized = 0;
+          return false;
+        }
       }
       memoizedIsInitialized = 1;
       return true;
@@ -21021,6 +21807,15 @@ public final class Datasource {
       }
       if (((bitField0_ & 0x00000200) == 0x00000200)) {
         output.writeUInt32(10, rulePosition_);
+      }
+      if (((bitField0_ & 0x00000400) == 0x00000400)) {
+        output.writeBytes(11, getUidChainBytes());
+      }
+      if (((bitField0_ & 0x00000800) == 0x00000800)) {
+        output.writeBytes(12, getDbNameBytes());
+      }
+      if (((bitField0_ & 0x00001000) == 0x00001000)) {
+        output.writeMessage(13, accessor_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -21070,6 +21865,18 @@ public final class Datasource {
       if (((bitField0_ & 0x00000200) == 0x00000200)) {
         size += com.google.protobuf.CodedOutputStream
           .computeUInt32Size(10, rulePosition_);
+      }
+      if (((bitField0_ & 0x00000400) == 0x00000400)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(11, getUidChainBytes());
+      }
+      if (((bitField0_ & 0x00000800) == 0x00000800)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(12, getDbNameBytes());
+      }
+      if (((bitField0_ & 0x00001000) == 0x00001000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(13, accessor_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -21185,6 +21992,7 @@ public final class Datasource {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
           getDataFieldBuilder();
           getBindInfoFieldBuilder();
+          getAccessorFieldBuilder();
         }
       }
       private static Builder create() {
@@ -21221,6 +22029,16 @@ public final class Datasource {
         bitField0_ = (bitField0_ & ~0x00000100);
         rulePosition_ = 0;
         bitField0_ = (bitField0_ & ~0x00000200);
+        uidChain_ = "";
+        bitField0_ = (bitField0_ & ~0x00000400);
+        dbName_ = "";
+        bitField0_ = (bitField0_ & ~0x00000800);
+        if (accessorBuilder_ == null) {
+          accessor_ = com.ibm.guardium.proto.datasource.Datasource.Accessor.getDefaultInstance();
+        } else {
+          accessorBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00001000);
         return this;
       }
 
@@ -21297,6 +22115,22 @@ public final class Datasource {
           to_bitField0_ |= 0x00000200;
         }
         result.rulePosition_ = rulePosition_;
+        if (((from_bitField0_ & 0x00000400) == 0x00000400)) {
+          to_bitField0_ |= 0x00000400;
+        }
+        result.uidChain_ = uidChain_;
+        if (((from_bitField0_ & 0x00000800) == 0x00000800)) {
+          to_bitField0_ |= 0x00000800;
+        }
+        result.dbName_ = dbName_;
+        if (((from_bitField0_ & 0x00001000) == 0x00001000)) {
+          to_bitField0_ |= 0x00001000;
+        }
+        if (accessorBuilder_ == null) {
+          result.accessor_ = accessor_;
+        } else {
+          result.accessor_ = accessorBuilder_.build();
+        }
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -21345,6 +22179,19 @@ public final class Datasource {
         if (other.hasRulePosition()) {
           setRulePosition(other.getRulePosition());
         }
+        if (other.hasUidChain()) {
+          bitField0_ |= 0x00000400;
+          uidChain_ = other.uidChain_;
+          onChanged();
+        }
+        if (other.hasDbName()) {
+          bitField0_ |= 0x00000800;
+          dbName_ = other.dbName_;
+          onChanged();
+        }
+        if (other.hasAccessor()) {
+          mergeAccessor(other.getAccessor());
+        }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
       }
@@ -21361,6 +22208,12 @@ public final class Datasource {
         if (!getData().isInitialized()) {
           
           return false;
+        }
+        if (hasAccessor()) {
+          if (!getAccessor().isInitialized()) {
+            
+            return false;
+          }
         }
         return true;
       }
@@ -21988,6 +22841,301 @@ public final class Datasource {
         rulePosition_ = 0;
         onChanged();
         return this;
+      }
+
+      // optional string uid_chain = 11;
+      private java.lang.Object uidChain_ = "";
+      /**
+       * <code>optional string uid_chain = 11;</code>
+       *
+       * <pre>
+       * 3 fields below carry access and session info for FAM, so that if fam sessions were interrupted by an incident
+       * e.g snif restart, snif would still get these info
+       * </pre>
+       */
+      public boolean hasUidChain() {
+        return ((bitField0_ & 0x00000400) == 0x00000400);
+      }
+      /**
+       * <code>optional string uid_chain = 11;</code>
+       *
+       * <pre>
+       * 3 fields below carry access and session info for FAM, so that if fam sessions were interrupted by an incident
+       * e.g snif restart, snif would still get these info
+       * </pre>
+       */
+      public java.lang.String getUidChain() {
+        java.lang.Object ref = uidChain_;
+        if (!(ref instanceof java.lang.String)) {
+          java.lang.String s = ((com.google.protobuf.ByteString) ref)
+              .toStringUtf8();
+          uidChain_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string uid_chain = 11;</code>
+       *
+       * <pre>
+       * 3 fields below carry access and session info for FAM, so that if fam sessions were interrupted by an incident
+       * e.g snif restart, snif would still get these info
+       * </pre>
+       */
+      public com.google.protobuf.ByteString
+          getUidChainBytes() {
+        java.lang.Object ref = uidChain_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          uidChain_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string uid_chain = 11;</code>
+       *
+       * <pre>
+       * 3 fields below carry access and session info for FAM, so that if fam sessions were interrupted by an incident
+       * e.g snif restart, snif would still get these info
+       * </pre>
+       */
+      public Builder setUidChain(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000400;
+        uidChain_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string uid_chain = 11;</code>
+       *
+       * <pre>
+       * 3 fields below carry access and session info for FAM, so that if fam sessions were interrupted by an incident
+       * e.g snif restart, snif would still get these info
+       * </pre>
+       */
+      public Builder clearUidChain() {
+        bitField0_ = (bitField0_ & ~0x00000400);
+        uidChain_ = getDefaultInstance().getUidChain();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string uid_chain = 11;</code>
+       *
+       * <pre>
+       * 3 fields below carry access and session info for FAM, so that if fam sessions were interrupted by an incident
+       * e.g snif restart, snif would still get these info
+       * </pre>
+       */
+      public Builder setUidChainBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000400;
+        uidChain_ = value;
+        onChanged();
+        return this;
+      }
+
+      // optional string db_name = 12;
+      private java.lang.Object dbName_ = "";
+      /**
+       * <code>optional string db_name = 12;</code>
+       */
+      public boolean hasDbName() {
+        return ((bitField0_ & 0x00000800) == 0x00000800);
+      }
+      /**
+       * <code>optional string db_name = 12;</code>
+       */
+      public java.lang.String getDbName() {
+        java.lang.Object ref = dbName_;
+        if (!(ref instanceof java.lang.String)) {
+          java.lang.String s = ((com.google.protobuf.ByteString) ref)
+              .toStringUtf8();
+          dbName_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string db_name = 12;</code>
+       */
+      public com.google.protobuf.ByteString
+          getDbNameBytes() {
+        java.lang.Object ref = dbName_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          dbName_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string db_name = 12;</code>
+       */
+      public Builder setDbName(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000800;
+        dbName_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string db_name = 12;</code>
+       */
+      public Builder clearDbName() {
+        bitField0_ = (bitField0_ & ~0x00000800);
+        dbName_ = getDefaultInstance().getDbName();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string db_name = 12;</code>
+       */
+      public Builder setDbNameBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000800;
+        dbName_ = value;
+        onChanged();
+        return this;
+      }
+
+      // optional .guard.datasource.Accessor accessor = 13;
+      private com.ibm.guardium.proto.datasource.Datasource.Accessor accessor_ = com.ibm.guardium.proto.datasource.Datasource.Accessor.getDefaultInstance();
+      private com.google.protobuf.SingleFieldBuilder<
+          com.ibm.guardium.proto.datasource.Datasource.Accessor, com.ibm.guardium.proto.datasource.Datasource.Accessor.Builder, com.ibm.guardium.proto.datasource.Datasource.AccessorOrBuilder> accessorBuilder_;
+      /**
+       * <code>optional .guard.datasource.Accessor accessor = 13;</code>
+       */
+      public boolean hasAccessor() {
+        return ((bitField0_ & 0x00001000) == 0x00001000);
+      }
+      /**
+       * <code>optional .guard.datasource.Accessor accessor = 13;</code>
+       */
+      public com.ibm.guardium.proto.datasource.Datasource.Accessor getAccessor() {
+        if (accessorBuilder_ == null) {
+          return accessor_;
+        } else {
+          return accessorBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>optional .guard.datasource.Accessor accessor = 13;</code>
+       */
+      public Builder setAccessor(com.ibm.guardium.proto.datasource.Datasource.Accessor value) {
+        if (accessorBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          accessor_ = value;
+          onChanged();
+        } else {
+          accessorBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00001000;
+        return this;
+      }
+      /**
+       * <code>optional .guard.datasource.Accessor accessor = 13;</code>
+       */
+      public Builder setAccessor(
+          com.ibm.guardium.proto.datasource.Datasource.Accessor.Builder builderForValue) {
+        if (accessorBuilder_ == null) {
+          accessor_ = builderForValue.build();
+          onChanged();
+        } else {
+          accessorBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00001000;
+        return this;
+      }
+      /**
+       * <code>optional .guard.datasource.Accessor accessor = 13;</code>
+       */
+      public Builder mergeAccessor(com.ibm.guardium.proto.datasource.Datasource.Accessor value) {
+        if (accessorBuilder_ == null) {
+          if (((bitField0_ & 0x00001000) == 0x00001000) &&
+              accessor_ != com.ibm.guardium.proto.datasource.Datasource.Accessor.getDefaultInstance()) {
+            accessor_ =
+              com.ibm.guardium.proto.datasource.Datasource.Accessor.newBuilder(accessor_).mergeFrom(value).buildPartial();
+          } else {
+            accessor_ = value;
+          }
+          onChanged();
+        } else {
+          accessorBuilder_.mergeFrom(value);
+        }
+        bitField0_ |= 0x00001000;
+        return this;
+      }
+      /**
+       * <code>optional .guard.datasource.Accessor accessor = 13;</code>
+       */
+      public Builder clearAccessor() {
+        if (accessorBuilder_ == null) {
+          accessor_ = com.ibm.guardium.proto.datasource.Datasource.Accessor.getDefaultInstance();
+          onChanged();
+        } else {
+          accessorBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00001000);
+        return this;
+      }
+      /**
+       * <code>optional .guard.datasource.Accessor accessor = 13;</code>
+       */
+      public com.ibm.guardium.proto.datasource.Datasource.Accessor.Builder getAccessorBuilder() {
+        bitField0_ |= 0x00001000;
+        onChanged();
+        return getAccessorFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>optional .guard.datasource.Accessor accessor = 13;</code>
+       */
+      public com.ibm.guardium.proto.datasource.Datasource.AccessorOrBuilder getAccessorOrBuilder() {
+        if (accessorBuilder_ != null) {
+          return accessorBuilder_.getMessageOrBuilder();
+        } else {
+          return accessor_;
+        }
+      }
+      /**
+       * <code>optional .guard.datasource.Accessor accessor = 13;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilder<
+          com.ibm.guardium.proto.datasource.Datasource.Accessor, com.ibm.guardium.proto.datasource.Datasource.Accessor.Builder, com.ibm.guardium.proto.datasource.Datasource.AccessorOrBuilder> 
+          getAccessorFieldBuilder() {
+        if (accessorBuilder_ == null) {
+          accessorBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+              com.ibm.guardium.proto.datasource.Datasource.Accessor, com.ibm.guardium.proto.datasource.Datasource.Accessor.Builder, com.ibm.guardium.proto.datasource.Datasource.AccessorOrBuilder>(
+                  accessor_,
+                  getParentForChildren(),
+                  isClean());
+          accessor_ = null;
+        }
+        return accessorBuilder_;
       }
 
       // @@protoc_insertion_point(builder_scope:guard.datasource.Client_request)
@@ -87722,6 +88870,20 @@ public final class Datasource {
      * <code>optional .guard.datasource.FAM_NAS_rules fam_nas_rules = 33;</code>
      */
     com.ibm.guardium.proto.datasource.Datasource.FAM_NAS_rulesOrBuilder getFamNasRulesOrBuilder();
+
+    // optional .guard.datasource.TenantID tenant_id = 34;
+    /**
+     * <code>optional .guard.datasource.TenantID tenant_id = 34;</code>
+     */
+    boolean hasTenantId();
+    /**
+     * <code>optional .guard.datasource.TenantID tenant_id = 34;</code>
+     */
+    com.ibm.guardium.proto.datasource.Datasource.TenantID getTenantId();
+    /**
+     * <code>optional .guard.datasource.TenantID tenant_id = 34;</code>
+     */
+    com.ibm.guardium.proto.datasource.Datasource.TenantIDOrBuilder getTenantIdOrBuilder();
   }
   /**
    * Protobuf type {@code guard.datasource.Guard_ds_message}
@@ -88151,6 +89313,19 @@ public final class Datasource {
               bitField0_ |= 0x40000000;
               break;
             }
+            case 274: {
+              com.ibm.guardium.proto.datasource.Datasource.TenantID.Builder subBuilder = null;
+              if (((bitField0_ & 0x80000000) == 0x80000000)) {
+                subBuilder = tenantId_.toBuilder();
+              }
+              tenantId_ = input.readMessage(com.ibm.guardium.proto.datasource.Datasource.TenantID.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(tenantId_);
+                tenantId_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x80000000;
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -88307,6 +89482,10 @@ public final class Datasource {
        * <code>FAM_NAS_RULES = 28;</code>
        */
       FAM_NAS_RULES(26, 28),
+      /**
+       * <code>TENANT_ID = 29;</code>
+       */
+      TENANT_ID(27, 29),
       ;
 
       /**
@@ -88421,6 +89600,10 @@ public final class Datasource {
        * <code>FAM_NAS_RULES = 28;</code>
        */
       public static final int FAM_NAS_RULES_VALUE = 28;
+      /**
+       * <code>TENANT_ID = 29;</code>
+       */
+      public static final int TENANT_ID_VALUE = 29;
 
 
       public final int getNumber() { return value; }
@@ -88454,6 +89637,7 @@ public final class Datasource {
           case 26: return FAM_RULES;
           case 27: return FAM_SHAREPOINT_RULES;
           case 28: return FAM_NAS_RULES;
+          case 29: return TENANT_ID;
           default: return null;
         }
       }
@@ -89196,6 +90380,28 @@ public final class Datasource {
       return famNasRules_;
     }
 
+    // optional .guard.datasource.TenantID tenant_id = 34;
+    public static final int TENANT_ID_FIELD_NUMBER = 34;
+    private com.ibm.guardium.proto.datasource.Datasource.TenantID tenantId_;
+    /**
+     * <code>optional .guard.datasource.TenantID tenant_id = 34;</code>
+     */
+    public boolean hasTenantId() {
+      return ((bitField0_ & 0x80000000) == 0x80000000);
+    }
+    /**
+     * <code>optional .guard.datasource.TenantID tenant_id = 34;</code>
+     */
+    public com.ibm.guardium.proto.datasource.Datasource.TenantID getTenantId() {
+      return tenantId_;
+    }
+    /**
+     * <code>optional .guard.datasource.TenantID tenant_id = 34;</code>
+     */
+    public com.ibm.guardium.proto.datasource.Datasource.TenantIDOrBuilder getTenantIdOrBuilder() {
+      return tenantId_;
+    }
+
     private void initFields() {
       type_ = com.ibm.guardium.proto.datasource.Datasource.Guard_ds_message.Type.HANDSHAKE;
       handshake_ = com.ibm.guardium.proto.datasource.Datasource.Handshake.getDefaultInstance();
@@ -89228,6 +90434,7 @@ public final class Datasource {
       famRules_ = com.ibm.guardium.proto.datasource.Datasource.FAM_rules.getDefaultInstance();
       famSharepointRules_ = com.ibm.guardium.proto.datasource.Datasource.FAM_SHAREPOINT_rules.getDefaultInstance();
       famNasRules_ = com.ibm.guardium.proto.datasource.Datasource.FAM_NAS_rules.getDefaultInstance();
+      tenantId_ = com.ibm.guardium.proto.datasource.Datasource.TenantID.getDefaultInstance();
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -89370,6 +90577,12 @@ public final class Datasource {
           return false;
         }
       }
+      if (hasTenantId()) {
+        if (!getTenantId().isInitialized()) {
+          memoizedIsInitialized = 0;
+          return false;
+        }
+      }
       memoizedIsInitialized = 1;
       return true;
     }
@@ -89469,6 +90682,9 @@ public final class Datasource {
       }
       if (((bitField0_ & 0x40000000) == 0x40000000)) {
         output.writeMessage(33, famNasRules_);
+      }
+      if (((bitField0_ & 0x80000000) == 0x80000000)) {
+        output.writeMessage(34, tenantId_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -89602,6 +90818,10 @@ public final class Datasource {
       if (((bitField0_ & 0x40000000) == 0x40000000)) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(33, famNasRules_);
+      }
+      if (((bitField0_ & 0x80000000) == 0x80000000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(34, tenantId_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -89738,6 +90958,7 @@ public final class Datasource {
           getFamRulesFieldBuilder();
           getFamSharepointRulesFieldBuilder();
           getFamNasRulesFieldBuilder();
+          getTenantIdFieldBuilder();
         }
       }
       private static Builder create() {
@@ -89916,6 +91137,12 @@ public final class Datasource {
           famNasRulesBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x40000000);
+        if (tenantIdBuilder_ == null) {
+          tenantId_ = com.ibm.guardium.proto.datasource.Datasource.TenantID.getDefaultInstance();
+        } else {
+          tenantIdBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x80000000);
         return this;
       }
 
@@ -90176,6 +91403,14 @@ public final class Datasource {
         } else {
           result.famNasRules_ = famNasRulesBuilder_.build();
         }
+        if (((from_bitField0_ & 0x80000000) == 0x80000000)) {
+          to_bitField0_ |= 0x80000000;
+        }
+        if (tenantIdBuilder_ == null) {
+          result.tenantId_ = tenantId_;
+        } else {
+          result.tenantId_ = tenantIdBuilder_.build();
+        }
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -90284,6 +91519,9 @@ public final class Datasource {
         }
         if (other.hasFamNasRules()) {
           mergeFamNasRules(other.getFamNasRules());
+        }
+        if (other.hasTenantId()) {
+          mergeTenantId(other.getTenantId());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -90422,6 +91660,12 @@ public final class Datasource {
         }
         if (hasFamNasRules()) {
           if (!getFamNasRules().isInitialized()) {
+            
+            return false;
+          }
+        }
+        if (hasTenantId()) {
+          if (!getTenantId().isInitialized()) {
             
             return false;
           }
@@ -93830,6 +95074,123 @@ public final class Datasource {
         return famNasRulesBuilder_;
       }
 
+      // optional .guard.datasource.TenantID tenant_id = 34;
+      private com.ibm.guardium.proto.datasource.Datasource.TenantID tenantId_ = com.ibm.guardium.proto.datasource.Datasource.TenantID.getDefaultInstance();
+      private com.google.protobuf.SingleFieldBuilder<
+          com.ibm.guardium.proto.datasource.Datasource.TenantID, com.ibm.guardium.proto.datasource.Datasource.TenantID.Builder, com.ibm.guardium.proto.datasource.Datasource.TenantIDOrBuilder> tenantIdBuilder_;
+      /**
+       * <code>optional .guard.datasource.TenantID tenant_id = 34;</code>
+       */
+      public boolean hasTenantId() {
+        return ((bitField0_ & 0x80000000) == 0x80000000);
+      }
+      /**
+       * <code>optional .guard.datasource.TenantID tenant_id = 34;</code>
+       */
+      public com.ibm.guardium.proto.datasource.Datasource.TenantID getTenantId() {
+        if (tenantIdBuilder_ == null) {
+          return tenantId_;
+        } else {
+          return tenantIdBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>optional .guard.datasource.TenantID tenant_id = 34;</code>
+       */
+      public Builder setTenantId(com.ibm.guardium.proto.datasource.Datasource.TenantID value) {
+        if (tenantIdBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          tenantId_ = value;
+          onChanged();
+        } else {
+          tenantIdBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x80000000;
+        return this;
+      }
+      /**
+       * <code>optional .guard.datasource.TenantID tenant_id = 34;</code>
+       */
+      public Builder setTenantId(
+          com.ibm.guardium.proto.datasource.Datasource.TenantID.Builder builderForValue) {
+        if (tenantIdBuilder_ == null) {
+          tenantId_ = builderForValue.build();
+          onChanged();
+        } else {
+          tenantIdBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x80000000;
+        return this;
+      }
+      /**
+       * <code>optional .guard.datasource.TenantID tenant_id = 34;</code>
+       */
+      public Builder mergeTenantId(com.ibm.guardium.proto.datasource.Datasource.TenantID value) {
+        if (tenantIdBuilder_ == null) {
+          if (((bitField0_ & 0x80000000) == 0x80000000) &&
+              tenantId_ != com.ibm.guardium.proto.datasource.Datasource.TenantID.getDefaultInstance()) {
+            tenantId_ =
+              com.ibm.guardium.proto.datasource.Datasource.TenantID.newBuilder(tenantId_).mergeFrom(value).buildPartial();
+          } else {
+            tenantId_ = value;
+          }
+          onChanged();
+        } else {
+          tenantIdBuilder_.mergeFrom(value);
+        }
+        bitField0_ |= 0x80000000;
+        return this;
+      }
+      /**
+       * <code>optional .guard.datasource.TenantID tenant_id = 34;</code>
+       */
+      public Builder clearTenantId() {
+        if (tenantIdBuilder_ == null) {
+          tenantId_ = com.ibm.guardium.proto.datasource.Datasource.TenantID.getDefaultInstance();
+          onChanged();
+        } else {
+          tenantIdBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x80000000);
+        return this;
+      }
+      /**
+       * <code>optional .guard.datasource.TenantID tenant_id = 34;</code>
+       */
+      public com.ibm.guardium.proto.datasource.Datasource.TenantID.Builder getTenantIdBuilder() {
+        bitField0_ |= 0x80000000;
+        onChanged();
+        return getTenantIdFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>optional .guard.datasource.TenantID tenant_id = 34;</code>
+       */
+      public com.ibm.guardium.proto.datasource.Datasource.TenantIDOrBuilder getTenantIdOrBuilder() {
+        if (tenantIdBuilder_ != null) {
+          return tenantIdBuilder_.getMessageOrBuilder();
+        } else {
+          return tenantId_;
+        }
+      }
+      /**
+       * <code>optional .guard.datasource.TenantID tenant_id = 34;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilder<
+          com.ibm.guardium.proto.datasource.Datasource.TenantID, com.ibm.guardium.proto.datasource.Datasource.TenantID.Builder, com.ibm.guardium.proto.datasource.Datasource.TenantIDOrBuilder> 
+          getTenantIdFieldBuilder() {
+        if (tenantIdBuilder_ == null) {
+          tenantIdBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+              com.ibm.guardium.proto.datasource.Datasource.TenantID, com.ibm.guardium.proto.datasource.Datasource.TenantID.Builder, com.ibm.guardium.proto.datasource.Datasource.TenantIDOrBuilder>(
+                  tenantId_,
+                  getParentForChildren(),
+                  isClean());
+          tenantId_ = null;
+        }
+        return tenantIdBuilder_;
+      }
+
       // @@protoc_insertion_point(builder_scope:guard.datasource.Guard_ds_message)
     }
 
@@ -94386,6 +95747,11 @@ public final class Datasource {
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_guard_datasource_HTTP_reply_Header_field_fieldAccessorTable;
   private static com.google.protobuf.Descriptors.Descriptor
+    internal_static_guard_datasource_TenantID_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_guard_datasource_TenantID_fieldAccessorTable;
+  private static com.google.protobuf.Descriptors.Descriptor
     internal_static_guard_datasource_Handshake_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
@@ -94730,7 +96096,7 @@ public final class Datasource {
       "ession_locator\022\021\n\tclient_ip\030\001 \001(\007\022\023\n\013cli" +
       "ent_port\030\002 \001(\007\022\021\n\tserver_ip\030\003 \001(\007\022\023\n\013ser" +
       "ver_port\030\004 \001(\007\022\017\n\007is_ipv6\030\005 \001(\010\022\023\n\013clien" +
-      "t_ipv6\030\006 \001(\t\022\023\n\013server_ipv6\030\007 \001(\t\"\340\007\n\020Ap" +
+      "t_ipv6\030\006 \001(\t\022\023\n\013server_ipv6\030\007 \001(\t\"\245\010\n\020Ap" +
       "plication_data\022B\n\010language\030\001 \001(\01620.guard" +
       ".datasource.Application_data.Language_ty" +
       "pe\022:\n\004type\030\002 \002(\0162,.guard.datasource.Appl",
@@ -94744,455 +96110,461 @@ public final class Datasource {
       "ype\030\n \001(\01622.guard.datasource.Application" +
       "_data.Datasource_type\0220\n\nhttp_reply\030\024 \001(" +
       "\0132\034.guard.datasource.HTTP_reply\"-\n\tData_",
-      "type\022\010\n\004TEXT\020\001\022\007\n\003RAW\020\002\022\r\n\tCONSTRUCT\020\003\"\202" +
+      "type\022\010\n\004TEXT\020\001\022\007\n\003RAW\020\002\022\r\n\tCONSTRUCT\020\003\"\307" +
       "\003\n\rLanguage_type\022\r\n\tFREE_TEXT\020\004\022\t\n\005MSSQL" +
       "\020\010\022\007\n\003SYB\020\020\022\n\n\006ORACLE\020 \022\007\n\003DB2\020@\022\t\n\004INFX" +
       "\020\200\010\022\n\n\005MYSQL\020\200@\022\t\n\003TRD\020\200\200\001\022\014\n\006HADOOP\020\200\200\002" +
-      "\022\n\n\004PGRS\020\200\200 \022\013\n\004MSSP\020\200\200\200\002\022\022\n\013OPTIM_AUDIT" +
-      "\020\200\200\200\004\022\021\n\014OPTIM_REDACT\020\200\020\022\023\n\014BIG_INSIGHTS" +
-      "\020\200\200\200\010\022\t\n\005MONGO\020(\022\010\n\004CASS\020X\022\t\n\005ASTER\020x\022\n\n" +
-      "\005GPLUM\020\210\001\022\n\n\005COUCH\020\230\001\022\014\n\007MARIADB\020\270\001\022\010\n\003F" +
-      "SM\020\310\001\022\n\n\005MAGEN\020\330\001\022\t\n\004HIVE\020\350\001\022\r\n\010ACCUMULO" +
-      "\020\370\001\022\013\n\006IMPALA\020\230\002\022\t\n\004VRTC\020\350\002\022\013\n\006MEMSQL\020\370\002",
-      "\022\014\n\007MYSQL_X\020\210\003\022\013\n\006COUCHB\020\230\003\"\'\n\017Datasourc" +
-      "e_type\022\007\n\003RDS\020\001\022\013\n\007UNI_CON\020\002\"\363\001\n\nHTTP_re" +
-      "ply\022\023\n\013status_code\030\001 \001(\r\022?\n\014header_field" +
-      "\030\002 \003(\0132).guard.datasource.HTTP_reply.Hea" +
-      "der_field\022\024\n\014content_type\030\003 \001(\t\022\030\n\020conte" +
-      "nt_encoding\030\004 \001(\t\022\020\n\010redirect\030\005 \001(\t\022\022\n\ns" +
-      "et_cookie\030\006 \001(\t\022\014\n\004body\030\007 \001(\014\032+\n\014Header_" +
-      "field\022\014\n\004name\030\001 \001(\t\022\r\n\005value\030\002 \001(\t\"\317\003\n\tH" +
-      "andshake\022.\n\ttimestamp\030\001 \002(\0132\033.guard.data" +
-      "source.Timestamp\022\031\n\021client_identifier\030\002 ",
-      "\002(\t\022\026\n\016current_master\030\003 \002(\t\022\031\n\021current_m" +
-      "aster_ip\030\004 \002(\007\022\016\n\006vendor\030\005 \001(\t\022\017\n\007produc" +
-      "t\030\006 \001(\t\022\017\n\007version\030\007 \001(\t\022\020\n\010firewall\030\010 \001" +
-      "(\010\022\021\n\ttransient\030\t \001(\010\022>\n\nforwarding\030\r \003(" +
-      "\0132*.guard.datasource.Forwarding_configur" +
-      "ation\022\023\n\004sink\030\n \001(\010:\005false\022\023\n\013policy_pus" +
-      "h\030\014 \001(\010\022\027\n\017quarantine_push\030\016 \001(\010\022\023\n\013clie" +
-      "nt_type\030\017 \001(\t\022\026\n\007is_ipv6\030\020 \001(\010:\005false\022\033\n" +
-      "\023current_master_ipv6\030\021 \001(\t\022 \n\021force_log_" +
-      "limited\030\022 \001(\010:\005false\"`\n\030Forwarding_confi",
-      "guration\022\021\n\tvendor_id\030\001 \001(\007\022\030\n\020forward_m" +
-      "essages\030\002 \003(\t\022\027\n\017filter_messages\030\003 \003(\t\"\271" +
-      "\001\n\004Ping\022.\n\ttimestamp\030\001 \002(\0132\033.guard.datas" +
-      "ource.Timestamp\022\031\n\021client_identifier\030\002 \002" +
-      "(\t\022\026\n\016current_master\030\003 \002(\t\022\031\n\021current_ma" +
-      "ster_ip\030\004 \002(\007\022\026\n\007is_ipv6\030\005 \001(\010:\005false\022\033\n" +
-      "\023current_master_ipv6\030\006 \001(\t\"\306\001\n\tError_msg" +
-      "\022\013\n\003msg\030\001 \002(\t\0226\n\005level\030\002 \002(\0162\'.guard.dat" +
-      "asource.Error_msg.Error_level\022.\n\ttimesta" +
-      "mp\030\003 \002(\0132\033.guard.datasource.Timestamp\"D\n",
-      "\013Error_level\022\010\n\004INFO\020\000\022\013\n\007WARNING\020\001\022\t\n\005E" +
-      "RROR\020\002\022\t\n\005FATAL\020\003\022\010\n\004DIAG\020\004\"\223\004\n\010Accessor" +
-      "\022\017\n\007db_user\030\001 \002(\t\022\023\n\013server_type\030\002 \002(\t\022\021" +
-      "\n\tserver_os\030\003 \001(\t\022\021\n\tclient_os\030\004 \001(\t\022\027\n\017" +
-      "client_hostname\030\005 \001(\t\022\027\n\017server_hostname" +
-      "\030\006 \001(\t\022\025\n\rcomm_protocol\030\007 \001(\t\022\023\n\013db_prot" +
-      "ocol\030\010 \001(\t\022\033\n\023db_protocol_version\030\t \001(\t\022" +
-      "\017\n\007os_user\030\n \001(\t\022\026\n\016source_program\030\013 \001(\t" +
-      "\022\022\n\nclient_mac\030\014 \001(\t\022\032\n\022server_descripti" +
-      "on\030\r \001(\t\022\024\n\014service_name\030\016 \001(\t\022B\n\010langua",
-      "ge\030\017 \001(\01620.guard.datasource.Application_" +
-      "data.Language_type\022@\n\004type\030\020 \001(\0162,.guard" +
-      ".datasource.Application_data.Data_type:\004" +
-      "TEXT\022K\n\017datasource_type\030\021 \001(\01622.guard.da" +
-      "tasource.Application_data.Datasource_typ" +
-      "e\"\315\002\n\rSession_start\022\022\n\nsession_id\030\001 \001(\003\022" +
-      ":\n\017session_locator\030\002 \001(\0132!.guard.datasou" +
-      "rce.Session_locator\022.\n\ttimestamp\030\003 \001(\0132\033" +
-      ".guard.datasource.Timestamp\022,\n\010accessor\030" +
-      "\004 \001(\0132\032.guard.datasource.Accessor\022\021\n\tuid",
-      "_chain\030\005 \001(\t\022\027\n\017prev_session_id\030\006 \001(\003\022\022\n" +
-      "\nprocess_id\030\007 \001(\t\022\023\n\013terminal_id\030\010 \001(\t\022\017" +
-      "\n\007db_name\030\t \001(\t\022\025\n\rapp_user_name\030\n \001(\t\022\021" +
-      "\n\tconfig_id\030\013 \001(\t\"\215\001\n\013Session_end\022\022\n\nses" +
-      "sion_id\030\001 \002(\003\022.\n\ttimestamp\030\002 \002(\0132\033.guard" +
-      ".datasource.Timestamp\022:\n\017session_locator" +
-      "\030\003 \001(\0132!.guard.datasource.Session_locato" +
-      "r\",\n\rBind_variable\022\014\n\004type\030\001 \001(\005\022\r\n\005valu" +
-      "e\030\002 \001(\t\":\n\tBind_info\022-\n\004vars\030\001 \003(\0132\037.gua" +
-      "rd.datasource.Bind_variable\"\314\014\n\016Client_r",
-      "equest\022\022\n\nsession_id\030\001 \002(\003\022\022\n\nrequest_id" +
-      "\030\002 \001(\003\0220\n\004data\030\003 \002(\0132\".guard.datasource." +
-      "Application_data\022.\n\tbind_info\030\004 \001(\0132\033.gu" +
-      "ard.datasource.Bind_info\022\017\n\007rule_id\030\005 \001(" +
-      "\r\022\022\n\nfam_action\030\006 \001(\r\022E\n\rfam_action_op\030\007" +
-      " \001(\0162..guard.datasource.Client_request.F" +
-      "AM_Action_op\022\022\n\nextra_info\030\010 \001(\t\022\023\n\013retu" +
-      "rn_code\030\t \001(\003\022\025\n\rrule_position\030\n \001(\r\"\203\n\n" +
-      "\rFAM_Action_op\022\022\n\016ACTION_OP_NONE\020\000\022\022\n\016AC" +
-      "TION_OP_OPEN\020\001\022\022\n\016ACTION_OP_READ\020\002\022\023\n\017AC",
-      "TION_OP_WRITE\020\003\022\025\n\021ACTION_OP_EXECUTE\020\004\022\024" +
-      "\n\020ACTION_OP_DELETE\020\005\022\024\n\020ACTION_OP_FILEOP" +
-      "\020\006\022\032\n\026ACTION_OP_ADD_TO_GROUP\020\007\022\037\n\033ACTION" +
-      "_OP_AUDIT_MASK_CHANGE\020\010\022\037\n\033ACTION_OP_CHA" +
-      "NGE_PERMISSION\020\t\022\031\n\025ACTION_OP_CHANGE_ROL" +
-      "E\020\n\022\026\n\022ACTION_OP_CHECK_IN\020\013\022\027\n\023ACTION_OP" +
-      "_CHECK_OUT\020\014\022\032\n\026ACTION_OP_CHILD_DELETE\020\r" +
-      "\022\030\n\024ACTION_OP_CHILD_MOVE\020\016\022\022\n\016ACTION_OP_" +
-      "COPY\020\017\022\031\n\025ACTION_OP_CREATE_ROLE\020\020\022\037\n\033ACT" +
-      "ION_OP_CREATE_USER_GROUP\020\021\022\024\n\020ACTION_OP_",
-      "CUSTOM\020\022\022\030\n\024ACTION_OP_DELETE_DOC\020\023\022\034\n\030AC" +
-      "TION_OP_DELETE_AUDITED\020\024\022\037\n\033ACTION_OP_DE" +
-      "LETE_FROM_GROUP\020\025\022\032\n\026ACTION_OP_DELETE_GR" +
-      "OUP\020\026\022!\n\035ACTION_OP_FILE_FRAGMENT_WRITE\020\027" +
-      "\022\036\n\032ACTION_OP_GRANT_PERMISSION\020\030\022\022\n\016ACTI" +
-      "ON_OP_MOVE\020\031\022\034\n\030ACTION_OP_PROFILE_CHANGE" +
-      "\020\032\022\031\n\025ACTION_OP_REMOVE_ROLE\020\033\022\037\n\033ACTION_" +
-      "OP_REVOKE_PERMISSION\020\034\022\033\n\027ACTION_OP_SCHE" +
-      "MA_CHANGE\020\035\022\024\n\020ACTION_OP_SEARCH\020\036\022\032\n\026ACT" +
-      "ION_OP_TURNOFF_ROLE\020\037\022\036\n\032ACTION_OP_TURNO",
-      "FF_SECURITY\020 \022\035\n\031ACTION_OP_TURNON_SECURI" +
-      "TY\020!\022\026\n\022ACTION_OP_UNDELETE\020\"\022\024\n\020ACTION_O" +
-      "P_UPDATE\020#\022\022\n\016ACTION_OP_VIEW\020$\022\026\n\022ACTION" +
-      "_OP_WORKFLOW\020%\022\025\n\021ACTION_OP_ADD_DIR\020&\022\026\n" +
-      "\022ACTION_OP_ADD_FILE\020\'\022\030\n\024ACTION_OP_DELET" +
-      "E_DIR\020(\022\031\n\025ACTION_OP_DELETE_FILE\020)\022\035\n\031AC" +
-      "TION_OP_CHANGE_DIR_PERM\020*\022\036\n\032ACTION_OP_C" +
-      "HANGE_FILE_PERM\020+\022\027\n\023ACTION_OP_READ_FILE" +
-      "\020,\022\031\n\025ACTION_OP_UPDATE_FILE\020-\022\031\n\025ACTION_" +
-      "OP_RENAME_FILE\020.\022\030\n\024ACTION_OP_RENAME_DIR",
-      "\020/\"\220\002\n\014Server_reply\022\022\n\nsession_id\030\001 \002(\003\022" +
-      "\022\n\nrequest_id\030\002 \001(\003\022\021\n\treply_seq\030\003 \001(\003\0220" +
-      "\n\004data\030\004 \002(\0132\".guard.datasource.Applicat" +
-      "ion_data\022\026\n\016request_failed\030\005 \001(\r\022\030\n\020reco" +
-      "rds_affected\030\006 \001(\r\022\026\n\016execution_time\030\007 \001" +
-      "(\r\022!\n\031request_acknowledged_time\030\010 \001(\r\022\017\n" +
-      "\007rule_id\030\t \001(\r\022\025\n\rrule_position\030\n \001(\r\"5\n" +
-      "\013Value_group\022\026\n\016value_group_id\030\001 \002(\r\022\016\n\006" +
-      "member\030\002 \003(\t\"{\n\020Policy_rule_item\022\022\n\nfiel" +
-      "d_name\030\001 \002(\t\022\r\n\005value\030\002 \001(\t\0222\n\013value_gro",
-      "up\030\003 \001(\0132\035.guard.datasource.Value_group\022" +
-      "\020\n\010inverted\030\004 \001(\010\"4\n\022Policy_rule_action\022" +
-      "\020\n\010sequence\030\001 \001(\r\022\014\n\004type\030\002 \001(\r\"\376\003\n\013Poli" +
-      "cy_rule\022\020\n\010position\030\001 \002(\r\022\030\n\020replacement" +
-      "_char\030\002 \001(\t\022\"\n\032records_affected_threshol" +
-      "d\030\003 \001(\r\022\'\n\037matched_returned_data_thresho" +
-      "ld\030\004 \001(\r\022\032\n\022quarantine_minutes\030\005 \001(\r\0220\n\004" +
-      "item\030\006 \003(\0132\".guard.datasource.Policy_rul" +
-      "e_item\022\014\n\004type\030\007 \002(\r\0224\n\006action\030\010 \003(\0132$.g" +
-      "uard.datasource.Policy_rule_action\022\035\n\025co",
-      "ntinue_to_next_rule\030\t \001(\010\022\020\n\010severity\030\n " +
-      "\001(\r\022\014\n\004name\030\013 \001(\t\022\023\n\013policy_name\030\014 \001(\t\"\217" +
-      "\001\n\tRule_type\022\017\n\013ACCESS_RULE\020\000\022\022\n\016EXCEPTI" +
-      "ON_RULE\020\001\022\022\n\016EXTRUSION_RULE\020\002\022\032\n\026DB2_COL" +
-      "LECTION_PROFILE\020\n\022\033\n\027VSAM_COLLECTION_PRO" +
-      "FILE\020\013\022\020\n\014IMS_ARTIFACT\020\014\"W\n\023Interception" +
-      "_policy\0222\n\013policy_rule\030\001 \003(\0132\035.guard.dat" +
-      "asource.Policy_rule\022\014\n\004name\030\002 \001(\t\"\257\001\n\023Op" +
-      "aque_session_data\022B\n\tblob_type\030\001 \002(\0162/.g" +
-      "uard.datasource.Opaque_session_data.Blob",
-      "_type\0224\n\014session_blob\030\002 \003(\0132\036.guard.data" +
-      "source.Session_blob\"\036\n\tBlob_type\022\021\n\rFAIL" +
-      "OVER_BLOB\020Q\"P\n\014Session_blob\0222\n\007session\030\002" +
-      " \002(\0132!.guard.datasource.Session_locator\022" +
-      "\014\n\004blob\030\003 \001(\014\"q\n\017Monitor_session\0226\n\rsess" +
-      "ion_flags\030\001 \003(\0132\037.guard.datasource.Sessi" +
-      "on_flags\022&\n\005scrub\030\003 \003(\0132\027.guard.datasour" +
-      "ce.Scrub\"A\n\005Scrub\022\027\n\017ktap_session_id\030\001 \002" +
-      "(\007\022\017\n\007pattern\030\002 \002(\t\022\016\n\006filler\030\003 \001(\t\"R\n\rS" +
-      "ession_flags\0222\n\007session\030\001 \002(\0132!.guard.da",
-      "tasource.Session_locator\022\r\n\005flags\030\002 \001(\007\"" +
-      "\302\002\n\tException\022\031\n\021EXCEPTION_TYPE_ID\030\001 \001(\t" +
-      "\0222\n\007session\030\002 \001(\0132!.guard.datasource.Ses" +
-      "sion_locator\022\022\n\nSESSION_ID\030\003 \001(\t\022\023\n\013DB_P" +
-      "ROTOCOL\030\004 \001(\t\022\023\n\013DESCRIPTION\030\005 \001(\t\022\022\n\nSQ" +
-      "L_STRING\030\006 \001(\t\022\017\n\007DB_USER\030\007 \001(\t\022\030\n\020DB_PA" +
-      "SSWORD_HASH\030\010 \001(\t\022\023\n\013ERROR_CAUSE\030\t \001(\t\022\025" +
-      "\n\rAPP_USER_NAME\030\n \001(\t\022\r\n\005count\030\013 \001(\005\022.\n\t" +
-      "timestamp\030\014 \001(\0132\033.guard.datasource.Times" +
-      "tamp\"/\n\021Positional_string\022\r\n\005start\030\001 \001(\r",
-      "\022\013\n\003end\030\002 \001(\r\"\243\002\n\tGDM_field\022\014\n\004name\030\001 \002(" +
-      "\t\0223\n\007origins\030\002 \003(\0162\".guard.datasource.GD" +
-      "M_field.Origin\022\r\n\005value\030\003 \001(\014\0225\n\010positio" +
-      "n\030\004 \001(\0132#.guard.datasource.Positional_st" +
-      "ring\022\024\n\014before_value\030\005 \001(\014\"w\n\006Origin\022\020\n\014" +
-      "CLAUSE_WHERE\020\001\022\023\n\017CLAUSE_ORDER_BY\020\002\022\021\n\rC" +
-      "LAUSE_HAVING\020\003\022\023\n\017CLAUSE_GROUP_BY\020\004\022\017\n\013C" +
-      "LAUSE_LIST\020\005\022\r\n\tCLAUSE_ON\020\006\"\234\001\n\nGDM_obje" +
-      "ct\022\014\n\004name\030\001 \002(\t\022\016\n\006schema\030\002 \001(\t\022\014\n\004type" +
-      "\030\003 \001(\t\022+\n\006fields\030\004 \003(\0132\033.guard.datasourc",
-      "e.GDM_field\0225\n\010position\030\005 \001(\0132#.guard.da" +
-      "tasource.Positional_string\"\344\001\n\014GDM_sente" +
-      "nce\022\014\n\004verb\030\001 \002(\t\0223\n\013descendants\030\002 \003(\0132\036" +
-      ".guard.datasource.GDM_sentence\022-\n\007object" +
-      "s\030\003 \003(\0132\034.guard.datasource.GDM_object\022+\n" +
-      "\006fields\030\004 \003(\0132\033.guard.datasource.GDM_fie" +
-      "ld\0225\n\010position\030\005 \001(\0132#.guard.datasource." +
-      "Positional_string\"\232\001\n\rGDM_construct\0221\n\ts" +
-      "entences\030\001 \003(\0132\036.guard.datasource.GDM_se" +
-      "ntence\022\024\n\014original_sql\030\002 \001(\t\022\020\n\010full_sql",
-      "\030\003 \001(\t\022\026\n\010is_valid\030\004 \001(\010:\004true\022\026\n\016statem" +
-      "ent_type\030\005 \001(\005\"\303\002\n\004ICAP\022)\n\004type\030\001 \001(\0162\033." +
-      "guard.datasource.ICAP.Type\022\014\n\004body\030\002 \001(\014" +
-      "\022\013\n\003eof\030\003 \001(\010\022\022\n\nreq_header\030\004 \003(\t\022\023\n\013res" +
-      "p_header\030\005 \003(\t\022\021\n\tclient_ip\030\006 \001(\t\022\027\n\017cli" +
-      "ent_username\030\007 \001(\t\022\021\n\tserver_ip\030\010 \001(\t\022\022\n" +
-      "\nuser_agent\030\t \001(\t\022\027\n\017server_hostname\030\n \001" +
-      "(\t\022\013\n\003url\030\013 \001(\t\022\024\n\014content_type\030\014 \001(\t\022\017\n" +
-      "\007referer\030\r \001(\t\",\n\004Type\022\013\n\007OPTIONS\020\001\022\n\n\006R" +
-      "EQMOD\020\002\022\013\n\007RESPMOD\020\004\".\n\017Name_value_pair\022",
-      "\014\n\004name\030\001 \001(\t\022\r\n\005value\030\002 \001(\t\"c\n\024Agent_co" +
-      "nfig_section\022\024\n\014section_name\030\001 \001(\t\0225\n\npa" +
-      "rameters\030\002 \003(\0132!.guard.datasource.Name_v" +
-      "alue_pair\"}\n\014Agent_config\022\031\n\021client_iden" +
-      "tifier\030\001 \001(\t\0228\n\010sections\030\002 \003(\0132&.guard.d" +
-      "atasource.Agent_config_section\022\030\n\nfor_up" +
-      "date\030\003 \001(\010:\004true\"O\n\013PI_position\022\r\n\005start" +
-      "\030\001 \002(\r\022\013\n\003end\030\002 \002(\r\022\022\n\nbyte_start\030\003 \001(\r\022" +
-      "\020\n\010byte_end\030\004 \001(\r\"\274\001\n\010PI_Field\022\022\n\nfield_" +
-      "name\030\001 \001(\t\0220\n\tfield_pos\030\002 \001(\0132\035.guard.da",
-      "tasource.PI_position\0223\n\007origins\030\003 \003(\0162\"." +
-      "guard.datasource.GDM_field.Origin\0225\n\016una" +
-      "liased_name\030\004 \001(\0132\035.guard.datasource.PI_" +
-      "position\"\266\001\n\tPI_Object\022\023\n\013object_name\030\001 " +
-      "\001(\t\0221\n\nobject_pos\030\002 \001(\0132\035.guard.datasour" +
-      "ce.PI_position\022*\n\006fields\030\003 \003(\0132\032.guard.d" +
-      "atasource.PI_Field\0225\n\016unaliased_name\030\004 \001" +
-      "(\0132\035.guard.datasource.PI_position\"|\n\rPI_" +
-      "Expression\0224\n\rleft_side_pos\030\001 \001(\0132\035.guar" +
-      "d.datasource.PI_position\0225\n\016right_side_p",
-      "os\030\002 \001(\0132\035.guard.datasource.PI_position\"" +
-      "\253\003\n\013PI_Sentence\022\r\n\005verbs\030\001 \003(\t\0220\n\tverbs_" +
-      "pos\030\002 \003(\0132\035.guard.datasource.PI_position" +
-      "\022*\n\006fields\030\003 \003(\0132\032.guard.datasource.PI_F" +
-      "ield\022,\n\007objects\030\004 \003(\0132\033.guard.datasource" +
-      ".PI_Object\0223\n\014subsentences\030\005 \003(\0132\035.guard" +
-      ".datasource.PI_Sentence\0224\n\013expressions\030\007" +
-      " \003(\0132\037.guard.datasource.PI_Expression\0223\n" +
-      "\014sentence_pos\030\010 \001(\0132\035.guard.datasource.P" +
-      "I_position\022/\n\010join_pos\030\t \001(\0132\035.guard.dat",
-      "asource.PI_position\0220\n\twhere_pos\030\006 \001(\0132\035" +
-      ".guard.datasource.PI_position\"\244\001\n\014PI_Con" +
-      "struct\0220\n\tsentences\030\001 \003(\0132\035.guard.dataso" +
-      "urce.PI_Sentence\0220\n\tconstants\030\002 \003(\0132\035.gu" +
-      "ard.datasource.PI_position\0220\n\tpasswords\030" +
-      "\003 \003(\0132\035.guard.datasource.PI_position\"\202\001\n" +
-      "\rParser_result\0222\n\nconstructs\030\001 \003(\0132\036.gua" +
-      "rd.datasource.PI_Construct\022\024\n\014original_s" +
-      "ql\030\002 \001(\t\022\030\n\020parse_request_id\030\003 \001(\005\022\r\n\005er" +
-      "ror\030\004 \001(\t\"\276\001\n\016Parser_request\022\024\n\014original",
-      "_sql\030\001 \001(\t\022\033\n\020parse_request_id\030\002 \001(\005:\0011\022" +
-      "B\n\010language\030\003 \001(\01620.guard.datasource.App" +
-      "lication_data.Language_type\0225\n\014sql_eleme" +
-      "nts\030\004 \001(\0132\037.guard.datasource.Parser_resu" +
-      "lt\"\222\001\n\034QueryRewrite_preview_request\022B\n\010l" +
-      "anguage\030\001 \001(\01620.guard.datasource.Applica" +
-      "tion_data.Language_type\022\023\n\013sample_sqls\030\002" +
-      " \003(\t\022\031\n\021qr_definition_ids\030\003 \003(\003\"\337\003\n\032Quer" +
-      "yRewrite_preview_reply\022J\n\nqr_results\030\001 \003" +
-      "(\01326.guard.datasource.QueryRewrite_previ",
-      "ew_reply.QR_result\032\364\002\n\tQR_result\022\025\n\rrewr" +
-      "itten_sql\030\001 \001(\t\022R\n\010qrStatus\030\002 \001(\0162@.guar" +
-      "d.datasource.QueryRewrite_preview_reply." +
-      "QR_result.QR_Status\022\023\n\013qr_log_info\030\003 \001(\t" +
-      "\022s\n\031applied_qr_definition_ids\030\004 \001(\0132P.gu" +
-      "ard.datasource.QueryRewrite_preview_repl" +
-      "y.QR_result.Applied_QR_Definition_IDs\0326\n" +
-      "\031Applied_QR_Definition_IDs\022\031\n\021qr_definit" +
-      "ion_ids\030\001 \003(\003\":\n\tQR_Status\022\020\n\014QR_NO_CHAN" +
-      "GE\020\000\022\r\n\tQR_CHANGE\020\001\022\014\n\010QR_ERROR\020\002\"9\n\tFAM",
-      "_rules\022,\n\010fam_rule\030\001 \003(\0132\032.guard.datasou" +
-      "rce.FAM_rule\"\247\004\n\010FAM_rule\022\017\n\007rule_id\030\001 \002" +
-      "(\r\022\025\n\rrule_position\030\002 \001(\r\022\020\n\010os_users\030\003 " +
-      "\003(\t\022\030\n\020os_user_not_flag\030\004 \001(\010\022\023\n\013unix_gr" +
-      "oups\030\005 \003(\t\022\033\n\023unix_group_not_flag\030\006 \001(\010\022" +
-      "\022\n\nfile_paths\030\007 \003(\t\022\032\n\022file_path_not_fla" +
-      "g\030\010 \001(\010\022\036\n\026include_subdirectories\030\013 \001(\010\022" +
-      "\037\n\027monitor_removable_media\030\014 \001(\010\022\026\n\013open" +
-      "_action\030\025 \001(\r:\0010\022\026\n\013read_action\030\026 \001(\r:\0010" +
-      "\022\027\n\014write_action\030\027 \001(\r:\0010\022\031\n\016execute_act",
-      "ion\030\030 \001(\r:\0010\022\030\n\rdelete_action\030\031 \001(\r:\0010\022\030" +
-      "\n\rfileop_action\030\032 \001(\r:\0010\"\213\001\n\017FAM_Action_" +
-      "type\022\017\n\013ACTION_NONE\020\000\022\020\n\014ACTION_AUDIT\020\001\022" +
-      "\033\n\027ACTION_POLICY_VIOLATION\020\002\022\020\n\014ACTION_B" +
-      "LOCK\020\004\022\024\n\020ACTION_EXCEPTION\020\010\022\020\n\014ACTION_A" +
-      "LERT\020\020\"y\n\024FAM_SHAREPOINT_rules\022B\n\023fam_sh" +
-      "arepoint_rule\030\001 \003(\0132%.guard.datasource.F" +
-      "AM_SHAREPOINT_rule\022\035\n\025rule_condition_pol" +
-      "icy\030\002 \003(\t\"\212\n\n\023FAM_SHAREPOINT_rule\022\017\n\007rul" +
-      "e_id\030\001 \002(\r\022\025\n\rrule_position\030\002 \001(\r\022\020\n\010os_",
-      "users\030\003 \003(\t\022\030\n\020os_user_not_flag\030\004 \001(\010\022\023\n" +
-      "\013unix_groups\030\005 \003(\t\022\033\n\023unix_group_not_fla" +
-      "g\030\006 \001(\010\022\022\n\nfile_paths\030\007 \003(\t\022\032\n\022file_path" +
-      "_not_flag\030\010 \001(\010\022\034\n\021AddToGroup_action\030\025 \001" +
-      "(\r:\0010\022!\n\026AuditMaskChange_action\030\026 \001(\r:\0010" +
-      "\022\"\n\027ChangePermission_action\030\027 \001(\r:\0010\022\034\n\021" +
-      "ChangeRole_action\030\030 \001(\r:\0010\022\031\n\016CheckIn_ac" +
-      "tion\030\031 \001(\r:\0010\022\032\n\017CheckOut_action\030\032 \001(\r:\001" +
-      "0\022\035\n\022ChildDelete_action\030\033 \001(\r:\0010\022\033\n\020Chil" +
-      "dMove_action\030\034 \001(\r:\0010\022\026\n\013Copy_action\030\035 \001",
-      "(\r:\0010\022\034\n\021CreateRole_action\030\036 \001(\r:\0010\022!\n\026C" +
-      "reateUserGroup_action\030\037 \001(\r:\0010\022\030\n\rCustom" +
-      "_action\030  \001(\r:\0010\022\030\n\rDelete_action\030! \001(\r:" +
-      "\0010\022\037\n\024DeleteAudited_action\030\" \001(\r:\0010\022!\n\026D" +
-      "eleteFromGroup_action\030# \001(\r:\0010\022\035\n\022Delete" +
-      "Group_action\030$ \001(\r:\0010\022#\n\030FileFragmentWri" +
-      "te_action\030% \001(\r:\0010\022!\n\026GrantPermission_ac" +
-      "tion\030& \001(\r:\0010\022\026\n\013Move_action\030\' \001(\r:\0010\022\037\n" +
-      "\024ProfileChange_action\030( \001(\r:\0010\022\034\n\021Remove" +
-      "Role_action\030) \001(\r:\0010\022\"\n\027RevokePermission",
-      "_action\030* \001(\r:\0010\022\036\n\023SchemaChange_action\030" +
-      "+ \001(\r:\0010\022\030\n\rSearch_action\030, \001(\r:\0010\022\035\n\022Tu" +
-      "rnOffRole_action\030- \001(\r:\0010\022!\n\026TurnOffSecu" +
-      "rity_action\030. \001(\r:\0010\022 \n\025TurnOnSecurity_a" +
-      "ction\030/ \001(\r:\0010\022\032\n\017Undelete_action\0300 \001(\r:" +
-      "\0010\022\030\n\rUpdate_action\0301 \001(\r:\0010\022\026\n\013View_act" +
-      "ion\0302 \001(\r:\0010\022\032\n\017Workflow_action\0303 \001(\r:\0010" +
-      "\"\213\001\n\017FAM_Action_type\022\017\n\013ACTION_NONE\020\000\022\020\n" +
-      "\014ACTION_AUDIT\020\001\022\033\n\027ACTION_POLICY_VIOLATI" +
-      "ON\020\002\022\020\n\014ACTION_BLOCK\020\004\022\024\n\020ACTION_EXCEPTI",
-      "ON\020\010\022\020\n\014ACTION_ALERT\020\020\"E\n\rFAM_NAS_rules\022" +
-      "4\n\014fam_nas_rule\030\001 \003(\0132\036.guard.datasource" +
-      ".FAM_NAS_rule\"\344\006\n\014FAM_NAS_rule\022\017\n\007rule_i" +
-      "d\030\001 \002(\r\022\025\n\rrule_position\030\002 \001(\r\022\020\n\010os_use" +
-      "rs\030\003 \003(\t\022\030\n\020os_user_not_flag\030\004 \001(\010\022\023\n\013un" +
-      "ix_groups\030\005 \003(\t\022\033\n\023unix_group_not_flag\030\006" +
-      " \001(\010\022\022\n\nfile_paths\030\007 \003(\t\022\032\n\022file_path_no" +
-      "t_flag\030\010 \001(\010\022\036\n\026include_subdirectories\030\013" +
-      " \001(\010\022\037\n\027monitor_removable_media\030\014 \001(\010\022\021\n" +
-      "\textension\030\r \003(\t\022\032\n\022extension_group_id\030\016",
-      " \001(\r\022\032\n\022extension_not_flag\030\017 \001(\010\022\032\n\022excl" +
-      "ude_file_paths\030\020 \003(\t\022\"\n\032exclude_file_pat" +
-      "h_group_id\030\021 \001(\r\022\"\n\032exclude_file_path_no" +
-      "t_flag\030\022 \001(\010\022\030\n\rAddDir_action\030\025 \001(\r:\0010\022\031" +
-      "\n\016AddFile_action\030\026 \001(\r:\0010\022\033\n\020DeleteDir_a" +
-      "ction\030\027 \001(\r:\0010\022\034\n\021DeleteFile_action\030\030 \001(" +
-      "\r:\0010\022\034\n\021DirPermChg_action\030\031 \001(\r:\0010\022\035\n\022Fi" +
-      "lePermChg_action\030\032 \001(\r:\0010\022\032\n\017ReadFile_ac" +
-      "tion\030\033 \001(\r:\0010\022\034\n\021UpdateFile_action\030\034 \001(\r" +
-      ":\0010\022\034\n\021RenameFile_action\030\035 \001(\r:\0010\022\033\n\020Ren",
-      "ameDir_action\030\036 \001(\r:\0010\"\213\001\n\017FAM_Action_ty" +
+      "\022\n\n\004PGRS\020\200\200 \022\010\n\002NZ\020\200\200@\022\013\n\004MSSP\020\200\200\200\002\022\022\n\013O" +
+      "PTIM_AUDIT\020\200\200\200\004\022\021\n\014OPTIM_REDACT\020\200\020\022\023\n\014BI" +
+      "G_INSIGHTS\020\200\200\200\010\022\t\n\005MONGO\020(\022\010\n\004CASS\020X\022\t\n\005" +
+      "ASTER\020x\022\n\n\005GPLUM\020\210\001\022\n\n\005COUCH\020\230\001\022\r\n\010SAP_H" +
+      "ANA\020\250\001\022\014\n\007MARIADB\020\270\001\022\010\n\003FSM\020\310\001\022\n\n\005MAGEN\020" +
+      "\330\001\022\t\n\004HIVE\020\350\001\022\r\n\010ACCUMULO\020\370\001\022\013\n\006IMPALA\020\230",
+      "\002\022\t\n\004VRTC\020\350\002\022\013\n\006MEMSQL\020\370\002\022\014\n\007MYSQL_X\020\210\003\022" +
+      "\013\n\006COUCHB\020\230\003\022\n\n\005REDIS\020\330\003\022\016\n\tCOCKROACH\020\270\010" +
+      "\022\016\n\tSNOWFLAKE\020\310\010\"\'\n\017Datasource_type\022\007\n\003R" +
+      "DS\020\001\022\013\n\007UNI_CON\020\002\"\363\001\n\nHTTP_reply\022\023\n\013stat" +
+      "us_code\030\001 \001(\r\022?\n\014header_field\030\002 \003(\0132).gu" +
+      "ard.datasource.HTTP_reply.Header_field\022\024" +
+      "\n\014content_type\030\003 \001(\t\022\030\n\020content_encoding" +
+      "\030\004 \001(\t\022\020\n\010redirect\030\005 \001(\t\022\022\n\nset_cookie\030\006" +
+      " \001(\t\022\014\n\004body\030\007 \001(\014\032+\n\014Header_field\022\014\n\004na" +
+      "me\030\001 \001(\t\022\r\n\005value\030\002 \001(\t\"\035\n\010TenantID\022\021\n\tt",
+      "enant_id\030\001 \002(\t\"\317\003\n\tHandshake\022.\n\ttimestam" +
+      "p\030\001 \002(\0132\033.guard.datasource.Timestamp\022\031\n\021" +
+      "client_identifier\030\002 \002(\t\022\026\n\016current_maste" +
+      "r\030\003 \002(\t\022\031\n\021current_master_ip\030\004 \002(\007\022\016\n\006ve" +
+      "ndor\030\005 \001(\t\022\017\n\007product\030\006 \001(\t\022\017\n\007version\030\007" +
+      " \001(\t\022\020\n\010firewall\030\010 \001(\010\022\021\n\ttransient\030\t \001(" +
+      "\010\022>\n\nforwarding\030\r \003(\0132*.guard.datasource" +
+      ".Forwarding_configuration\022\023\n\004sink\030\n \001(\010:" +
+      "\005false\022\023\n\013policy_push\030\014 \001(\010\022\027\n\017quarantin" +
+      "e_push\030\016 \001(\010\022\023\n\013client_type\030\017 \001(\t\022\026\n\007is_",
+      "ipv6\030\020 \001(\010:\005false\022\033\n\023current_master_ipv6" +
+      "\030\021 \001(\t\022 \n\021force_log_limited\030\022 \001(\010:\005false" +
+      "\"`\n\030Forwarding_configuration\022\021\n\tvendor_i" +
+      "d\030\001 \001(\007\022\030\n\020forward_messages\030\002 \003(\t\022\027\n\017fil" +
+      "ter_messages\030\003 \003(\t\"\271\001\n\004Ping\022.\n\ttimestamp" +
+      "\030\001 \002(\0132\033.guard.datasource.Timestamp\022\031\n\021c" +
+      "lient_identifier\030\002 \002(\t\022\026\n\016current_master" +
+      "\030\003 \002(\t\022\031\n\021current_master_ip\030\004 \002(\007\022\026\n\007is_" +
+      "ipv6\030\005 \001(\010:\005false\022\033\n\023current_master_ipv6" +
+      "\030\006 \001(\t\"\306\001\n\tError_msg\022\013\n\003msg\030\001 \002(\t\0226\n\005lev",
+      "el\030\002 \002(\0162\'.guard.datasource.Error_msg.Er" +
+      "ror_level\022.\n\ttimestamp\030\003 \002(\0132\033.guard.dat" +
+      "asource.Timestamp\"D\n\013Error_level\022\010\n\004INFO" +
+      "\020\000\022\013\n\007WARNING\020\001\022\t\n\005ERROR\020\002\022\t\n\005FATAL\020\003\022\010\n" +
+      "\004DIAG\020\004\"\223\004\n\010Accessor\022\017\n\007db_user\030\001 \002(\t\022\023\n" +
+      "\013server_type\030\002 \002(\t\022\021\n\tserver_os\030\003 \001(\t\022\021\n" +
+      "\tclient_os\030\004 \001(\t\022\027\n\017client_hostname\030\005 \001(" +
+      "\t\022\027\n\017server_hostname\030\006 \001(\t\022\025\n\rcomm_proto" +
+      "col\030\007 \001(\t\022\023\n\013db_protocol\030\010 \001(\t\022\033\n\023db_pro" +
+      "tocol_version\030\t \001(\t\022\017\n\007os_user\030\n \001(\t\022\026\n\016",
+      "source_program\030\013 \001(\t\022\022\n\nclient_mac\030\014 \001(\t" +
+      "\022\032\n\022server_description\030\r \001(\t\022\024\n\014service_" +
+      "name\030\016 \001(\t\022B\n\010language\030\017 \001(\01620.guard.dat" +
+      "asource.Application_data.Language_type\022@" +
+      "\n\004type\030\020 \001(\0162,.guard.datasource.Applicat" +
+      "ion_data.Data_type:\004TEXT\022K\n\017datasource_t" +
+      "ype\030\021 \001(\01622.guard.datasource.Application" +
+      "_data.Datasource_type\"\315\002\n\rSession_start\022" +
+      "\022\n\nsession_id\030\001 \001(\003\022:\n\017session_locator\030\002" +
+      " \001(\0132!.guard.datasource.Session_locator\022",
+      ".\n\ttimestamp\030\003 \001(\0132\033.guard.datasource.Ti" +
+      "mestamp\022,\n\010accessor\030\004 \001(\0132\032.guard.dataso" +
+      "urce.Accessor\022\021\n\tuid_chain\030\005 \001(\t\022\027\n\017prev" +
+      "_session_id\030\006 \001(\003\022\022\n\nprocess_id\030\007 \001(\t\022\023\n" +
+      "\013terminal_id\030\010 \001(\t\022\017\n\007db_name\030\t \001(\t\022\025\n\ra" +
+      "pp_user_name\030\n \001(\t\022\021\n\tconfig_id\030\013 \001(\t\"\215\001" +
+      "\n\013Session_end\022\022\n\nsession_id\030\001 \002(\003\022.\n\ttim" +
+      "estamp\030\002 \002(\0132\033.guard.datasource.Timestam" +
+      "p\022:\n\017session_locator\030\003 \001(\0132!.guard.datas" +
+      "ource.Session_locator\",\n\rBind_variable\022\014",
+      "\n\004type\030\001 \001(\005\022\r\n\005value\030\002 \001(\t\":\n\tBind_info" +
+      "\022-\n\004vars\030\001 \003(\0132\037.guard.datasource.Bind_v" +
+      "ariable\"\236\r\n\016Client_request\022\022\n\nsession_id" +
+      "\030\001 \002(\003\022\022\n\nrequest_id\030\002 \001(\003\0220\n\004data\030\003 \002(\013" +
+      "2\".guard.datasource.Application_data\022.\n\t" +
+      "bind_info\030\004 \001(\0132\033.guard.datasource.Bind_" +
+      "info\022\017\n\007rule_id\030\005 \001(\r\022\022\n\nfam_action\030\006 \001(" +
+      "\r\022E\n\rfam_action_op\030\007 \001(\0162..guard.datasou" +
+      "rce.Client_request.FAM_Action_op\022\022\n\nextr" +
+      "a_info\030\010 \001(\t\022\023\n\013return_code\030\t \001(\003\022\025\n\rrul",
+      "e_position\030\n \001(\r\022\021\n\tuid_chain\030\013 \001(\t\022\017\n\007d" +
+      "b_name\030\014 \001(\t\022,\n\010accessor\030\r \001(\0132\032.guard.d" +
+      "atasource.Accessor\"\203\n\n\rFAM_Action_op\022\022\n\016" +
+      "ACTION_OP_NONE\020\000\022\022\n\016ACTION_OP_OPEN\020\001\022\022\n\016" +
+      "ACTION_OP_READ\020\002\022\023\n\017ACTION_OP_WRITE\020\003\022\025\n" +
+      "\021ACTION_OP_EXECUTE\020\004\022\024\n\020ACTION_OP_DELETE" +
+      "\020\005\022\024\n\020ACTION_OP_FILEOP\020\006\022\032\n\026ACTION_OP_AD" +
+      "D_TO_GROUP\020\007\022\037\n\033ACTION_OP_AUDIT_MASK_CHA" +
+      "NGE\020\010\022\037\n\033ACTION_OP_CHANGE_PERMISSION\020\t\022\031" +
+      "\n\025ACTION_OP_CHANGE_ROLE\020\n\022\026\n\022ACTION_OP_C",
+      "HECK_IN\020\013\022\027\n\023ACTION_OP_CHECK_OUT\020\014\022\032\n\026AC" +
+      "TION_OP_CHILD_DELETE\020\r\022\030\n\024ACTION_OP_CHIL" +
+      "D_MOVE\020\016\022\022\n\016ACTION_OP_COPY\020\017\022\031\n\025ACTION_O" +
+      "P_CREATE_ROLE\020\020\022\037\n\033ACTION_OP_CREATE_USER" +
+      "_GROUP\020\021\022\024\n\020ACTION_OP_CUSTOM\020\022\022\030\n\024ACTION" +
+      "_OP_DELETE_DOC\020\023\022\034\n\030ACTION_OP_DELETE_AUD" +
+      "ITED\020\024\022\037\n\033ACTION_OP_DELETE_FROM_GROUP\020\025\022" +
+      "\032\n\026ACTION_OP_DELETE_GROUP\020\026\022!\n\035ACTION_OP" +
+      "_FILE_FRAGMENT_WRITE\020\027\022\036\n\032ACTION_OP_GRAN" +
+      "T_PERMISSION\020\030\022\022\n\016ACTION_OP_MOVE\020\031\022\034\n\030AC",
+      "TION_OP_PROFILE_CHANGE\020\032\022\031\n\025ACTION_OP_RE" +
+      "MOVE_ROLE\020\033\022\037\n\033ACTION_OP_REVOKE_PERMISSI" +
+      "ON\020\034\022\033\n\027ACTION_OP_SCHEMA_CHANGE\020\035\022\024\n\020ACT" +
+      "ION_OP_SEARCH\020\036\022\032\n\026ACTION_OP_TURNOFF_ROL" +
+      "E\020\037\022\036\n\032ACTION_OP_TURNOFF_SECURITY\020 \022\035\n\031A" +
+      "CTION_OP_TURNON_SECURITY\020!\022\026\n\022ACTION_OP_" +
+      "UNDELETE\020\"\022\024\n\020ACTION_OP_UPDATE\020#\022\022\n\016ACTI" +
+      "ON_OP_VIEW\020$\022\026\n\022ACTION_OP_WORKFLOW\020%\022\025\n\021" +
+      "ACTION_OP_ADD_DIR\020&\022\026\n\022ACTION_OP_ADD_FIL" +
+      "E\020\'\022\030\n\024ACTION_OP_DELETE_DIR\020(\022\031\n\025ACTION_",
+      "OP_DELETE_FILE\020)\022\035\n\031ACTION_OP_CHANGE_DIR" +
+      "_PERM\020*\022\036\n\032ACTION_OP_CHANGE_FILE_PERM\020+\022" +
+      "\027\n\023ACTION_OP_READ_FILE\020,\022\031\n\025ACTION_OP_UP" +
+      "DATE_FILE\020-\022\031\n\025ACTION_OP_RENAME_FILE\020.\022\030" +
+      "\n\024ACTION_OP_RENAME_DIR\020/\"\220\002\n\014Server_repl" +
+      "y\022\022\n\nsession_id\030\001 \002(\003\022\022\n\nrequest_id\030\002 \001(" +
+      "\003\022\021\n\treply_seq\030\003 \001(\003\0220\n\004data\030\004 \002(\0132\".gua" +
+      "rd.datasource.Application_data\022\026\n\016reques" +
+      "t_failed\030\005 \001(\r\022\030\n\020records_affected\030\006 \001(\r" +
+      "\022\026\n\016execution_time\030\007 \001(\r\022!\n\031request_ackn",
+      "owledged_time\030\010 \001(\r\022\017\n\007rule_id\030\t \001(\r\022\025\n\r" +
+      "rule_position\030\n \001(\r\"5\n\013Value_group\022\026\n\016va" +
+      "lue_group_id\030\001 \002(\r\022\016\n\006member\030\002 \003(\t\"{\n\020Po" +
+      "licy_rule_item\022\022\n\nfield_name\030\001 \002(\t\022\r\n\005va" +
+      "lue\030\002 \001(\t\0222\n\013value_group\030\003 \001(\0132\035.guard.d" +
+      "atasource.Value_group\022\020\n\010inverted\030\004 \001(\010\"" +
+      "4\n\022Policy_rule_action\022\020\n\010sequence\030\001 \001(\r\022" +
+      "\014\n\004type\030\002 \001(\r\"\376\003\n\013Policy_rule\022\020\n\010positio" +
+      "n\030\001 \002(\r\022\030\n\020replacement_char\030\002 \001(\t\022\"\n\032rec" +
+      "ords_affected_threshold\030\003 \001(\r\022\'\n\037matched",
+      "_returned_data_threshold\030\004 \001(\r\022\032\n\022quaran" +
+      "tine_minutes\030\005 \001(\r\0220\n\004item\030\006 \003(\0132\".guard" +
+      ".datasource.Policy_rule_item\022\014\n\004type\030\007 \002" +
+      "(\r\0224\n\006action\030\010 \003(\0132$.guard.datasource.Po" +
+      "licy_rule_action\022\035\n\025continue_to_next_rul" +
+      "e\030\t \001(\010\022\020\n\010severity\030\n \001(\r\022\014\n\004name\030\013 \001(\t\022" +
+      "\023\n\013policy_name\030\014 \001(\t\"\217\001\n\tRule_type\022\017\n\013AC" +
+      "CESS_RULE\020\000\022\022\n\016EXCEPTION_RULE\020\001\022\022\n\016EXTRU" +
+      "SION_RULE\020\002\022\032\n\026DB2_COLLECTION_PROFILE\020\n\022" +
+      "\033\n\027VSAM_COLLECTION_PROFILE\020\013\022\020\n\014IMS_ARTI",
+      "FACT\020\014\"W\n\023Interception_policy\0222\n\013policy_" +
+      "rule\030\001 \003(\0132\035.guard.datasource.Policy_rul" +
+      "e\022\014\n\004name\030\002 \001(\t\"\257\001\n\023Opaque_session_data\022" +
+      "B\n\tblob_type\030\001 \002(\0162/.guard.datasource.Op" +
+      "aque_session_data.Blob_type\0224\n\014session_b" +
+      "lob\030\002 \003(\0132\036.guard.datasource.Session_blo" +
+      "b\"\036\n\tBlob_type\022\021\n\rFAILOVER_BLOB\020Q\"P\n\014Ses" +
+      "sion_blob\0222\n\007session\030\002 \002(\0132!.guard.datas" +
+      "ource.Session_locator\022\014\n\004blob\030\003 \001(\014\"q\n\017M" +
+      "onitor_session\0226\n\rsession_flags\030\001 \003(\0132\037.",
+      "guard.datasource.Session_flags\022&\n\005scrub\030" +
+      "\003 \003(\0132\027.guard.datasource.Scrub\"A\n\005Scrub\022" +
+      "\027\n\017ktap_session_id\030\001 \002(\007\022\017\n\007pattern\030\002 \002(" +
+      "\t\022\016\n\006filler\030\003 \001(\t\"R\n\rSession_flags\0222\n\007se" +
+      "ssion\030\001 \002(\0132!.guard.datasource.Session_l" +
+      "ocator\022\r\n\005flags\030\002 \001(\007\"\302\002\n\tException\022\031\n\021E" +
+      "XCEPTION_TYPE_ID\030\001 \001(\t\0222\n\007session\030\002 \001(\0132" +
+      "!.guard.datasource.Session_locator\022\022\n\nSE" +
+      "SSION_ID\030\003 \001(\t\022\023\n\013DB_PROTOCOL\030\004 \001(\t\022\023\n\013D" +
+      "ESCRIPTION\030\005 \001(\t\022\022\n\nSQL_STRING\030\006 \001(\t\022\017\n\007",
+      "DB_USER\030\007 \001(\t\022\030\n\020DB_PASSWORD_HASH\030\010 \001(\t\022" +
+      "\023\n\013ERROR_CAUSE\030\t \001(\t\022\025\n\rAPP_USER_NAME\030\n " +
+      "\001(\t\022\r\n\005count\030\013 \001(\005\022.\n\ttimestamp\030\014 \001(\0132\033." +
+      "guard.datasource.Timestamp\"/\n\021Positional" +
+      "_string\022\r\n\005start\030\001 \001(\r\022\013\n\003end\030\002 \001(\r\"\243\002\n\t" +
+      "GDM_field\022\014\n\004name\030\001 \002(\t\0223\n\007origins\030\002 \003(\016" +
+      "2\".guard.datasource.GDM_field.Origin\022\r\n\005" +
+      "value\030\003 \001(\014\0225\n\010position\030\004 \001(\0132#.guard.da" +
+      "tasource.Positional_string\022\024\n\014before_val" +
+      "ue\030\005 \001(\014\"w\n\006Origin\022\020\n\014CLAUSE_WHERE\020\001\022\023\n\017",
+      "CLAUSE_ORDER_BY\020\002\022\021\n\rCLAUSE_HAVING\020\003\022\023\n\017" +
+      "CLAUSE_GROUP_BY\020\004\022\017\n\013CLAUSE_LIST\020\005\022\r\n\tCL" +
+      "AUSE_ON\020\006\"\234\001\n\nGDM_object\022\014\n\004name\030\001 \002(\t\022\016" +
+      "\n\006schema\030\002 \001(\t\022\014\n\004type\030\003 \001(\t\022+\n\006fields\030\004" +
+      " \003(\0132\033.guard.datasource.GDM_field\0225\n\010pos" +
+      "ition\030\005 \001(\0132#.guard.datasource.Positiona" +
+      "l_string\"\344\001\n\014GDM_sentence\022\014\n\004verb\030\001 \002(\t\022" +
+      "3\n\013descendants\030\002 \003(\0132\036.guard.datasource." +
+      "GDM_sentence\022-\n\007objects\030\003 \003(\0132\034.guard.da" +
+      "tasource.GDM_object\022+\n\006fields\030\004 \003(\0132\033.gu",
+      "ard.datasource.GDM_field\0225\n\010position\030\005 \001" +
+      "(\0132#.guard.datasource.Positional_string\"" +
+      "\232\001\n\rGDM_construct\0221\n\tsentences\030\001 \003(\0132\036.g" +
+      "uard.datasource.GDM_sentence\022\024\n\014original" +
+      "_sql\030\002 \001(\t\022\020\n\010full_sql\030\003 \001(\t\022\026\n\010is_valid" +
+      "\030\004 \001(\010:\004true\022\026\n\016statement_type\030\005 \001(\005\"\303\002\n" +
+      "\004ICAP\022)\n\004type\030\001 \001(\0162\033.guard.datasource.I" +
+      "CAP.Type\022\014\n\004body\030\002 \001(\014\022\013\n\003eof\030\003 \001(\010\022\022\n\nr" +
+      "eq_header\030\004 \003(\t\022\023\n\013resp_header\030\005 \003(\t\022\021\n\t" +
+      "client_ip\030\006 \001(\t\022\027\n\017client_username\030\007 \001(\t",
+      "\022\021\n\tserver_ip\030\010 \001(\t\022\022\n\nuser_agent\030\t \001(\t\022" +
+      "\027\n\017server_hostname\030\n \001(\t\022\013\n\003url\030\013 \001(\t\022\024\n" +
+      "\014content_type\030\014 \001(\t\022\017\n\007referer\030\r \001(\t\",\n\004" +
+      "Type\022\013\n\007OPTIONS\020\001\022\n\n\006REQMOD\020\002\022\013\n\007RESPMOD" +
+      "\020\004\".\n\017Name_value_pair\022\014\n\004name\030\001 \001(\t\022\r\n\005v" +
+      "alue\030\002 \001(\t\"c\n\024Agent_config_section\022\024\n\014se" +
+      "ction_name\030\001 \001(\t\0225\n\nparameters\030\002 \003(\0132!.g" +
+      "uard.datasource.Name_value_pair\"}\n\014Agent" +
+      "_config\022\031\n\021client_identifier\030\001 \001(\t\0228\n\010se" +
+      "ctions\030\002 \003(\0132&.guard.datasource.Agent_co",
+      "nfig_section\022\030\n\nfor_update\030\003 \001(\010:\004true\"O" +
+      "\n\013PI_position\022\r\n\005start\030\001 \002(\r\022\013\n\003end\030\002 \002(" +
+      "\r\022\022\n\nbyte_start\030\003 \001(\r\022\020\n\010byte_end\030\004 \001(\r\"" +
+      "\274\001\n\010PI_Field\022\022\n\nfield_name\030\001 \001(\t\0220\n\tfiel" +
+      "d_pos\030\002 \001(\0132\035.guard.datasource.PI_positi" +
+      "on\0223\n\007origins\030\003 \003(\0162\".guard.datasource.G" +
+      "DM_field.Origin\0225\n\016unaliased_name\030\004 \001(\0132" +
+      "\035.guard.datasource.PI_position\"\266\001\n\tPI_Ob" +
+      "ject\022\023\n\013object_name\030\001 \001(\t\0221\n\nobject_pos\030" +
+      "\002 \001(\0132\035.guard.datasource.PI_position\022*\n\006",
+      "fields\030\003 \003(\0132\032.guard.datasource.PI_Field" +
+      "\0225\n\016unaliased_name\030\004 \001(\0132\035.guard.datasou" +
+      "rce.PI_position\"|\n\rPI_Expression\0224\n\rleft" +
+      "_side_pos\030\001 \001(\0132\035.guard.datasource.PI_po" +
+      "sition\0225\n\016right_side_pos\030\002 \001(\0132\035.guard.d" +
+      "atasource.PI_position\"\253\003\n\013PI_Sentence\022\r\n" +
+      "\005verbs\030\001 \003(\t\0220\n\tverbs_pos\030\002 \003(\0132\035.guard." +
+      "datasource.PI_position\022*\n\006fields\030\003 \003(\0132\032" +
+      ".guard.datasource.PI_Field\022,\n\007objects\030\004 " +
+      "\003(\0132\033.guard.datasource.PI_Object\0223\n\014subs",
+      "entences\030\005 \003(\0132\035.guard.datasource.PI_Sen" +
+      "tence\0224\n\013expressions\030\007 \003(\0132\037.guard.datas" +
+      "ource.PI_Expression\0223\n\014sentence_pos\030\010 \001(" +
+      "\0132\035.guard.datasource.PI_position\022/\n\010join" +
+      "_pos\030\t \001(\0132\035.guard.datasource.PI_positio" +
+      "n\0220\n\twhere_pos\030\006 \001(\0132\035.guard.datasource." +
+      "PI_position\"\244\001\n\014PI_Construct\0220\n\tsentence" +
+      "s\030\001 \003(\0132\035.guard.datasource.PI_Sentence\0220" +
+      "\n\tconstants\030\002 \003(\0132\035.guard.datasource.PI_" +
+      "position\0220\n\tpasswords\030\003 \003(\0132\035.guard.data",
+      "source.PI_position\"\202\001\n\rParser_result\0222\n\n" +
+      "constructs\030\001 \003(\0132\036.guard.datasource.PI_C" +
+      "onstruct\022\024\n\014original_sql\030\002 \001(\t\022\030\n\020parse_" +
+      "request_id\030\003 \001(\005\022\r\n\005error\030\004 \001(\t\"\276\001\n\016Pars" +
+      "er_request\022\024\n\014original_sql\030\001 \001(\t\022\033\n\020pars" +
+      "e_request_id\030\002 \001(\005:\0011\022B\n\010language\030\003 \001(\0162" +
+      "0.guard.datasource.Application_data.Lang" +
+      "uage_type\0225\n\014sql_elements\030\004 \001(\0132\037.guard." +
+      "datasource.Parser_result\"\222\001\n\034QueryRewrit" +
+      "e_preview_request\022B\n\010language\030\001 \001(\01620.gu",
+      "ard.datasource.Application_data.Language" +
+      "_type\022\023\n\013sample_sqls\030\002 \003(\t\022\031\n\021qr_definit" +
+      "ion_ids\030\003 \003(\003\"\337\003\n\032QueryRewrite_preview_r" +
+      "eply\022J\n\nqr_results\030\001 \003(\01326.guard.datasou" +
+      "rce.QueryRewrite_preview_reply.QR_result" +
+      "\032\364\002\n\tQR_result\022\025\n\rrewritten_sql\030\001 \001(\t\022R\n" +
+      "\010qrStatus\030\002 \001(\0162@.guard.datasource.Query" +
+      "Rewrite_preview_reply.QR_result.QR_Statu" +
+      "s\022\023\n\013qr_log_info\030\003 \001(\t\022s\n\031applied_qr_def" +
+      "inition_ids\030\004 \001(\0132P.guard.datasource.Que",
+      "ryRewrite_preview_reply.QR_result.Applie" +
+      "d_QR_Definition_IDs\0326\n\031Applied_QR_Defini" +
+      "tion_IDs\022\031\n\021qr_definition_ids\030\001 \003(\003\":\n\tQ" +
+      "R_Status\022\020\n\014QR_NO_CHANGE\020\000\022\r\n\tQR_CHANGE\020" +
+      "\001\022\014\n\010QR_ERROR\020\002\"9\n\tFAM_rules\022,\n\010fam_rule" +
+      "\030\001 \003(\0132\032.guard.datasource.FAM_rule\"\247\004\n\010F" +
+      "AM_rule\022\017\n\007rule_id\030\001 \002(\r\022\025\n\rrule_positio" +
+      "n\030\002 \001(\r\022\020\n\010os_users\030\003 \003(\t\022\030\n\020os_user_not" +
+      "_flag\030\004 \001(\010\022\023\n\013unix_groups\030\005 \003(\t\022\033\n\023unix" +
+      "_group_not_flag\030\006 \001(\010\022\022\n\nfile_paths\030\007 \003(",
+      "\t\022\032\n\022file_path_not_flag\030\010 \001(\010\022\036\n\026include" +
+      "_subdirectories\030\013 \001(\010\022\037\n\027monitor_removab" +
+      "le_media\030\014 \001(\010\022\026\n\013open_action\030\025 \001(\r:\0010\022\026" +
+      "\n\013read_action\030\026 \001(\r:\0010\022\027\n\014write_action\030\027" +
+      " \001(\r:\0010\022\031\n\016execute_action\030\030 \001(\r:\0010\022\030\n\rde" +
+      "lete_action\030\031 \001(\r:\0010\022\030\n\rfileop_action\030\032 " +
+      "\001(\r:\0010\"\213\001\n\017FAM_Action_type\022\017\n\013ACTION_NON" +
+      "E\020\000\022\020\n\014ACTION_AUDIT\020\001\022\033\n\027ACTION_POLICY_V" +
+      "IOLATION\020\002\022\020\n\014ACTION_BLOCK\020\004\022\024\n\020ACTION_E" +
+      "XCEPTION\020\010\022\020\n\014ACTION_ALERT\020\020\"y\n\024FAM_SHAR",
+      "EPOINT_rules\022B\n\023fam_sharepoint_rule\030\001 \003(" +
+      "\0132%.guard.datasource.FAM_SHAREPOINT_rule" +
+      "\022\035\n\025rule_condition_policy\030\002 \003(\t\"\212\n\n\023FAM_" +
+      "SHAREPOINT_rule\022\017\n\007rule_id\030\001 \002(\r\022\025\n\rrule" +
+      "_position\030\002 \001(\r\022\020\n\010os_users\030\003 \003(\t\022\030\n\020os_" +
+      "user_not_flag\030\004 \001(\010\022\023\n\013unix_groups\030\005 \003(\t" +
+      "\022\033\n\023unix_group_not_flag\030\006 \001(\010\022\022\n\nfile_pa" +
+      "ths\030\007 \003(\t\022\032\n\022file_path_not_flag\030\010 \001(\010\022\034\n" +
+      "\021AddToGroup_action\030\025 \001(\r:\0010\022!\n\026AuditMask" +
+      "Change_action\030\026 \001(\r:\0010\022\"\n\027ChangePermissi",
+      "on_action\030\027 \001(\r:\0010\022\034\n\021ChangeRole_action\030" +
+      "\030 \001(\r:\0010\022\031\n\016CheckIn_action\030\031 \001(\r:\0010\022\032\n\017C" +
+      "heckOut_action\030\032 \001(\r:\0010\022\035\n\022ChildDelete_a" +
+      "ction\030\033 \001(\r:\0010\022\033\n\020ChildMove_action\030\034 \001(\r" +
+      ":\0010\022\026\n\013Copy_action\030\035 \001(\r:\0010\022\034\n\021CreateRol" +
+      "e_action\030\036 \001(\r:\0010\022!\n\026CreateUserGroup_act" +
+      "ion\030\037 \001(\r:\0010\022\030\n\rCustom_action\030  \001(\r:\0010\022\030" +
+      "\n\rDelete_action\030! \001(\r:\0010\022\037\n\024DeleteAudite" +
+      "d_action\030\" \001(\r:\0010\022!\n\026DeleteFromGroup_act" +
+      "ion\030# \001(\r:\0010\022\035\n\022DeleteGroup_action\030$ \001(\r",
+      ":\0010\022#\n\030FileFragmentWrite_action\030% \001(\r:\0010" +
+      "\022!\n\026GrantPermission_action\030& \001(\r:\0010\022\026\n\013M" +
+      "ove_action\030\' \001(\r:\0010\022\037\n\024ProfileChange_act" +
+      "ion\030( \001(\r:\0010\022\034\n\021RemoveRole_action\030) \001(\r:" +
+      "\0010\022\"\n\027RevokePermission_action\030* \001(\r:\0010\022\036" +
+      "\n\023SchemaChange_action\030+ \001(\r:\0010\022\030\n\rSearch" +
+      "_action\030, \001(\r:\0010\022\035\n\022TurnOffRole_action\030-" +
+      " \001(\r:\0010\022!\n\026TurnOffSecurity_action\030. \001(\r:" +
+      "\0010\022 \n\025TurnOnSecurity_action\030/ \001(\r:\0010\022\032\n\017" +
+      "Undelete_action\0300 \001(\r:\0010\022\030\n\rUpdate_actio",
+      "n\0301 \001(\r:\0010\022\026\n\013View_action\0302 \001(\r:\0010\022\032\n\017Wo" +
+      "rkflow_action\0303 \001(\r:\0010\"\213\001\n\017FAM_Action_ty" +
       "pe\022\017\n\013ACTION_NONE\020\000\022\020\n\014ACTION_AUDIT\020\001\022\033\n" +
       "\027ACTION_POLICY_VIOLATION\020\002\022\020\n\014ACTION_BLO" +
       "CK\020\004\022\024\n\020ACTION_EXCEPTION\020\010\022\020\n\014ACTION_ALE" +
-      "RT\020\020\"\270\002\n\021FSM_AlertFileOpen\022\n\n\002id\030\001 \002(\r\022\024" +
-      "\n\014machine_name\030\002 \001(\t\022\032\n\022file_specificati" +
-      "on\030\003 \001(\t\0221\n\014modification\030\004 \001(\0132\033.guard.d" +
-      "atasource.Timestamp\022\013\n\003pid\030\005 \001(\r\022\022\n\nimag" +
-      "e_name\030\006 \001(\t\022\021\n\tuser_name\030\007 \001(\t\022\022\n\nbytes" +
-      "_read\030\010 \001(\004\022\025\n\rbytes_written\030\t \001(\004\022\021\n\tcl",
-      "ient_ip\030\n \001(\r\022\030\n\020client_host_name\030\013 \001(\t\022" +
-      "\017\n\007rule_id\030\014 \001(\r\022\025\n\rrule_position\030\r \001(\r\"" +
-      "-\n\021FSM_AlertFileData\022\n\n\002id\030\001 \002(\r\022\014\n\004data" +
-      "\030\002 \001(\014\"1\n\022FSM_AlertFileClose\022\n\n\002id\030\001 \002(\r" +
-      "\022\017\n\007discard\030\002 \001(\010\"\217\001\n\021Collector_feature\022" +
-      "\033\n\023ims_time_conversion\030\001 \001(\010\022\024\n\014support_" +
-      "itap\030\002 \001(\010\022\035\n\022support_itap_chunk\030\003 \001(\005:\001" +
-      "0\022(\n\031support_force_log_limited\030\004 \001(\010:\005fa" +
-      "lse\".\n\014System_i_raw\022\014\n\004data\030\001 \002(\014\022\020\n\010seq" +
-      "uence\030\002 \001(\006\"\335\002\n\014Gdm_app_data\022\021\n\tapps_cod",
-      "e\030\001 \001(\t\022\020\n\010app_type\030\002 \001(\t\022\020\n\010app_user\030\003 " +
-      "\001(\t\022\026\n\016operation_type\030\004 \001(\t\0220\n\013change_da" +
-      "te\030\005 \001(\0132\033.guard.datasource.Timestamp\022\021\n" +
-      "\titem_name\030\006 \001(\t\022\030\n\020transaction_code\030\007 \001" +
-      "(\t\022\021\n\tsystem_id\030\010 \001(\t\022\027\n\017record_detail_1" +
-      "\030\t \001(\t\022\027\n\017record_detail_2\030\n \001(\t\022\027\n\017recor" +
-      "d_detail_3\030\013 \001(\t\022\027\n\017record_detail_4\030\014 \001(" +
-      "\t\022\r\n\005vbkey\030\r \001(\t\022\031\n\021original_timezone\030\016 " +
-      "\001(\t\"\205\001\n\017Unit_Identifier\0224\n\004type\030\001 \002(\0162&." +
-      "guard.datasource.Unit_Identifier.Type\022\n\n",
-      "\002id\030\002 \001(\t\022\n\n\002ip\030\003 \001(\t\"$\n\004Type\022\r\n\tSTAP_UN" +
-      "IT\020\001\022\r\n\tCOLLECTOR\020\002\"\247\001\n\023Name_bin_value_p" +
-      "air\022\014\n\004name\030\001 \001(\t\022\r\n\005value\030\002 \001(\014\022<\n\006form" +
-      "at\030\003 \001(\0162,.guard.datasource.Name_bin_val" +
-      "ue_pair.Format\"5\n\006Format\022\010\n\004STCK\020\001\022\013\n\007IN" +
-      "TEGER\020\002\022\007\n\003HEX\020\003\022\013\n\007EBCIDIC\020\004\"C\n\nOne_Rec" +
-      "ord\0225\n\006values\030\001 \003(\0132%.guard.datasource.N" +
-      "ame_bin_value_pair\"L\n\013Data_Status\022\016\n\006ent" +
-      "ity\030\001 \002(\t\022-\n\007records\030\002 \003(\0132\034.guard.datas" +
-      "ource.One_Record\"O\n\nUnit_Debug\022\020\n\010debug_",
-      "on\030\001 \001(\010\022\023\n\013debug_level\030\002 \001(\005\022\032\n\022debug_d" +
-      "uration_sec\030\005 \001(\005\"\356\002\n\017Console_Command\0224\n" +
-      "\004type\030\001 \002(\0162&.guard.datasource.Console_C" +
-      "ommand.Type\0226\n\013destination\030\002 \002(\0132!.guard" +
-      ".datasource.Unit_Identifier\0220\n\nunit_debu" +
-      "g\030\003 \001(\0132\034.guard.datasource.Unit_Debug\0222\n" +
-      "\013data_status\030\004 \003(\0132\035.guard.datasource.Da" +
-      "ta_Status\022\027\n\017stap_identifier\030\005 \003(\t\022\024\n\014me" +
-      "ssage_text\030\006 \001(\t\"X\n\004Type\022\016\n\nUNIT_DEBUG\020\001" +
-      "\022\017\n\013MUST_GATHER\020\002\022\017\n\013DATA_STATUS\020\003\022\016\n\nUN",
-      "REGISTER\020\004\022\016\n\nGET_STATUS\020\005\"\212\002\n\024Connectio" +
-      "nQuarantine\022\021\n\tserver_ip\030\001 \001(\t\022\024\n\014servic" +
-      "e_name\030\002 \001(\t\022\017\n\007db_user\030\003 \001(\t\022.\n\ttimesta" +
-      "mp\030\004 \001(\0132\033.guard.datasource.Timestamp\0225\n" +
-      "\020quarantine_until\030\005 \001(\0132\033.guard.datasour" +
-      "ce.Timestamp\0220\n\013allow_until\030\006 \001(\0132\033.guar" +
-      "d.datasource.Timestamp\022\017\n\007deleted\030\007 \001(\010\022" +
-      "\016\n\006ims_id\030\010 \001(\t\"\274\001\n\016QuarantineList\022>\n\016qu" +
-      "arantineItem\030\001 \003(\0132&.guard.datasource.Co" +
-      "nnectionQuarantine\022.\n\ttimestamp\030\002 \001(\0132\033.",
-      "guard.datasource.Timestamp\022\023\n\013incrementa" +
-      "l\030\003 \001(\010\022\017\n\007ack_num\030\004 \001(\003\022\024\n\014list_omitted" +
-      "\030\005 \001(\010\"\377\002\n\024STAP_Policy_Response\0229\n\004type\030" +
-      "\001 \001(\0162+.guard.datasource.STAP_Policy_Res" +
-      "ponse.Type\022\024\n\014thread_token\030\002 \001(\r\022\025\n\rmvsS" +
-      "ystemName\030\003 \001(\t\022\026\n\016db2SubsystemId\030\004 \001(\t\022" +
-      "6\n\013destination\030\005 \001(\0132!.guard.datasource." +
-      "Unit_Identifier\0228\n\016quarantineList\030\006 \001(\0132" +
-      " .guard.datasource.QuarantineList\0221\n\014cur" +
-      "rent_time\030\007 \001(\0132\033.guard.datasource.Times",
-      "tamp\"B\n\004Type\022\022\n\016STAP_TERMINATE\020\001\022\016\n\nQUAR" +
-      "ANTINE\020\002\022\026\n\022QUARANTINE_CHANGED\020\003\"\373\020\n\020Gua" +
-      "rd_ds_message\0225\n\004type\030\001 \002(\0162\'.guard.data" +
-      "source.Guard_ds_message.Type\022.\n\thandshak" +
-      "e\030\002 \001(\0132\033.guard.datasource.Handshake\022$\n\004" +
-      "ping\030\003 \001(\0132\026.guard.datasource.Ping\0226\n\rse" +
-      "ssion_start\030\004 \001(\0132\037.guard.datasource.Ses" +
-      "sion_start\0222\n\013session_end\030\005 \001(\0132\035.guard." +
-      "datasource.Session_end\0228\n\016client_request" +
-      "\030\006 \001(\0132 .guard.datasource.Client_request",
-      "\0224\n\014server_reply\030\007 \001(\0132\036.guard.datasourc" +
-      "e.Server_reply\022.\n\terror_msg\030\010 \001(\0132\033.guar" +
-      "d.datasource.Error_msg\022B\n\023interception_p" +
-      "olicy\030\t \001(\0132%.guard.datasource.Intercept" +
-      "ion_policy\022B\n\023opaque_session_data\030\n \001(\0132" +
-      "%.guard.datasource.Opaque_session_data\022:" +
-      "\n\017monitor_session\030\013 \001(\0132!.guard.datasour" +
-      "ce.Monitor_session\022.\n\texception\030\014 \001(\0132\033." +
-      "guard.datasource.Exception\022$\n\004icap\030\r \001(\013" +
-      "2\026.guard.datasource.ICAP\022.\n\006config\030\016 \001(\013",
-      "2\036.guard.datasource.Agent_config\022\020\n\010sequ" +
-      "ence\030\017 \001(\r\022\014\n\004more\030\020 \001(\010\022/\n\005parse\030\021 \001(\0132" +
-      " .guard.datasource.Parser_request\022>\n\021col" +
-      "lector_feature\030\022 \001(\0132#.guard.datasource." +
-      "Collector_feature\0224\n\014system_i_raw\030\023 \001(\0132" +
-      "\036.guard.datasource.System_i_raw\0224\n\014gdm_a" +
-      "pp_data\030\024 \001(\0132\036.guard.datasource.Gdm_app" +
-      "_data\022K\n\023qrw_preview_request\030\025 \001(\0132..gua" +
-      "rd.datasource.QueryRewrite_preview_reque" +
-      "st\022H\n\022qrw_preview_result\030\026 \001(\0132,.guard.d",
-      "atasource.QueryRewrite_preview_reply\0225\n\010" +
-      "fsm_open\030\030 \001(\0132#.guard.datasource.FSM_Al" +
-      "ertFileOpen\0225\n\010fsm_data\030\031 \001(\0132#.guard.da" +
-      "tasource.FSM_AlertFileData\0227\n\tfsm_close\030" +
-      "\032 \001(\0132$.guard.datasource.FSM_AlertFileCl" +
-      "ose\022D\n\024stap_policy_response\030\033 \001(\0132&.guar" +
-      "d.datasource.STAP_Policy_Response\022:\n\017con" +
-      "sole_command\030\034 \001(\0132!.guard.datasource.Co" +
-      "nsole_Command\022\026\n\013instance_id\030\035 \001(\r:\0010\022.\n" +
-      "\tfam_rules\030\037 \001(\0132\033.guard.datasource.FAM_",
-      "rules\022D\n\024fam_sharepoint_rules\030  \001(\0132&.gu" +
-      "ard.datasource.FAM_SHAREPOINT_rules\0226\n\rf" +
-      "am_nas_rules\030! \001(\0132\037.guard.datasource.FA" +
-      "M_NAS_rules\"\200\004\n\004Type\022\r\n\tHANDSHAKE\020\001\022\010\n\004P" +
-      "ING\020\002\022\r\n\tERROR_MSG\020\003\022\021\n\rSESSION_START\020\004\022" +
-      "\017\n\013SESSION_END\020\005\022\022\n\016CLIENT_REQUEST\020\006\022\020\n\014" +
-      "SERVER_REPLY\020\007\022\020\n\014POLICY_RULES\020\010\022\020\n\014SESS" +
-      "ION_DATA\020\t\022\023\n\017MONITOR_SESSION\020\n\022\r\n\tEXCEP" +
-      "TION\020\013\022\010\n\004ICAP\020\014\022\n\n\006CONFIG\020\r\022\t\n\005PARSE\020\016\022" +
-      "\025\n\021COLLECTOR_FEATURE\020\017\022\020\n\014SYSTEM_I_RAW\020\020",
-      "\022\020\n\014GDM_APP_DATA\020\021\022\030\n\024QUERYREWRITE_PREVI" +
-      "EW\020\022\022\021\n\rFSM_TEMPLATES\020\023\022\027\n\023FSM_ALERT_FIL" +
-      "E_OPEN\020\024\022\027\n\023FSM_ALERT_FILE_DATA\020\025\022\030\n\024FSM" +
-      "_ALERT_FILE_CLOSE\020\026\022\030\n\024STAP_POLICY_RESPO" +
-      "NSE\020\027\022\023\n\017CONSOLE_COMMAND\020\030\022\r\n\tFAM_RULES\020" +
-      "\032\022\030\n\024FAM_SHAREPOINT_RULES\020\033\022\021\n\rFAM_NAS_R" +
-      "ULES\020\034\"8\n\005Event\022/\n\003msg\030\001 \001(\0132\".guard.dat" +
-      "asource.Guard_ds_messageB#\n!com.ibm.guar" +
-      "dium.proto.datasource"
+      "RT\020\020\"E\n\rFAM_NAS_rules\0224\n\014fam_nas_rule\030\001 " +
+      "\003(\0132\036.guard.datasource.FAM_NAS_rule\"\344\006\n\014" +
+      "FAM_NAS_rule\022\017\n\007rule_id\030\001 \002(\r\022\025\n\rrule_po" +
+      "sition\030\002 \001(\r\022\020\n\010os_users\030\003 \003(\t\022\030\n\020os_use" +
+      "r_not_flag\030\004 \001(\010\022\023\n\013unix_groups\030\005 \003(\t\022\033\n",
+      "\023unix_group_not_flag\030\006 \001(\010\022\022\n\nfile_paths" +
+      "\030\007 \003(\t\022\032\n\022file_path_not_flag\030\010 \001(\010\022\036\n\026in" +
+      "clude_subdirectories\030\013 \001(\010\022\037\n\027monitor_re" +
+      "movable_media\030\014 \001(\010\022\021\n\textension\030\r \003(\t\022\032" +
+      "\n\022extension_group_id\030\016 \001(\r\022\032\n\022extension_" +
+      "not_flag\030\017 \001(\010\022\032\n\022exclude_file_paths\030\020 \003" +
+      "(\t\022\"\n\032exclude_file_path_group_id\030\021 \001(\r\022\"" +
+      "\n\032exclude_file_path_not_flag\030\022 \001(\010\022\030\n\rAd" +
+      "dDir_action\030\025 \001(\r:\0010\022\031\n\016AddFile_action\030\026" +
+      " \001(\r:\0010\022\033\n\020DeleteDir_action\030\027 \001(\r:\0010\022\034\n\021",
+      "DeleteFile_action\030\030 \001(\r:\0010\022\034\n\021DirPermChg" +
+      "_action\030\031 \001(\r:\0010\022\035\n\022FilePermChg_action\030\032" +
+      " \001(\r:\0010\022\032\n\017ReadFile_action\030\033 \001(\r:\0010\022\034\n\021U" +
+      "pdateFile_action\030\034 \001(\r:\0010\022\034\n\021RenameFile_" +
+      "action\030\035 \001(\r:\0010\022\033\n\020RenameDir_action\030\036 \001(" +
+      "\r:\0010\"\213\001\n\017FAM_Action_type\022\017\n\013ACTION_NONE\020" +
+      "\000\022\020\n\014ACTION_AUDIT\020\001\022\033\n\027ACTION_POLICY_VIO" +
+      "LATION\020\002\022\020\n\014ACTION_BLOCK\020\004\022\024\n\020ACTION_EXC" +
+      "EPTION\020\010\022\020\n\014ACTION_ALERT\020\020\"\270\002\n\021FSM_Alert" +
+      "FileOpen\022\n\n\002id\030\001 \002(\r\022\024\n\014machine_name\030\002 \001",
+      "(\t\022\032\n\022file_specification\030\003 \001(\t\0221\n\014modifi" +
+      "cation\030\004 \001(\0132\033.guard.datasource.Timestam" +
+      "p\022\013\n\003pid\030\005 \001(\r\022\022\n\nimage_name\030\006 \001(\t\022\021\n\tus" +
+      "er_name\030\007 \001(\t\022\022\n\nbytes_read\030\010 \001(\004\022\025\n\rbyt" +
+      "es_written\030\t \001(\004\022\021\n\tclient_ip\030\n \001(\r\022\030\n\020c" +
+      "lient_host_name\030\013 \001(\t\022\017\n\007rule_id\030\014 \001(\r\022\025" +
+      "\n\rrule_position\030\r \001(\r\"-\n\021FSM_AlertFileDa" +
+      "ta\022\n\n\002id\030\001 \002(\r\022\014\n\004data\030\002 \001(\014\"1\n\022FSM_Aler" +
+      "tFileClose\022\n\n\002id\030\001 \002(\r\022\017\n\007discard\030\002 \001(\010\"" +
+      "\217\001\n\021Collector_feature\022\033\n\023ims_time_conver",
+      "sion\030\001 \001(\010\022\024\n\014support_itap\030\002 \001(\010\022\035\n\022supp" +
+      "ort_itap_chunk\030\003 \001(\005:\0010\022(\n\031support_force" +
+      "_log_limited\030\004 \001(\010:\005false\".\n\014System_i_ra" +
+      "w\022\014\n\004data\030\001 \002(\014\022\020\n\010sequence\030\002 \001(\006\"\335\002\n\014Gd" +
+      "m_app_data\022\021\n\tapps_code\030\001 \001(\t\022\020\n\010app_typ" +
+      "e\030\002 \001(\t\022\020\n\010app_user\030\003 \001(\t\022\026\n\016operation_t" +
+      "ype\030\004 \001(\t\0220\n\013change_date\030\005 \001(\0132\033.guard.d" +
+      "atasource.Timestamp\022\021\n\titem_name\030\006 \001(\t\022\030" +
+      "\n\020transaction_code\030\007 \001(\t\022\021\n\tsystem_id\030\010 " +
+      "\001(\t\022\027\n\017record_detail_1\030\t \001(\t\022\027\n\017record_d",
+      "etail_2\030\n \001(\t\022\027\n\017record_detail_3\030\013 \001(\t\022\027" +
+      "\n\017record_detail_4\030\014 \001(\t\022\r\n\005vbkey\030\r \001(\t\022\031" +
+      "\n\021original_timezone\030\016 \001(\t\"\205\001\n\017Unit_Ident" +
+      "ifier\0224\n\004type\030\001 \002(\0162&.guard.datasource.U" +
+      "nit_Identifier.Type\022\n\n\002id\030\002 \001(\t\022\n\n\002ip\030\003 " +
+      "\001(\t\"$\n\004Type\022\r\n\tSTAP_UNIT\020\001\022\r\n\tCOLLECTOR\020" +
+      "\002\"\247\001\n\023Name_bin_value_pair\022\014\n\004name\030\001 \001(\t\022" +
+      "\r\n\005value\030\002 \001(\014\022<\n\006format\030\003 \001(\0162,.guard.d" +
+      "atasource.Name_bin_value_pair.Format\"5\n\006" +
+      "Format\022\010\n\004STCK\020\001\022\013\n\007INTEGER\020\002\022\007\n\003HEX\020\003\022\013",
+      "\n\007EBCIDIC\020\004\"C\n\nOne_Record\0225\n\006values\030\001 \003(" +
+      "\0132%.guard.datasource.Name_bin_value_pair" +
+      "\"L\n\013Data_Status\022\016\n\006entity\030\001 \002(\t\022-\n\007recor" +
+      "ds\030\002 \003(\0132\034.guard.datasource.One_Record\"O" +
+      "\n\nUnit_Debug\022\020\n\010debug_on\030\001 \001(\010\022\023\n\013debug_" +
+      "level\030\002 \001(\005\022\032\n\022debug_duration_sec\030\005 \001(\005\"" +
+      "\356\002\n\017Console_Command\0224\n\004type\030\001 \002(\0162&.guar" +
+      "d.datasource.Console_Command.Type\0226\n\013des" +
+      "tination\030\002 \002(\0132!.guard.datasource.Unit_I" +
+      "dentifier\0220\n\nunit_debug\030\003 \001(\0132\034.guard.da",
+      "tasource.Unit_Debug\0222\n\013data_status\030\004 \003(\013" +
+      "2\035.guard.datasource.Data_Status\022\027\n\017stap_" +
+      "identifier\030\005 \003(\t\022\024\n\014message_text\030\006 \001(\t\"X" +
+      "\n\004Type\022\016\n\nUNIT_DEBUG\020\001\022\017\n\013MUST_GATHER\020\002\022" +
+      "\017\n\013DATA_STATUS\020\003\022\016\n\nUNREGISTER\020\004\022\016\n\nGET_" +
+      "STATUS\020\005\"\212\002\n\024ConnectionQuarantine\022\021\n\tser" +
+      "ver_ip\030\001 \001(\t\022\024\n\014service_name\030\002 \001(\t\022\017\n\007db" +
+      "_user\030\003 \001(\t\022.\n\ttimestamp\030\004 \001(\0132\033.guard.d" +
+      "atasource.Timestamp\0225\n\020quarantine_until\030" +
+      "\005 \001(\0132\033.guard.datasource.Timestamp\0220\n\013al",
+      "low_until\030\006 \001(\0132\033.guard.datasource.Times" +
+      "tamp\022\017\n\007deleted\030\007 \001(\010\022\016\n\006ims_id\030\010 \001(\t\"\274\001" +
+      "\n\016QuarantineList\022>\n\016quarantineItem\030\001 \003(\013" +
+      "2&.guard.datasource.ConnectionQuarantine" +
+      "\022.\n\ttimestamp\030\002 \001(\0132\033.guard.datasource.T" +
+      "imestamp\022\023\n\013incremental\030\003 \001(\010\022\017\n\007ack_num" +
+      "\030\004 \001(\003\022\024\n\014list_omitted\030\005 \001(\010\"\377\002\n\024STAP_Po" +
+      "licy_Response\0229\n\004type\030\001 \001(\0162+.guard.data" +
+      "source.STAP_Policy_Response.Type\022\024\n\014thre" +
+      "ad_token\030\002 \001(\r\022\025\n\rmvsSystemName\030\003 \001(\t\022\026\n",
+      "\016db2SubsystemId\030\004 \001(\t\0226\n\013destination\030\005 \001" +
+      "(\0132!.guard.datasource.Unit_Identifier\0228\n" +
+      "\016quarantineList\030\006 \001(\0132 .guard.datasource" +
+      ".QuarantineList\0221\n\014current_time\030\007 \001(\0132\033." +
+      "guard.datasource.Timestamp\"B\n\004Type\022\022\n\016ST" +
+      "AP_TERMINATE\020\001\022\016\n\nQUARANTINE\020\002\022\026\n\022QUARAN" +
+      "TINE_CHANGED\020\003\"\271\021\n\020Guard_ds_message\0225\n\004t" +
+      "ype\030\001 \002(\0162\'.guard.datasource.Guard_ds_me" +
+      "ssage.Type\022.\n\thandshake\030\002 \001(\0132\033.guard.da" +
+      "tasource.Handshake\022$\n\004ping\030\003 \001(\0132\026.guard",
+      ".datasource.Ping\0226\n\rsession_start\030\004 \001(\0132" +
+      "\037.guard.datasource.Session_start\0222\n\013sess" +
+      "ion_end\030\005 \001(\0132\035.guard.datasource.Session" +
+      "_end\0228\n\016client_request\030\006 \001(\0132 .guard.dat" +
+      "asource.Client_request\0224\n\014server_reply\030\007" +
+      " \001(\0132\036.guard.datasource.Server_reply\022.\n\t" +
+      "error_msg\030\010 \001(\0132\033.guard.datasource.Error" +
+      "_msg\022B\n\023interception_policy\030\t \001(\0132%.guar" +
+      "d.datasource.Interception_policy\022B\n\023opaq" +
+      "ue_session_data\030\n \001(\0132%.guard.datasource",
+      ".Opaque_session_data\022:\n\017monitor_session\030" +
+      "\013 \001(\0132!.guard.datasource.Monitor_session" +
+      "\022.\n\texception\030\014 \001(\0132\033.guard.datasource.E" +
+      "xception\022$\n\004icap\030\r \001(\0132\026.guard.datasourc" +
+      "e.ICAP\022.\n\006config\030\016 \001(\0132\036.guard.datasourc" +
+      "e.Agent_config\022\020\n\010sequence\030\017 \001(\r\022\014\n\004more" +
+      "\030\020 \001(\010\022/\n\005parse\030\021 \001(\0132 .guard.datasource" +
+      ".Parser_request\022>\n\021collector_feature\030\022 \001" +
+      "(\0132#.guard.datasource.Collector_feature\022" +
+      "4\n\014system_i_raw\030\023 \001(\0132\036.guard.datasource",
+      ".System_i_raw\0224\n\014gdm_app_data\030\024 \001(\0132\036.gu" +
+      "ard.datasource.Gdm_app_data\022K\n\023qrw_previ" +
+      "ew_request\030\025 \001(\0132..guard.datasource.Quer" +
+      "yRewrite_preview_request\022H\n\022qrw_preview_" +
+      "result\030\026 \001(\0132,.guard.datasource.QueryRew" +
+      "rite_preview_reply\0225\n\010fsm_open\030\030 \001(\0132#.g" +
+      "uard.datasource.FSM_AlertFileOpen\0225\n\010fsm" +
+      "_data\030\031 \001(\0132#.guard.datasource.FSM_Alert" +
+      "FileData\0227\n\tfsm_close\030\032 \001(\0132$.guard.data" +
+      "source.FSM_AlertFileClose\022D\n\024stap_policy",
+      "_response\030\033 \001(\0132&.guard.datasource.STAP_" +
+      "Policy_Response\022:\n\017console_command\030\034 \001(\013" +
+      "2!.guard.datasource.Console_Command\022\026\n\013i" +
+      "nstance_id\030\035 \001(\r:\0010\022.\n\tfam_rules\030\037 \001(\0132\033" +
+      ".guard.datasource.FAM_rules\022D\n\024fam_share" +
+      "point_rules\030  \001(\0132&.guard.datasource.FAM" +
+      "_SHAREPOINT_rules\0226\n\rfam_nas_rules\030! \001(\013" +
+      "2\037.guard.datasource.FAM_NAS_rules\022-\n\tten" +
+      "ant_id\030\" \001(\0132\032.guard.datasource.TenantID" +
+      "\"\217\004\n\004Type\022\r\n\tHANDSHAKE\020\001\022\010\n\004PING\020\002\022\r\n\tER",
+      "ROR_MSG\020\003\022\021\n\rSESSION_START\020\004\022\017\n\013SESSION_" +
+      "END\020\005\022\022\n\016CLIENT_REQUEST\020\006\022\020\n\014SERVER_REPL" +
+      "Y\020\007\022\020\n\014POLICY_RULES\020\010\022\020\n\014SESSION_DATA\020\t\022" +
+      "\023\n\017MONITOR_SESSION\020\n\022\r\n\tEXCEPTION\020\013\022\010\n\004I" +
+      "CAP\020\014\022\n\n\006CONFIG\020\r\022\t\n\005PARSE\020\016\022\025\n\021COLLECTO" +
+      "R_FEATURE\020\017\022\020\n\014SYSTEM_I_RAW\020\020\022\020\n\014GDM_APP" +
+      "_DATA\020\021\022\030\n\024QUERYREWRITE_PREVIEW\020\022\022\021\n\rFSM" +
+      "_TEMPLATES\020\023\022\027\n\023FSM_ALERT_FILE_OPEN\020\024\022\027\n" +
+      "\023FSM_ALERT_FILE_DATA\020\025\022\030\n\024FSM_ALERT_FILE" +
+      "_CLOSE\020\026\022\030\n\024STAP_POLICY_RESPONSE\020\027\022\023\n\017CO",
+      "NSOLE_COMMAND\020\030\022\r\n\tFAM_RULES\020\032\022\030\n\024FAM_SH" +
+      "AREPOINT_RULES\020\033\022\021\n\rFAM_NAS_RULES\020\034\022\r\n\tT" +
+      "ENANT_ID\020\035\"8\n\005Event\022/\n\003msg\030\001 \001(\0132\".guard" +
+      ".datasource.Guard_ds_messageB#\n!com.ibm." +
+      "guardium.proto.datasource"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -95229,248 +96601,254 @@ public final class Datasource {
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guard_datasource_HTTP_reply_Header_field_descriptor,
               new java.lang.String[] { "Name", "Value", });
-          internal_static_guard_datasource_Handshake_descriptor =
+          internal_static_guard_datasource_TenantID_descriptor =
             getDescriptor().getMessageTypes().get(4);
+          internal_static_guard_datasource_TenantID_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_guard_datasource_TenantID_descriptor,
+              new java.lang.String[] { "TenantId", });
+          internal_static_guard_datasource_Handshake_descriptor =
+            getDescriptor().getMessageTypes().get(5);
           internal_static_guard_datasource_Handshake_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guard_datasource_Handshake_descriptor,
               new java.lang.String[] { "Timestamp", "ClientIdentifier", "CurrentMaster", "CurrentMasterIp", "Vendor", "Product", "Version", "Firewall", "Transient", "Forwarding", "Sink", "PolicyPush", "QuarantinePush", "ClientType", "IsIpv6", "CurrentMasterIpv6", "ForceLogLimited", });
           internal_static_guard_datasource_Forwarding_configuration_descriptor =
-            getDescriptor().getMessageTypes().get(5);
+            getDescriptor().getMessageTypes().get(6);
           internal_static_guard_datasource_Forwarding_configuration_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guard_datasource_Forwarding_configuration_descriptor,
               new java.lang.String[] { "VendorId", "ForwardMessages", "FilterMessages", });
           internal_static_guard_datasource_Ping_descriptor =
-            getDescriptor().getMessageTypes().get(6);
+            getDescriptor().getMessageTypes().get(7);
           internal_static_guard_datasource_Ping_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guard_datasource_Ping_descriptor,
               new java.lang.String[] { "Timestamp", "ClientIdentifier", "CurrentMaster", "CurrentMasterIp", "IsIpv6", "CurrentMasterIpv6", });
           internal_static_guard_datasource_Error_msg_descriptor =
-            getDescriptor().getMessageTypes().get(7);
+            getDescriptor().getMessageTypes().get(8);
           internal_static_guard_datasource_Error_msg_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guard_datasource_Error_msg_descriptor,
               new java.lang.String[] { "Msg", "Level", "Timestamp", });
           internal_static_guard_datasource_Accessor_descriptor =
-            getDescriptor().getMessageTypes().get(8);
+            getDescriptor().getMessageTypes().get(9);
           internal_static_guard_datasource_Accessor_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guard_datasource_Accessor_descriptor,
               new java.lang.String[] { "DbUser", "ServerType", "ServerOs", "ClientOs", "ClientHostname", "ServerHostname", "CommProtocol", "DbProtocol", "DbProtocolVersion", "OsUser", "SourceProgram", "ClientMac", "ServerDescription", "ServiceName", "Language", "Type", "DatasourceType", });
           internal_static_guard_datasource_Session_start_descriptor =
-            getDescriptor().getMessageTypes().get(9);
+            getDescriptor().getMessageTypes().get(10);
           internal_static_guard_datasource_Session_start_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guard_datasource_Session_start_descriptor,
               new java.lang.String[] { "SessionId", "SessionLocator", "Timestamp", "Accessor", "UidChain", "PrevSessionId", "ProcessId", "TerminalId", "DbName", "AppUserName", "ConfigId", });
           internal_static_guard_datasource_Session_end_descriptor =
-            getDescriptor().getMessageTypes().get(10);
+            getDescriptor().getMessageTypes().get(11);
           internal_static_guard_datasource_Session_end_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guard_datasource_Session_end_descriptor,
               new java.lang.String[] { "SessionId", "Timestamp", "SessionLocator", });
           internal_static_guard_datasource_Bind_variable_descriptor =
-            getDescriptor().getMessageTypes().get(11);
+            getDescriptor().getMessageTypes().get(12);
           internal_static_guard_datasource_Bind_variable_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guard_datasource_Bind_variable_descriptor,
               new java.lang.String[] { "Type", "Value", });
           internal_static_guard_datasource_Bind_info_descriptor =
-            getDescriptor().getMessageTypes().get(12);
+            getDescriptor().getMessageTypes().get(13);
           internal_static_guard_datasource_Bind_info_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guard_datasource_Bind_info_descriptor,
               new java.lang.String[] { "Vars", });
           internal_static_guard_datasource_Client_request_descriptor =
-            getDescriptor().getMessageTypes().get(13);
+            getDescriptor().getMessageTypes().get(14);
           internal_static_guard_datasource_Client_request_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guard_datasource_Client_request_descriptor,
-              new java.lang.String[] { "SessionId", "RequestId", "Data", "BindInfo", "RuleId", "FamAction", "FamActionOp", "ExtraInfo", "ReturnCode", "RulePosition", });
+              new java.lang.String[] { "SessionId", "RequestId", "Data", "BindInfo", "RuleId", "FamAction", "FamActionOp", "ExtraInfo", "ReturnCode", "RulePosition", "UidChain", "DbName", "Accessor", });
           internal_static_guard_datasource_Server_reply_descriptor =
-            getDescriptor().getMessageTypes().get(14);
+            getDescriptor().getMessageTypes().get(15);
           internal_static_guard_datasource_Server_reply_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guard_datasource_Server_reply_descriptor,
               new java.lang.String[] { "SessionId", "RequestId", "ReplySeq", "Data", "RequestFailed", "RecordsAffected", "ExecutionTime", "RequestAcknowledgedTime", "RuleId", "RulePosition", });
           internal_static_guard_datasource_Value_group_descriptor =
-            getDescriptor().getMessageTypes().get(15);
+            getDescriptor().getMessageTypes().get(16);
           internal_static_guard_datasource_Value_group_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guard_datasource_Value_group_descriptor,
               new java.lang.String[] { "ValueGroupId", "Member", });
           internal_static_guard_datasource_Policy_rule_item_descriptor =
-            getDescriptor().getMessageTypes().get(16);
+            getDescriptor().getMessageTypes().get(17);
           internal_static_guard_datasource_Policy_rule_item_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guard_datasource_Policy_rule_item_descriptor,
               new java.lang.String[] { "FieldName", "Value", "ValueGroup", "Inverted", });
           internal_static_guard_datasource_Policy_rule_action_descriptor =
-            getDescriptor().getMessageTypes().get(17);
+            getDescriptor().getMessageTypes().get(18);
           internal_static_guard_datasource_Policy_rule_action_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guard_datasource_Policy_rule_action_descriptor,
               new java.lang.String[] { "Sequence", "Type", });
           internal_static_guard_datasource_Policy_rule_descriptor =
-            getDescriptor().getMessageTypes().get(18);
+            getDescriptor().getMessageTypes().get(19);
           internal_static_guard_datasource_Policy_rule_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guard_datasource_Policy_rule_descriptor,
               new java.lang.String[] { "Position", "ReplacementChar", "RecordsAffectedThreshold", "MatchedReturnedDataThreshold", "QuarantineMinutes", "Item", "Type", "Action", "ContinueToNextRule", "Severity", "Name", "PolicyName", });
           internal_static_guard_datasource_Interception_policy_descriptor =
-            getDescriptor().getMessageTypes().get(19);
+            getDescriptor().getMessageTypes().get(20);
           internal_static_guard_datasource_Interception_policy_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guard_datasource_Interception_policy_descriptor,
               new java.lang.String[] { "PolicyRule", "Name", });
           internal_static_guard_datasource_Opaque_session_data_descriptor =
-            getDescriptor().getMessageTypes().get(20);
+            getDescriptor().getMessageTypes().get(21);
           internal_static_guard_datasource_Opaque_session_data_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guard_datasource_Opaque_session_data_descriptor,
               new java.lang.String[] { "BlobType", "SessionBlob", });
           internal_static_guard_datasource_Session_blob_descriptor =
-            getDescriptor().getMessageTypes().get(21);
+            getDescriptor().getMessageTypes().get(22);
           internal_static_guard_datasource_Session_blob_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guard_datasource_Session_blob_descriptor,
               new java.lang.String[] { "Session", "Blob", });
           internal_static_guard_datasource_Monitor_session_descriptor =
-            getDescriptor().getMessageTypes().get(22);
+            getDescriptor().getMessageTypes().get(23);
           internal_static_guard_datasource_Monitor_session_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guard_datasource_Monitor_session_descriptor,
               new java.lang.String[] { "SessionFlags", "Scrub", });
           internal_static_guard_datasource_Scrub_descriptor =
-            getDescriptor().getMessageTypes().get(23);
+            getDescriptor().getMessageTypes().get(24);
           internal_static_guard_datasource_Scrub_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guard_datasource_Scrub_descriptor,
               new java.lang.String[] { "KtapSessionId", "Pattern", "Filler", });
           internal_static_guard_datasource_Session_flags_descriptor =
-            getDescriptor().getMessageTypes().get(24);
+            getDescriptor().getMessageTypes().get(25);
           internal_static_guard_datasource_Session_flags_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guard_datasource_Session_flags_descriptor,
               new java.lang.String[] { "Session", "Flags", });
           internal_static_guard_datasource_Exception_descriptor =
-            getDescriptor().getMessageTypes().get(25);
+            getDescriptor().getMessageTypes().get(26);
           internal_static_guard_datasource_Exception_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guard_datasource_Exception_descriptor,
               new java.lang.String[] { "EXCEPTIONTYPEID", "Session", "SESSIONID", "DBPROTOCOL", "DESCRIPTION", "SQLSTRING", "DBUSER", "DBPASSWORDHASH", "ERRORCAUSE", "APPUSERNAME", "Count", "Timestamp", });
           internal_static_guard_datasource_Positional_string_descriptor =
-            getDescriptor().getMessageTypes().get(26);
+            getDescriptor().getMessageTypes().get(27);
           internal_static_guard_datasource_Positional_string_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guard_datasource_Positional_string_descriptor,
               new java.lang.String[] { "Start", "End", });
           internal_static_guard_datasource_GDM_field_descriptor =
-            getDescriptor().getMessageTypes().get(27);
+            getDescriptor().getMessageTypes().get(28);
           internal_static_guard_datasource_GDM_field_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guard_datasource_GDM_field_descriptor,
               new java.lang.String[] { "Name", "Origins", "Value", "Position", "BeforeValue", });
           internal_static_guard_datasource_GDM_object_descriptor =
-            getDescriptor().getMessageTypes().get(28);
+            getDescriptor().getMessageTypes().get(29);
           internal_static_guard_datasource_GDM_object_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guard_datasource_GDM_object_descriptor,
               new java.lang.String[] { "Name", "Schema", "Type", "Fields", "Position", });
           internal_static_guard_datasource_GDM_sentence_descriptor =
-            getDescriptor().getMessageTypes().get(29);
+            getDescriptor().getMessageTypes().get(30);
           internal_static_guard_datasource_GDM_sentence_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guard_datasource_GDM_sentence_descriptor,
               new java.lang.String[] { "Verb", "Descendants", "Objects", "Fields", "Position", });
           internal_static_guard_datasource_GDM_construct_descriptor =
-            getDescriptor().getMessageTypes().get(30);
+            getDescriptor().getMessageTypes().get(31);
           internal_static_guard_datasource_GDM_construct_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guard_datasource_GDM_construct_descriptor,
               new java.lang.String[] { "Sentences", "OriginalSql", "FullSql", "IsValid", "StatementType", });
           internal_static_guard_datasource_ICAP_descriptor =
-            getDescriptor().getMessageTypes().get(31);
+            getDescriptor().getMessageTypes().get(32);
           internal_static_guard_datasource_ICAP_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guard_datasource_ICAP_descriptor,
               new java.lang.String[] { "Type", "Body", "Eof", "ReqHeader", "RespHeader", "ClientIp", "ClientUsername", "ServerIp", "UserAgent", "ServerHostname", "Url", "ContentType", "Referer", });
           internal_static_guard_datasource_Name_value_pair_descriptor =
-            getDescriptor().getMessageTypes().get(32);
+            getDescriptor().getMessageTypes().get(33);
           internal_static_guard_datasource_Name_value_pair_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guard_datasource_Name_value_pair_descriptor,
               new java.lang.String[] { "Name", "Value", });
           internal_static_guard_datasource_Agent_config_section_descriptor =
-            getDescriptor().getMessageTypes().get(33);
+            getDescriptor().getMessageTypes().get(34);
           internal_static_guard_datasource_Agent_config_section_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guard_datasource_Agent_config_section_descriptor,
               new java.lang.String[] { "SectionName", "Parameters", });
           internal_static_guard_datasource_Agent_config_descriptor =
-            getDescriptor().getMessageTypes().get(34);
+            getDescriptor().getMessageTypes().get(35);
           internal_static_guard_datasource_Agent_config_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guard_datasource_Agent_config_descriptor,
               new java.lang.String[] { "ClientIdentifier", "Sections", "ForUpdate", });
           internal_static_guard_datasource_PI_position_descriptor =
-            getDescriptor().getMessageTypes().get(35);
+            getDescriptor().getMessageTypes().get(36);
           internal_static_guard_datasource_PI_position_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guard_datasource_PI_position_descriptor,
               new java.lang.String[] { "Start", "End", "ByteStart", "ByteEnd", });
           internal_static_guard_datasource_PI_Field_descriptor =
-            getDescriptor().getMessageTypes().get(36);
+            getDescriptor().getMessageTypes().get(37);
           internal_static_guard_datasource_PI_Field_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guard_datasource_PI_Field_descriptor,
               new java.lang.String[] { "FieldName", "FieldPos", "Origins", "UnaliasedName", });
           internal_static_guard_datasource_PI_Object_descriptor =
-            getDescriptor().getMessageTypes().get(37);
+            getDescriptor().getMessageTypes().get(38);
           internal_static_guard_datasource_PI_Object_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guard_datasource_PI_Object_descriptor,
               new java.lang.String[] { "ObjectName", "ObjectPos", "Fields", "UnaliasedName", });
           internal_static_guard_datasource_PI_Expression_descriptor =
-            getDescriptor().getMessageTypes().get(38);
+            getDescriptor().getMessageTypes().get(39);
           internal_static_guard_datasource_PI_Expression_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guard_datasource_PI_Expression_descriptor,
               new java.lang.String[] { "LeftSidePos", "RightSidePos", });
           internal_static_guard_datasource_PI_Sentence_descriptor =
-            getDescriptor().getMessageTypes().get(39);
+            getDescriptor().getMessageTypes().get(40);
           internal_static_guard_datasource_PI_Sentence_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guard_datasource_PI_Sentence_descriptor,
               new java.lang.String[] { "Verbs", "VerbsPos", "Fields", "Objects", "Subsentences", "Expressions", "SentencePos", "JoinPos", "WherePos", });
           internal_static_guard_datasource_PI_Construct_descriptor =
-            getDescriptor().getMessageTypes().get(40);
+            getDescriptor().getMessageTypes().get(41);
           internal_static_guard_datasource_PI_Construct_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guard_datasource_PI_Construct_descriptor,
               new java.lang.String[] { "Sentences", "Constants", "Passwords", });
           internal_static_guard_datasource_Parser_result_descriptor =
-            getDescriptor().getMessageTypes().get(41);
+            getDescriptor().getMessageTypes().get(42);
           internal_static_guard_datasource_Parser_result_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guard_datasource_Parser_result_descriptor,
               new java.lang.String[] { "Constructs", "OriginalSql", "ParseRequestId", "Error", });
           internal_static_guard_datasource_Parser_request_descriptor =
-            getDescriptor().getMessageTypes().get(42);
+            getDescriptor().getMessageTypes().get(43);
           internal_static_guard_datasource_Parser_request_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guard_datasource_Parser_request_descriptor,
               new java.lang.String[] { "OriginalSql", "ParseRequestId", "Language", "SqlElements", });
           internal_static_guard_datasource_QueryRewrite_preview_request_descriptor =
-            getDescriptor().getMessageTypes().get(43);
+            getDescriptor().getMessageTypes().get(44);
           internal_static_guard_datasource_QueryRewrite_preview_request_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guard_datasource_QueryRewrite_preview_request_descriptor,
               new java.lang.String[] { "Language", "SampleSqls", "QrDefinitionIds", });
           internal_static_guard_datasource_QueryRewrite_preview_reply_descriptor =
-            getDescriptor().getMessageTypes().get(44);
+            getDescriptor().getMessageTypes().get(45);
           internal_static_guard_datasource_QueryRewrite_preview_reply_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guard_datasource_QueryRewrite_preview_reply_descriptor,
@@ -95488,139 +96866,139 @@ public final class Datasource {
               internal_static_guard_datasource_QueryRewrite_preview_reply_QR_result_Applied_QR_Definition_IDs_descriptor,
               new java.lang.String[] { "QrDefinitionIds", });
           internal_static_guard_datasource_FAM_rules_descriptor =
-            getDescriptor().getMessageTypes().get(45);
+            getDescriptor().getMessageTypes().get(46);
           internal_static_guard_datasource_FAM_rules_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guard_datasource_FAM_rules_descriptor,
               new java.lang.String[] { "FamRule", });
           internal_static_guard_datasource_FAM_rule_descriptor =
-            getDescriptor().getMessageTypes().get(46);
+            getDescriptor().getMessageTypes().get(47);
           internal_static_guard_datasource_FAM_rule_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guard_datasource_FAM_rule_descriptor,
               new java.lang.String[] { "RuleId", "RulePosition", "OsUsers", "OsUserNotFlag", "UnixGroups", "UnixGroupNotFlag", "FilePaths", "FilePathNotFlag", "IncludeSubdirectories", "MonitorRemovableMedia", "OpenAction", "ReadAction", "WriteAction", "ExecuteAction", "DeleteAction", "FileopAction", });
           internal_static_guard_datasource_FAM_SHAREPOINT_rules_descriptor =
-            getDescriptor().getMessageTypes().get(47);
+            getDescriptor().getMessageTypes().get(48);
           internal_static_guard_datasource_FAM_SHAREPOINT_rules_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guard_datasource_FAM_SHAREPOINT_rules_descriptor,
               new java.lang.String[] { "FamSharepointRule", "RuleConditionPolicy", });
           internal_static_guard_datasource_FAM_SHAREPOINT_rule_descriptor =
-            getDescriptor().getMessageTypes().get(48);
+            getDescriptor().getMessageTypes().get(49);
           internal_static_guard_datasource_FAM_SHAREPOINT_rule_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guard_datasource_FAM_SHAREPOINT_rule_descriptor,
               new java.lang.String[] { "RuleId", "RulePosition", "OsUsers", "OsUserNotFlag", "UnixGroups", "UnixGroupNotFlag", "FilePaths", "FilePathNotFlag", "AddToGroupAction", "AuditMaskChangeAction", "ChangePermissionAction", "ChangeRoleAction", "CheckInAction", "CheckOutAction", "ChildDeleteAction", "ChildMoveAction", "CopyAction", "CreateRoleAction", "CreateUserGroupAction", "CustomAction", "DeleteAction", "DeleteAuditedAction", "DeleteFromGroupAction", "DeleteGroupAction", "FileFragmentWriteAction", "GrantPermissionAction", "MoveAction", "ProfileChangeAction", "RemoveRoleAction", "RevokePermissionAction", "SchemaChangeAction", "SearchAction", "TurnOffRoleAction", "TurnOffSecurityAction", "TurnOnSecurityAction", "UndeleteAction", "UpdateAction", "ViewAction", "WorkflowAction", });
           internal_static_guard_datasource_FAM_NAS_rules_descriptor =
-            getDescriptor().getMessageTypes().get(49);
+            getDescriptor().getMessageTypes().get(50);
           internal_static_guard_datasource_FAM_NAS_rules_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guard_datasource_FAM_NAS_rules_descriptor,
               new java.lang.String[] { "FamNasRule", });
           internal_static_guard_datasource_FAM_NAS_rule_descriptor =
-            getDescriptor().getMessageTypes().get(50);
+            getDescriptor().getMessageTypes().get(51);
           internal_static_guard_datasource_FAM_NAS_rule_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guard_datasource_FAM_NAS_rule_descriptor,
               new java.lang.String[] { "RuleId", "RulePosition", "OsUsers", "OsUserNotFlag", "UnixGroups", "UnixGroupNotFlag", "FilePaths", "FilePathNotFlag", "IncludeSubdirectories", "MonitorRemovableMedia", "Extension", "ExtensionGroupId", "ExtensionNotFlag", "ExcludeFilePaths", "ExcludeFilePathGroupId", "ExcludeFilePathNotFlag", "AddDirAction", "AddFileAction", "DeleteDirAction", "DeleteFileAction", "DirPermChgAction", "FilePermChgAction", "ReadFileAction", "UpdateFileAction", "RenameFileAction", "RenameDirAction", });
           internal_static_guard_datasource_FSM_AlertFileOpen_descriptor =
-            getDescriptor().getMessageTypes().get(51);
+            getDescriptor().getMessageTypes().get(52);
           internal_static_guard_datasource_FSM_AlertFileOpen_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guard_datasource_FSM_AlertFileOpen_descriptor,
               new java.lang.String[] { "Id", "MachineName", "FileSpecification", "Modification", "Pid", "ImageName", "UserName", "BytesRead", "BytesWritten", "ClientIp", "ClientHostName", "RuleId", "RulePosition", });
           internal_static_guard_datasource_FSM_AlertFileData_descriptor =
-            getDescriptor().getMessageTypes().get(52);
+            getDescriptor().getMessageTypes().get(53);
           internal_static_guard_datasource_FSM_AlertFileData_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guard_datasource_FSM_AlertFileData_descriptor,
               new java.lang.String[] { "Id", "Data", });
           internal_static_guard_datasource_FSM_AlertFileClose_descriptor =
-            getDescriptor().getMessageTypes().get(53);
+            getDescriptor().getMessageTypes().get(54);
           internal_static_guard_datasource_FSM_AlertFileClose_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guard_datasource_FSM_AlertFileClose_descriptor,
               new java.lang.String[] { "Id", "Discard", });
           internal_static_guard_datasource_Collector_feature_descriptor =
-            getDescriptor().getMessageTypes().get(54);
+            getDescriptor().getMessageTypes().get(55);
           internal_static_guard_datasource_Collector_feature_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guard_datasource_Collector_feature_descriptor,
               new java.lang.String[] { "ImsTimeConversion", "SupportItap", "SupportItapChunk", "SupportForceLogLimited", });
           internal_static_guard_datasource_System_i_raw_descriptor =
-            getDescriptor().getMessageTypes().get(55);
+            getDescriptor().getMessageTypes().get(56);
           internal_static_guard_datasource_System_i_raw_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guard_datasource_System_i_raw_descriptor,
               new java.lang.String[] { "Data", "Sequence", });
           internal_static_guard_datasource_Gdm_app_data_descriptor =
-            getDescriptor().getMessageTypes().get(56);
+            getDescriptor().getMessageTypes().get(57);
           internal_static_guard_datasource_Gdm_app_data_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guard_datasource_Gdm_app_data_descriptor,
               new java.lang.String[] { "AppsCode", "AppType", "AppUser", "OperationType", "ChangeDate", "ItemName", "TransactionCode", "SystemId", "RecordDetail1", "RecordDetail2", "RecordDetail3", "RecordDetail4", "Vbkey", "OriginalTimezone", });
           internal_static_guard_datasource_Unit_Identifier_descriptor =
-            getDescriptor().getMessageTypes().get(57);
+            getDescriptor().getMessageTypes().get(58);
           internal_static_guard_datasource_Unit_Identifier_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guard_datasource_Unit_Identifier_descriptor,
               new java.lang.String[] { "Type", "Id", "Ip", });
           internal_static_guard_datasource_Name_bin_value_pair_descriptor =
-            getDescriptor().getMessageTypes().get(58);
+            getDescriptor().getMessageTypes().get(59);
           internal_static_guard_datasource_Name_bin_value_pair_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guard_datasource_Name_bin_value_pair_descriptor,
               new java.lang.String[] { "Name", "Value", "Format", });
           internal_static_guard_datasource_One_Record_descriptor =
-            getDescriptor().getMessageTypes().get(59);
+            getDescriptor().getMessageTypes().get(60);
           internal_static_guard_datasource_One_Record_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guard_datasource_One_Record_descriptor,
               new java.lang.String[] { "Values", });
           internal_static_guard_datasource_Data_Status_descriptor =
-            getDescriptor().getMessageTypes().get(60);
+            getDescriptor().getMessageTypes().get(61);
           internal_static_guard_datasource_Data_Status_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guard_datasource_Data_Status_descriptor,
               new java.lang.String[] { "Entity", "Records", });
           internal_static_guard_datasource_Unit_Debug_descriptor =
-            getDescriptor().getMessageTypes().get(61);
+            getDescriptor().getMessageTypes().get(62);
           internal_static_guard_datasource_Unit_Debug_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guard_datasource_Unit_Debug_descriptor,
               new java.lang.String[] { "DebugOn", "DebugLevel", "DebugDurationSec", });
           internal_static_guard_datasource_Console_Command_descriptor =
-            getDescriptor().getMessageTypes().get(62);
+            getDescriptor().getMessageTypes().get(63);
           internal_static_guard_datasource_Console_Command_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guard_datasource_Console_Command_descriptor,
               new java.lang.String[] { "Type", "Destination", "UnitDebug", "DataStatus", "StapIdentifier", "MessageText", });
           internal_static_guard_datasource_ConnectionQuarantine_descriptor =
-            getDescriptor().getMessageTypes().get(63);
+            getDescriptor().getMessageTypes().get(64);
           internal_static_guard_datasource_ConnectionQuarantine_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guard_datasource_ConnectionQuarantine_descriptor,
               new java.lang.String[] { "ServerIp", "ServiceName", "DbUser", "Timestamp", "QuarantineUntil", "AllowUntil", "Deleted", "ImsId", });
           internal_static_guard_datasource_QuarantineList_descriptor =
-            getDescriptor().getMessageTypes().get(64);
+            getDescriptor().getMessageTypes().get(65);
           internal_static_guard_datasource_QuarantineList_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guard_datasource_QuarantineList_descriptor,
               new java.lang.String[] { "QuarantineItem", "Timestamp", "Incremental", "AckNum", "ListOmitted", });
           internal_static_guard_datasource_STAP_Policy_Response_descriptor =
-            getDescriptor().getMessageTypes().get(65);
+            getDescriptor().getMessageTypes().get(66);
           internal_static_guard_datasource_STAP_Policy_Response_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guard_datasource_STAP_Policy_Response_descriptor,
               new java.lang.String[] { "Type", "ThreadToken", "MvsSystemName", "Db2SubsystemId", "Destination", "QuarantineList", "CurrentTime", });
           internal_static_guard_datasource_Guard_ds_message_descriptor =
-            getDescriptor().getMessageTypes().get(66);
+            getDescriptor().getMessageTypes().get(67);
           internal_static_guard_datasource_Guard_ds_message_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guard_datasource_Guard_ds_message_descriptor,
-              new java.lang.String[] { "Type", "Handshake", "Ping", "SessionStart", "SessionEnd", "ClientRequest", "ServerReply", "ErrorMsg", "InterceptionPolicy", "OpaqueSessionData", "MonitorSession", "Exception", "Icap", "Config", "Sequence", "More", "Parse", "CollectorFeature", "SystemIRaw", "GdmAppData", "QrwPreviewRequest", "QrwPreviewResult", "FsmOpen", "FsmData", "FsmClose", "StapPolicyResponse", "ConsoleCommand", "InstanceId", "FamRules", "FamSharepointRules", "FamNasRules", });
+              new java.lang.String[] { "Type", "Handshake", "Ping", "SessionStart", "SessionEnd", "ClientRequest", "ServerReply", "ErrorMsg", "InterceptionPolicy", "OpaqueSessionData", "MonitorSession", "Exception", "Icap", "Config", "Sequence", "More", "Parse", "CollectorFeature", "SystemIRaw", "GdmAppData", "QrwPreviewRequest", "QrwPreviewResult", "FsmOpen", "FsmData", "FsmClose", "StapPolicyResponse", "ConsoleCommand", "InstanceId", "FamRules", "FamSharepointRules", "FamNasRules", "TenantId", });
           internal_static_guard_datasource_Event_descriptor =
-            getDescriptor().getMessageTypes().get(67);
+            getDescriptor().getMessageTypes().get(68);
           internal_static_guard_datasource_Event_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guard_datasource_Event_descriptor,
