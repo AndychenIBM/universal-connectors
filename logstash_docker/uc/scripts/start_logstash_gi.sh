@@ -17,6 +17,10 @@ if [[ -z "$logstash_pid" ]]; then
     # TODO: change output plugin to get SniffersConfig.json from env variables
     echo "[{\"ip\":\"${MINI_SNIF_HOSTNAME}\", \"port\":\"${MINI_SNIF_PORT}\", \"isSSL\":\"${MINI_SNIF_SSL_ENABLED}\" }]" > ${UC_ETC}/SniffersConfig.json
 
+	export UC_CONTAINER_UNIQUE_ID=$(echo ${HOSTNAME} | sed 's/.*_//')
+	updateFromEnv "$UC_CONTAINER_UNIQUE_ID" "UC_CONTAINER_UNIQUE_ID"  ${UC_ETC}/UniversalConnector.json "\"containerUniqueId\":.*" "\"containerUniqueId\":\"$UC_CONTAINER_UNIQUE_ID\","
+	echo "Replacing  UC_CONTAINER_UNIQUE_ID to: ${UC_CONTAINER_UNIQUE_ID}"
+	
     # Replace pipelines.yml:
     echo "- pipeline.id: customer_pipeline" > ${UC_ETC}/pipelines.yml
     echo "  path.config: \"${GI_PIPELINE_DIR}\"" >> ${UC_ETC}/pipelines.yml
