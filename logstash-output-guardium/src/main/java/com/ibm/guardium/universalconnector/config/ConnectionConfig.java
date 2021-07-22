@@ -24,6 +24,11 @@ public class ConnectionConfig {
         if (ucConfig!=null){
             //sb.append(" ").append("(").append(databaseDetails.getDbType()).append(ID_DELIMITER).append(UC_STR).append(")");
             sb.append(ID_DELIMITER).append(UC_STR).append(ucConfig.getId());
+            // fix for INS-12471 - sniffer limitation - need to have different connection id on each pod
+            String containerId = ucConfig.getContainerUniqueId();
+            if (containerId!=null && containerId.trim().length()>0){
+                sb.append(ID_DELIMITER).append(containerId);
+            }
         }
         return sb.toString();
     }

@@ -4,6 +4,7 @@ import java.util.Objects;
 
 public class UCConfig {
     private String version;
+    private String containerUniqueId;
     private String connectorId;
     private String connectorIp = "";
     private String configurationFetchType;
@@ -13,6 +14,14 @@ public class UCConfig {
     private Integer noDataThresholdInMs;
 
     public UCConfig(){
+    }
+
+    public String getContainerUniqueId() {
+        return containerUniqueId;
+    }
+
+    public void setContainerUniqueId(String containerUniqueId) {
+        this.containerUniqueId = containerUniqueId;
     }
 
     public String getId(){
