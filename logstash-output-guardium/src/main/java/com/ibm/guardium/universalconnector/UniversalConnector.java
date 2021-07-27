@@ -29,7 +29,7 @@ public class UniversalConnector {
     private boolean shouldWaitForMain = true;
     private volatile boolean running = true;
     private String version = "1.2.44";
-    private String udsAgentVersion = "UniversalConnector (V" + version + ")";
+    private String udsAgentVersion = "(V" + version + ")";
     private UCConfig ucConfig = null;
     private RecordDispatcher recordDispatcher = null;
     private JsonRecordTransformer transformer = new JsonRecordTransformer();
