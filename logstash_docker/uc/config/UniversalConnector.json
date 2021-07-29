@@ -1,5 +1,5 @@
 {
-  "containerUniqueId":""
+  "containerUniqueId":"",
   "connectorId":"3",
   "connectorIp":"127.0.0.1",
   "configurationFetchType":"file",
