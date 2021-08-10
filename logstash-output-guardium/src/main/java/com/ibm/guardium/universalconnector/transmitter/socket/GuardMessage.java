@@ -22,6 +22,7 @@ public class GuardMessage {
     private static final int UNINSTALL_POSITION_IN_HEADER = 18;
     private static final int UNINSTALL_COMMAND = 1;
     private static final short SERVICE_ID_DS_MESSAGE = 4;
+    private static final int DUMMY_MASTER_IP_NUM = 1;
 
     private ByteBuffer header;
     private ByteBuffer dsMsgHeader;
@@ -89,6 +90,8 @@ public class GuardMessage {
     public static byte[] preparePingIpv6(String snifNetworkAddress, String clientId)
     {
         Datasource.Ping ping = getPingBuilder(clientId)
+                .setCurrentMaster(snifNetworkAddress)
+                .setCurrentMasterIp(DUMMY_MASTER_IP_NUM) // the field is defined as required in proto, but not used by sniffer in case of ipv6 addresses
                 .setCurrentMasterIpv6(snifNetworkAddress)
                 .setIsIpv6(true)
                 .setCurrentMasterIpv6Bytes(ByteString.copyFromUtf8(snifNetworkAddress))
@@ -128,8 +131,11 @@ public class GuardMessage {
     public static byte[] prepareHandshakeIpv6(String snifNetworkAddress, String clientId, String dbType, String udsVersion)
     {
         Datasource.Handshake just_handshake = getHandshakeBuilder(clientId, dbType, udsVersion)
+                .setCurrentMaster(snifNetworkAddress)
+                .setCurrentMasterIp(DUMMY_MASTER_IP_NUM) // the field is defined as required in proto, but not used by sniffer in case of ipv6 addresses
                 .setCurrentMasterIpv6(snifNetworkAddress)
                 .setCurrentMasterIpv6Bytes(ByteString.copyFromUtf8(snifNetworkAddress))
+                .setIsIpv6(true)
                 .setVendor("Guardium")
                 .setProduct("Universal Connector")
                 .setClientType(DB_TYPE_PREFIX+dbType)
