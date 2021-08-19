@@ -10,7 +10,7 @@ fi
 for file in "${CUSTOMER_PLUGINS_DIR}"/*.rpm; do
   [ -e "$file" ] || continue
   echo "preparing to install ${file##*/}"
-  rpm -ivh $CUSTOMER_PLUGINS_DIR/${file##*/}
+  rpm -ivh $CUSTOMER_PLUGINS_DIR/${file##*/} --reinstall
   status=$?
   if [ $status -eq 0 ]; then
     echo "done installing ${file##*/}"
