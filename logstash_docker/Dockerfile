@@ -6,7 +6,7 @@
 #                                                                   */
 # 5737-L66                                                          */
 #                                                                   */
-# Copyright IBM Corp. 2019, 2020                                    */
+# Copyright IBM Corp. 2019, 2021                                    */
 #                                                                   */
 # The source code for this program is not published or otherwise    */
 # divested of its trade secrets, irrespective of what has been      */
@@ -15,7 +15,7 @@
 # ***************************************************************** */
 
 # docker image version
-ARG adoptopenjdk_image_version=jre-11.0.11_9_openj9-0.26.0-ubi-minimal-8.3-298.1618432845
+ARG adoptopenjdk_image_version=jre-11.0.11_9_openj9-0.26.0-ubi-minimal-8.4-205.1626828526
 
 # Pull the UBI 8 docker base image based on provided version or default
 FROM sec-guardium-next-gen-docker-local.artifactory.swg-devops.com/openjdk-ubi-minimal:${adoptopenjdk_image_version}
