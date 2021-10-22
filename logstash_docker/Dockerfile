@@ -37,6 +37,7 @@ ENV UC_ETC=${LOGSTASH_DIR}/config/ \
 
 COPY uc/. /uc/.
 
+
 #Install necessary packages (libaio required for optional Oracle instant client installation)
 RUN microdnf install -y tzdata openssl curl ca-certificates procps shadow-utils.x86_64 tar gzip hostname vim cronie logrotate sudo libaio && \
     microdnf update -y; microdnf clean all && \
@@ -44,12 +45,18 @@ RUN microdnf install -y tzdata openssl curl ca-certificates procps shadow-utils.
     groupadd -g 991 guardium && useradd -G guardium -u 1001 guc && \
     mkdir -p ${LOGSTASH_DIR} ${LOG_GUC_DIR} ${SSL_DIR} && chown -R guc:guardium ${LOGSTASH_DIR} ${LOG_DIR} ${SSL_DIR}
 
+USER root
+COPY health/liveness.sh /usr/bin
+COPY health/readiness.sh /usr/bin
+RUN chmod +x /usr/bin/readiness.sh /usr/bin/liveness.sh
+
 #Change User to guc
 USER guc
 
 #Create a persistent volume which can be monted on the host
 VOLUME /var/log/uc
 VOLUME /etc/uc/conf
+
 
 WORKDIR ${LOGSTASH_DIR}
 
@@ -87,5 +94,6 @@ RUN curl https://artifacts.elastic.co/downloads/logstash/logstash-oss-${LOGSTASH
     rm -rf $LOGSTASH_DIR/vendor/cache/*.gem $LOGSTASH_DIR/vendor/bundle/jruby/2.5.0/cache/*.gem
 
 ENV PATH ${LOGSTASH_DIR}/bin:$PATH
+
 
 CMD ${UC_SCRIPTS}/start_logstash.sh
