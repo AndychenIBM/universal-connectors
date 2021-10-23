@@ -23,7 +23,7 @@ FROM sec-guardium-next-gen-docker-local.artifactory.swg-devops.com/openjdk-ubi-m
 ENV ETC=/etc \
 	JAVA_HOME=/opt/java/openjdk \
     PATH="/opt/java/openjdk/bin:${PATH}" \
-    JAVA_OPTS="-XX:+UseContainerSupport" \
+    LS_JAVA_OPTS="-XX:+UseContainerSupport -Xshareclasses:nonfatal" \
 	LOGSTASH_VERSION=7.10.0-linux-x86_64 \
     LOGSTASH_DIR=/usr/share/logstash \
     LOG_DIR=/var/log/ \
@@ -41,9 +41,10 @@ COPY uc/. /uc/.
 #Install necessary packages (libaio required for optional Oracle instant client installation)
 RUN microdnf install -y tzdata openssl curl ca-certificates procps shadow-utils.x86_64 tar gzip hostname vim cronie logrotate sudo libaio && \
     microdnf update -y; microdnf clean all && \
-#Change ownership to guc
-    groupadd -g 991 guardium && useradd -G guardium -u 1001 guc && \
-    mkdir -p ${LOGSTASH_DIR} ${LOG_GUC_DIR} ${SSL_DIR} && chown -R guc:guardium ${LOGSTASH_DIR} ${LOG_DIR} ${SSL_DIR}
+#Add guc user and prepare
+    useradd -g root guc && \
+    mkdir -p ${LOGSTASH_DIR} ${LOG_GUC_DIR} ${SSL_DIR} && \
+    chmod -vR g=u ${LOGSTASH_DIR} ${LOG_GUC_DIR} ${SSL_DIR} /tmp
 
 USER root
 COPY health/liveness.sh /usr/bin
@@ -91,9 +92,10 @@ RUN curl https://artifacts.elastic.co/downloads/logstash/logstash-oss-${LOGSTASH
 #Make sure scripts are not uploaded with windows characters additions
     sed -i -e 's/\r$//' ${LOGSTASH_DIR}/scripts/*.sh ${UC_ETC}/log4j2uc.properties && \
 #Clear cache
-    rm -rf $LOGSTASH_DIR/vendor/cache/*.gem $LOGSTASH_DIR/vendor/bundle/jruby/2.5.0/cache/*.gem
+    rm -rf $LOGSTASH_DIR/vendor/cache/*.gem $LOGSTASH_DIR/vendor/bundle/jruby/2.5.0/cache/*.gem && \
+#Grant permissions to group
+    chmod -R g=u ${LOGSTASH_DIR} ${LOG_GUC_DIR} ${SSL_DIR} /tmp /opt/java || true
 
 ENV PATH ${LOGSTASH_DIR}/bin:$PATH
-
 
 CMD ${UC_SCRIPTS}/start_logstash.sh
