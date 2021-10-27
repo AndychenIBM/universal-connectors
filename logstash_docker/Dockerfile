@@ -23,7 +23,7 @@ FROM sec-guardium-next-gen-docker-local.artifactory.swg-devops.com/openjdk-ubi-m
 ENV ETC=/etc \
 	JAVA_HOME=/opt/java/openjdk \
     PATH="/opt/java/openjdk/bin:${PATH}" \
-    LS_JAVA_OPTS="-XX:+UseContainerSupport -Xshareclasses:nonfatal" \
+    LS_JAVA_OPTS="-XX:+UseContainerSupport -Xshareclasses:nonfatal -Dls.cgroup.cpuacct.path.override=/ -Dls.cgroup.cpu.path.override=/" \
 	LOGSTASH_VERSION=7.10.0-linux-x86_64 \
     LOGSTASH_DIR=/usr/share/logstash \
     LOG_DIR=/var/log/ \
@@ -36,6 +36,7 @@ ENV UC_ETC=${LOGSTASH_DIR}/config/ \
     OUA_BINARY_PATH=${LOGSTASH_DIR}/customer/binaries/oracle_unified_audit_oci_standalone
 
 COPY uc/. /uc/.
+COPY health/liveness.sh health/readiness.sh /usr/bin/
 
 
 #Install necessary packages (libaio required for optional Oracle instant client installation)
@@ -44,12 +45,8 @@ RUN microdnf install -y tzdata openssl curl ca-certificates procps shadow-utils.
 #Add guc user and prepare
     useradd -g root guc && \
     mkdir -p ${LOGSTASH_DIR} ${LOG_GUC_DIR} ${SSL_DIR} && \
-    chmod -vR g=u ${LOGSTASH_DIR} ${LOG_GUC_DIR} ${SSL_DIR} /tmp
-
-USER root
-COPY health/liveness.sh /usr/bin
-COPY health/readiness.sh /usr/bin
-RUN chmod +x /usr/bin/readiness.sh /usr/bin/liveness.sh
+    chmod -vR g=u ${LOGSTASH_DIR} ${LOG_GUC_DIR} ${SSL_DIR} /tmp && \
+    chmod +x /usr/bin/readiness.sh /usr/bin/liveness.sh
 
 #Change User to guc
 USER guc
