@@ -9,8 +9,12 @@ if [[ -z "$logstash_pid" ]]; then
     echo "Setting GI_PIPELINE_DIR to: ${GI_PIPELINE_DIR}"
     export GI_PLUGINS_DIR="${GUC_PIPELINE_CONFIG_PATH}/${INPUT_PLUGIN_ID}/config/"
     echo "Setting GI_PLUGINS_DIR to: ${GI_PLUGINS_DIR}"
-
+    export GI_PLUGINS_BINARIES_DIR="${GI_PLUGINS_DIR}binaries/"
+    echo "Setting GI_PLUGINS_BINARIES_DIR to: ${GI_PLUGINS_BINARIES_DIR}"
+    export GI_PLUGINS_DEPENDENCIES_DIR="${GI_PLUGINS_DIR}dependencies/"
+    echo "Setting GI_PLUGINS_DEPENDENCIES_DIR to: ${GI_PLUGINS_DEPENDENCIES_DIR}"
 	  ${UC_SCRIPTS}/install_customer_plugins.sh
+	  ${UC_SCRIPTS}/install_customer_dependencies.sh
 
     setUcLogLevel "$UC_LOG_LEVEL"
 
@@ -20,7 +24,7 @@ if [[ -z "$logstash_pid" ]]; then
 	export UC_CONTAINER_UNIQUE_ID=$(echo ${HOSTNAME} | sed 's/.*_//')
 	updateFromEnv "$UC_CONTAINER_UNIQUE_ID" "UC_CONTAINER_UNIQUE_ID"  ${UC_ETC}/UniversalConnector.json "\"containerUniqueId\":.*" "\"containerUniqueId\":\"$UC_CONTAINER_UNIQUE_ID\","
 	echo "Replacing  UC_CONTAINER_UNIQUE_ID to: ${UC_CONTAINER_UNIQUE_ID}"
-	
+  
     # Replace pipelines.yml:
     echo "- pipeline.id: customer_pipeline" > ${UC_ETC}/pipelines.yml
     echo "  path.config: \"${GI_PIPELINE_DIR}\"" >> ${UC_ETC}/pipelines.yml
