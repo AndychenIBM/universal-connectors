@@ -83,7 +83,7 @@ RUN curl https://artifacts.elastic.co/downloads/logstash/logstash-oss-${LOGSTASH
     --add-opens=java.management/sun.management=ALL-UNNAMED" >>${UC_ETC}/jvm.options && \
 #Install plugins FIXME: enter output_to_guardium plugin to the default offline-package
     ${LOGSTASH_DIR}/bin/logstash-plugin install ${UC_ETC}/logstash-output-java_output_to_guardium-1.3.6.gem && \
-    ${LOGSTASH_DIR}/bin/logstash-plugin install file:///${UC_ETC}/guardium_logstash-offline-pluginsWToutput.zip && \
+    ${LOGSTASH_DIR}/bin/logstash-plugin install file:///${UC_ETC}/guardium_logstash-offline-plugins-11032021.zip && \
 #Make sure user can read,write and execute the scripts
     chmod 755 ${UC_SCRIPTS}/*.sh && \
 #Make sure scripts are not uploaded with windows characters additions
