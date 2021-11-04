@@ -74,7 +74,7 @@ run:
 # To build docker image with the latest build files/libs
 
 dockerBuild:
-	./buildDocketForTravis.sh
+	./buildDockerForTravis.sh
 
 #	./dockerBuild/package/build.sh
 #	docker tag ${NAME} ${ARTIFACTORY_DOCKER_REPO_DOMAIN}${NAME}:${DOCKER_IMAGE_TAG}

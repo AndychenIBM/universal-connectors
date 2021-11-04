@@ -1,0 +1,4 @@
+logstash-filter-mongodb-guardium;logstash-filter-mongodb_guardium_filter
+logstash-filter-mysql-guardium;logstash-filter-mysql_filter_guardium
+logstash-filter-s3-guardium;logstash-filter-logstash_filter_s3_guardium
+logstash-input-cloudwatch-logs-master;logstash-input-cloudwatch_logs

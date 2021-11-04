@@ -1,3 +1,14 @@
 *.DS_Store
 logstash-filter-mongodb-guardium/gradle.properties
 .vscode/settings.json
+
+# Ignore Gradle project-specific cache directory
+.gradle
+
+# Ignore Gradle build output directory
+/build/
+/bin/
+
+# IntelliJ IDEA files
+.idea/
+*.iml
