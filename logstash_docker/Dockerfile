@@ -83,7 +83,7 @@ RUN curl https://artifacts.elastic.co/downloads/logstash/logstash-oss-${LOGSTASH
     --add-opens=java.management/sun.management=ALL-UNNAMED" >>${UC_ETC}/jvm.options && \
 #Install plugins FIXME: enter output_to_guardium plugin to the default offline-package
     ${LOGSTASH_DIR}/bin/logstash-plugin install ${UC_ETC}/logstash-output-java_output_to_guardium-1.3.8.gem && \
-    ${LOGSTASH_DIR}/bin/logstash-plugin install file:///${UC_ETC}/guardium_default_plugins.zip && \
+    ${LOGSTASH_DIR}/bin/logstash-plugin install file:///${UC_ETC}/guardium_logstash-offline-pluginsWToutput.zip && \
 #Make sure user can read,write and execute the scripts
     chmod 755 ${UC_SCRIPTS}/*.sh && \
 #Make sure scripts are not uploaded with windows characters additions
@@ -92,6 +92,10 @@ RUN curl https://artifacts.elastic.co/downloads/logstash/logstash-oss-${LOGSTASH
     rm -rf $LOGSTASH_DIR/vendor/cache/*.gem $LOGSTASH_DIR/vendor/bundle/jruby/2.5.0/cache/*.gem && \
 #Grant permissions to group
     chmod -R g=u ${LOGSTASH_DIR} ${LOG_GUC_DIR} ${SSL_DIR} /tmp /opt/java || true
+
+# Handle CVEs found in logstash-7.10.0 dependencies
+# nokogiri: CVE-2021-41098, CVE-2020-7595
+RUN cd $LOGSTASH_DIR/vendor/bundle/jruby/2.5.0/gems && rm -rf nokogiri-*
 
 ENV PATH ${LOGSTASH_DIR}/bin:$PATH
 
