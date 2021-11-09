@@ -50,6 +50,6 @@ export UC_ETC=$PWD/logstash-output-guardium/src/resources
 
 #./logstash-output-guardium/gradlew setUTC -PUC_ETC=$PWD/logstash-output-guardium/src/resources
 #testPlugin "logstash-output-guardium" "setUTC" "-PUC_ETC=$PWD/logstash-output-guardium/src/resources"
-testPlugin "logstash-output-guardium" "test"
+#testPlugin "logstash-output-guardium" "test"
 #return success code
 exit 0
