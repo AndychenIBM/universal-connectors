@@ -1,5 +1,0 @@
-FROM universal-connector:latest
-RUN rm -rf ${LOGSTASH_DIR}/pipeline
-COPY pipeline/ ${LOGSTASH_DIR}/pipeline
-COPY test_logs/ /test_logs/
-
