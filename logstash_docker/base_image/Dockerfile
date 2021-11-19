@@ -15,7 +15,7 @@
 # ***************************************************************** */
 
 # docker image version
-ARG adoptopenjdk_image_version=jre-11.0.11_9_openj9-0.26.0-ubi-minimal-8.4-205.1626828526
+ARG adoptopenjdk_image_version=jre-11.0.13_8_openj9-0.29.0-ubi-minimal-8.4-212
 
 # Pull the UBI 8 docker base image based on provided version or default
 FROM sec-guardium-next-gen-docker-local.artifactory.swg-devops.com/openjdk-ubi-minimal:${adoptopenjdk_image_version}
