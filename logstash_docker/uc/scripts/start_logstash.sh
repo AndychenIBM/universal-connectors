@@ -34,12 +34,12 @@ if [[ -z "$logstash_pid" ]]; then
     setJVMParameters
 
     #Copy keystore, if exists:
-    if [[ -e ${SSL_DIR}/logstash.keystore ]]; then 
+    if [[ -e ${SSL_DIR}/logstash.keystore ]]; then
         cp ${SSL_DIR}/logstash.keystore ${LOGSTASH_DIR}/config/
     fi
-    
+
     #Start logstash
-    logstash -b 80 -u 500 -l ${LOG_GUC_DIR} 2>&1 | tee -a ${LOG_GUC_DIR}/logstash_stdout_stderr.log
+    logstash --config.reload.automatic -b 80 -u 500 -l ${LOG_GUC_DIR} 2>&1 | tee -a ${LOG_GUC_DIR}/logstash_stdout_stderr.log
 else
     echo "Logstash is already running..."
 fi
