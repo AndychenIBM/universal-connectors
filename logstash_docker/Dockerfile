@@ -24,7 +24,7 @@ ENV ETC=/etc \
 	JAVA_HOME=/opt/java/openjdk \
     PATH="/opt/java/openjdk/bin:${PATH}" \
     LS_JAVA_OPTS="-XX:+UseContainerSupport -Xshareclasses:nonfatal -Dls.cgroup.cpuacct.path.override=/ -Dls.cgroup.cpu.path.override=/" \
-	LOGSTASH_VERSION=logstash-oss-7.15.2-linux-x86_64 \
+	LOGSTASH_VERSION=logstash-oss-7.16.1-linux-x86_64 \
     LOGSTASH_DIR=/usr/share/logstash \
     LOG_DIR=/var/log/ \
     LOG_GUC_DIR=/var/log/uc/ \
