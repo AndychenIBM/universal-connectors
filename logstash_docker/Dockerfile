@@ -40,7 +40,7 @@ COPY health/liveness.sh health/readiness.sh /usr/bin/
 
 
 #Install necessary packages (libaio required for optional Oracle instant client installation)
-RUN microdnf install -y tzdata openssl curl ca-certificates procps shadow-utils.x86_64 tar gzip hostname vim cronie logrotate sudo libaio && \
+RUN microdnf install -y tzdata openssl curl ca-certificates procps shadow-utils.x86_64 tar zip gzip hostname vim cronie logrotate sudo libaio && \
     microdnf update -y; microdnf clean all && \
 #Add guc user and prepare
     useradd -g root guc && \
@@ -91,7 +91,10 @@ RUN curl https://artifacts.elastic.co/downloads/logstash/${LOGSTASH_VERSION}.tar
     rm -rf logstash-filter-geoip-* logstash-input-snmp-* logstash-input-azure-* logstash-integration-kafka-* logstash-input-http-* nokogiri-* \
     backports-* tzinfo-data-* snappy-* mail-* logstash-input-azure_event_hubs-* logstash-filter-jdbc_static-* snmp-* logstash-filter-useragent-* && \
 # Clear cache
-    rm -rf ${LOGSTASH_DIR}/vendor/cache/*.gem ${LOGSTASH_DIR}/vendor/bundle/jruby/2.5.0/cache/*.gem
+    rm -rf ${LOGSTASH_DIR}/vendor/cache/*.gem ${LOGSTASH_DIR}/vendor/bundle/jruby/2.5.0/cache/*.gem && \
+# Resolve CVE cve-2021-44228 FIXME: remove this line after upgrading to Logstash 7.16.2 or above
+    zip -q -d ${LOGSTASH_DIR}/logstash-core/lib/jars/log4j-core-2.* org/apache/logging/log4j/core/lookup/JndiLookup.class && \
+    echo "-Dlog4j2.formatMsgNoLookups=true" >> ${UC_ETC}/jvm.options
 
 ENV PATH ${LOGSTASH_DIR}/bin:$PATH
 
