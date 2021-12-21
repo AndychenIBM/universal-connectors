@@ -7,7 +7,7 @@
 #                                                                   */
 # 5737-L66                                                          */
 #                                                                   */
-# Copyright IBM Corp. 2019, 2021                                    */
+# Copyright IBM Corp. 2019, 2020                                    */
 #                                                                   */
 # The source code for this program is not published or otherwise    */
 # divested of its trade secrets, irrespective of what has been      */
@@ -16,7 +16,7 @@
 # ***************************************************************** */
 
 # docker image version
-ARG adoptopenjdk_image_version=jdk-11.0.11_9_openj9-0.26.0-ubi-minimal-8.3-298.1618432845
+ARG adoptopenjdk_image_version=jdk-11.0.9_11_openj9-0.23.0-ubi-minimal
 
 # Pull the UBI 8 docker base image based on provided version or default  new repo
 FROM sec-guardium-next-gen-docker-local.artifactory.swg-devops.com/openjdk-ubi-minimal:${adoptopenjdk_image_version}
@@ -25,12 +25,14 @@ ENV ETC=/etc \
 	JAVA_HOME=/opt/java/openjdk \
     PATH="/opt/java/openjdk/bin:${PATH}" \
     JAVA_OPTS="-XX:+UseContainerSupport" \
-	LOGSTASH_VERSION=7.10.0-linux-x86_64 \
-	LOGSTASH_GIT_TAG=v7.10.0 \
+	LOGSTASH_VERSION=7.5.2 \
+	LOGSTASH_GIT_TAG=v7.5.2 \
     LOGSTASH_DIR=/usr/share/logstash \
     LOGSTASH_SRC_DIR=/usr/share/logstashSRC \
     LOG_DIR=/var/log/ \
-    LOG_GUC_DIR=/var/log/uc/
+    LOG_GUC_DIR=/var/log/uc/ \
+    LOGSTASH_INPUT_BEATS_VERSION=6.0.11 \
+    LOGSTASH_INPUT_TCP_VERSION=6.0.6
 
 USER root
 
@@ -53,6 +55,7 @@ RUN curl https://artifacts.elastic.co/downloads/logstash/logstash-oss-${LOGSTASH
 #Remove unnecessary heavy plugins
     cd $LOGSTASH_DIR/vendor/bundle/jruby/2.5.0/gems && \
     rm -rf logstash-filter-geoip-6.0.3-java logstash-input-snmp-1.2.1 \
-    logstash-input-azure-* logstash-integration-kafka-* logstash-input-http-* nokogiri-* \
+    logstash-input-azure-* logstash-integration-kafka-* logstash-input-http-* nokogiri-1.10.7-java \
     sequl-5.27.0 backports-3.15.0 tzinfo-data-1.2019.3 snappy-0.0.12-java \
-    mail-2.6.6 logstash-input-azure_event_hubs-1.1.2 logstash-filter-jdbc_static-1.0.7 snmp-1.3.2
+    mail-2.6.6 logstash-input-azure_event_hubs-1.1.2 logstash-filter-jdbc_static-1.0.7 snmp-1.3.2 && \
+    ${LOGSTASH_DIR}/bin/logstash-plugin install --version ${LOGSTASH_INPUT_BEATS_VERSION} logstash-input-beats
