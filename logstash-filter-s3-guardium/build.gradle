@@ -15,8 +15,8 @@ version                    "${file("VERSION").text.trim()}" // read from require
 description                = "Java s3 to guardium"
 pluginInfo.licenses        = ['Apache-2.0'] // list of SPDX license IDs
 pluginInfo.longDescription = "This gem is a Logstash plugin required to be installed on top of the Logstash core pipeline using \$LS_HOME/bin/logstash-plugin install gemname. This gem is not a stand-alone program"
-pluginInfo.authors         = ['Guardium']
-pluginInfo.email           = ['nataliya.geimakher@ibm.com']
+pluginInfo.authors         = ['IBM']
+pluginInfo.email           = ['']
 pluginInfo.homepage        = "http://www.elastic.co/guide/en/logstash/current/index.html"
 pluginInfo.pluginType      = "filter"
 pluginInfo.pluginClass     = "LogstashFilterS3Guardium"
@@ -40,6 +40,14 @@ buildscript {
 
 repositories {
     mavenCentral()
+}
+
+task copyDependencyLibs(type: Copy) {
+    into "dependenciesLib"
+    from configurations.compileClasspath
+    from configurations.runtimeClasspath
+    from configurations.testCompileClasspath
+    from configurations.testRuntimeClasspath
 }
 
 task wrapper(type: Wrapper) {
@@ -69,6 +77,7 @@ clean {
     delete "${projectDir}/Gemfile"
     delete "${projectDir}/" + pluginInfo.pluginFullName() + ".gemspec"
     delete "${projectDir}/lib/"
+    delete "${projectDir}/dependenciesLib/"
     delete "${projectDir}/vendor/"
     new FileNameFinder().getFileNames(projectDir.toString(), pluginInfo.pluginFullName() + "-?.?.?.gem").each { filename ->
         delete filename
