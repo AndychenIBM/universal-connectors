@@ -30,16 +30,12 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.4'
+        classpath 'com.github.jengelman.gradle.plugins:shadow:4.0.4'
     }
 }
 
 repositories {
     mavenCentral()
-}
-
-task wrapper(type: Wrapper) {
-    gradleVersion = '4.0'
 }
 
 apply plugin: 'com.github.johnrengelman.shadow'
@@ -53,7 +49,7 @@ dependencies {
     compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.17.0'
     compile 'org.apache.commons:commons-lang3:3.7'
     compile 'com.google.code.gson:gson:2.8.6'
-    compile fileTree(dir: LOGSTASH_CORE_PATH, include: "**/logstash-core-?.?.?.jar")
+    compile fileTree(dir: LOGSTASH_CORE_PATH, include: "**/logstash-core-*.*.*.jar")
     compile fileTree(dir: GUARDIUM_UNIVERSALCONNECTOR_COMMONS_PATH, include: "guardium-universalconnector-commons-?.?.?.jar")
     //implementation 'com.google.code.gson:gson:2.8.6'
     
@@ -77,7 +73,8 @@ tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
 }
 
-task vendor(dependsOn: shadowJar) {
+tasks.register("vendor"){
+    dependsOn shadowJar
     doLast {
         String vendorPathPrefix = "vendor/jar-dependencies"
         String projectGroupPath = project.group.replaceAll('\\.', '/')
@@ -88,13 +85,13 @@ task vendor(dependsOn: shadowJar) {
     }
 }
 
-task generateRubySupportFiles() {
+tasks.register("generateRubySupportFiles") {
     doLast {
         generateRubySupportFilesForPlugin(project.description, project.group, version)
     }
 }
 
-task removeObsoleteJars() {
+tasks.register("removeObsoleteJars") {
     doLast {
         new FileNameFinder().getFileNames(
                 projectDir.toString(),
@@ -105,7 +102,8 @@ task removeObsoleteJars() {
     }
 }
 
-task gem(dependsOn: [downloadAndInstallJRuby, removeObsoleteJars, vendor, generateRubySupportFiles]) {
+tasks.register("gem"){
+    dependsOn = [downloadAndInstallJRuby, removeObsoleteJars, vendor, generateRubySupportFiles]
     doLast {
         buildGem(projectDir, buildDir, pluginInfo.pluginFullName() + ".gemspec")
     }

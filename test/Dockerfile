@@ -25,8 +25,8 @@ ENV ETC=/etc \
 	JAVA_HOME=/opt/java/openjdk \
     PATH="/opt/java/openjdk/bin:${PATH}" \
     JAVA_OPTS="-XX:+UseContainerSupport" \
-	LOGSTASH_VERSION=7.5.2 \
-	LOGSTASH_GIT_TAG=v7.5.2 \
+	LOGSTASH_VERSION=logstash-7.16.0-linux-x86_64 \
+	LOGSTASH_GIT_TAG=v7.16.0 \
     LOGSTASH_DIR=/usr/share/logstash \
     LOGSTASH_SRC_DIR=/usr/share/logstashSRC \
     LOG_DIR=/var/log/ \
@@ -43,14 +43,14 @@ RUN microdnf install -y git tzdata openssl curl ca-certificates procps shadow-ut
     groupadd -g 991 guardium && useradd -G guardium -u 1001 guc && \
     mkdir -p ${LOGSTASH_DIR} ${LOG_GUC_DIR} ${LOGSTASH_SRC_DIR} && chown -R guc:guardium ${LOGSTASH_DIR} ${LOG_DIR} ${LOGSTASH_SRC_DIR}
 RUN cd ${LOGSTASH_SRC_DIR} && git clone -b "${LOGSTASH_GIT_TAG}" https://github.com/elastic/logstash.git
-RUN cd ${LOGSTASH_SRC_DIR}/logstash && ./gradlew -q :logstash-core:jar
+RUN cd ${LOGSTASH_SRC_DIR}/logstash && ./gradlew --version && ./gradlew clean --warning-mode all && ./gradlew assemble
 
 
 #Change User to guc
 USER guc
 #Download and extract logstash
-RUN curl https://artifacts.elastic.co/downloads/logstash/logstash-oss-${LOGSTASH_VERSION}.tar.gz -o ${LOGSTASH_DIR}/logstash-oss-${LOGSTASH_VERSION}.tar.gz && \
-	tar -xzf ${LOGSTASH_DIR}/logstash*.tar.gz  -C ${LOGSTASH_DIR} --strip-components=1 && \
+RUN curl https://artifacts.elastic.co/downloads/logstash/${LOGSTASH_VERSION}.tar.gz -o ${LOGSTASH_DIR}/${LOGSTASH_VERSION}.tar.gz && \
+    tar -xzf ${LOGSTASH_DIR}/${LOGSTASH_VERSION}.tar.gz  -C ${LOGSTASH_DIR} --strip-components=1 && \
 	rm ${LOGSTASH_DIR}/*.tar.gz && \
 #Remove unnecessary heavy plugins
     cd $LOGSTASH_DIR/vendor/bundle/jruby/2.5.0/gems && \
@@ -58,4 +58,6 @@ RUN curl https://artifacts.elastic.co/downloads/logstash/logstash-oss-${LOGSTASH
     logstash-input-azure-* logstash-integration-kafka-* logstash-input-http-* nokogiri-1.10.7-java \
     sequl-5.27.0 backports-3.15.0 tzinfo-data-1.2019.3 snappy-0.0.12-java \
     mail-2.6.6 logstash-input-azure_event_hubs-1.1.2 logstash-filter-jdbc_static-1.0.7 snmp-1.3.2 && \
-    ${LOGSTASH_DIR}/bin/logstash-plugin install --version ${LOGSTASH_INPUT_BEATS_VERSION} logstash-input-beats
+    ${LOGSTASH_DIR}/bin/logstash-plugin update logstash-codec-plain && \
+    ${LOGSTASH_DIR}/bin/logstash-plugin install --version ${LOGSTASH_INPUT_BEATS_VERSION} logstash-input-beats && \
+    ${LOGSTASH_DIR}/bin/logstash-plugin update logstash-input-tcp

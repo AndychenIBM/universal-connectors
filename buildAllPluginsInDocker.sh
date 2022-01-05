@@ -45,15 +45,15 @@ buildUcCommons
 testPlugin "logstash-filter-mongodb-guardium" "test"
 testPlugin "logstash-filter-mysql-guardium" "test"
 testPlugin "logstash-filter-s3-guardium" "test"
-testPlugin "logstash-filter-mysql-percona-guardium" "test"
+#testPlugin "logstash-filter-mysql-percona-guardium" "test"
 #(echo && echo "UC_ETC=$PWD/logstash-output-guardium/src/resources") >> ./test/gradle.properties
 #test plugins
-grep -v '^#' pluginsToBuild.txt | while read -r line ; do testPlugin "$line" "test" ; done
+#grep -v '^#' pluginsToBuild.txt | while read -r line ; do testPlugin "$line" "test" ; done
 
 export UC_ETC=$PWD/logstash-output-guardium/src/resources
 
 #./logstash-output-guardium/gradlew setUTC -PUC_ETC=$PWD/logstash-output-guardium/src/resources
 #testPlugin "logstash-output-guardium" "setUTC" "-PUC_ETC=$PWD/logstash-output-guardium/src/resources"
-#testPlugin "logstash-output-guardium" "test"
+testPlugin "logstash-output-guardium" "test"
 #return success code
 exit 0
