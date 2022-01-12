@@ -1,4 +1,3 @@
-
 # ***************************************************************** */
 #                                                                   */
 # IBM Confidential                                                  */
@@ -7,7 +6,7 @@
 #                                                                   */
 # 5737-L66                                                          */
 #                                                                   */
-# Copyright IBM Corp. 2019, 2020                                    */
+# Copyright IBM Corp. 2019, 2022                                    */
 #                                                                   */
 # The source code for this program is not published or otherwise    */
 # divested of its trade secrets, irrespective of what has been      */
@@ -25,14 +24,12 @@ ENV ETC=/etc \
 	JAVA_HOME=/opt/java/openjdk \
     PATH="/opt/java/openjdk/bin:${PATH}" \
     JAVA_OPTS="-XX:+UseContainerSupport" \
-	LOGSTASH_VERSION=logstash-7.16.0-linux-x86_64 \
-	LOGSTASH_GIT_TAG=v7.16.0 \
+	LOGSTASH_VERSION=logstash-7.16.2-linux-x86_64 \
+	LOGSTASH_GIT_TAG=v7.16.2 \
     LOGSTASH_DIR=/usr/share/logstash \
     LOGSTASH_SRC_DIR=/usr/share/logstashSRC \
     LOG_DIR=/var/log/ \
-    LOG_GUC_DIR=/var/log/uc/ \
-    LOGSTASH_INPUT_BEATS_VERSION=6.0.11 \
-    LOGSTASH_INPUT_TCP_VERSION=6.0.6
+    LOG_GUC_DIR=/var/log/uc/
 
 USER root
 
@@ -45,7 +42,6 @@ RUN microdnf install -y git tzdata openssl curl ca-certificates procps shadow-ut
 RUN cd ${LOGSTASH_SRC_DIR} && git clone -b "${LOGSTASH_GIT_TAG}" https://github.com/elastic/logstash.git
 RUN cd ${LOGSTASH_SRC_DIR}/logstash && ./gradlew --version && ./gradlew clean --warning-mode all && ./gradlew assemble
 
-
 #Change User to guc
 USER guc
 #Download and extract logstash
@@ -53,11 +49,8 @@ RUN curl https://artifacts.elastic.co/downloads/logstash/${LOGSTASH_VERSION}.tar
     tar -xzf ${LOGSTASH_DIR}/${LOGSTASH_VERSION}.tar.gz  -C ${LOGSTASH_DIR} --strip-components=1 && \
 	rm ${LOGSTASH_DIR}/*.tar.gz && \
 #Remove unnecessary heavy plugins
-    cd $LOGSTASH_DIR/vendor/bundle/jruby/2.5.0/gems && \
-    rm -rf logstash-filter-geoip-6.0.3-java logstash-input-snmp-1.2.1 \
-    logstash-input-azure-* logstash-integration-kafka-* logstash-input-http-* nokogiri-1.10.7-java \
-    sequl-5.27.0 backports-3.15.0 tzinfo-data-1.2019.3 snappy-0.0.12-java \
-    mail-2.6.6 logstash-input-azure_event_hubs-1.1.2 logstash-filter-jdbc_static-1.0.7 snmp-1.3.2 && \
-    ${LOGSTASH_DIR}/bin/logstash-plugin update logstash-codec-plain && \
-    ${LOGSTASH_DIR}/bin/logstash-plugin install --version ${LOGSTASH_INPUT_BEATS_VERSION} logstash-input-beats && \
-    ${LOGSTASH_DIR}/bin/logstash-plugin update logstash-input-tcp
+    cd ${LOGSTASH_DIR}/vendor/bundle/jruby/2.5.0/gems && \
+    rm -rf logstash-filter-geoip-* logstash-input-snmp-* logstash-input-azure-* logstash-integration-kafka-* logstash-input-http-* nokogiri-* \
+    backports-* tzinfo-data-* snappy-* mail-* logstash-input-azure_event_hubs-* logstash-filter-jdbc_static-* snmp-* logstash-filter-useragent-* && \
+# Clear cache
+    rm -rf ${LOGSTASH_DIR}/vendor/cache/*.gem ${LOGSTASH_DIR}/vendor/bundle/jruby/2.5.0/cache/*.gem
