@@ -53,8 +53,8 @@ dependencies {
     compile fileTree(dir: LOGSTASH_CORE_PATH, include: "**/logstash-core-*.*.*.jar")
     compile fileTree(dir: GUARDIUM_UNIVERSALCONNECTOR_COMMONS_PATH, include: "guardium-universalconnector-commons-?.?.?.jar")
 
-    testCompile 'junit:junit:4.12'
-    testCompile 'org.jruby:jruby-complete:9.2.7.0'
+    testCompile 'junit:junit:4.13.1'
+    testCompile 'org.jruby:jruby-complete:9.3.2.0'
 }
 
 clean {
