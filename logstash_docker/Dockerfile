@@ -28,7 +28,8 @@ ENV ETC=/etc \
     LOGSTASH_DIR=/usr/share/logstash \
     LOG_DIR=/var/log/ \
     LOG_GUC_DIR=/var/log/uc/ \
-    SSL_DIR=/service/certs/universalconnector/
+    SSL_DIR=/service/certs/universalconnector/ \
+    RPM_DIR=/var/lib/rpm
 
 ENV UC_ETC=${LOGSTASH_DIR}/config/ \
     UC_SCRIPTS=${LOGSTASH_DIR}/scripts/ \
@@ -45,7 +46,7 @@ RUN microdnf install -y tzdata openssl curl ca-certificates procps shadow-utils.
 #Add guc user and prepare
     useradd -g root guc && \
     mkdir -p ${LOGSTASH_DIR} ${LOG_GUC_DIR} ${SSL_DIR} && \
-    chmod -vR g=u ${LOGSTASH_DIR} ${LOG_GUC_DIR} ${SSL_DIR} /tmp && \
+    chmod -vR g=u ${LOGSTASH_DIR} ${LOG_GUC_DIR} ${SSL_DIR} ${RPM_DIR} /tmp && \
     chmod +x /usr/bin/readiness.sh /usr/bin/liveness.sh && \
     chown -R guc:root /uc
 
