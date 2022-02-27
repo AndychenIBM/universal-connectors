@@ -23,14 +23,6 @@ if [[ -z "$logstash_pid" ]]; then
     #Change connectorId if needed
     updateFromEnv "$CONNECTOR_ID" "CONNECTOR_ID" $UC_ETC/UniversalConnector.json "\"connectorId\":.*" "\"connectorId\":\"$CONNECTOR_ID\","
 
-
-    #Change filebeat/syslog ports if needed
-    #Note that this option is only relevant when using mongodb-syslog-filebeat.conf as a configuration file for logstash
-    MONGODB_CONF=${LOGSTASH_DIR}/pipeline/mongodb-syslog-filebeat.conf
-    updateFromEnv "$FILEBEAT_PORT" "FILEBEAT_PORT" $MONGODB_CONF "beats \{ port => 5044 type => filebeat" "beats \{ port => $FILEBEAT_PORT type => filebeat"
-    updateFromEnv "$UDP_PORT" "UDP_PORT" $MONGODB_CONF "udp \{ port => 5141 type => syslog" "udp \{ port => $UDP_PORT type => syslog"
-    updateFromEnv "$TCP_PORT" "TCP_PORT" $MONGODB_CONF "tcp \{ port => 5000 type => syslog" "tcp \{ port => $TCP_PORT type => syslog"
-
     setJVMParameters
 
     #Copy keystore, if exists:
