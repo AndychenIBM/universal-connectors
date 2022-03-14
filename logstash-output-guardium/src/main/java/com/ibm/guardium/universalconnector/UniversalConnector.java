@@ -30,14 +30,35 @@ public class UniversalConnector {
     private volatile boolean running = true;
     private String version = "1.2.44";
     private String udsAgentVersion = "(V" + version + ")";
-    private UCConfig ucConfig = null;
-    private RecordDispatcher recordDispatcher = null;
-    private JsonRecordTransformer transformer = new JsonRecordTransformer();
+    private final UCConfig ucConfig;
+    private final RecordDispatcher recordDispatcher;
+    private final JsonRecordTransformer transformer;
 
     public UniversalConnector(){
-        initConnector();
+        log.info("using etc path as: " + Environment.getUcEtc());
+        transformer = new JsonRecordTransformer();
+        try {
+            JsonReader reader = new JsonReader(new FileReader(Environment.getUcEtc() + "UniversalConnector.json"));
+            UCConfig config = new Gson().fromJson(reader, UCConfig.class);
+            config.setVersion(udsAgentVersion);
+            this.ucConfig = config;
+        } catch (FileNotFoundException e){
+            log.error("Failed to find file "+Environment.getUcEtc() + "UniversalConnector.json");
+            throw new IllegalArgumentException("Failed to find files during connector initialization, Path base is "+Environment.getUcEtc(), e);
+        }
+
+        try {
+            ConfigurationFetcherFactory factory = new ConfigurationFetcherFactory();
+            ConfigurationFetcher configurationFetcher = factory.Build(ucConfig);
+            List<SnifferConfig> snifferConfigs = configurationFetcher.fetch();
+            recordDispatcher = new RecordDispatcher(ucConfig, snifferConfigs);
+        } catch (Exception e) {
+            log.error("Failed to initialize record dispatcher", e);
+            throw  new IllegalArgumentException("Failed initialize record dispatcher", e);
+        }
+
         log.info("UniversalConnector was initialized");
-        log.debug("The Thread name is " + Thread.currentThread().getId() + "__" +Thread.currentThread().getName());
+        log.debug("The Thread name is " + Thread.currentThread().getId() + "__" +Thread.currentThread().getName()+" this "+this);
 
     }
 
@@ -122,7 +143,7 @@ public class UniversalConnector {
             //getAgentInstance().send(record.getBytes());
             if (log.isDebugEnabled()) { log.debug("Message to be dispatched to agent " + record); }
 
-            getRecordDispatcher().dispatch(transformer.transform(record));
+            recordDispatcher.dispatch(transformer.transform(record));
 
             if (log.isDebugEnabled()) { log.debug("Message was dispatched to agent");}
 
@@ -132,21 +153,23 @@ public class UniversalConnector {
         }
     }
 
-    public RecordDispatcher getRecordDispatcher() throws Exception{
-        if (recordDispatcher==null){
-            synchronized (UniversalConnector.class){
-                if (recordDispatcher!=null){
-                    return recordDispatcher;
-                }
-                ConfigurationFetcherFactory factory = new ConfigurationFetcherFactory();
-                ConfigurationFetcher configurationFetcher = factory.Build(ucConfig);
-                List<SnifferConfig> snifferConfigs = configurationFetcher.fetch();
-                recordDispatcher = new RecordDispatcher(ucConfig, snifferConfigs);
-            }
+    public void onExit(){
+        log.debug("UniversalConnector on exit");
+        try {
+            log.debug("UniversalConnector onExit waitForAllQToEmpty");
+            recordDispatcher.waitForAllQToEmpty();
+        } catch (Exception e){
+            log.error("Error on waiting for messages to be sent onExit (emptying messages queue). The Thread name is " + Thread.currentThread().getId() + "__" +Thread.currentThread().getName()+" this "+this);
         }
-        return recordDispatcher;
+        try {
+            log.debug("UniversalConnector onExit stopAllAgents, dispatcher is "+recordDispatcher+", this is "+this);
+            recordDispatcher.stopAllAgents();
+        } catch (Exception e){
+            log.error("Error on stopping agents",e);
+        }
     }
 
+    //---- section below only meant to be used when using ucconnector locally, not us a plugin, and has not be tested for a while -----------//
     private void readFromFileToGuard(String recordsFileName) throws Exception{
         log.info("Reading and sending to Guard from file:" + recordsFileName);
 
@@ -158,9 +181,9 @@ public class UniversalConnector {
             while ((line = bufferedReader.readLine()) != null) {
                 lineNumber++;
                 List<com.ibm.guardium.proto.datasource.Datasource.Guard_ds_message> messages = transformer.transform(line);
-                getRecordDispatcher().dispatch(messages);
-                getRecordDispatcher().dispatch(messages);
-                getRecordDispatcher().dispatch(messages);
+                recordDispatcher.dispatch(messages);
+                recordDispatcher.dispatch(messages);
+                recordDispatcher.dispatch(messages);
                     //agent.incIncomingRecordsCount();
                     //agent.send(message);
                     //agent.send(message.toByteArray());
@@ -170,12 +193,12 @@ public class UniversalConnector {
             }
             // need to wait for connection to send...
             try {
-                getRecordDispatcher().waitForAllQToEmpty();
-            } catch (InterruptedException e) {
-                log.warn("Interrupted while waiting for messages to be sent.");
+                recordDispatcher.waitForAllQToEmpty();
+            } catch (Exception e) {
+                log.warn("Interrupted while waiting for messages to be sent. The Thread name is " + Thread.currentThread().getId() + "__" +Thread.currentThread().getName()+" this "+this);
             }
             progressPercentage(numeberOfLinesInFile, numeberOfLinesInFile);
-            getRecordDispatcher().stopAllAgents();
+            recordDispatcher.stopAllAgents();
             log.debug("Done sending.");
         } catch (IOException e) {
             log.error(e);
@@ -201,25 +224,6 @@ public class UniversalConnector {
         shouldWaitForMain = false;
     }
 
-    private void initConnector(){
-        log.info("using etc path as: " + Environment.getUcEtc());
-        try {
-            JsonReader reader = new JsonReader(new FileReader(Environment.getUcEtc() + "UniversalConnector.json"));
-            UCConfig ucConfig = new Gson().fromJson(reader, UCConfig.class);
-            ucConfig.setVersion(udsAgentVersion);
-            this.ucConfig = ucConfig;
-        } catch (FileNotFoundException e){
-            log.error("Failed to find file");
-            throw new IllegalArgumentException("Failed to find files during connector initialization, Path base is "+Environment.getUcEtc(), e);
-        }
-        try {
-            getRecordDispatcher();
-        } catch (Exception e) {
-            log.error("Failed to initialize record dispatcher", e);
-            throw  new IllegalArgumentException("Failed initialize record dispatcher", e);
-        }
-
-    }
 
     private void connectorMain(String[] args) throws Exception {
 
@@ -246,30 +250,6 @@ public class UniversalConnector {
         }
         signalShutdownHookToExit();
         log.info("UniversalConnector stopped.");
-    }
-
-    public void onExit(){
-        log.debug("UniversalConnector on exit");
-        try {
-            log.debug("UniversalConnector onExit waitForAllQToEmpty");
-            getRecordDispatcher().waitForAllQToEmpty();
-        } catch (InterruptedException e) {
-            log.warn("Interrupted while waiting for messages to be sent.");
-        } catch (Exception e){
-            log.error("Error on waiting for messages to be sent");
-        }
-//        try{
-//            log.debug("UniversalConnector onExit persistAgentConfigurations");
-//            getRecordDispatcher().persistAgentConfigurations();
-//        } catch (Exception e){
-//            log.error("Error persisting configurations");
-//        }
-        try {
-            log.debug("UniversalConnector onExit stopAllAgents");
-            getRecordDispatcher().stopAllAgents();
-        } catch (Exception e){
-            log.error("Error on stopping agents",e);
-        }
     }
 
     public static void main(String[] args) {

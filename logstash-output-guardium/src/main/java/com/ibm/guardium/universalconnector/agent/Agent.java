@@ -123,9 +123,9 @@ public class Agent {
             statusWriter.init();
             this.recordTransmitter.setStatusWriter(statusWriter);
 
-            log.debug("ready to create connection to snif " + config.getId());
+            log.debug("Agent in thread id "+Thread.currentThread().getId()+" name "+Thread.currentThread().getName()+" agent obj "+this+" ready to create connection to snif " + config.getId());
             connThread = new Thread(recordTransmitter);
-            connThread.setName(config.getId() + "-recordTransmitter");
+            connThread.setName(config.getId() + "-recordTransmitter-parent-"+Thread.currentThread().getId()+"_"+Thread.currentThread().getName());
             connThread.start();
             log.info("waiting for connection to snif to open" + config.getId());
             int retries = CONNECTION_RETRIES;

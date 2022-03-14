@@ -41,7 +41,7 @@ public class JavaOutputToGuardium implements Output {
     private PrintStream printer;
     private final CountDownLatch done = new CountDownLatch(1);
     private volatile boolean stopped = false;
-    private static UniversalConnector connector = null;//new UniversalConnector();
+    private final UniversalConnector connector;
     private static Gson gson = new Gson();
 
     // all plugins must provide a constructor that accepts id, Configuration, and Context
