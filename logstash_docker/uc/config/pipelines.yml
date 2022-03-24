@@ -1,4 +1,6 @@
+- pipeline.id: test_pipeline
+  path.config: "/usr/share/logstash/pipeline/test-filebeat.conf"
+  queue.type: ${GUC_PERSISTENT_QUEUE_TYPE:memory}
 - pipeline.id: customer_pipeline
   path.config: "${GI_PIPELINE_DIR:/usr/share/logstash/customer/pipeline/}"
   queue.type: ${GUC_PERSISTENT_QUEUE_TYPE:memory}
-
