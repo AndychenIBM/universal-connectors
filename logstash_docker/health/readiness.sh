@@ -15,5 +15,12 @@
 #
 # **************************************************************
 
+# Initial delay
+sleep 10s
 
-exit 0
+head -n 1 /proc/1/sched | grep java
+if [ $? -eq 0 ]; then
+  exit 0
+else
+  exit 1
+fi
