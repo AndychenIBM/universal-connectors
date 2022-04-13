@@ -15,9 +15,6 @@
 #
 # **************************************************************
 
-# Initial delay
-sleep 10s
-
 head -n 1 /proc/1/sched | grep java
 if [ $? -eq 0 ]; then
   exit 0
