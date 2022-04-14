@@ -89,7 +89,7 @@ RUN curl https://artifacts.elastic.co/downloads/logstash/${LOGSTASH_VERSION}.tar
     chmod -R g=u ${LOGSTASH_DIR} ${LOG_GUC_DIR} ${SSL_DIR} /tmp /opt/java || true && \
 #Remove unnecessary heavy plugins
     cd ${LOGSTASH_DIR}/vendor/bundle/jruby/2.5.0/gems && \
-    rm -rf logstash-filter-geoip-* logstash-input-snmp-* logstash-input-azure-* logstash-integration-kafka-* logstash-input-http-* nokogiri-* \
+    rm -rf logstash-filter-geoip-* logstash-input-snmp-* logstash-input-azure-* logstash-input-http-* nokogiri-* \
     backports-* tzinfo-data-* snappy-* mail-* logstash-input-azure_event_hubs-* logstash-filter-jdbc_static-* snmp-* logstash-filter-useragent-* && \
 # Clear cache
     rm -rf ${LOGSTASH_DIR}/vendor/cache/*.gem ${LOGSTASH_DIR}/vendor/bundle/jruby/2.5.0/cache/*.gem
