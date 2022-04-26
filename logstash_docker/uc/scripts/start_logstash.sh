@@ -8,7 +8,7 @@ if [[ -z "$logstash_pid" ]]; then
     then
         if [[ "$GI_MODE" = "true" ]]; then
             echo "run gi mode" >> /usr/share/logstash/mode.log
-            /usr/share/logstash/scripts/start_logstash_gi.sh
+            exec /usr/share/logstash/scripts/start_logstash_gi.sh
             exit 0
         fi
     fi
@@ -31,7 +31,7 @@ if [[ -z "$logstash_pid" ]]; then
     fi
     
     #Start logstash
-    exec logstash -b 80 -u 500 -l ${LOG_GUC_DIR} 2>&1 | tee -a ${LOG_GUC_DIR}/logstash_stdout_stderr.log
+    exec logstash -b 80 -u 500 -l ${LOG_GUC_DIR} > >(tee -a ${LOG_GUC_DIR}/logstash_stdout_stderr.log) 2>&1
 else
     echo "Logstash is already running..."
 fi
