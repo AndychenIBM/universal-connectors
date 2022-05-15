@@ -1,7 +1,7 @@
 #!/bin/bash
 
 DEFAULT_ERR_LOG=${LOG_GUC_DIR}/logstash_stdout_stderr.log
-ERR_LOG=${1:-DEFAULT_ERR_LOG}
+ERR_LOG=${1:-$DEFAULT_ERR_LOG}
 MAX_ERROR_LOGS_AMOUNT=500
 MAX_ERROR_LOGS_AMOUNT_TO_PRINT=10
 
@@ -14,9 +14,9 @@ MAX_ERROR_LOGS_AMOUNT_TO_PRINT=10
 # Check if Logstash is up
 logstash_pid=$("${UC_SCRIPTS}"/get_logstash_pid.sh)
 if [[ -z "$logstash_pid" ]]; then
-  echo "logstash is running"
-else
   echo "logstash is down"
+else
+  echo "logstash is running"
 fi
 
 
