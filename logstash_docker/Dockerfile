@@ -81,6 +81,9 @@ RUN curl https://artifacts.elastic.co/downloads/logstash/${LOGSTASH_VERSION}.tar
 #Install plugins FIXME: enter output_to_guardium plugin to the default offline-package
     ${LOGSTASH_DIR}/bin/logstash-plugin install ${UC_ETC}/logstash-output-java_output_to_guardium-1.3.9.gem && \
     ${LOGSTASH_DIR}/bin/logstash-plugin install file:///${UC_ETC}/guardium_logstash-offline-plugins.zip && \
+    ${LOGSTASH_DIR}/bin/logstash-plugin install file:///${UC_ETC}/generic-offline-plugins-7.5.2.zip && \
+    ${LOGSTASH_DIR}/bin/logstash-plugin install file:///${UC_ETC}/logstash-filter-json_encode-3.0.3-java.zip && \
+    ${LOGSTASH_DIR}/bin/logstash-plugin install file:///${UC_ETC}/logstash-offline-plugin-input-google_pubsub.zip && \
 #Make sure user can read,write and execute the scripts
     chmod 755 ${UC_SCRIPTS}/*.sh && \
 #Make sure scripts are not uploaded with windows characters additions
@@ -89,8 +92,8 @@ RUN curl https://artifacts.elastic.co/downloads/logstash/${LOGSTASH_VERSION}.tar
     chmod -R g=u ${LOGSTASH_DIR} ${LOG_GUC_DIR} ${SSL_DIR} /tmp /opt/java || true && \
 #Remove unnecessary heavy plugins
     cd ${LOGSTASH_DIR}/vendor/bundle/jruby/2.5.0/gems && \
-    rm -rf logstash-filter-geoip-* logstash-input-snmp-* logstash-input-azure-* logstash-input-http-* nokogiri-* \
-    backports-* tzinfo-data-* snappy-* mail-* logstash-input-azure_event_hubs-* logstash-filter-jdbc_static-* snmp-* logstash-filter-useragent-* && \
+    rm -rf logstash-filter-geoip-* logstash-input-snmp-* logstash-input-http-* nokogiri-* \
+    backports-* tzinfo-data-* snappy-* mail-* logstash-filter-jdbc_static-* snmp-* logstash-filter-useragent-* && \
 # Clear cache
     rm -rf ${LOGSTASH_DIR}/vendor/cache/*.gem ${LOGSTASH_DIR}/vendor/bundle/jruby/2.5.0/cache/*.gem
 
