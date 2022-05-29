@@ -83,7 +83,7 @@ RUN curl https://artifacts.elastic.co/downloads/logstash/${LOGSTASH_VERSION}.tar
     ${LOGSTASH_DIR}/bin/logstash-plugin install file:///${UC_ETC}/guardium_logstash-offline-plugins.zip && \
     ${LOGSTASH_DIR}/bin/logstash-plugin install file:///${UC_ETC}/generic-offline-plugins-7.5.2.zip && \
     ${LOGSTASH_DIR}/bin/logstash-plugin install file:///${UC_ETC}/logstash-filter-json_encode-3.0.3-java.zip && \
-    ${LOGSTASH_DIR}/bin/logstash-plugin install file:///${UC_ETC}/logstash-offline-plugin-input-google_pubsub.zip && \
+    ${LOGSTASH_DIR}/bin/logstash-plugin install file:///${UC_ETC}/logstash-offline-plugins-input-google_pubsub-1.2.1.zip && \
 #Make sure user can read,write and execute the scripts
     chmod 755 ${UC_SCRIPTS}/*.sh && \
 #Make sure scripts are not uploaded with windows characters additions
