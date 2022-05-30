@@ -19,7 +19,6 @@ else
   echo "logstash is running"
 fi
 
-
 # Check if ERR_LOG exists
 if [[ -f "$ERR_LOG" ]]; then
   echo "$ERR_LOG exists. Checking logs..."
@@ -35,9 +34,38 @@ if [ $err_cnt -gt $MAX_ERROR_LOGS_AMOUNT ]; then
    exit 0
 fi
 
+# Connection errors -TODO: extract pattern,err_msg to file
+pattern="InvalidURIError: bad URI"
+err_msg="InvalidURIError. Please verify credentials correctness and network access"
+grep -q "$pattern" $ERR_LOG && echo $err_msg;
+
+pattern="ERROR GuardConnection"
+err_msg="Connection to Guardium Sniffer is down. Please verify Sniffer is up"
+grep -q "$pattern" $ERR_LOG && echo $err_msg;
+
+pattern="Java::NetSnowflakeClientJdbc::SnowflakeSQLException: Your free trial has ended"
+err_msg="Connection to Guardium Sniffer is down. Please verify Sniffer is up"
+grep -q "$pattern" $ERR_LOG && echo $err_msg;
+
+pattern="Check your AWS Secret Access Key and signing method."
+err_msg="Check your AWS Secret Access Key and signing method."
+grep -q "$pattern" $ERR_LOG && echo $err_msg;
+
+pattern="Your free trial has ended"
+err_msg="Your free trial has ended. Please make sure your db instance is valid"
+grep -q "$pattern" $ERR_LOG && echo $err_msg;
+
+pattern="The specified log group does not exist."
+err_msg="The specified log group does not exist."
+grep -q "$pattern" $ERR_LOG && echo $err_msg;
+
+pattern="HTTPServerException"
+err_msg="AWS domain not added in allowed domain list"
+grep -q "$pattern" $ERR_LOG && echo $err_msg;
+
 # TODO - remove duplicates before printing them to logs
 # TODO - add more information regarding known exception
-if [ $err_cnt -lt $MAX_ERROR_LOGS_AMOUNT_TO_PRINT ]; then
-   echo $(grep "ERROR" ${ERR_LOG})
-   exit 0
-fi
+#if [ $err_cnt -lt $MAX_ERROR_LOGS_AMOUNT_TO_PRINT ]; then
+#   echo $(grep "ERROR" ${ERR_LOG})
+#   exit 0
+#fi
