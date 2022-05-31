@@ -1,4 +1,13 @@
 #!/bin/bash
+
+# This script help to change universal-connector log level
+#
+# Usage example:
+# ./set_uc_log_level.sh debug
+#
+# avialible arguments are: 
+# all|debug|info|warn|error|fatal|off|trace
+
 source ${UC_SCRIPTS}/utils.sh
 
 function setUcLogLevel(){

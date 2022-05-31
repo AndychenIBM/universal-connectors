@@ -1,12 +1,21 @@
 package com.ibm.guardium.universalconnector.common;
 
 
+import com.ibm.guardium.universalconnector.services.CipherService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.GCMParameterSpec;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.PBEKeySpec;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.File;
-import java.io.FileInputStream;
-import java.util.Properties;
+import java.security.spec.KeySpec;
+import java.util.Arrays;
+import java.util.Base64;
 
 
 public class Environment {
@@ -18,6 +27,26 @@ public class Environment {
 
     public static final String UC_EXTERNAL_CONFIG = "UC_EXTERNAL_CONFIG";
     public static final String PERSISTENT_CONFIGURATION_FILE_NAME = "PersistentConfig.json";
+
+    public static final String INSIGHT_KEYSTORE_PATH = getEnvOrDefault("INSIGHT_KEYSTORE_PATH",
+            "/service/certs/universalconnector/insights.jks");
+
+    public static final String UNIVERSAL_CONNECTOR_KEYSTORE_PASSWORD = getEnvOrDefault("UNIVERSAL_CONNECTOR_KEYSTORE_PASSWORD", "");
+
+    //cipher
+    public static final String ENCRYPTION_ALG = getEnvOrDefault("ENCRYPTION_ALG", "");
+    public static final String MASTER_KEY = getEnvOrDefault("MASTER_KEY", "");
+    public static final String MASTER_AAD = getEnvOrDefault("MASTER_AAD", "");
+    public static final String ENCRYPTION_PASSWORD = getEnvOrDefault("ENCRYPTION_PASSWORD", "");
+    public static final String GCM_AAD = getEnvOrDefault("GCM_AAD", "");
+
+    private static String getEnvOrDefault(String envName, String defaultVal) {
+        String value = System.getenv(envName);
+        if ((value == null) || (value.isEmpty())) {
+            return defaultVal;
+        }
+        return value;
+    }
 
     public static String getUcEtc() {
         String gEnv = System.getenv(UC_ETC);
@@ -56,5 +85,4 @@ public class Environment {
         String gEnv = getUcEtc();
         return gEnv+ File.separator+LOG42_CONF;
     }
-
 }

@@ -1,5 +1,6 @@
 package com.ibm.guardium.universalconnector.transmitter.socket;
 
+import com.ibm.guardium.universalconnector.common.InsightsTrustManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import javax.net.ssl.*;
@@ -8,6 +9,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.Selector;
 import java.security.KeyManagementException;
+import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
@@ -24,27 +26,16 @@ public class GuardSecuredConnection extends GuardAbstractConnection {
     private SSLEngine engine;
     private static Logger log = LogManager.getLogger(GuardSecuredConnection.class);
 
-    public GuardSecuredConnection(String remoteAddress, int port) throws CertificateException, IOException, NoSuchAlgorithmException, KeyManagementException {
+    public GuardSecuredConnection(String remoteAddress, int port) throws CertificateException, IOException, NoSuchAlgorithmException, KeyManagementException, KeyStoreException {
         this.conn = new GuardNonSecuredConnection(remoteAddress, port);
         log.debug("GuardSecuredConnection with remoteAddress:" + remoteAddress + " port:" + port);
         SSLContext context = SSLContext.getInstance("TLSv1.2");
+        TrustManagerFactory tmf =  InsightsTrustManager.getInstance();;
+        if(tmf == null) {
+            throw new CertificateException("failed to create trust manager for Certificate");
+        }
 
-        // This is done to trust all certificates, no need to add the g-machines certificate to the key store.
-        TrustManager[] trustAllCerts = new TrustManager[] {
-                new X509TrustManager() {
-                    public X509Certificate[] getAcceptedIssuers() {
-                        return null;
-                    }
-
-                    @Override
-                    public void checkClientTrusted(X509Certificate[] certs, String authType) throws CertificateException {}
-
-                    @Override
-                    public void checkServerTrusted(X509Certificate[] arg0, String arg1)	throws CertificateException {}
-
-                }
-        };
-        context.init(null, trustAllCerts, new SecureRandom());
+        context.init(null, tmf.getTrustManagers(), new SecureRandom());
 
         engine = context.createSSLEngine(remoteAddress, port);
         engine.setUseClientMode(true);

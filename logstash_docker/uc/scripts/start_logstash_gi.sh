@@ -1,6 +1,7 @@
 #!/bin/bash
 source ${UC_SCRIPTS}/utils.sh
 source ${UC_SCRIPTS}/set_uc_log_level.sh
+source ${UC_SCRIPTS}/create_keystore.sh
 
 logstash_pid=$(/usr/share/logstash/scripts/get_logstash_pid.sh)
 if [[ -z "$logstash_pid" ]]; then
