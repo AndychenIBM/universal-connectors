@@ -26,7 +26,7 @@ public class GuardSecuredConnection extends GuardAbstractConnection {
     private SSLEngine engine;
     private static Logger log = LogManager.getLogger(GuardSecuredConnection.class);
 
-    public GuardSecuredConnection(String remoteAddress, int port) throws CertificateException, IOException, NoSuchAlgorithmException, KeyManagementException, KeyStoreException {
+    public GuardSecuredConnection(String remoteAddress, int port) throws Exception {
         this.conn = new GuardNonSecuredConnection(remoteAddress, port);
         log.debug("GuardSecuredConnection with remoteAddress:" + remoteAddress + " port:" + port);
         SSLContext context = SSLContext.getInstance("TLSv1.2");

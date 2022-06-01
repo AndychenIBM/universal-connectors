@@ -4,13 +4,15 @@ import com.ibm.guardium.universalconnector.common.Environment;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.crypto.Cipher;
-import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
+import javax.crypto.*;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.util.Arrays;
 import java.util.Base64;
@@ -31,11 +33,11 @@ public class CipherService {
         return cipherService;
     }
 
-    public String decryptUCKeyStorePass() {
+    public String decryptUCKeyStorePass() throws Exception{
         return decryptWithMaster(Environment.UNIVERSAL_CONNECTOR_KEYSTORE_PASSWORD);
     }
 
-    private String decryptWithMaster(String passphrase) {
+    private String decryptWithMaster(String passphrase) throws Exception {
             try {
                 if (passphrase.equals("")) {
                     return "";
@@ -89,7 +91,7 @@ public class CipherService {
                 }
             } catch (Exception e) {
                 log.error("could not decrypt keystore password, ", e);
-                return "";
+                throw e;
             }
         }
 

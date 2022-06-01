@@ -22,11 +22,7 @@ import org.apache.logging.log4j.Logger;
 
 import javax.net.ssl.TrustManagerFactory;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
 
 public class InsightsTrustManager {
 
@@ -36,7 +32,7 @@ public class InsightsTrustManager {
 
     private InsightsTrustManager() {}
 
-    public static synchronized TrustManagerFactory getInstance() throws CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException {
+    public static synchronized TrustManagerFactory getInstance() throws Exception {
         // return cached TrustManagerFactory
         if (tmf != null) {
             return tmf;
