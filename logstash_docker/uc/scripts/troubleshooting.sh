@@ -2,7 +2,7 @@
 
 DEFAULT_ERR_LOG=${LOG_GUC_DIR}/logstash_stdout_stderr.log
 ERR_LOG=${1:-$DEFAULT_ERR_LOG}
-MAX_ERROR_LOGS_AMOUNT=500
+MAX_ERROR_LOGS_AMOUNT=1000
 MAX_ERROR_LOGS_AMOUNT_TO_PRINT=10
 
 # ERROR types:
@@ -30,8 +30,7 @@ fi
 # Check length
 err_cnt=$(grep "ERROR" ${ERR_LOG} | wc -l)
 if [ $err_cnt -gt $MAX_ERROR_LOGS_AMOUNT ]; then
-   echo "More than ${MAX_ERROR_LOGS_AMOUNT} are found on ${ERR_LOG}"
-   exit 0
+   echo "More than ${MAX_ERROR_LOGS_AMOUNT} errors are found on ${ERR_LOG}"
 fi
 
 # Connection errors -TODO: extract pattern,err_msg to file
