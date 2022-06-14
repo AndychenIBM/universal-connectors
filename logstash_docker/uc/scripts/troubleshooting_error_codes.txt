@@ -1,0 +1,8 @@
+# Lines format:
+# ERROR_PATTERN;ERROR_CODE;ERROR_MESSAGE
+InvalidURIError: bad URI;1;"InvalidURIError. Please verify credentials correctness and network access"
+ERROR GuardConnection;2;"Connection to Guardium Sniffer is down. Please verify Sniffer is up"
+Your free trial has ended;3;"Database free trial has ended"
+Check your AWS Secret Access Key and signing method.;4;"Check your AWS Secret Access Key and signing method."
+The specified log group does not exist.;5;"The specified log group does not exist."
+HTTPServerException;6;"AWS domain not added in allowed domain list"
