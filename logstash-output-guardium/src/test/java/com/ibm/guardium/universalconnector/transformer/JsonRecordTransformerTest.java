@@ -3,18 +3,11 @@ package com.ibm.guardium.universalconnector.transformer;
 
 import com.google.gson.Gson;
 import com.ibm.guardium.proto.datasource.Datasource;
-import com.ibm.guardium.universalconnector.common.Utilities;
 import com.ibm.guardium.universalconnector.commons.structures.*;
 import com.ibm.guardium.universalconnector.exceptions.GuardUCInvalidRecordException;
-import org.jruby.RubyProcess;
 import org.junit.Assert;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import sun.net.util.IPAddressUtil;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.List;
 
 public class JsonRecordTransformerTest {
@@ -186,7 +179,7 @@ public class JsonRecordTransformerTest {
                 "\t\t\t\"serverDescription\":\"n/a\",\n" +
                 "\t\t\t\"serviceName\":\"abcservicename\",\n" +
                 "\t\t\t\"language\":\"FREE_TEXT\",\n" +
-                "\t\t\t\"type\":\"CONSTRUCT\"\n" +
+                "\t\t\t\"dataType\":\"CONSTRUCT\"\n" +
                 "\t\t}";
         ra = new Gson().fromJson(accessorString, Accessor.class);
         record = new Record();
@@ -313,18 +306,79 @@ public class JsonRecordTransformerTest {
     }
 
     @Test
+    public void testSessionId(){
+
+        Record record = (new Gson()).fromJson(recordString, Record.class);
+        JsonRecordTransformer transformer = new JsonRecordTransformer();
+
+        Long hashOfOne = -4266524885998029950L;
+        record.setSessionId("1");
+        Long sessionId = transformer.getSessionIdForSniffer(record);
+        Assert.assertTrue("invalid sessionId for given sessionId property", hashOfOne.equals(sessionId)/*correct hash for 1*/);
+
+        Long hashOfRecordString = -1721301020957000723L;
+        record.setSessionId("");
+        sessionId = transformer.getSessionIdForSniffer(record);
+        Assert.assertTrue("invalid sessionId for empty sessionId property", hashOfRecordString.equals(sessionId));
+
+        record.setSessionId(" ");
+        sessionId = transformer.getSessionIdForSniffer(record);
+        Assert.assertTrue("invalid sessionId for empty with space sessionId property", hashOfRecordString.equals(sessionId));
+
+        record.setSessionId(null);
+        sessionId = transformer.getSessionIdForSniffer(record);
+        Assert.assertTrue("invalid sessionId for null sessionId property", hashOfRecordString.equals(sessionId));
+    }
+
+
+    @Test
     public void testIp() {
 
-        Record record = (new Gson()).fromJson(msgTemplateIPV6, Record.class);
+        Record record = (new Gson()).fromJson(recordString, Record.class);
+        JsonRecordTransformer transformer = new JsonRecordTransformer();
+        Datasource.Session_locator session_locator = transformer.buildSessionLocator(record);
 
-        Assert.assertTrue("failed to parse record string to json", record != null);
-        Assert.assertTrue("failed to set ipv6 type", record.getSessionLocator().isIpv6());
-        Assert.assertTrue("failed to set client ip", "1:1:1:1:1:1:1:1".equals(record.getSessionLocator().getClientIpv6()));
-        Assert.assertTrue("failed to set server ip", "2001:0db8:0000:0000:0000:ff00:0042:8329".equals(record.getSessionLocator().getServerIpv6()));
-
-        record = (new Gson()).fromJson(recordString, Record.class);
-        Assert.assertTrue("failed to set ipv4 type", !record.getSessionLocator().isIpv6());
+        Assert.assertTrue("failed to set ip type", !session_locator.getIsIpv6());
+        Assert.assertTrue("failed to set client ip", 18088063==session_locator.getClientIp());
+        Assert.assertTrue("failed to set server ip", 18743423==session_locator.getServerIp());
     }
+
+    @Test
+    public void testIpV6() {
+
+        Record record = (new Gson()).fromJson(msgTemplateIPV6, Record.class);
+        JsonRecordTransformer transformer = new JsonRecordTransformer();
+        Datasource.Session_locator session_locator = transformer.buildSessionLocator(record);
+
+        Assert.assertTrue("failed to set ipv6 type", session_locator.getIsIpv6());
+        Assert.assertTrue("failed to set client ip", "1:1:1:1:1:1:1:1".equals(session_locator.getClientIpv6()));
+        Assert.assertTrue("failed to set server ip", "2001:0db8:0000:0000:0000:ff00:0042:8329".equals(session_locator.getServerIpv6()));
+    }
+
+    @Test
+    public void testMixedIpClientV6() {
+
+        Record record = (new Gson()).fromJson(msgTemplateMixedIpClientV6, Record.class);
+        JsonRecordTransformer transformer = new JsonRecordTransformer();
+        Datasource.Session_locator session_locator = transformer.buildSessionLocator(record);
+
+        Assert.assertTrue("failed to set ipv6 type", session_locator.getIsIpv6());
+        Assert.assertTrue("failed to set client ip", "1:1:1:1:1:1:1:1".equals(session_locator.getClientIpv6()));
+        Assert.assertTrue("failed to set server ip", 67305985==session_locator.getServerIp());
+    }
+
+    @Test
+    public void testMixedIpServerV6() {
+
+        Record record = (new Gson()).fromJson(msgTemplateMixedIPServerV6, Record.class);
+        JsonRecordTransformer transformer = new JsonRecordTransformer();
+        Datasource.Session_locator session_locator = transformer.buildSessionLocator(record);
+
+        Assert.assertTrue("failed to set ipv6 type", session_locator.getIsIpv6());
+        Assert.assertTrue("failed to set client ip", 67305985==session_locator.getClientIp());
+        Assert.assertTrue("failed to set server ip", "2001:0db8:0000:0000:0000:ff00:0042:8329".equals(session_locator.getServerIpv6()));
+    }
+
 
     @Test
     public void testIpTranslation() {
@@ -373,7 +427,123 @@ public class JsonRecordTransformerTest {
             "\t\t\"serverDescription\": \"\",\n" +
             "\t\t\"serviceName\": \"admin\",\n" +
             "\t\t\"language\": \"FREE_TEXT\",\n" +
-            "\t\t\"type\": \"CONSTRUCT\"\n" +
+            "\t\t\"dataType\": \"CONSTRUCT\"\n" +
+            "\t},\n" +
+            "\t\"data\": {\n" +
+            "\t\t\"construct\": {\n" +
+            "\t\t\t\"sentences\": [\n" +
+            "\t\t\t\t{\n" +
+            "\t\t\t\t\t\"verb\": \"insert\",\n" +
+            "\t\t\t\t\t\"objects\": [\n" +
+            "\t\t\t\t\t\t{\n" +
+            "\t\t\t\t\t\t\t\"name\": \"system.users.BBBB\",\n" +
+            "\t\t\t\t\t\t\t\"type\": \"collection\",\n" +
+            "\t\t\t\t\t\t\t\"fields\": [],\n" +
+            "\t\t\t\t\t\t\t\"schema\": \"\"\n" +
+            "\t\t\t\t\t\t}\n" +
+            "\t\t\t\t\t],\n" +
+            "\t\t\t\t\t\"descendants\": [],\n" +
+            "\t\t\t\t\t\"fields\": []\n" +
+            "\t\t\t\t}\n" +
+            "\t\t\t],\n" +
+            "\t\t\t\"fullSql\": \"{\\\"atype\\\":\\\"authCheck\\\",\\\"ts\\\":{\\\"$date\\\":\\\"2020-08-13T05:56:26.518-0400\\\"},\\\"local\\\":{\\\"ip\\\":\\\"127.0.0.1\\\",\\\"port\\\":27017},\\\"remote\\\":{\\\"ip\\\":\\\"127.0.0.1\\\",\\\"port\\\":36802},\\\"users\\\":[{\\\"user\\\":\\\"admin\\\",\\\"db\\\":\\\"admin\\\"}],\\\"roles\\\":[{\\\"role\\\":\\\"root\\\",\\\"db\\\":\\\"admin\\\"}],\\\"param\\\":{\\\"command\\\":\\\"insert\\\",\\\"ns\\\":\\\"admin.system.users\\\",\\\"args\\\":{\\\"insert\\\":\\\"system.users\\\",\\\"bypassDocumentValidation\\\":false,\\\"ordered\\\":true,\\\"$db\\\":\\\"admin\\\",\\\"documents\\\":[{\\\"_id\\\":\\\"admin.accountAdmin01\\\",\\\"userId\\\":{\\\"$binary\\\":\\\"afqdFgM0QRWMrjkX7iYbGg==\\\",\\\"$type\\\":\\\"04\\\"},\\\"user\\\":\\\"accountAdmin01\\\",\\\"db\\\":\\\"admin\\\",\\\"credentials\\\":{\\\"SCRAM-SHA-1\\\":{\\\"iterationCount\\\":10000,\\\"salt\\\":\\\"Z29DxpJONJhacqELtKMaTg==\\\",\\\"storedKey\\\":\\\"qB0+KFWmWp+ri6Q+S8nmuPrpnUI=\\\",\\\"serverKey\\\":\\\"hy/3s2oajbPM7WEtNeQqWriUUNg=\\\"},\\\"SCRAM-SHA-256\\\":{\\\"iterationCount\\\":15000,\\\"salt\\\":\\\"6QiTwW12fv+la9VhbzTl3Uv7RdBNrox1SdirtQ==\\\",\\\"storedKey\\\":\\\"IIKOj7fIs5YgipTW/KH1dybI80OcgYwyg6WixwSyAys=\\\",\\\"serverKey\\\":\\\"USBpc2bFYigXyTx5CG1tHXJWvJJ3NlQrbJY7arUKKr4=\\\"}},\\\"customData\\\":{\\\"employeeId\\\":12345},\\\"roles\\\":[{\\\"role\\\":\\\"clusterAdmin\\\",\\\"db\\\":\\\"admin\\\"},{\\\"role\\\":\\\"readAnyDatabase\\\",\\\"db\\\":\\\"admin\\\"},{\\\"role\\\":\\\"readWrite\\\",\\\"db\\\":\\\"admin\\\"}]}]}},\\\"result\\\":0}\",\n" +
+            "\t\t\t\"redactedSensitiveDataSql\": \"{\\\"atype\\\":\\\"authCheck\\\",\\\"ts\\\":{\\\"$date\\\":\\\"2020-08-13T05:56:26.518-0400\\\"},\\\"local\\\":{\\\"ip\\\":\\\"127.0.0.1\\\",\\\"port\\\":27017},\\\"remote\\\":{\\\"ip\\\":\\\"127.0.0.1\\\",\\\"port\\\":36802},\\\"users\\\":[{\\\"user\\\":\\\"admin\\\",\\\"db\\\":\\\"admin\\\"}],\\\"roles\\\":[{\\\"role\\\":\\\"root\\\",\\\"db\\\":\\\"admin\\\"}],\\\"param\\\":{\\\"command\\\":\\\"insert\\\",\\\"ns\\\":\\\"admin.system.users\\\",\\\"args\\\":{\\\"ordered\\\":\\\"?\\\",\\\"documents\\\":[{\\\"credentials\\\":{\\\"SCRAM-SHA-1\\\":{\\\"iterationCount\\\":\\\"?\\\",\\\"salt\\\":\\\"?\\\",\\\"serverKey\\\":\\\"?\\\",\\\"storedKey\\\":\\\"?\\\"},\\\"SCRAM-SHA-256\\\":{\\\"iterationCount\\\":\\\"?\\\",\\\"salt\\\":\\\"?\\\",\\\"serverKey\\\":\\\"?\\\",\\\"storedKey\\\":\\\"?\\\"}},\\\"roles\\\":[{\\\"role\\\":\\\"?\\\",\\\"db\\\":\\\"?\\\"},{\\\"role\\\":\\\"?\\\",\\\"db\\\":\\\"?\\\"},{\\\"role\\\":\\\"?\\\",\\\"db\\\":\\\"?\\\"}],\\\"customData\\\":{\\\"employeeId\\\":\\\"?\\\"},\\\"_id\\\":\\\"?\\\",\\\"userId\\\":{\\\"$binary\\\":\\\"?\\\",\\\"$type\\\":\\\"?\\\"},\\\"user\\\":\\\"?\\\",\\\"db\\\":\\\"?\\\"}],\\\"bypassDocumentValidation\\\":\\\"?\\\",\\\"insert\\\":\\\"system.users\\\",\\\"$db\\\":\\\"admin\\\"}},\\\"result\\\":0}\"\n" +
+            "\t\t},\n" +
+            "\t\t\"originalSqlCommand\": \"\",\n" +
+            "\t\t\"useConstruct\": true\n" +
+            "\t},\n" +
+            "\t\"exception\": null\n" +
+            "}";
+
+    public static final String msgTemplateMixedIPServerV6="{\n" +
+            "\t\"sessionId\": \"\",\n" +
+            "\t\"dbName\": \"admin\",\n" +
+            "\t\"appUserName\": \"\",\n" +
+            "\t\"time\":{ \"timstamp\": 1581841318, \"minOffsetFromGMT\":2, \"minDst\":0 },\n" +
+            "\t\"sessionLocator\": {\n" +
+            "\t\t\"clientIp\": \"\",\n" +
+            "\t\t\"clientPort\": 36802,\n" +
+            "\t\t\"serverIp\": \"\",\n" +
+            "\t\t\"serverPort\": 111,\n" +
+            "\t\t\"isIpv6\": true,\n" +
+            "\t\t\"clientIp\": \"1.2.3.4\",\n" +
+            "\t\t\"serverIpv6\": \"2001:0db8:0000:0000:0000:ff00:0042:8329\"\n" +
+            "\t},\n" +
+            "\t\"accessor\": {\n" +
+            "\t\t\"dbUser\": \"QQQ\",\n" +
+            "\t\t\"serverType\": \"MongoDB\",\n" +
+            "\t\t\"serverOs\": \"\",\n" +
+            "\t\t\"clientOs\": \"\",\n" +
+            "\t\t\"clientHostName\": \"\",\n" +
+            "\t\t\"serverHostName\": \"AAAAAA\",\n" +
+            "\t\t\"commProtocol\": \"\",\n" +
+            "\t\t\"dbProtocol\": \"MongoDB native audit\",\n" +
+            "\t\t\"dbProtocolVersion\": \"\",\n" +
+            "\t\t\"osUser\": \"\",\n" +
+            "\t\t\"sourceProgram\": \"mongod\",\n" +
+            "\t\t\"client_mac\": \"\",\n" +
+            "\t\t\"serverDescription\": \"\",\n" +
+            "\t\t\"serviceName\": \"admin\",\n" +
+            "\t\t\"language\": \"FREE_TEXT\",\n" +
+            "\t\t\"dataType\": \"CONSTRUCT\"\n" +
+            "\t},\n" +
+            "\t\"data\": {\n" +
+            "\t\t\"construct\": {\n" +
+            "\t\t\t\"sentences\": [\n" +
+            "\t\t\t\t{\n" +
+            "\t\t\t\t\t\"verb\": \"insert\",\n" +
+            "\t\t\t\t\t\"objects\": [\n" +
+            "\t\t\t\t\t\t{\n" +
+            "\t\t\t\t\t\t\t\"name\": \"system.users.BBBB\",\n" +
+            "\t\t\t\t\t\t\t\"type\": \"collection\",\n" +
+            "\t\t\t\t\t\t\t\"fields\": [],\n" +
+            "\t\t\t\t\t\t\t\"schema\": \"\"\n" +
+            "\t\t\t\t\t\t}\n" +
+            "\t\t\t\t\t],\n" +
+            "\t\t\t\t\t\"descendants\": [],\n" +
+            "\t\t\t\t\t\"fields\": []\n" +
+            "\t\t\t\t}\n" +
+            "\t\t\t],\n" +
+            "\t\t\t\"fullSql\": \"{\\\"atype\\\":\\\"authCheck\\\",\\\"ts\\\":{\\\"$date\\\":\\\"2020-08-13T05:56:26.518-0400\\\"},\\\"local\\\":{\\\"ip\\\":\\\"127.0.0.1\\\",\\\"port\\\":27017},\\\"remote\\\":{\\\"ip\\\":\\\"127.0.0.1\\\",\\\"port\\\":36802},\\\"users\\\":[{\\\"user\\\":\\\"admin\\\",\\\"db\\\":\\\"admin\\\"}],\\\"roles\\\":[{\\\"role\\\":\\\"root\\\",\\\"db\\\":\\\"admin\\\"}],\\\"param\\\":{\\\"command\\\":\\\"insert\\\",\\\"ns\\\":\\\"admin.system.users\\\",\\\"args\\\":{\\\"insert\\\":\\\"system.users\\\",\\\"bypassDocumentValidation\\\":false,\\\"ordered\\\":true,\\\"$db\\\":\\\"admin\\\",\\\"documents\\\":[{\\\"_id\\\":\\\"admin.accountAdmin01\\\",\\\"userId\\\":{\\\"$binary\\\":\\\"afqdFgM0QRWMrjkX7iYbGg==\\\",\\\"$type\\\":\\\"04\\\"},\\\"user\\\":\\\"accountAdmin01\\\",\\\"db\\\":\\\"admin\\\",\\\"credentials\\\":{\\\"SCRAM-SHA-1\\\":{\\\"iterationCount\\\":10000,\\\"salt\\\":\\\"Z29DxpJONJhacqELtKMaTg==\\\",\\\"storedKey\\\":\\\"qB0+KFWmWp+ri6Q+S8nmuPrpnUI=\\\",\\\"serverKey\\\":\\\"hy/3s2oajbPM7WEtNeQqWriUUNg=\\\"},\\\"SCRAM-SHA-256\\\":{\\\"iterationCount\\\":15000,\\\"salt\\\":\\\"6QiTwW12fv+la9VhbzTl3Uv7RdBNrox1SdirtQ==\\\",\\\"storedKey\\\":\\\"IIKOj7fIs5YgipTW/KH1dybI80OcgYwyg6WixwSyAys=\\\",\\\"serverKey\\\":\\\"USBpc2bFYigXyTx5CG1tHXJWvJJ3NlQrbJY7arUKKr4=\\\"}},\\\"customData\\\":{\\\"employeeId\\\":12345},\\\"roles\\\":[{\\\"role\\\":\\\"clusterAdmin\\\",\\\"db\\\":\\\"admin\\\"},{\\\"role\\\":\\\"readAnyDatabase\\\",\\\"db\\\":\\\"admin\\\"},{\\\"role\\\":\\\"readWrite\\\",\\\"db\\\":\\\"admin\\\"}]}]}},\\\"result\\\":0}\",\n" +
+            "\t\t\t\"redactedSensitiveDataSql\": \"{\\\"atype\\\":\\\"authCheck\\\",\\\"ts\\\":{\\\"$date\\\":\\\"2020-08-13T05:56:26.518-0400\\\"},\\\"local\\\":{\\\"ip\\\":\\\"127.0.0.1\\\",\\\"port\\\":27017},\\\"remote\\\":{\\\"ip\\\":\\\"127.0.0.1\\\",\\\"port\\\":36802},\\\"users\\\":[{\\\"user\\\":\\\"admin\\\",\\\"db\\\":\\\"admin\\\"}],\\\"roles\\\":[{\\\"role\\\":\\\"root\\\",\\\"db\\\":\\\"admin\\\"}],\\\"param\\\":{\\\"command\\\":\\\"insert\\\",\\\"ns\\\":\\\"admin.system.users\\\",\\\"args\\\":{\\\"ordered\\\":\\\"?\\\",\\\"documents\\\":[{\\\"credentials\\\":{\\\"SCRAM-SHA-1\\\":{\\\"iterationCount\\\":\\\"?\\\",\\\"salt\\\":\\\"?\\\",\\\"serverKey\\\":\\\"?\\\",\\\"storedKey\\\":\\\"?\\\"},\\\"SCRAM-SHA-256\\\":{\\\"iterationCount\\\":\\\"?\\\",\\\"salt\\\":\\\"?\\\",\\\"serverKey\\\":\\\"?\\\",\\\"storedKey\\\":\\\"?\\\"}},\\\"roles\\\":[{\\\"role\\\":\\\"?\\\",\\\"db\\\":\\\"?\\\"},{\\\"role\\\":\\\"?\\\",\\\"db\\\":\\\"?\\\"},{\\\"role\\\":\\\"?\\\",\\\"db\\\":\\\"?\\\"}],\\\"customData\\\":{\\\"employeeId\\\":\\\"?\\\"},\\\"_id\\\":\\\"?\\\",\\\"userId\\\":{\\\"$binary\\\":\\\"?\\\",\\\"$type\\\":\\\"?\\\"},\\\"user\\\":\\\"?\\\",\\\"db\\\":\\\"?\\\"}],\\\"bypassDocumentValidation\\\":\\\"?\\\",\\\"insert\\\":\\\"system.users\\\",\\\"$db\\\":\\\"admin\\\"}},\\\"result\\\":0}\"\n" +
+            "\t\t},\n" +
+            "\t\t\"originalSqlCommand\": \"\",\n" +
+            "\t\t\"useConstruct\": true\n" +
+            "\t},\n" +
+            "\t\"exception\": null\n" +
+            "}";
+
+    public static final String msgTemplateMixedIpClientV6 ="{\n" +
+            "\t\"sessionId\": \"\",\n" +
+            "\t\"dbName\": \"admin\",\n" +
+            "\t\"appUserName\": \"\",\n" +
+            "\t\"time\":{ \"timstamp\": 1581841318, \"minOffsetFromGMT\":2, \"minDst\":0 },\n" +
+            "\t\"sessionLocator\": {\n" +
+            "\t\t\"clientIp\": \"\",\n" +
+            "\t\t\"clientPort\": 36802,\n" +
+            "\t\t\"serverIp\": \"\",\n" +
+            "\t\t\"serverPort\": 111,\n" +
+            "\t\t\"isIpv6\": true,\n" +
+            "\t\t\"clientIpv6\": \"1:1:1:1:1:1:1:1\",\n" +
+            "\t\t\"serverIp\": \"1.2.3.4\"\n" +
+            "\t},\n" +
+            "\t\"accessor\": {\n" +
+            "\t\t\"dbUser\": \"QQQ\",\n" +
+            "\t\t\"serverType\": \"MongoDB\",\n" +
+            "\t\t\"serverOs\": \"\",\n" +
+            "\t\t\"clientOs\": \"\",\n" +
+            "\t\t\"clientHostName\": \"\",\n" +
+            "\t\t\"serverHostName\": \"AAAAAA\",\n" +
+            "\t\t\"commProtocol\": \"\",\n" +
+            "\t\t\"dbProtocol\": \"MongoDB native audit\",\n" +
+            "\t\t\"dbProtocolVersion\": \"\",\n" +
+            "\t\t\"osUser\": \"\",\n" +
+            "\t\t\"sourceProgram\": \"mongod\",\n" +
+            "\t\t\"client_mac\": \"\",\n" +
+            "\t\t\"serverDescription\": \"\",\n" +
+            "\t\t\"serviceName\": \"admin\",\n" +
+            "\t\t\"language\": \"FREE_TEXT\",\n" +
+            "\t\t\"dataType\": \"CONSTRUCT\"\n" +
             "\t},\n" +
             "\t\"data\": {\n" +
             "\t\t\"construct\": {\n" +

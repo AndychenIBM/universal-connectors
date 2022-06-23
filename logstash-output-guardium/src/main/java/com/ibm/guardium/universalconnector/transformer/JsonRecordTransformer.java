@@ -9,6 +9,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import sun.net.util.IPAddressUtil;
 
+import java.security.MessageDigest;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -28,6 +29,7 @@ public class JsonRecordTransformer implements RecordTransformer {
         }
         return gEnv;
     }
+
     @Override
     public List<Datasource.Guard_ds_message> transform(String recordStr) {
 
@@ -52,24 +54,28 @@ public class JsonRecordTransformer implements RecordTransformer {
 
 
         // 2. Client_request or exception
+        // GRD-59489 - build client request - the one that contains actual sql data (data part will be empty in case of exception message)
+        // According to Tim's last update - exception message should also have client request
+        // so we need to build it for both cases - for data and for error
+        Datasource.Application_data appData = buildAppplicationData(record, sessionLocator);
+
+        Datasource.Client_request clientRequest = Datasource.Client_request.newBuilder()
+                .setSessionId(getSessionIdForSniffer(record))
+                .setData(appData)
+                .build();
+
         if(record.isException()){
             // build exception - the one that has data on errors
             Datasource.Exception exception = buildExceptionData(record, sessionLocator);
             Datasource.Guard_ds_message exceptionMsg = Datasource.Guard_ds_message.newBuilder()
                     .setType(Datasource.Guard_ds_message.Type.EXCEPTION)
                     .setException(exception)
+                    .setClientRequest(clientRequest)
                     .build();
 
             messages.add(exceptionMsg);
         }else {
-            // build client request - the one that contains actual sql data
-            Datasource.Application_data appData = buildAppplicationData(record, sessionLocator);
-
-            Datasource.Client_request clientRequest = Datasource.Client_request.newBuilder()
-                    .setSessionId(getSessionIdForSniffer(record.getSessionId()))
-                    .setData(appData)
-                    .build();
-
+            // build client request - client request will have a reference to data object that contains actual sql data.
             Datasource.Guard_ds_message sqlMsg = Datasource.Guard_ds_message.newBuilder()
                     .setType(Datasource.Guard_ds_message.Type.CLIENT_REQUEST)
                     .setClientRequest(clientRequest)
@@ -90,12 +96,12 @@ public class JsonRecordTransformer implements RecordTransformer {
                 .setSessionLocator(sessionLocator)
                 .setTimestamp(Utilities.getTimestamp(record.getTime()))
                 .setAccessor(accessor)
-                .setSessionId(getSessionIdForSniffer(record.getSessionId()));
+                .setSessionId(getSessionIdForSniffer(record));
+
         if("true".equals(get("GI_MODE","false"))) {
                 builder.setTerminalId(get("TENANT_ID", "TNT_ATGPHITOV3JEIXUXK8LTGR"))
                     .setConfigId(get("CONFIG_ID", "5d9f48d097ea6054a51f6b98"));
         }
-//              .setProcessId(record.getSessionId())
 
         // optional fields - only set them if they have some value
         trimAndSetIfNotEmpty(builder::setAppUserName, record::getAppUserName);
@@ -104,11 +110,21 @@ public class JsonRecordTransformer implements RecordTransformer {
         return builder.build();
     }
 
-    private static int getSessionIdForSniffer(String sessionId){
-        if (sessionId==null){
-            return 0;
+    public static long getSessionIdForSniffer(Record record){
+        String sessionIdStr = record.getSessionId();
+        if (sessionIdStr==null || sessionIdStr.trim().isEmpty()){
+
+            // must generate unique value that could identify session and we are not provided with real session id value
+            StringBuffer sb = new StringBuffer();
+            sb.append(record.getDbName())
+                    .append(record.getAppUserName())
+                    .append(record.getSessionLocator())
+                    .append(record.getAccessor());
+            sessionIdStr = sb.toString();
         }
-        return sessionId.hashCode();
+
+        Long id = UUID.nameUUIDFromBytes(sessionIdStr.getBytes()).getMostSignificantBits();
+        return id;
     }
 
     /**
@@ -144,7 +160,7 @@ public class JsonRecordTransformer implements RecordTransformer {
         // must make sure sessionId in session start is aligned with sessionId in exception
         // per Tim's suggestion put here same hash that we set in session start
         // otherwise it causes problems in sniffer and exception is not stored in guardium
-        exceptionMsg.setSESSIONID(""+getSessionIdForSniffer(record.getSessionId()));
+        exceptionMsg.setSESSIONID(""+getSessionIdForSniffer(record));
 
         return exceptionMsg.build();
     }
@@ -307,13 +323,18 @@ public class JsonRecordTransformer implements RecordTransformer {
             sessionBuilder.setServerIp(convert_ipstr_to_int(rsl.getServerIp())).setClientIp(convert_ipstr_to_int(rsl.getClientIp()));
         } else {
             // having ipv6 flag may mean that only one of ips is ipv6
+            // GRD-61611: if ipv6 flag is passed -
+            // sniffer will treat both ips as ipv6 ips ( meaning it will "Translate" number of ipv4 field into ipv6 address
+            // this is how it is handled for stap and this behaviour is not changed for UC
             if (rsl.getServerIpv6()!=null && rsl.getServerIpv6().length()>0){
                 sessionBuilder.setServerIpv6(rsl.getServerIpv6());
+                sessionBuilder.setIsIpv6(true);
             } else {
                 sessionBuilder.setServerIp(convert_ipstr_to_int(rsl.getServerIp()));
             }
-            if (rsl.getClientIpv6()!=null && rsl.getServerIpv6().length()>0){
+            if (rsl.getClientIpv6()!=null && rsl.getClientIpv6().length()>0){
                 sessionBuilder.setClientIpv6(rsl.getClientIpv6());
+                sessionBuilder.setIsIpv6(true);
             } else {
                 sessionBuilder.setClientIp(convert_ipstr_to_int(rsl.getClientIp()));
             }

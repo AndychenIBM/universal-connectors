@@ -185,4 +185,18 @@ public class Record {
     public void setException(ExceptionRecord exception) {
         this.exception = exception;
     }
+
+    @Override
+    public String toString() {
+        return "Record{" +
+                "sessionId='" + sessionId + '\'' +
+                ", dbName='" + dbName + '\'' +
+                ", appUserName='" + appUserName + '\'' +
+                ", time=" + time +
+                ", sessionLocator=" + sessionLocator +
+                ", accessor=" + accessor +
+                ", data=" + data +
+                ", exception=" + exception +
+                '}';
+    }
 }
