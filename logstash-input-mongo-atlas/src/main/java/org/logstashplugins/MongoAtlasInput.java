@@ -103,6 +103,8 @@ public class MongoAtlasInput implements Input {
                         ) {
                             HashMap map = new HashMap();
                             map.put("message", line);
+                            map.put("hostname", hostname);
+                            map.put("groupId", groupId);
                             map.put("type", pluginType);
                             if (log.isDebugEnabled()) {
                                 log.debug(line);
