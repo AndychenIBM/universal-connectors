@@ -44,7 +44,7 @@ COPY health/liveness.sh health/readiness.sh /usr/bin/
 RUN microdnf install -y tzdata openssl curl ca-certificates procps shadow-utils.x86_64 tar zip gzip hostname vim cronie logrotate sudo libaio && \
     microdnf update -y; microdnf clean all && \
 #Add guc user and prepare
-    useradd -g root guc && \
+    useradd -g root -u 1001 guc && \
     mkdir -p ${LOGSTASH_DIR} ${LOG_GUC_DIR} ${SSL_DIR} && \
     chmod -vR g=u ${LOGSTASH_DIR} ${LOG_GUC_DIR} ${SSL_DIR} ${RPM_DIR} /tmp && \
     chmod +x /usr/bin/readiness.sh /usr/bin/liveness.sh && \
