@@ -1,4 +1,4 @@
-#build docker image - could be taken from artifcatory
+#build docker image - could be taken from artifactory
 chmod -R 777 *
 cd test
 docker build -t guc_dit:latest .
@@ -7,7 +7,7 @@ cd ..
 #docker  run  -v `pwd`:`pwd` -w `pwd` -dit guc_dit:latest bash
 docker  run  --name="Alan" -v `pwd`:`pwd` -w `pwd` -dit guc_dit:latest bash
 chmod -R 755 **/gradlew
-docker exec Alan bash -c "./buildAllPluginsInDocker.sh"
+  docker exec Alan bash -c "./buildUCPluginGems.sh"
 if [ $? -eq 0 ]
 then
   echo "Successfully tested and built"

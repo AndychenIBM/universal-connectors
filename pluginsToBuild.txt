@@ -1,5 +1,5 @@
 logstash-filter-mongodb-guardium
 logstash-filter-mysql-guardium
 logstash-filter-s3-guardium
-logstash-filter-mysql-percona-guardium
+#logstash-filter-mysql-percona-guardium
 #logstash-input-cloudwatch-logs-master

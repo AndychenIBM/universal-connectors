@@ -28,64 +28,25 @@ DEVOPS_COMPOSE_UP=up -d
 DEVOPS_COMPOSE_DOWN=down
 ARTIFACTORY_DOCKER_REPO_DOMAIN=sec-guardium-next-gen-docker-local.artifactory.swg-devops.com/
 DOCKER_IMAGE_TAG=latest
-.PHONY:all build test check clean run dockerBuild dockerRun dockerStop
-# To build all:
-all: build test check run
+.PHONY:build dockerBuild
 
-
-
-# To clean the reports-runner build env
-clean:
-#	./gradlew clean
-
-# To build reports-runner service dev local runtime
+# Build UC plugins
 build:
-#	clean
-#	./buildPlugins.sh
-#    ./gradlew .
-#	./gradlew installDist
+	./buildUCpluginGemsInDocker.sh
 
-# To run git submodule update --init --recursive
+# Pull submodules from Git
 submodule:
 	git submodule update --init --recursive
 
 # To run unit-test:
 test:
-	./runPluginsTests.sh
-#	./gradlew test
+	chmod -R 755 ./test
+	./test/test.sh
 
 # To run e2e test:
 test_e2e:
-	./teste2e.sh
-#	./gradlew test_e2e
+#	./teste2e.sh
 
-# To run unit-test and JaCoCo code coverage script:
-check:
-#	./gradlew check
-
-# To run just JaCoCo code coverage script, make test will be executed first.
-report:  test
-#	./gradlew jacocoTestReport
-
-# To run the server for production use:
-run:
-#	./build/install/reports-runner/build/common-reports-runner-server
-
-# To build docker image with the latest build files/libs
-
+# Build UC docker image
 dockerBuild:
-	./buildDockerForTravis.sh
-
-#	./dockerBuild/package/build.sh
-#	docker tag ${NAME} ${ARTIFACTORY_DOCKER_REPO_DOMAIN}${NAME}:${DOCKER_IMAGE_TAG}
-
-# To run reports-runner inside docker container
-dockerRun:
-#	cd ${DEVOPS_COMPOSE_DIR} && ${DOCKER_START_SCRIPT} ${DOCKER_LST} ${DEVOPS_COMPOSE_PULL}
-#	cd ${DEVOPS_COMPOSE_DIR} && ${DOCKER_START_SCRIPT} ${DOCKER_LST} ${DEVOPS_COMPOSE_ARGS} ${DEVOPS_COMPOSE_UP}
-
-
-# To stop the reports-runner container
-
-dockerStop:
-#	cd ${DEVOPS_COMPOSE_DIR} && ${DOCKER_START_SCRIPT} ${DOCKER_LST} ${DEVOPS_COMPOSE_ARGS} ${DEVOPS_COMPOSE_DOWN}
+	./buildUCDockerImageForTravis.sh

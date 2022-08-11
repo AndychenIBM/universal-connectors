@@ -16,7 +16,7 @@ services:
     - docker
 
 env:
-    - NAME=universal-connector LOGSTASH_VERSION_TAG=v7.10.0
+    - NAME=universal-connector LOGSTASH_VERSION_TAG=v7.16.3
 
 before_install:
     - printf "machine github.ibm.com\n  login $GITHUB_TOKEN\n" > ~/.netrc
@@ -26,24 +26,16 @@ install:
     # Give execute permission to scripts
     - chmod -R 755 ./deployments/devops-compose/scripts
 
-    # Run the install script
-    # - ./install.sh
     - ./deployments/devops-compose/scripts/artifactory/docker/login.sh
-    - ./runPreBuildTasks.sh
+    - ./GCMDecryptBashWrapper.sh
 
 before_script:
-    # Run the build script
-    - make build
-    - make test
+  - make build
 
 script:
-    # Run the test script.  "check" task will run: test, jacocoTestCoverageVerification, jacocoTestReport
     - make submodule
-    - make check
     - make dockerBuild
-    # Run tests
-    - chmod -R 755 ./test
-    - ./test/test.sh
+    - make test
     #- travis_wait 20 make test_e2e
     # Following scripts should be run last in the Travis script section
     - ./deployments/devops-compose/scripts/artifactory/docker/imageDeploy.sh

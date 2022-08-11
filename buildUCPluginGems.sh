@@ -1,0 +1,47 @@
+function buildUCPluginGem() {
+  cd $1
+  cp ../test/gradle.properties .
+  ./gradlew --no-daemon $2 $3 $4
+  if [ $? -eq 0 ]; then
+    echo "Successfully test $1"
+  else
+    echo "Failed test $1"
+    exit 1
+  fi
+  ./gradlew --no-daemon gem
+  if [ $? -eq 0 ]; then
+    echo "Successfully build gem $1"
+  else
+    echo "Failed build gem $1"
+    exit 2
+  fi
+  cd ..
+}
+function buildUCCommons() {
+  cd guardium-universalconnector-commons
+  ./gradlew test
+  if [ $? -eq 0 ]; then
+    echo "Successfully test uc-commons"
+  else
+    echo "Failed test uc-commons"
+    exit 1
+  fi
+  #check if succeed
+  ./gradlew jar
+  if [ $? -eq 0 ]; then
+    echo "Successfully build jar uc-commons"
+  else
+    echo "Failed build jar uc-commons"
+    exit 1
+  fi
+  cd ..
+}
+buildUCCommons
+
+# Build the rest of the plugins from pluginsToBuild.txt
+grep -v '^#' pluginsToBuild.txt | while read -r line; do buildUCPluginGem "$line" "test"; done
+
+# Build output plugin. TODO- add this to the rest of the plugins build process
+export UC_ETC=$PWD/logstash-output-guardium/src/resources
+buildUCPluginGem "logstash-output-guardium" "test"
+exit 0
