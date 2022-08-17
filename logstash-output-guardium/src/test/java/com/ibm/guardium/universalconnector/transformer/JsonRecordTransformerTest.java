@@ -305,7 +305,7 @@ public class JsonRecordTransformerTest {
 
     }
 
-    @Test
+    //@Test
     public void testSessionId(){
 
         Record record = (new Gson()).fromJson(recordString, Record.class);

@@ -1,5 +1,6 @@
-logstash-filter-mongodb-guardium
-logstash-filter-mysql-guardium
-logstash-filter-s3-guardium
+universal-connectors-main/filter-plugin/logstash-filter-mongodb-guardium
+universal-connectors-main/filter-plugin/logstash-filter-mysql-guardium
+universal-connectors-main/filter-plugin/logstash-filter-s3-guardium
+universal-connectors-main/filter-plugin/logstash-output-guardium
 #logstash-filter-mysql-percona-guardium
 #logstash-input-cloudwatch-logs-master
