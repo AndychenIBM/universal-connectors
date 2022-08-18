@@ -28,7 +28,7 @@ DEVOPS_COMPOSE_UP=up -d
 DEVOPS_COMPOSE_DOWN=down
 ARTIFACTORY_DOCKER_REPO_DOMAIN=sec-guardium-next-gen-docker-local.artifactory.swg-devops.com/
 DOCKER_IMAGE_TAG=latest
-.PHONY:build dockerBuild
+.PHONY:build dockerBuild test
 
 # Build UC plugins
 build:
