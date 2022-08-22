@@ -1,5 +1,8 @@
+#!/bin/bash
+
 BASE_DIR=$(pwd)
 function buildUCPluginGem() {
+  echo "================ Building $1 gem file================"
   cd $BASE_DIR
   cd $1
   cp ../../../test/gradle.properties .

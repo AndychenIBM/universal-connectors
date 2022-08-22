@@ -1,3 +1,5 @@
+#!/bin/bash
+
 echo "==========================test images status (docker images):=========================="
 docker images
 echo "==========================test container status (docker ps -a):=========================="

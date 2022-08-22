@@ -1,3 +1,4 @@
+#!/bin/bash
 # Gather plugins to wrap in UC default offline package
 grep -v '^#' defaultOfflinePackagePlugins.txt | while read -r line; do cp "$line" logstash_docker/uc/config/.; done
 ls -la ./logstash_docker/uc/config
