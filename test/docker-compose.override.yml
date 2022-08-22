@@ -1,0 +1,26 @@
+# **************************************************************
+#
+# IBM Confidential
+#
+# OCO Source Materials
+#
+# 5737-L66
+#
+# (C) Copyright IBM Corp. 2019, 2022
+#
+# The source code for this program is not published or otherwise
+# divested of its trade secrets, irrespective of what has been
+# deposited with the U.S. Copyright Office.
+#
+# **************************************************************
+
+universal-connector-manager:
+  image: universal-connector:latest
+  ports:
+    - 44444:44444
+  environment:
+    - AUDIT_ENDPOINT=audit:33810
+    - CONFIGURATION_ENDPOINT=configuration:56623
+    - DEPLOYED_PORT=44444
+    - CONTROLLER_TEST_ENVIRONMENT=true
+    - GO_ENV=development

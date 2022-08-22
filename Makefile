@@ -22,13 +22,13 @@ NAME=universal-connector
 DOCKER_START_SCRIPT=./start.sh
 DOCKER_LST=v1/universal-connector.lst
 DEVOPS_COMPOSE_DIR=deployments/devops-compose
-DEVOPS_COMPOSE_ARGS=-f ../test/docker-compose.override.yml
+DEVOPS_COMPOSE_ARGS=-f ../../test/docker-compose.override.yml
 DEVOPS_COMPOSE_PULL=pull
 DEVOPS_COMPOSE_UP=up -d
 DEVOPS_COMPOSE_DOWN=down
 ARTIFACTORY_DOCKER_REPO_DOMAIN=sec-guardium-next-gen-docker-local.artifactory.swg-devops.com/
 DOCKER_IMAGE_TAG=latest
-.PHONY:build dockerBuild test
+.PHONY:build dockerBuild test test_e2e dockerRun dockerStop
 
 # Build UC plugins
 build:
@@ -45,8 +45,17 @@ test:
 
 # To run e2e test:
 test_e2e:
-#	./teste2e.sh
+	./test/teste2e.sh
 
 # Build UC docker image
 dockerBuild:
 	./buildUCDockerImageForTravis.sh
+
+# To run universal-connector inside docker container
+dockerRun:
+	cd ${DEVOPS_COMPOSE_DIR} && ${DOCKER_START_SCRIPT} ${DOCKER_LST} ${DEVOPS_COMPOSE_PULL}
+	cd ${DEVOPS_COMPOSE_DIR} && ${DOCKER_START_SCRIPT} ${DOCKER_LST} ${DEVOPS_COMPOSE_ARGS} ${DEVOPS_COMPOSE_UP}
+
+# To stop the universal-connector container
+dockerStop:
+	cd ${DEVOPS_COMPOSE_DIR} && ${DOCKER_START_SCRIPT} ${DOCKER_LST} ${DEVOPS_COMPOSE_ARGS} ${DEVOPS_COMPOSE_DOWN}

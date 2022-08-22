@@ -1,7 +1,10 @@
+echo "==========================test images status (docker images):=========================="
+docker images
+echo "==========================test container status (docker ps -a):=========================="
+docker ps -a
 docker run -d --name="Klaus" --network="host" -e UC_LOG_LEVEL="DEBUG" -it universal-connector
 installedPluginsNum=$(docker exec -it Klaus bash -c "logstash-plugin list --verbose | grep guardium | wc -l")
 echo "num of installed plugins: ${installedPluginsNum}"
-echo $installedPluginsNum
 
 if [ "$installedPluginsNum" -lt 5 ]; then
   echo "Missing Guardium plugins"
