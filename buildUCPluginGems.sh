@@ -1,10 +1,8 @@
 #!/bin/bash
-
 BASE_DIR=$(pwd)
 function buildUCPluginGem() {
   echo "================ Building $1 gem file================"
-  cd $BASE_DIR
-  cd $1
+  cd $BASE_DIR/${UC_OPENSOURCE_ROOT_DIR}/$1
   cp ../../../test/gradle.properties .
   ./gradlew --no-daemon $2 $3 $4
   if [ $? -eq 0 ]; then
@@ -23,7 +21,7 @@ function buildUCPluginGem() {
 }
 
 function buildUCCommons() {
-  cd universal-connectors-main/common
+  cd ${UC_OPENSOURCE_ROOT_DIR}/common
   ./gradlew test
   if [ $? -eq 0 ]; then
     echo "Successfully test uc-commons"
@@ -46,7 +44,7 @@ function buildUCCommons() {
 buildUCCommons
 
 # Build the rest of the plugins from pluginsToBuild.txt
-export UC_ETC=${BASE_DIR}/universal-connectors-main/filter-plugin/logstash-output-guardium/src/resources
+export UC_ETC=${BASE_DIR}/${UC_OPENSOURCE_ROOT_DIR}/filter-plugin/logstash-output-guardium/src/resources
 grep -v '^#' pluginsToBuild.txt | while read -r line; do buildUCPluginGem "$line" "test"; done
 
 exit 0
