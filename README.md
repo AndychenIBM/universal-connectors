@@ -28,10 +28,16 @@ add your current user to docker group, see docker online help ...
 $ make build
 ```
 
-### Updating submodules
+## Updating submodules
 
 ```bash
 $ make submodule
+```
+
+## Build UC image
+
+```bash
+$ make dockerBuild
 ```
 
 ## Running tests
