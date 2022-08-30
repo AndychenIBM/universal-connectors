@@ -8,9 +8,9 @@ java -jar setup/uc-bootstrap.jar
 logstash_pid=$(/usr/share/logstash/scripts/get_logstash_pid.sh)
 if [[ -z "$logstash_pid" ]]; then
   # Aggregate env vars
-    export GI_PIPELINE_DIR="${GUC_PIPELINE_CONFIG_PATH}/${INPUT_PLUGIN_ID}/pipeline/"
+    export GI_PIPELINE_DIR="${UC_ETC}/pipeline/"
     echo "Setting GI_PIPELINE_DIR to: ${GI_PIPELINE_DIR}"
-    export GI_PLUGINS_DIR="${GUC_PIPELINE_CONFIG_PATH}/${INPUT_PLUGIN_ID}/config/"
+    export GI_PLUGINS_DIR="${UC_ETC}/config/"
     echo "Setting GI_PLUGINS_DIR to: ${GI_PLUGINS_DIR}"
     export GI_PLUGINS_BINARIES_DIR="${GI_PLUGINS_DIR}binaries/"
     echo "Setting GI_PLUGINS_BINARIES_DIR to: ${GI_PLUGINS_BINARIES_DIR}"
