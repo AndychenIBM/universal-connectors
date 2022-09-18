@@ -3,6 +3,7 @@ package com.ibm.guardium.universalconnector.plugins;
 import co.elastic.logstash.api.Configuration;
 import co.elastic.logstash.api.Event;
 import com.ibm.guardium.universalconnector.commons.GuardConstants;
+import org.junit.Test;
 import org.logstash.plugins.ConfigurationImpl;
 
 import java.io.ByteArrayOutputStream;
@@ -48,7 +49,7 @@ public class JavaOutputExampleTest {
     }
 
 
-    //@Test
+ //   @Test
     public void testActualSendingDataToRealMachine() throws InterruptedException {
         //GRD-43047
         String prefix = "Prefix";
@@ -87,7 +88,7 @@ public class JavaOutputExampleTest {
         }
     }
 
-    //@Test
+   // @Test
     public void testJavaOutputExceptionExample() {
 
         String prefix = "Prefix";
@@ -106,14 +107,18 @@ public class JavaOutputExampleTest {
             events.add(e);
         }*/
         //add mongoDB syslog event
-        Event e = new org.logstash.Event();
-        e.setField("timestamp", "2020-05-04T05:09:06.149-0500");
-        e.setField("Record", "{\"sessionId\":\"0vpeEPORRFecjnJihLQbqQ\\u003d\\u003d\",\"dbName\":\"admin\",\"appUserName\":\"\",\"time\":1595237402291,\"sessionLocator\":{\"clientIp\":\"9.42.29.56\",\"clientPort\":41050,\"serverIp\":\"9.42.29.56\",\"serverPort\":27017,\"isIpv6\":false,\"clientIpv6\":\"\",\"serverIpv6\":\"\"},\"accessor\":{\"dbUser\":\"Kerri \",\"serverType\":\"MongoDB\",\"serverOs\":\"\",\"clientOs\":\"\",\"clientHostName\":\"\",\"serverHostName\":\"dbqa111\",\"commProtocol\":\"\",\"dbProtocol\":\"MongoDB native audit\",\"dbProtocolVersion\":\"\",\"osUser\":\"\",\"sourceProgram\":\"mongod\",\"client_mac\":\"\",\"serverDescription\":\"\",\"serviceName\":\"admin\",\"language\":\"FREE_TEXT\",\"type\":\"CONSTRUCT\"},\"data\":{\"construct\":{\"sentences\":[{\"verb\":\"create\",\"objects\":[{\"name\":\"customer_A126\",\"type\":\"collection\",\"fields\":[],\"schema\":\"\"}],\"descendants\":[],\"fields\":[]}],\"full_sql\":\"{\"atype\":\"authCheck\",\"ts\":{\"$date\":\"2020-07-20T05:30:02.291-0400\"},\"local\":{\"ip\":\"9.42.29.56\",\"port\":27017},\"remote\":{\"ip\":\"9.42.29.56\",\"port\":41050},\"users\":[{\"user\":\"Kerri\",\"db\":\"admin\"}],\"roles\":[{\"role\":\"root\",\"db\":\"admin\"}],\"param\":{\"command\":\"create\",\"ns\":\"admin.customer_A126\",\"args\":{\"create\":\"customer_A126\",\"lsid\":{\"id\":{\"$binary\":\"0vpeEPORRFecjnJihLQbqQ\\u003d\\u003d\",\"$type\":\"04\"}},\"$db\":\"admin\",\"$readPreference\":{\"mode\":\"primary\"}}},\"result\":0}\",\"original_sql\":\"{\"atype\":\"authCheck\",\"ts\":{\"$date\":\"2020-07-20T05:30:02.291-0400\"},\"local\":{\"ip\":\"9.42.29.56\",\"port\":27017},\"remote\":{\"ip\":\"9.42.29.56\",\"port\":41050},\"users\":[{\"user\":\"Kerri\",\"db\":\"admin\"}],\"roles\":[{\"role\":\"root\",\"db\":\"admin\"}],\"param\":{\"command\":\"create\",\"ns\":\"admin.customer_A126\",\"args\":{\"lsid\":{\"id\":{\"$binary\":\"?\",\"$type\":\"?\"}},\"$readPreference\":{\"mode\":\"?\"},\"create\":\"customer_A126\",\"$db\":\"admin\"}},\"result\":0}\"},\"timestamp\":1595237402291,\"originalSqlCommand\":\"\",\"useConstruct\":true},\"exception\":null}");
-        e.setField("server_type", "MONGODB");
-        e.setField("server_hostname", "qa-db51");
 
+//        String exceptionRecord = String.format(solrException, (new Date()).getTime());
+        String exceptionRecord = String.format(mongoError, (new Date()).getTime());
+        Event e = new org.logstash.Event();
+        e.setField(GuardConstants.GUARDIUM_RECORD_FIELD_NAME, exceptionRecord);
         events.add(e);
 
+        String exceptionRecordSolr = String.format(solrException, (new Date()).getTime());
+        Event eSolr = new org.logstash.Event();
+        eSolr.setField(GuardConstants.GUARDIUM_RECORD_FIELD_NAME, exceptionRecordSolr);
+
+        events.add(eSolr);
 
         output.output(events);
 
@@ -266,4 +271,50 @@ public class JavaOutputExampleTest {
             "    \"sqlString\": \"select * from nidhi\"\n" +
             "  }\n" +
             "}";
+
+    public static final String solrException = "{\n" +
+            "\t\"sessionId\": \"a05id3fbxvoun\",\n" +
+            "\t\"dbName\": \"\",\n" +
+            "\t\"appUserName\": \"NA\",\n" +
+            "\t\"time\": {\n" +
+            "\t\t\"timstamp\": %d,\n" +
+            "\t\t\"minOffsetFromGMT\": 0,\n" +
+            "\t\t\"minDst\": 0\n" +
+            "\t},\n" +
+            "\t\"sessionLocator\": {\n" +
+            "\t\t\"clientIp\": \"1.2.3.4\",\n" +
+            "\t\t\"clientPort\": 111,\n" +
+            "\t\t\"serverIp\": \"5.6.7.8\",\n" +
+            "\t\t\"serverPort\": 222,\n" +
+            "\t\t\"isIpv6\": false,\n" +
+            "\t\t\"clientIpv6\": \"\",\n" +
+            "\t\t\"serverIpv6\": \"\"\n" +
+            "\t},\n" +
+            "\t\"accessor\": {\n" +
+            "\t\t\"dbUser\": \"NA\",\n" +
+            "\t\t\"serverType\": \"SolrDB\",\n" +
+            "\t\t\"serverOs\": \"\",\n" +
+            "\t\t\"clientOs\": \"\",\n" +
+            "\t\t\"clientHostName\": \"\",\n" +
+            "\t\t\"serverHostName\": \"charged-mind-281913_7322797003770403197_googlecloud.com\",\n" +
+            "\t\t\"commProtocol\": \"\",\n" +
+            "\t\t\"dbProtocol\": \"ApacheSolrGCP\",\n" +
+            "\t\t\"dbProtocolVersion\": \"\",\n" +
+            "\t\t\"osUser\": \"\",\n" +
+            "\t\t\"sourceProgram\": \"\",\n" +
+            "\t\t\"client_mac\": \"\",\n" +
+            "\t\t\"serverDescription\": \"\",\n" +
+            "\t\t\"serviceName\": \"charged-mind-281913:7322797003770403197\",\n" +
+            "\t\t\"language\": \"FREE_TEXT\",\n" +
+            "\t\t\"dataType\": \"CONSTRUCT\"\n" +
+            "\t},\n" +
+            "\t\"data\": null,\n" +
+            "\t\"exception\": {\n" +
+            "\t\t\"exceptionTypeId\": \"SQL_ERROR\",\n" +
+            "\t\t\"description\": \"SolrException\",\n" +
+            "\t\t\"sqlString\": \"org.apache.solr.common.SolrException\"\n" +
+            "\t}\n" +
+            "}";
+
+    public static String mongoError = "{\"sessionId\":\"co8ZfYQNT0q4L7Tpa4bFBw\\u003d\\u003d\",\"dbName\":\"test\",\"appUserName\":\"collectionreader\",\"time\":{\"timstamp\": %d,\"minOffsetFromGMT\":-300,\"minDst\":0},\"sessionLocator\":{\"clientIp\":\"10.200.42.55\",\"clientPort\":49304,\"serverIp\":\"22.36.32.17\",\"serverPort\":27017,\"isIpv6\":false,\"clientIpv6\":\"\",\"serverIpv6\":\"\"},\"accessor\":{\"dbUser\":\"collectionreader\",\"serverType\":\"MongoDB\",\"serverOs\":\"\",\"clientOs\":\"\",\"clientHostName\":\"\",\"serverHostName\":\"\",\"commProtocol\":\"\",\"dbProtocol\":\"MongoDB native audit\",\"dbProtocolVersion\":\"\",\"osUser\":\"\",\"sourceProgram\":\"\",\"client_mac\":\"\",\"serverDescription\":\"\",\"serviceName\":\"test\",\"language\":\"FREE_TEXT\",\"dataType\":\"CONSTRUCT\"},\"data\":null,\"exception\":{\"exceptionTypeId\":\"SQL_ERROR\",\"description\":\"Unauthorized to perform the operation (13)\",\"sqlString\":\"{\\\"atype\\\":\\\"authCheck\\\",\\\"ts\\\":{\\\"$date\\\":\\\"2022-08-30T07:00:00.426-05:00\\\"},\\\"local\\\":{\\\"ip\\\":\\\"22.36.32.17\\\",\\\"port\\\":27017},\\\"remote\\\":{\\\"ip\\\":\\\"10.200.42.55\\\",\\\"port\\\":49304},\\\"users\\\":[{\\\"user\\\":\\\"collectionreader\\\",\\\"db\\\":\\\"dbgbdi1\\\"}],\\\"roles\\\":[{\\\"role\\\":\\\"read\\\",\\\"db\\\":\\\"dbgbdi1\\\"}],\\\"param\\\":{\\\"command\\\":\\\"insert\\\",\\\"ns\\\":\\\"test.collgbdi1\\\",\\\"args\\\":{\\\"insert\\\":\\\"collgbdi1\\\",\\\"documents\\\":[{\\\"item\\\":\\\"canvas\\\",\\\"qty\\\":100,\\\"tags\\\":[\\\"cotton\\\"],\\\"size\\\":{\\\"h\\\":28,\\\"w\\\":35.5,\\\"uom\\\":\\\"cm\\\"},\\\"_id\\\":{\\\"$oid\\\":\\\"630dfbc02dd898326512a24f\\\"}}],\\\"ordered\\\":true,\\\"lsid\\\":{\\\"id\\\":{\\\"$binary\\\":\\\"co8ZfYQNT0q4L7Tpa4bFBw\\u003d\\u003d\\\",\\\"$type\\\":\\\"04\\\"}},\\\"$db\\\":\\\"test\\\"}},\\\"result\\\":13}\"}}";
 }

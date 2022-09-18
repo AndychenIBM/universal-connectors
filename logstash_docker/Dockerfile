@@ -80,7 +80,7 @@ RUN curl https://artifacts.elastic.co/downloads/logstash/${LOGSTASH_VERSION}.tar
     --add-opens=java.management/sun.management=ALL-UNNAMED" >>${UC_ETC}/jvm.options && \
 #Install plugins FIXME: enter output_to_guardium plugin to the default offline-package
     ${LOGSTASH_DIR}/bin/logstash-plugin install logstash-input-google_pubsub && \
-    ${LOGSTASH_DIR}/bin/logstash-plugin install ${UC_ETC}/logstash-output-java_output_to_guardium-1.3.9.gem && \
+    ${LOGSTASH_DIR}/bin/logstash-plugin install ${UC_ETC}/logstash-output-java_output_to_guardium-1.4.0.gem && \
     ${LOGSTASH_DIR}/bin/logstash-plugin install file:///${UC_ETC}/guardium_logstash-offline-plugins.zip && \
     ${LOGSTASH_DIR}/bin/logstash-plugin install file:///${UC_ETC}/generic-offline-plugins-7.5.2.zip && \
     ${LOGSTASH_DIR}/bin/logstash-plugin install file:///${UC_ETC}/logstash-filter-json_encode-3.0.3-java.zip && \

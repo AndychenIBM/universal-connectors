@@ -21,7 +21,7 @@ import java.util.Base64;
 public class Environment {
     private static Logger log = LogManager.getLogger(Environment.class);
     public static final String UC_ETC = "UC_ETC";
-    public static final String UC_ETC_DEFAULT_PATH="C:\\Guard\\Git\\universal-connector\\logstash-output-guardium\\src\\resources\\";//"/tmp/logstash_plugin/";
+    public static final String UC_ETC_DEFAULT_PATH=System.getProperty("user.dir")+"\\src\\resources\\";//"/tmp/logstash_plugin/";
 
     public static final String LOG42_CONF="log4j2uc.properties";
 

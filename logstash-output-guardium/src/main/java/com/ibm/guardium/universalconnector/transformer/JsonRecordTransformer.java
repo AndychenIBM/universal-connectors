@@ -9,7 +9,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import sun.net.util.IPAddressUtil;
 
-import java.security.MessageDigest;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -65,15 +64,21 @@ public class JsonRecordTransformer implements RecordTransformer {
                 .build();
 
         if(record.isException()){
+
+            Datasource.Guard_ds_message clientRequestMsg = Datasource.Guard_ds_message.newBuilder()
+                    .setType(Datasource.Guard_ds_message.Type.CLIENT_REQUEST)
+                    .setClientRequest(clientRequest)
+                    .build();
+            messages.add(clientRequestMsg);
+
             // build exception - the one that has data on errors
             Datasource.Exception exception = buildExceptionData(record, sessionLocator);
             Datasource.Guard_ds_message exceptionMsg = Datasource.Guard_ds_message.newBuilder()
                     .setType(Datasource.Guard_ds_message.Type.EXCEPTION)
                     .setException(exception)
-                    .setClientRequest(clientRequest)
                     .build();
-
             messages.add(exceptionMsg);
+
         }else {
             // build client request - client request will have a reference to data object that contains actual sql data.
             Datasource.Guard_ds_message sqlMsg = Datasource.Guard_ds_message.newBuilder()
@@ -99,7 +104,7 @@ public class JsonRecordTransformer implements RecordTransformer {
                 .setSessionId(getSessionIdForSniffer(record));
 
         if("true".equals(get("GI_MODE","false"))) {
-                builder.setTerminalId(get("TENANT_ID", "TNT_ATGPHITOV3JEIXUXK8LTGR"))
+            builder.setTerminalId(get("TENANT_ID", "TNT_ATGPHITOV3JEIXUXK8LTGR"))
                     .setConfigId(get("CONFIG_ID", "5d9f48d097ea6054a51f6b98"));
         }
 
@@ -229,7 +234,7 @@ public class JsonRecordTransformer implements RecordTransformer {
      * @param stringInputApi
      */
     public static void trimAndSet(Consumer<String> apiToCall, Supplier<String> stringInputApi){
-            //Function<String, com.google.protobuf.GeneratedMessage.Builder<Datasource.Accessor.Builder>> apiToCall, Supplier<String> stringInputApi){
+        //Function<String, com.google.protobuf.GeneratedMessage.Builder<Datasource.Accessor.Builder>> apiToCall, Supplier<String> stringInputApi){
         String value = stringInputApi.get();
         if (value!=null) {
             value = value.trim();
@@ -342,7 +347,7 @@ public class JsonRecordTransformer implements RecordTransformer {
         return sessionBuilder.build();
     }
 
-//    public static int convert_ipstr_to_int(String ip){
+    //    public static int convert_ipstr_to_int(String ip){
 //        int ret = 0;
 //        String[] segs = ip.split("\\.");
 //
@@ -425,6 +430,15 @@ public class JsonRecordTransformer implements RecordTransformer {
             } else {
                 Datasource.GDM_construct gdmConstruct = buildConstruct(rd);
                 builder.setConstruct(gdmConstruct);
+            }
+        } else { // exception record also need to create construct with text/sql only
+            ExceptionRecord ex = record.getException();
+            if (shouldGuardiumParseSql(dataType)) {
+                trimAndSet(builder::setText, ex::getSqlString);
+            } else {
+                Datasource.GDM_construct.Builder gdmConstructBuilder = Datasource.GDM_construct.newBuilder();
+                gdmConstructBuilder.setOriginalSql(ex.getSqlString());
+                builder.setConstruct(gdmConstructBuilder.build());
             }
         }
         return builder.build();
