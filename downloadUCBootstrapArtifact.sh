@@ -19,7 +19,7 @@
 BASE_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 # constant
-VERSION=1.0.1
+VERSION=1.0.2
 BOOSTRAP_LOCATION=logstash_docker/uc/setup
 
 # main
