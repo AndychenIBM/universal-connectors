@@ -1,6 +1,6 @@
 #!/bin/bash
 
-DEFAULT_ERR_LOG=${LOG_GUC_DIR}/logstash_stdout_stderr.log
+DEFAULT_ERR_LOG=${LOG_GUC_DIR}logstash_stdout_stderr.log
 ERR_LOG=${1:-$DEFAULT_ERR_LOG}
 MAX_ERROR_LOGS_AMOUNT=1000
 
@@ -36,3 +36,4 @@ fi
 
 # Connection errors
 grep -v '^#' ${UC_SCRIPTS}/troubleshooting_error_codes.txt | while read -r line ; do returnKnownErrorCodes "$line"; done
+exit 0
