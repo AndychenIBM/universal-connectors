@@ -39,18 +39,29 @@ docker ps -a | grep ${UC_CONTAINER_NAME}
 # Print logstash-plugin list
 docker exec -it Klaus bash -c "logstash-plugin list --verbose &> ${LOGSTASH_PLUGIN_LIST_FILE}"
 docker cp Klaus:/usr/share/logstash/${LOGSTASH_PLUGIN_LIST_FILE} .
-#echo "copied output:"
-#cat ${LOGSTASH_PLUGIN_LIST_FILE}
 
 # Test 1: check at least ${MINIMUM_AMOUNT_OF_PLUGINS} installed plugins with Guardium name
 installedPluginsNum=$(grep guardium ${LOGSTASH_PLUGIN_LIST_FILE} | wc -l)
-echo "num of installed plugins: ${installedPluginsNum}"
+echo "num of installed plugins that contain the name guardium: ${installedPluginsNum}"
 if [[ "$installedPluginsNum" -lt ${MINIMUM_AMOUNT_OF_PLUGINS} ]]; then
   echo "Missing Guardium plugins. Please check if UC default offline package was installed."
   exit 1
 fi
 
-# Test 2: check plugin existence and version in UC image
+# Test 2: verify output plugin existence
+if grep "output_to_guardium" ${LOGSTASH_PLUGIN_LIST_FILE}
+then
+    outputInstalledVersion=$(grep "output_to_guardium" ${LOGSTASH_PLUGIN_LIST_FILE} | cut -d ")" -f1 | cut -d "(" -f2 | xargs)
+    echo "Logstash output plugin to Guardium exists. Version: ${outputInstalledVersion}"
+else
+    echo "Missing Guardium output plugin for Universal Connector"
+    exit 1
+fi
+
+# Test 3: check plugin existence and version in UC image
 grep -v '^#' defaultOfflinePackagePlugins.txt | while read -r line; do testPluginExistence "${line}"; done
+
+
+
 
 rm -rf ${LOGSTASH_PLUGIN_LIST_FILE}
