@@ -46,5 +46,11 @@ buildUCCommons
 # Build the rest of the plugins from pluginsToBuild.txt
 export UC_ETC=${BASE_DIR}/${UC_OPENSOURCE_ROOT_DIR}/filter-plugin/logstash-output-guardium/src/resources
 grep -v '^#' pluginsToBuild.txt | while read -r line; do buildUCPluginGem "$line" "test"; done
+echo "hardcoded build of Mongo Atlas plugin"
+buildUCPluginGem "input-plugin/logstash-input-mongo-atlas" "test"
+echo "hardcoded build of MariaDB Atlas plugin"
+buildUCPluginGem "filter-plugin/logstash-filter-mariadb-guardium" "test"
 grep -v '^#' pluginsToBuildNotFromOpenSource.txt | while read -r line; do buildUCPluginGem "$line" "test"; done
+echo "hardcoded build of Output plugin"
+buildUCPluginGem "filter-plugin/logstash-output-guardium" "test"
 exit 0
