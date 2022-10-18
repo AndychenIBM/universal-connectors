@@ -45,12 +45,25 @@ buildUCCommons
 
 # Build the rest of the plugins from pluginsToBuild.txt
 export UC_ETC=${BASE_DIR}/${UC_OPENSOURCE_ROOT_DIR}/filter-plugin/logstash-output-guardium/src/resources
-grep -v '^#' pluginsToBuild.txt | while read -r line; do buildUCPluginGem "$line" "test"; done
-echo "hardcoded build of Mongo Atlas plugin"
-buildUCPluginGem "input-plugin/logstash-input-mongo-atlas" "test"
-echo "hardcoded build of MariaDB Atlas plugin"
+# grep -v '^#' pluginsToBuild.txt | while read -r line; do buildUCPluginGem "$line" "test"; done
+echo "hardcoded build of all the plugins"
+buildUCPluginGem "filter-plugin/logstash-filter-mongodb-guardium" "test"
+buildUCPluginGem "filter-plugin/logstash-filter-mysql-guardium" "test"
+buildUCPluginGem "filter-plugin/logstash-filter-s3-guardium" "test"
+buildUCPluginGem "filter-plugin/logstash-filter-hdfs-guardium" "test"
+buildUCPluginGem "filter-plugin/logstash-filter-mysql-percona-guardium" "test"
+buildUCPluginGem "filter-plugin/logstash-filter-generic-guardium" "test"
+buildUCPluginGem "filter-plugin/logstash-filter-saphana-guardium" "test"
+buildUCPluginGem "filter-plugin/logstash-filter-cassandra-guardium" "test"
+buildUCPluginGem "filter-plugin/logstash-filter-aurora-mysql-guardium" "test"
+buildUCPluginGem "filter-plugin/logstash-filter-dynamodb-guardium" "test"
+buildUCPluginGem "filter-plugin/logstash-filter-neptune-aws-guardium" "test"
+buildUCPluginGem "filter-plugin/logstash-filter-couchbasedb-guardium" "test"
+buildUCPluginGem "filter-plugin/logstash-filter-couchdb-guardium" "test"
 buildUCPluginGem "filter-plugin/logstash-filter-mariadb-guardium" "test"
-grep -v '^#' pluginsToBuildNotFromOpenSource.txt | while read -r line; do buildUCPluginGem "$line" "test"; done
+buildUCPluginGem "input-plugin/logstash-input-mongo-atlas" "test"
+
+# grep -v '^#' pluginsToBuildNotFromOpenSource.txt | while read -r line; do buildUCPluginGem "$line" "test"; done
 echo "hardcoded build of Output plugin"
 buildUCPluginGem "filter-plugin/logstash-output-guardium" "test"
 exit 0
