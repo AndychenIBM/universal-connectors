@@ -4,19 +4,17 @@ function buildUCPluginGem() {
   echo "================ Building $1 gem file================"
   cd $BASE_DIR/${UC_OPENSOURCE_ROOT_DIR}/$1
   cp ../../../test/gradle.properties .
-  ./gradlew --no-daemon $2 $3 $4
+  ./gradlew --no-daemon $2 $3 $4 </dev/null
   if [ $? -eq 0 ]; then
     echo "Successfully test $1"
   else
     echo "Failed test $1"
-    exit 1
   fi
-  ./gradlew --no-daemon gem
+  ./gradlew --no-daemon gem </dev/null
   if [ $? -eq 0 ]; then
     echo "Successfully build gem $1"
   else
     echo "Failed build gem $1"
-    exit 2
   fi
 }
 
@@ -35,7 +33,7 @@ function buildUCCommons() {
     echo "Successfully build jar uc-commons"
   else
     echo "Failed build jar uc-commons"
-    exit 1
+    exit 2
   fi
   cp ./build/libs/common-1.0.0.jar ./build/libs/guardium-universalconnector-commons-1.0.0.jar
   cd ../../
@@ -45,25 +43,6 @@ buildUCCommons
 
 # Build the rest of the plugins from pluginsToBuild.txt
 export UC_ETC=${BASE_DIR}/${UC_OPENSOURCE_ROOT_DIR}/filter-plugin/logstash-output-guardium/src/resources
-# grep -v '^#' pluginsToBuild.txt | while read -r line; do buildUCPluginGem "$line" "test"; done
-echo "hardcoded build of all the plugins"
-buildUCPluginGem "filter-plugin/logstash-filter-mongodb-guardium" "test"
-buildUCPluginGem "filter-plugin/logstash-filter-mysql-guardium" "test"
-buildUCPluginGem "filter-plugin/logstash-filter-s3-guardium" "test"
-buildUCPluginGem "filter-plugin/logstash-filter-hdfs-guardium" "test"
-buildUCPluginGem "filter-plugin/logstash-filter-mysql-percona-guardium" "test"
-buildUCPluginGem "filter-plugin/logstash-filter-generic-guardium" "test"
-buildUCPluginGem "filter-plugin/logstash-filter-saphana-guardium" "test"
-buildUCPluginGem "filter-plugin/logstash-filter-cassandra-guardium" "test"
-buildUCPluginGem "filter-plugin/logstash-filter-aurora-mysql-guardium" "test"
-buildUCPluginGem "filter-plugin/logstash-filter-dynamodb-guardium" "test"
-buildUCPluginGem "filter-plugin/logstash-filter-neptune-aws-guardium" "test"
-buildUCPluginGem "filter-plugin/logstash-filter-couchbasedb-guardium" "test"
-buildUCPluginGem "filter-plugin/logstash-filter-couchdb-guardium" "test"
-buildUCPluginGem "filter-plugin/logstash-filter-mariadb-guardium" "test"
-buildUCPluginGem "input-plugin/logstash-input-mongo-atlas" "test"
-
-# grep -v '^#' pluginsToBuildNotFromOpenSource.txt | while read -r line; do buildUCPluginGem "$line" "test"; done
-echo "hardcoded build of Output plugin"
-buildUCPluginGem "filter-plugin/logstash-output-guardium" "test"
+grep -v '^#' pluginsToBuild.txt | while read -r line; do buildUCPluginGem "$line" "test";done
+grep -v '^#' pluginsToBuildNotFromOpenSource.txt | while read -r line; do buildUCPluginGem "$line" "test"; done
 exit 0
