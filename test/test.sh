@@ -3,7 +3,7 @@
 UC_IMAGE_NAME="universal-connector"
 UC_CONTAINER_NAME="Klaus"
 LOGSTASH_PLUGIN_LIST_FILE=logstash-plugin-list.txt
-MINIMUM_AMOUNT_OF_PLUGINS=5
+MINIMUM_AMOUNT_OF_PLUGINS=15
 
 UC_PLUGIN_REPO_BRANCH=main
 UC_OPENSOURCE_ROOT_DIR=universal-connectors-${UC_PLUGIN_REPO_BRANCH}
@@ -31,7 +31,7 @@ echo "========================== check images status (docker images | grep ${UC_
 docker images | grep ${UC_IMAGE_NAME}
 
 # Check container status after creation
-docker rm -f ${UC_CONTAINER_NAME}
+docker rm -f ${UC_CONTAINER_NAME} > /dev/null 2>&1
 docker run -d --name=${UC_CONTAINER_NAME} --network="host" -e UC_LOG_LEVEL="DEBUG" -it universal-connector
 echo "========================== check container status (docker ps -a | grep ${UC_CONTAINER_NAME}): =========================="
 docker ps -a | grep ${UC_CONTAINER_NAME}

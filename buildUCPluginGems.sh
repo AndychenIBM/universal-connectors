@@ -4,13 +4,13 @@ function buildUCPluginGem() {
   echo "================ Building $1 gem file================"
   cd $BASE_DIR/${UC_OPENSOURCE_ROOT_DIR}/$1
   cp ../../../test/gradle.properties .
-  ./gradlew --no-daemon $2 $3 $4 </dev/null
+  ./gradlew --no-daemon $2 $3 $4 </dev/null >/dev/null 2>&1
   if [ $? -eq 0 ]; then
     echo "Successfully test $1"
   else
     echo "Failed test $1"
   fi
-  ./gradlew --no-daemon gem </dev/null
+  ./gradlew --no-daemon gem </dev/null >/dev/null 2>&1
   if [ $? -eq 0 ]; then
     echo "Successfully build gem $1"
   else
@@ -20,7 +20,7 @@ function buildUCPluginGem() {
 
 function buildUCCommons() {
   cd ${UC_OPENSOURCE_ROOT_DIR}/common
-  ./gradlew test
+  ./gradlew test >/dev/null 2>&1
   if [ $? -eq 0 ]; then
     echo "Successfully test uc-commons"
   else
@@ -28,7 +28,7 @@ function buildUCCommons() {
     exit 1
   fi
   #check if succeed
-  ./gradlew jar
+  ./gradlew jar >/dev/null 2>&1
   if [ $? -eq 0 ]; then
     echo "Successfully build jar uc-commons"
   else

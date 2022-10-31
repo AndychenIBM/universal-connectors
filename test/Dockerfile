@@ -48,9 +48,11 @@ USER guc
 RUN curl https://artifacts.elastic.co/downloads/logstash/${LOGSTASH_VERSION}.tar.gz -o ${LOGSTASH_DIR}/${LOGSTASH_VERSION}.tar.gz && \
     tar -xzf ${LOGSTASH_DIR}/${LOGSTASH_VERSION}.tar.gz  -C ${LOGSTASH_DIR} --strip-components=1 && \
 	rm ${LOGSTASH_DIR}/*.tar.gz && \
+#Remove UC plugins that were already installed in UC
+    cd ${LOGSTASH_DIR} && rm -f *.gem *.zip && \
 #Remove unnecessary heavy plugins
     cd ${LOGSTASH_DIR}/vendor/bundle/jruby/2.5.0/gems && \
-    rm -rf logstash-filter-geoip-* logstash-input-snmp-* logstash-input-azure-* logstash-integration-kafka-* logstash-input-http-* nokogiri-* \
-    backports-* tzinfo-data-* snappy-* mail-* logstash-input-azure_event_hubs-* logstash-filter-jdbc_static-* snmp-* logstash-filter-useragent-* && \
+    rm -rf logstash-filter-geoip-* logstash-input-snmp-* logstash-input-http-* nokogiri-* \
+    backports-* tzinfo-data-* snappy-* mail-* logstash-filter-jdbc_static-* snmp-* logstash-filter-useragent-* && \
 # Clear cache
     rm -rf ${LOGSTASH_DIR}/vendor/cache/*.gem ${LOGSTASH_DIR}/vendor/bundle/jruby/2.5.0/cache/*.gem

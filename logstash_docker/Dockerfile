@@ -34,33 +34,33 @@ ENV ETC=/etc \
 ENV UC_ETC=${LOGSTASH_DIR}/config/ \
     UC_SCRIPTS=${LOGSTASH_DIR}/scripts/ \
     THIRD_PARTY_PATH=${LOGSTASH_DIR}/third_party \
-    OUA_BINARY_PATH=${LOGSTASH_DIR}/customer/binaries/oracle_unified_audit_oci_standalone
+    OUA_BINARY_PATH=${LOGSTASH_DIR}/customer/binaries/oracle_unified_audit_oci_standalone \
+    LS_JAVA_HOME=${JAVA_HOME}
 
 COPY uc/. /uc/.
 COPY health/liveness.sh health/readiness.sh /usr/bin/
 
 
-#Install necessary packages (libaio required for optional Oracle instant client installation)
+# Install necessary packages (libaio required for optional Oracle instant client installation)
 RUN microdnf install -y tzdata openssl curl ca-certificates procps shadow-utils.x86_64 tar zip gzip hostname vim cronie logrotate sudo libaio && \
     microdnf update -y; microdnf clean all && \
-#Add guc user and prepare
+# Add guc user and prepare
     useradd -g root -u 1001 guc && \
     mkdir -p ${LOGSTASH_DIR} ${LOG_GUC_DIR} ${SSL_DIR} && \
-    chmod -vR g=u ${LOGSTASH_DIR} ${LOG_GUC_DIR} ${SSL_DIR} ${RPM_DIR} /tmp && \
+    chmod -Rf g=u ${LOGSTASH_DIR} ${LOG_GUC_DIR} ${SSL_DIR} ${RPM_DIR} /tmp && \
     chmod +x /usr/bin/readiness.sh /usr/bin/liveness.sh && \
     chown -R guc:root /uc
 
-#Change User to guc
+# Change User to guc
 USER guc
 
-#Create a persistent volume which can be monted on the host
+# Create a persistent volume which can be monted on the host
 VOLUME /var/log/uc
 VOLUME /etc/uc/conf
 
-
 WORKDIR ${LOGSTASH_DIR}
 
-#Download and extract logstash
+# Download and extract logstash
 RUN curl https://artifacts.elastic.co/downloads/logstash/${LOGSTASH_VERSION}.tar.gz -o ${LOGSTASH_DIR}/${LOGSTASH_VERSION}.tar.gz && \
     tar -xzf ${LOGSTASH_DIR}/logstash*.tar.gz  -C ${LOGSTASH_DIR} --strip-components=1 && \
 	rm ${LOGSTASH_DIR}/*.tar.gz && \
@@ -78,20 +78,22 @@ RUN curl https://artifacts.elastic.co/downloads/logstash/${LOGSTASH_VERSION}.tar
     --add-opens=java.base/java.lang=ALL-UNNAMED \
     --add-opens=java.base/javax.crypto=ALL-UNNAMED \
     --add-opens=java.management/sun.management=ALL-UNNAMED" >>${UC_ETC}/jvm.options && \
-#Install plugins
-#TODO: uncomment after v1.2.2 is available (currently not found even thuogh it already appears in Github)
+# Install plugins
+# TODO: uncomment after v1.2.2 is available (can be applied to Logstash 8.2 or above)
 #    ${LOGSTASH_DIR}/bin/logstash-plugin install --version '1.2.2' logstash-input-google_pubsub && \
-#FIXME: enter output_to_guardium plugin to the default offline-package
+# FIXME: enter output_to_guardium plugin to the default offline-package
     ${LOGSTASH_DIR}/bin/logstash-plugin install ${UC_ETC}/logstash-output-java_output_to_guardium-1.4.0.gem && \
     ${LOGSTASH_DIR}/bin/logstash-plugin install file:///${UC_ETC}/guardium_logstash-offline-plugins.zip && \
     ${LOGSTASH_DIR}/bin/logstash-plugin install file:///${UC_ETC}/logstash-filter-json_encode-3.0.3-java.zip && \
-#Make sure user can read,write and execute the scripts
-    chmod 755 ${UC_SCRIPTS}/*.sh && \
-#Make sure scripts are not uploaded with windows characters additions
+# Make sure user can read,write and execute the scripts
+    chmod -f 755 ${UC_SCRIPTS}/*.sh && \
+# Make sure scripts are not uploaded with windows characters additions
     sed -i -e 's/\r$//' ${LOGSTASH_DIR}/scripts/*.sh ${UC_ETC}/log4j2uc.properties && \
-#Grant permissions to group
+# Grant permissions to group
     chmod -Rf g=u ${LOGSTASH_DIR} ${LOG_GUC_DIR} ${SSL_DIR} /tmp /opt/java || true && \
-#Remove unnecessary heavy plugins
+# Remove UC plugins that were already installed in UC
+    cd ${LOGSTASH_DIR} && rm -f *.gem *.zip && \
+# Remove unnecessary heavy plugins
     cd ${LOGSTASH_DIR}/vendor/bundle/jruby/2.5.0/gems && \
     rm -rf logstash-filter-geoip-* logstash-input-snmp-* logstash-input-http-* nokogiri-* \
     backports-* tzinfo-data-* snappy-* mail-* logstash-filter-jdbc_static-* snmp-* logstash-filter-useragent-* && \
