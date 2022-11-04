@@ -18,8 +18,8 @@ import java.util.concurrent.CountDownLatch;
 
 
 // class name must match plugin name
-@LogstashPlugin(name = "java_output_to_guardium")
-public class JavaOutputToGuardium implements Output {
+@LogstashPlugin(name = "guardium")
+public class Guardium implements Output {
 
     static {
         try {
@@ -34,7 +34,7 @@ public class JavaOutputToGuardium implements Output {
     public static final PluginConfigSpec<String> PREFIX_CONFIG =
             PluginConfigSpec.stringSetting("prefix", "");
 
-    private static Logger log = LogManager.getLogger(JavaOutputToGuardium.class);
+    private static Logger log = LogManager.getLogger(Guardium.class);
 
     private final String id;
     private String prefix;
@@ -45,17 +45,17 @@ public class JavaOutputToGuardium implements Output {
     private static Gson gson = new Gson();
 
     // all plugins must provide a constructor that accepts id, Configuration, and Context
-    public JavaOutputToGuardium(final String id, final Configuration configuration, final Context context) {
+    public Guardium(final String id, final Configuration configuration, final Context context) {
         this(id, configuration, context, System.out);
     }
 
-    JavaOutputToGuardium(final String id, final Configuration config, final Context context, OutputStream targetStream) {
+    Guardium(final String id, final Configuration config, final Context context, OutputStream targetStream) {
         // constructors should validate configuration options
         this.id = id;
         prefix = config.get(PREFIX_CONFIG);
         printer = new PrintStream(targetStream);
         connector = new UniversalConnector();
-        log.info("Finished JavaOutputToGuardium constructor");
+        log.info("Finished Guardium constructor");
     }
 
     @Override

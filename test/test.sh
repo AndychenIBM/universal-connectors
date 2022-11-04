@@ -49,9 +49,9 @@ if [[ "$installedPluginsNum" -lt ${MINIMUM_AMOUNT_OF_PLUGINS} ]]; then
 fi
 
 # Test 2: verify output plugin existence
-if grep "output_to_guardium" ${LOGSTASH_PLUGIN_LIST_FILE}
+if grep "output-guardium" ${LOGSTASH_PLUGIN_LIST_FILE}
 then
-    outputInstalledVersion=$(grep "output_to_guardium" ${LOGSTASH_PLUGIN_LIST_FILE} | cut -d ")" -f1 | cut -d "(" -f2 | xargs)
+    outputInstalledVersion=$(grep "output-guardium" ${LOGSTASH_PLUGIN_LIST_FILE} | cut -d ")" -f1 | cut -d "(" -f2 | xargs)
     echo "Logstash output plugin to Guardium exists. Version: ${outputInstalledVersion}"
 else
     echo "Missing Guardium output plugin for Universal Connector"

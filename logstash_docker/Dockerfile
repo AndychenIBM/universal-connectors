@@ -81,8 +81,6 @@ RUN curl https://artifacts.elastic.co/downloads/logstash/${LOGSTASH_VERSION}.tar
 # Install plugins
 # TODO: uncomment after v1.2.2 is available (can be applied to Logstash 8.2 or above)
 #    ${LOGSTASH_DIR}/bin/logstash-plugin install --version '1.2.2' logstash-input-google_pubsub && \
-# FIXME: enter output_to_guardium plugin to the default offline-package
-    ${LOGSTASH_DIR}/bin/logstash-plugin install ${UC_ETC}/logstash-output-java_output_to_guardium-1.4.0.gem && \
     ${LOGSTASH_DIR}/bin/logstash-plugin install file:///${UC_ETC}/guardium_logstash-offline-plugins.zip && \
     ${LOGSTASH_DIR}/bin/logstash-plugin install file:///${UC_ETC}/logstash-filter-json_encode-3.0.3-java.zip && \
 # Make sure user can read,write and execute the scripts

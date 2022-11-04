@@ -16,10 +16,10 @@ public class JavaOutputExampleTest {
         //GRD-43047
         String prefix = "Prefix";
         Map<String, Object> configValues = new HashMap<>();
-        configValues.put(JavaOutputToGuardium.PREFIX_CONFIG.name(), prefix);
+        configValues.put(Guardium.PREFIX_CONFIG.name(), prefix);
         Configuration config = new ConfigurationImpl(configValues);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        JavaOutputToGuardium output = new JavaOutputToGuardium("test-id", config, null, baos);
+        Guardium output = new Guardium("test-id", config, null, baos);
 
         Collection<Event> events = new ArrayList<>();
 
@@ -54,10 +54,10 @@ public class JavaOutputExampleTest {
         //GRD-43047
         String prefix = "Prefix";
         Map<String, Object> configValues = new HashMap<>();
-        configValues.put(JavaOutputToGuardium.PREFIX_CONFIG.name(), prefix);
+        configValues.put(Guardium.PREFIX_CONFIG.name(), prefix);
         Configuration config = new ConfigurationImpl(configValues);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        JavaOutputToGuardium output = new JavaOutputToGuardium("test-id", config, null, baos);
+        Guardium output = new Guardium("test-id", config, null, baos);
 
         Collection<Event> events = new ArrayList<>();
 
@@ -93,10 +93,10 @@ public class JavaOutputExampleTest {
 
         String prefix = "Prefix";
         Map<String, Object> configValues = new HashMap<>();
-        configValues.put(JavaOutputToGuardium.PREFIX_CONFIG.name(), prefix);
+        configValues.put(Guardium.PREFIX_CONFIG.name(), prefix);
         Configuration config = new ConfigurationImpl(configValues);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        JavaOutputToGuardium output = new JavaOutputToGuardium("test-id", config, null, baos);
+        Guardium output = new Guardium("test-id", config, null, baos);
 
         String sourceField = "message";
         int eventCount = 5;
