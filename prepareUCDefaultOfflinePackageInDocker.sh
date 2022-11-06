@@ -10,23 +10,14 @@ function addPluginToInstallationList() {
 }
 
 function removeUninstalledPluginFromPackagingList() {
-  echo "======removeUninstalledPluginFromPackagingList=========="
-  echo "packages list:"
-  echo $packages_list
   installedPlugins=$(ls | grep gem)
-  echo "gem files same in installPlugins var:"
-  echo $installedPlugins
-
   for value in $packages_list
   do
     if [[ ${installedPlugins} != *"${value}"* ]];then
       echo "${value} gem file was not found in the plugins directory. Removing it from default offline-package for UC"
       packages_list=${packages_list//$value/}
-    else
-      echo "${value} was found in the installedPlugins list"
     fi
   done
-  echo "========================================================"
 }
 
 cp logstash_docker/uc/config/*.gem defaultOfflinePackagePlugins.txt /usr/share/logstash/config
