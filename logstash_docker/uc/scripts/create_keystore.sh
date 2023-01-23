@@ -75,4 +75,22 @@ if [ ! -f ${INSIGHT_KEYSTORE} ]; then
     echo "Adding root CA to keystore"
     keytool -import -v -trustcacerts -alias "rootCA" -file "${ROOT_CA_LOCATION}" \
         -keystore "${INSIGHT_KEYSTORE}" -storepass "${keystore_pwd}" -noprompt
+
+    # add specified microservices to keystore
+    echo "Adding Insights microservices to keystore"
+    microservices="authserver  tenantuser  universalconnector  universalconnectormanager"
+    for ms in ${microservices}; do
+        cert_alias="${ms}"
+        cert_file="${CERTS_PATH}/${ms}/app.crt"
+        keytool -import -v -trustcacerts -alias ${cert_alias} -file "${cert_file}" \
+         -keystore "${INSIGHT_KEYSTORE}" -storepass "${keystore_pwd}" -noprompt
+    done
+
+    # add Redis cert to default Java keystore
+    if [ ! -z "$REDIS_TLS_ENABLED" ]; then
+        keytool -import -noprompt -keystore "${INSIGHT_KEYSTORE}" -file "$REDIS_TLS_CERT_CA" --trustcacerts -storepass "${keystore_pwd}" -alias "insights-redis-ca"
+    fi
 fi
+
+export JAVA_KEYSTORE_PASSWORD=${keystore_pwd}
+export JAVA_KEYSTORE_PATH=${INSIGHT_KEYSTORE}

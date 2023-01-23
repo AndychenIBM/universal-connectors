@@ -28,6 +28,7 @@ ENV ETC=/etc \
     LOGSTASH_DIR=/usr/share/logstash \
     LOG_DIR=/var/log/ \
     LOG_GUC_DIR=/var/log/uc/ \
+    CERTS_PATH=/service/certs/ \
     SSL_DIR=/service/certs/universalconnector/ \
     CLIENT_CERTS_PATH=/service/certs/client/ \
     RPM_DIR=/var/lib/rpm
