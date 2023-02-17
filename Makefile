@@ -26,7 +26,7 @@ DEVOPS_COMPOSE_ARGS=-f ../../test/docker-compose.override.yml
 DEVOPS_COMPOSE_PULL=pull
 DEVOPS_COMPOSE_UP=up -d
 DEVOPS_COMPOSE_DOWN=down
-ARTIFACTORY_DOCKER_REPO_DOMAIN=sec-guardium-next-gen-docker-local.artifactory.swg-devops.com/
+ARTIFACTORY_DOCKER_REPO_DOMAIN=docker-na-public.artifactory.swg-devops.com/sec-guardium-next-gen-docker-local/
 DOCKER_IMAGE_TAG=latest
 .PHONY:build dockerBuild test test_e2e dockerRun dockerStop
 

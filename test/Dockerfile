@@ -18,7 +18,7 @@
 ARG ibm_semeru_runtimes_ubi_minimal_image_jdk_version=open-11.0.16.1_1-jdk-focal_ubi-minimal-8.7-1049
 
 # Pull the UBI 8 docker base image based on provided version or default  new repo
-FROM sec-guardium-next-gen-docker-local.artifactory.swg-devops.com/ibm-semeru-runtimes-ubi-minimal:${ibm_semeru_runtimes_ubi_minimal_image_jdk_version}
+FROM docker-na-public.artifactory.swg-devops.com/sec-guardium-next-gen-docker-local/ibm-semeru-runtimes-ubi-minimal:${ibm_semeru_runtimes_ubi_minimal_image_jdk_version}
 
 ENV ETC=/etc \
 	JAVA_HOME=/opt/java/openjdk \

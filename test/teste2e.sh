@@ -1,7 +1,7 @@
 docker logs universal-connector
 docker rm -f mongo_fb
-docker pull sec-guardium-next-gen-docker-local.artifactory.swg-devops.com/mongo_filebeat_ubi:travisBuild
-docker run -d --name="mongo_fb" -e FILEBEAT_HOSTS="universal-connector:5044" --link universal-connector:universal-connector -it sec-guardium-next-gen-docker-local.artifactory.swg-devops.com/mongo_filebeat_ubi:travisBuild bash
+docker pull docker-na-public.artifactory.swg-devops.com/sec-guardium-next-gen-docker-local/mongo_filebeat_ubi:travisBuild
+docker run -d --name="mongo_fb" -e FILEBEAT_HOSTS="universal-connector:5044" --link universal-connector:universal-connector -it docker-na-public.artifactory.swg-devops.com/sec-guardium-next-gen-docker-local/mongo_filebeat_ubi:travisBuild bash
 cd deployments/devops-compose
 ./start.sh v1/universal-connector.lst pull
 _MINI_SNIF_SSL_ENABLED=true _GUC_UC_LOG_LEVEL=error _GUC_PERSISTENT_QUEUE_SIZE=512mb _GUC_PERSISTENT_QUEUE_TYPE=persisted _TENANT_ID=TNT_7J7BDDBGQDUOYGQ5WQ3WXJ TENANT_ID=TNT_7J7BDDBGQDUOYGQ5WQ3WXJ _MINI_SNIF_HOSTNAME=mini-snif ./start.sh v1/universal-connector.lst
