@@ -15,7 +15,7 @@
 # ***************************************************************** */
 
 # docker image version
-ARG ibm_semeru_runtimes_ubi_minimal_image_version=open-11.0.16.1_1-jre-focal_ubi-minimal-8.7-1049
+ARG ibm_semeru_runtimes_ubi_minimal_image_version=open-11.0.16.1_1-jre-focal_ubi-minimal-8.7-1085
 
 # Pull the UBI 8 docker base image based on provided version or default
 FROM docker-na-public.artifactory.swg-devops.com/sec-guardium-next-gen-docker-local/ibm-semeru-runtimes-ubi-minimal:${ibm_semeru_runtimes_ubi_minimal_image_version}
