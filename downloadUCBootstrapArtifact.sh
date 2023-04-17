@@ -25,7 +25,7 @@ BOOSTRAP_LOCATION=logstash_docker/uc/setup
 # main
 mkdir -p $BOOSTRAP_LOCATION
 echo "downloading uc-bootstrap JAR from artifactory with version: $VERSION"
-wget -q --user=$ARTIFACTORY_USERNAME --password=$ARTIFACTORY_PASSWORD https://na.artifactory.swg-devops.com/artifactory/sec-guardium-next-gen-team-gradle-local/com/ibm/guardium/ucbootstrap/$VERSION/ucbootstrap-$VERSION.jar -O $BOOSTRAP_LOCATION/uc-bootstrap.jar
+wget -q --user=$ARTIFACTORY_USERNAME --password=$ARTIFACTORY_AUTH_TOKEN https://na.artifactory.swg-devops.com/artifactory/sec-guardium-next-gen-team-gradle-local/com/ibm/guardium/ucbootstrap/$VERSION/ucbootstrap-$VERSION.jar -O $BOOSTRAP_LOCATION/uc-bootstrap.jar
 
 if [ $? -ne 0 ]; then
   echo "failed to download uc-bootstrap artifact"
