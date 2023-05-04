@@ -203,7 +203,9 @@ class LogStash::Inputs::CloudWatch_Logs < LogStash::Inputs::Base
       }
       resp = @cloudwatch.filter_log_events(params)
 
+      @logger.info("Events in response in process_group INS-29090: #{resp.events.size}")
       resp.events.each do |event|
+        @logger.info("Event in process_group INS-29090: #{event.message.to_str}")
         process_log(event, group)
       end
 
