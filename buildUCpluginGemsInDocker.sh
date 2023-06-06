@@ -48,6 +48,10 @@ chmod -R 777 ${UC_OPENSOURCE_ROOT_DIR}
 # copy lists of plugins to build and package in UC default offline-package
 force_copy_if_exists pluginsToBuild.txt
 force_copy_if_exists defaultOfflinePackagePlugins.txt
+
+# Add ruby plugins to default offline packages list
+grep -v '^#' rubyPluginsToBuild.txt | while read -r line; do echo "$line/${line##*/}" >> defaultOfflinePackagePlugins.txt; done
+
 verify_plugins_version
 
 echo "Final list in defaultOfflinePackagePlugins.txt:"

@@ -30,11 +30,9 @@ public class JsonRecordTransformer implements RecordTransformer {
     }
 
     @Override
-    public List<Datasource.Guard_ds_message> transform(String recordStr) {
+    public List<Datasource.Guard_ds_message> transform(Record record) {
 
         List<Datasource.Guard_ds_message> messages = new LinkedList<>();
-
-        Record record = new Gson().fromJson(recordStr, Record.class);
 
         // from each audit log record we need to build 2 proto messages -
         // session_start and one of client_request or exception
@@ -553,7 +551,7 @@ public class JsonRecordTransformer implements RecordTransformer {
 
         System.out.println(5);
         int X=0;
-        List<Datasource.Guard_ds_message> messages = transformer.transform(recordStr);
+        List<Datasource.Guard_ds_message> messages = transformer.transform(record);
 
         System.out.println("Result size"+messages.size());
     }

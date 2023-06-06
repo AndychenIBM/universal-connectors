@@ -15,16 +15,16 @@
 # ***************************************************************** */
 
 # docker image version
-ARG ibm_semeru_runtimes_ubi_minimal_image_version=open-11.0.16.1_1-jre-focal_ubi-minimal-8.8-860
+ARG rhel_image_version=8.8-860
 
 # Pull the UBI 8 docker base image based on provided version or default
-FROM docker-na-public.artifactory.swg-devops.com/sec-guardium-next-gen-docker-local/ibm-semeru-runtimes-ubi-minimal:${ibm_semeru_runtimes_ubi_minimal_image_version}
+FROM registry.access.redhat.com/ubi8/ubi-minimal:${rhel_image_version}
 
 ENV ETC=/etc \
-	JAVA_HOME=/opt/java/openjdk \
-    PATH="/opt/java/openjdk/bin:${PATH}" \
-    LS_JAVA_OPTS="-XX:+UseContainerSupport -Xshareclasses:nonfatal -Dls.cgroup.cpuacct.path.override=/ -Dls.cgroup.cpu.path.override=/" \
-	LOGSTASH_VERSION=logstash-oss-7.17.10-linux-x86_64 \
+
+    JAVA_HOME="/usr/share/logstash/jdk" \
+    PATH="${JAVA_HOME}/bin:${PATH}" \
+	LOGSTASH_VERSION=logstash-oss-8.7.0-linux-x86_64 \
     LOGSTASH_DIR=/usr/share/logstash \
     LOG_DIR=/var/log/ \
     LOG_GUC_DIR=/var/log/uc/ \
@@ -36,8 +36,7 @@ ENV ETC=/etc \
 ENV UC_ETC=${LOGSTASH_DIR}/config/ \
     UC_SCRIPTS=${LOGSTASH_DIR}/scripts/ \
     THIRD_PARTY_PATH=${LOGSTASH_DIR}/third_party \
-    OUA_BINARY_PATH=${LOGSTASH_DIR}/customer/binaries/oracle_unified_audit_oci_standalone \
-    LS_JAVA_HOME=${JAVA_HOME}
+    OUA_BINARY_PATH=${LOGSTASH_DIR}/customer/binaries/oracle_unified_audit_oci_standalone
 
 COPY uc/. /uc/.
 COPY health/liveness.sh health/readiness.sh /usr/bin/
@@ -79,10 +78,9 @@ RUN curl https://artifacts.elastic.co/downloads/logstash/${LOGSTASH_VERSION}.tar
     --add-opens=java.base/java.io=ALL-UNNAMED \
     --add-opens=java.base/java.lang=ALL-UNNAMED \
     --add-opens=java.base/javax.crypto=ALL-UNNAMED \
-    --add-opens=java.management/sun.management=ALL-UNNAMED" >>${UC_ETC}/jvm.options && \
+    --add-opens=java.management/sun.management=ALL-UNNAMED \
+    --add-exports=java.base/sun.net.util=ALL-UNNAMED" >>${UC_ETC}/jvm.options && \
 # Install plugins
-# TODO: uncomment after v1.2.2 is available (can be applied to Logstash 8.2 or above)
-#    ${LOGSTASH_DIR}/bin/logstash-plugin install --version '1.2.2' logstash-input-google_pubsub && \
     ${LOGSTASH_DIR}/bin/logstash-plugin install file:///${UC_ETC}/guardium_logstash-offline-plugins.zip && \
     ${LOGSTASH_DIR}/bin/logstash-plugin install file:///${UC_ETC}/logstash-filter-json_encode-3.0.3-java.zip && \
 # Make sure user can read,write and execute the scripts
@@ -94,13 +92,14 @@ RUN curl https://artifacts.elastic.co/downloads/logstash/${LOGSTASH_VERSION}.tar
 # Remove UC plugins that were already installed in UC
     cd ${UC_ETC} && rm -f *.gem *.zip && \
 # Remove unnecessary heavy plugins
-    cd ${LOGSTASH_DIR}/vendor/bundle/jruby/2.5.0/gems && \
+    cd ${LOGSTASH_DIR}/vendor/bundle/jruby/*.*.*/gems && \
     rm -rf logstash-filter-geoip-* logstash-input-snmp-* logstash-input-http-* nokogiri-* \
     backports-* tzinfo-data-* snappy-* mail-* logstash-filter-jdbc_static-* snmp-* logstash-filter-useragent-* \
     logstash-output-elasticsearch-* logstash-output-s3-* logstash-output-cloudwatch-* logstash-output-http-* logstash-output-webhdfs-* && \
 # Clear cache
-    rm -rf ${LOGSTASH_DIR}/vendor/bundle/jruby/2.5.0/cache/*.gem
+    rm -rf ${LOGSTASH_DIR}/vendor/bundle/jruby/*.*.*/cache/*.gem
 
-ENV PATH ${LOGSTASH_DIR}/bin:$PATH
+ENV PATH="${LOGSTASH_DIR}/bin:${JAVA_HOME}/bin:${PATH}" \
+    LS_JAVA_OPTS="-Dls.cgroup.cpuacct.path.override=/ -Dls.cgroup.cpu.path.override=/ $LS_JAVA_OPTS"
 
 CMD ${UC_SCRIPTS}/start_logstash.sh

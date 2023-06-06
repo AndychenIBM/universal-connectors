@@ -72,7 +72,7 @@ It is more important to the community that you are able to contribute.
 
 For more information about contributing, see the [CONTRIBUTING](https://github.com/elasticsearch/logstash/blob/master/CONTRIBUTING.md) file.
 
-[ico-version]: https://img.shields.io/gem/v/logstash-input-cloudwatch_logs.svg?style=flat-square
+[ico-version]: https://img.shields.io/badge/gem-v1.0.4-blue
 [ico-downloads]: https://img.shields.io/gem/dt/logstash-input-cloudwatch_logs.svg?style=flat-square
 [ico-license]: https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=flat-square
 [ico-travis]: https://img.shields.io/travis/lukewaite/logstash-input-cloudwatch-logs.svg?style=flat-square

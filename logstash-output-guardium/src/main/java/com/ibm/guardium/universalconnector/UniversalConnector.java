@@ -5,6 +5,7 @@ import com.google.gson.stream.JsonReader;
 import com.ibm.guardium.proto.datasource.*;
 import com.ibm.guardium.universalconnector.commons.*;
 import com.ibm.guardium.universalconnector.common.*;
+import com.ibm.guardium.universalconnector.commons.structures.Record;
 import com.ibm.guardium.universalconnector.config.SnifferConfig;
 import com.ibm.guardium.universalconnector.config.UCConfig;
 import com.ibm.guardium.universalconnector.dispatcher.RecordDispatcher;
@@ -138,12 +139,14 @@ public class UniversalConnector {
         }
     }
 
-    public void sendRecord(String record)throws GuardUCException {
+    public void sendRecord(String recordStr)throws GuardUCException {
         try {
             //getAgentInstance().send(record.getBytes());
-            if (log.isDebugEnabled()) { log.debug("Message to be dispatched to agent " + record); }
+            if (log.isDebugEnabled()) { log.debug("Message to be dispatched to agent " + recordStr); }
 
-            recordDispatcher.dispatch(transformer.transform(record));
+            Record record = new Gson().fromJson(recordStr, Record.class);
+
+            recordDispatcher.dispatch(transformer.transform(record), record);
 
             if (log.isDebugEnabled()) { log.debug("Message was dispatched to agent");}
 
@@ -180,10 +183,10 @@ public class UniversalConnector {
             log.debug("Sending records");
             while ((line = bufferedReader.readLine()) != null) {
                 lineNumber++;
-                List<com.ibm.guardium.proto.datasource.Datasource.Guard_ds_message> messages = transformer.transform(line);
-                recordDispatcher.dispatch(messages);
-                recordDispatcher.dispatch(messages);
-                recordDispatcher.dispatch(messages);
+
+                Record record = new Gson().fromJson(line, Record.class);
+                List<com.ibm.guardium.proto.datasource.Datasource.Guard_ds_message> messages = transformer.transform(record);
+                recordDispatcher.dispatch(messages, record);
                     //agent.incIncomingRecordsCount();
                     //agent.send(message);
                     //agent.send(message.toByteArray());

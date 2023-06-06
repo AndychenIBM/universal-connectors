@@ -1,20 +1,30 @@
 package com.ibm.guardium.universalconnector.config;
 
 import com.ibm.guardium.proto.datasource.Datasource;
+import com.ibm.guardium.universalconnector.commons.structures.Record;
 
 import java.util.Objects;
 
 public class DatabaseDetails {
 
     public static final String DELIMITER = ":";
+    private String connectorName;
+    private String connectorId;
     private String dbName;
     private String dbHost;
     private int    dbPort;
     private String dbType;
 
     public String getId(){
-        String id = dbHost +DELIMITER+dbPort;
-        return id;
+        StringBuffer sb = new StringBuffer();
+        if (connectorName!=null){
+            sb.append(connectorName).append(DELIMITER);
+        }
+        if (connectorId!=null){
+            sb.append(connectorId).append(DELIMITER);
+        }
+        sb.append(dbHost).append(DELIMITER).append(dbPort);
+        return sb.toString();
     }
 
     public String getDbName() {
@@ -49,8 +59,18 @@ public class DatabaseDetails {
         this.dbType = dbType;
     }
 
-    public static DatabaseDetails buildFromMessage(Datasource.Session_start ss){
+    public String getConnectorName() { return connectorName; }
+
+    public void setConnectorName(String connectorName) { this.connectorName = connectorName; }
+
+    public String getConnectorId() { return connectorId; }
+
+    public void setConnectorId(String connectorId) { this.connectorId = connectorId; }
+
+    public static DatabaseDetails buildFromMessage(Datasource.Session_start ss, Record record){
         DatabaseDetails dd = new DatabaseDetails();
+        dd.setConnectorName(record.getConnectorName());
+        dd.setConnectorId(record.getConnectorId());
         dd.setDbName(ss.getDbName());
         dd.setDbPort(ss.getSessionLocator().getServerPort());
         dd.setDbHost(ss.getAccessor().getServerHostname());

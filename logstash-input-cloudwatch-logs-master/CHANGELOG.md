@@ -5,6 +5,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [v1.0.4] (2023-02-09)
+* Adjustments to comply with Logstash v8.6.0
+* Resolved dependencies conflicts by upgrading aws-sdk and integrating logstash-mixin-aws to be loaded from the code
+* Deprecated `Aws.eager_autoload` patch was replaced with `require`s
+
 ## [v1.0.3] (2018-05-28)
 * Update minimum version of `logstash-mixin-aws` to support assume role ([#9a4677f](https://github.com/lukewaite/logstash-input-cloudwatch-logs/commit/9a4677fef8bcbf291bd4b357be2a9568ea4f3fc1) - Fixes [#51](https://github.com/lukewaite/logstash-input-cloudwatch-logs/issues/51), [#39](https://github.com/lukewaite/logstash-input-cloudwatch-logs/issues/39))
 
@@ -30,6 +35,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 * Incrementally write to since_db on each page of data from the CWL API (Fixes [#4](https://github.com/lukewaite/logstash-input-cloudwatch-logs/issues/4))
 
 [Unreleased]: https://github.com/lukewaite/logstash-input-cloudwatch-logs/compare/v1.0.3...HEAD
+[v1.0.4]: https://github.com/IBM/universal-connectors/tree/main/input-plugin/logstash-input-cloudwatch-logs
 [v1.0.3]: https://github.com/lukewaite/logstash-input-cloudwatch-logs/compare/v1.0.2...v1.0.3
 [v1.0.2]: https://github.com/lukewaite/logstash-input-cloudwatch-logs/compare/v1.0.1...v1.0.2
 [v1.0.1]: https://github.com/lukewaite/logstash-input-cloudwatch-logs/compare/v1.0.0...v1.0.1

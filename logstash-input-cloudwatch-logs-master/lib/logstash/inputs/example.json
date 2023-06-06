@@ -2,10 +2,10 @@
     "eventVersion": "1.07",
     "userIdentity": {
         "type": "IAMUser",
-        "principalId": "AIDAJWW2XAIOY2WN3KAAM",
+        "principalId": "ZZZZZZZZZZZZZZZZZZZZZ",
         "arn": "arn:aws:iam::987076625343:user/ProxyTest",
-        "accountId": "987076625343",
-        "accessKeyId": "ASIA6LUS2AO7Z4EHS6VL",
+        "accountId": "XXXXXXXXXXXX",
+        "accessKeyId": "YYYYYYYYYYYYYYYYYYYY",
         "userName": "ProxyTest",
         "sessionContext": {
             "attributes": {

@@ -21,11 +21,9 @@ ARG ibm_semeru_runtimes_ubi_minimal_image_jdk_version=open-11.0.16.1_1-jdk-focal
 FROM docker-na-public.artifactory.swg-devops.com/sec-guardium-next-gen-docker-local/ibm-semeru-runtimes-ubi-minimal:${ibm_semeru_runtimes_ubi_minimal_image_jdk_version}
 
 ENV ETC=/etc \
-	JAVA_HOME=/opt/java/openjdk \
-    PATH="/opt/java/openjdk/bin:${PATH}" \
-    JAVA_OPTS="-XX:+UseContainerSupport" \
-	LOGSTASH_VERSION=logstash-7.17.10-linux-x86_64 \
-	LOGSTASH_GIT_TAG=v7.17.10 \
+    LOGSTASH_VERSION=logstash-oss-8.7.0-linux-x86_64 \
+    LOGSTASH_GIT_TAG=v8.7.0 \
+    JRUBY_VERSION=9.4.2.0 \
     LOGSTASH_DIR=/usr/share/logstash \
     LOGSTASH_SRC_DIR=/usr/share/logstashSRC \
     LOG_DIR=/var/log/ \
@@ -34,13 +32,18 @@ ENV ETC=/etc \
 USER root
 
 #Install necessary packages
-RUN microdnf install -y git tzdata openssl curl ca-certificates procps shadow-utils.x86_64 tar gzip hostname vim cronie logrotate sudo && \
+RUN microdnf install -y git tzdata openssl curl ca-certificates procps shadow-utils.x86_64 tar gzip hostname vim cronie logrotate sudo findutils && \
     microdnf update -y; microdnf clean all && \
 #Change ownership to guc
     groupadd -g 991 guardium && useradd -G guardium -u 1001 guc && \
     mkdir -p ${LOGSTASH_DIR} ${LOG_GUC_DIR} ${LOGSTASH_SRC_DIR} && chown -R guc:guardium ${LOGSTASH_DIR} ${LOG_DIR} ${LOGSTASH_SRC_DIR}
 RUN cd ${LOGSTASH_SRC_DIR} && git clone -b "${LOGSTASH_GIT_TAG}" https://github.com/elastic/logstash.git
 RUN cd ${LOGSTASH_SRC_DIR}/logstash && ./gradlew --version && ./gradlew clean --warning-mode all && ./gradlew assemble
+#Jruby
+RUN curl https://repo1.maven.org/maven2/org/jruby/jruby-dist/${JRUBY_VERSION}/jruby-dist-${JRUBY_VERSION}-bin.tar.gz -o jruby-dist-${JRUBY_VERSION}-bin.tar.gz && \
+    tar -xzf jruby-dist-${JRUBY_VERSION}-bin.tar.gz && rm -rf jruby-dist-${JRUBY_VERSION}-bin.tar.gz && \
+    chown -R guc:guardium jruby-${JRUBY_VERSION}
+ENV PATH=$PATH:/jruby-${JRUBY_VERSION}/bin
 
 #Change User to guc
 USER guc
@@ -51,8 +54,8 @@ RUN curl https://artifacts.elastic.co/downloads/logstash/${LOGSTASH_VERSION}.tar
 #Remove UC plugins that were already installed in UC
     cd ${LOGSTASH_DIR} && rm -f *.gem *.zip && \
 #Remove unnecessary heavy plugins
-    cd ${LOGSTASH_DIR}/vendor/bundle/jruby/2.5.0/gems && \
+    cd ${LOGSTASH_DIR}/vendor/bundle/jruby/*.*.*/gems && \
     rm -rf logstash-filter-geoip-* logstash-input-snmp-* logstash-input-http-* nokogiri-* \
     backports-* tzinfo-data-* snappy-* mail-* logstash-filter-jdbc_static-* snmp-* logstash-filter-useragent-* && \
 # Clear cache
-    rm -rf ${LOGSTASH_DIR}/vendor/cache/*.gem ${LOGSTASH_DIR}/vendor/bundle/jruby/2.5.0/cache/*.gem
+    rm -rf ${LOGSTASH_DIR}/vendor/cache/*.gem ${LOGSTASH_DIR}/vendor/bundle/jruby/*.*.*/cache/*.gem

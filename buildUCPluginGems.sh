@@ -1,8 +1,13 @@
 #!/bin/bash
 BASE_DIR=$(pwd)
+
+function adjustToLogstash8() {
+  sed -i 's/logstash-core-*.*.*.jar/logstash-core.jar/' build.gradle
+}
 function buildUCPluginGem() {
   echo "================ Building $1 gem file================"
-  cd $BASE_DIR/${UC_OPENSOURCE_ROOT_DIR}/$1
+  cd ${BASE_DIR}/${UC_OPENSOURCE_ROOT_DIR}/$1
+  adjustToLogstash8
   cp ../../../test/gradle.properties .
   ./gradlew --no-daemon $2 $3 $4 </dev/null >/dev/null 2>&1
   if [ $? -eq 0 ]; then
@@ -39,10 +44,20 @@ function buildUCCommons() {
   cd ../../
 }
 
+function buildRubyPlugin(){
+  cd ${BASE_DIR}/$1
+  bundle install >/dev/null 2>&1
+  gem build $2
+}
+
 buildUCCommons
 
 # Build the rest of the plugins from pluginsToBuild.txt
 export UC_ETC=${BASE_DIR}/${UC_OPENSOURCE_ROOT_DIR}/filter-plugin/logstash-output-guardium/src/resources
 grep -v '^#' pluginsToBuild.txt | while read -r line; do buildUCPluginGem "$line" "test";done
 grep -v '^#' pluginsToBuildNotFromOpenSource.txt | while read -r line; do buildUCPluginGem "$line" "test"; done
+
+buildRubyPlugin logstash-input-cloudwatch-logs-master logstash-input-cloudwatch_logs.gemspec
+grep -v '^#' ${BASE_DIR}/rubyPluginsToBuild.txt | while read -r line; do buildRubyPlugin "${UC_OPENSOURCE_ROOT_DIR}/${line}" "${line##*/}.gemspec"; done
+
 exit 0

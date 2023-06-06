@@ -1,15 +1,19 @@
 # encoding: utf-8
+
 require "logstash/inputs/base"
 require "logstash/namespace"
-require "logstash/plugin_mixins/aws_config"
+require_relative "plugin_mixins/aws_config"
 require "logstash/timestamp"
 require "time"
 require "stud/interval"
-require "aws-sdk"
-require "logstash/inputs/cloudwatch_logs/patch"
+require "aws-sdk-cloudwatch"
+require "aws-sdk-configservice"
+require "aws-sdk-cloudwatchlogs"
+# require_relative "cloudwatch_logs/patch"
 require "fileutils"
 
-Aws.eager_autoload!
+# Aws.eager_autoload is no longer needed, usage of autoload has been replaced with require statements
+# Aws.eager_autoload!
 
 # Stream events from CloudWatch Logs streams.
 #

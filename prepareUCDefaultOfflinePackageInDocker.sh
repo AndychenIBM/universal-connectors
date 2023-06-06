@@ -29,7 +29,7 @@ addPluginToInstallationList ${UC_OPENSOURCE_ROOT_DIR}/filter-plugin/logstash-out
 
 
 #TODO- remove hardcoded installation of cloudwatch_logs after publishing it to open-source Github repo
-addPluginToInstallationList logstash_docker/uc/config/logstash-input-cloudwatch_logs-1.0.3.gem
+addPluginToInstallationList logstash_docker/uc/config/logstash-input-cloudwatch_logs-1.0.4.gem
 
 echo "Installing packages on Logstash..."
 ../bin/logstash-plugin install *.gem

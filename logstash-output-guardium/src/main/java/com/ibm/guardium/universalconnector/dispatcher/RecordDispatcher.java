@@ -5,17 +5,12 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
 import com.ibm.guardium.proto.datasource.*;
 import com.ibm.guardium.universalconnector.agent.Agent;
-import com.ibm.guardium.universalconnector.common.Environment;
+import com.ibm.guardium.universalconnector.commons.structures.Record;
 import com.ibm.guardium.universalconnector.config.*;
 import com.ibm.guardium.universalconnector.exceptions.GuardUCException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -41,37 +36,37 @@ public class RecordDispatcher {
     /*
     * Make sure all specific db messages go via same agent
     * */
-    public void dispatch(List<Datasource.Guard_ds_message> messages){
+    public void dispatch(List<Datasource.Guard_ds_message> messages, Record record){
         try{
-            Agent agent = getAgent(messages);
+            Agent agent = getAgent(messages, record);
             synchronized (must_put_2_messages_per_record_flag) {
                 for (Datasource.Guard_ds_message message : messages) {
                     agent.send(message);
                 }
             }
         } catch (Exception e){
-            String dbId = getDbIdFromMessages(messages);
+            String dbId = getDbIdFromMessages(messages, record);
             log.error("Error sending message via agent "+dbId, e);
             throw new GuardUCException("Error sending message via agent "+dbId, e);
         }
     }
 
-    private String getDbIdFromMessages(List<Datasource.Guard_ds_message> messages){
-        DatabaseDetails dbDetails = getDbDetailsFromMessages(messages);
+    private String getDbIdFromMessages(List<Datasource.Guard_ds_message> messages, Record record){
+        DatabaseDetails dbDetails = getDbDetailsFromMessages(messages, record);
         return dbDetails.getId();
     }
 
-    private DatabaseDetails getDbDetailsFromMessages(List<Datasource.Guard_ds_message> messages){
+    private DatabaseDetails getDbDetailsFromMessages(List<Datasource.Guard_ds_message> messages, Record record){
         Datasource.Session_start sessionStart = messages.get(0).getSessionStart();
-        return DatabaseDetails.buildFromMessage(sessionStart);
+        return DatabaseDetails.buildFromMessage(sessionStart, record);
     }
 
-    private Agent getAgent(List<Datasource.Guard_ds_message> messages) throws Exception {
-        String dbId = getDbIdFromMessages(messages);
+    private Agent getAgent(List<Datasource.Guard_ds_message> messages, Record record) throws Exception {
+        String dbId = getDbIdFromMessages(messages, record);
         try {
             //log.debug("The Thread name is " + Thread.currentThread().getId() + "__" +Thread.currentThread().getName());
             if (agentsMap.get(dbId) == null) {
-                DatabaseDetails dbDetails = getDbDetailsFromMessages(messages);
+                DatabaseDetails dbDetails = getDbDetailsFromMessages(messages, record);
                 ConnectionConfig cc = new ConnectionConfig(ucConfig, snifferConfigs.get(0), dbDetails);
                 addAgentToMap(cc);
             }

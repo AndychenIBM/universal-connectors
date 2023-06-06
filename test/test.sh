@@ -8,6 +8,17 @@ MINIMUM_AMOUNT_OF_PLUGINS=15
 UC_PLUGIN_REPO_BRANCH=main
 UC_OPENSOURCE_ROOT_DIR=universal-connectors-${UC_PLUGIN_REPO_BRANCH}
 
+function testMandatoryPluginExistence(){
+  if grep $1 ${LOGSTASH_PLUGIN_LIST_FILE}
+  then
+    pluginInstalledVersion=$(grep "$1" ${LOGSTASH_PLUGIN_LIST_FILE} | cut -d ")" -f1 | cut -d "(" -f2 | xargs)
+    echo "$1 exists. Version: ${pluginInstalledVersion}"
+  else
+    echo "Missing $1. Exiting..."
+    exit 1
+fi
+}
+
 function testPluginExistence() {
   pluginName=${1##*/}
   pluginName=${pluginName%-*} # removed version
@@ -48,15 +59,9 @@ if [[ "$installedPluginsNum" -lt ${MINIMUM_AMOUNT_OF_PLUGINS} ]]; then
   exit 1
 fi
 
-# Test 2: verify output plugin existence
-if grep "output-guardium" ${LOGSTASH_PLUGIN_LIST_FILE}
-then
-    outputInstalledVersion=$(grep "output-guardium" ${LOGSTASH_PLUGIN_LIST_FILE} | cut -d ")" -f1 | cut -d "(" -f2 | xargs)
-    echo "Logstash output plugin to Guardium exists. Version: ${outputInstalledVersion}"
-else
-    echo "Missing Guardium output plugin for Universal Connector"
-    exit 1
-fi
+# Test 2: verify mandatory plugins existence
+testMandatoryPluginExistence "output-guardium"
+testMandatoryPluginExistence "input-cloudwatch_logs"
 
 # Test 3: check plugin existence and version in UC image
 grep -v '^#' defaultOfflinePackagePlugins.txt | while read -r line; do testPluginExistence "${line}"; done
