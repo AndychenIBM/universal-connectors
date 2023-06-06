@@ -3,6 +3,9 @@ BASE_DIR=$(pwd)
 
 function adjustToLogstash8() {
   sed -i 's/logstash-core-*.*.*.jar/logstash-core.jar/' build.gradle
+  sed -i '/ext { snakeYamlVersion.*/d' build.gradle
+  sed -i '/^buildscript.*/a ext { snakeYamlVersion = '$snakeYamlVersion' }' build.gradle
+
 }
 function buildUCPluginGem() {
   echo "================ Building $1 gem file================"
@@ -52,12 +55,15 @@ function buildRubyPlugin(){
 
 buildUCCommons
 
+snakeYamlVersion=$(grep -E "snakeYamlVersion =" /usr/share/logstashSRC/logstash/build.gradle | cut -d \' -f 2)
+echo "snakeYamlVersion is $snakeYamlVersion"
+
 # Build the rest of the plugins from pluginsToBuild.txt
 export UC_ETC=${BASE_DIR}/${UC_OPENSOURCE_ROOT_DIR}/filter-plugin/logstash-output-guardium/src/resources
 grep -v '^#' pluginsToBuild.txt | while read -r line; do buildUCPluginGem "$line" "test";done
 grep -v '^#' pluginsToBuildNotFromOpenSource.txt | while read -r line; do buildUCPluginGem "$line" "test"; done
 
 buildRubyPlugin logstash-input-cloudwatch-logs-master logstash-input-cloudwatch_logs.gemspec
-grep -v '^#' ${BASE_DIR}/rubyPluginsToBuild.txt | while read -r line; do buildRubyPlugin "${UC_OPENSOURCE_ROOT_DIR}/${line}" "${line##*/}.gemspec"; done
+#grep -v '^#' ${BASE_DIR}/rubyPluginsToBuild.txt | while read -r line; do buildRubyPlugin "${UC_OPENSOURCE_ROOT_DIR}/${line}" "${line##*/}.gemspec"; done
 
 exit 0

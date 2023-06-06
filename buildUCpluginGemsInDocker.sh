@@ -50,7 +50,7 @@ force_copy_if_exists pluginsToBuild.txt
 force_copy_if_exists defaultOfflinePackagePlugins.txt
 
 # Add ruby plugins to default offline packages list
-grep -v '^#' rubyPluginsToBuild.txt | while read -r line; do echo "$line/${line##*/}" >> defaultOfflinePackagePlugins.txt; done
+#grep -v '^#' rubyPluginsToBuild.txt | while read -r line; do echo "$line/${line##*/}" >> defaultOfflinePackagePlugins.txt; done
 
 verify_plugins_version
 
