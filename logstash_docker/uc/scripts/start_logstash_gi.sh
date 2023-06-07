@@ -32,6 +32,7 @@ if [[ -z "$logstash_pid" ]]; then
     echo "- pipeline.id: customer_pipeline" > ${UC_ETC}/pipelines.yml
     echo "  path.config: \"${GI_PIPELINE_DIR}\"" >> ${UC_ETC}/pipelines.yml
     echo "  queue.type: \${GUC_PERSISTENT_QUEUE_TYPE:memory}" >> ${UC_ETC}/pipelines.yml
+    echo "  pipeline.ecs_compatibility: disabled" >> ${UC_ETC}/pipelines.yml
 
     # Start logstash
     exec logstash -l ${LOG_GUC_DIR} 2>&1
