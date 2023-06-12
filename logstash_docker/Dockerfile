@@ -76,6 +76,7 @@ RUN curl https://artifacts.elastic.co/downloads/logstash/${LOGSTASH_VERSION}.tar
     --add-opens=java.base/java.util.regex=ALL-UNNAMED \
     --add-opens=java.base/java.net=ALL-UNNAMED \
     --add-opens=java.base/java.io=ALL-UNNAMED \
+    --add-opens=java.base/java.nio=ALL-UNNAMED \
     --add-opens=java.base/java.lang=ALL-UNNAMED \
     --add-opens=java.base/javax.crypto=ALL-UNNAMED \
     --add-opens=java.management/sun.management=ALL-UNNAMED \
