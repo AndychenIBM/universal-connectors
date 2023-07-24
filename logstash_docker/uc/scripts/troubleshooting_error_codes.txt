@@ -1,8 +1,10 @@
 # Lines format:
 # ERROR_PATTERN;ERROR_CODE;ERROR_MESSAGE
-InvalidURIError: bad URI;1;"InvalidURIError. Please verify credentials correctness and network access"
-ERROR GuardConnection;2;"Connection to Guardium Sniffer is down. Please verify Sniffer is up"
-Your free trial has ended;3;"Database free trial has ended"
-Check your AWS Secret Access Key and signing method.;4;"Check your AWS Secret Access Key and signing method."
-The specified log group does not exist.;5;"The specified log group does not exist."
-HTTPServerException;6;"AWS domain not added in allowed domain list"
+InvalidURIError: bad URI;1;InvalidURIError. Please verify credentials correctness and network access.
+ERROR GuardConnection;2;The connection to Guardium Sniffer is down. Please verify Sniffer is up.
+Your free trial has ended;3;The database free trial has ended.
+Check your AWS Secret Access Key and signing method.;4;Check your AWS Secret Access Key and signing method.
+The specified log group does not exist.;5;The specified log group does not exist.
+HTTPServerException;6;AWS domain not added in allowed domain list.
+The security token included in the request is invalid.;7;Check your AWS Secret Access Key and signing method.
+ERROR: file oracle_unified_audit_oci.cc;8;The rpm file is not uploaded or uploaded before the oua zip, make sure to first upload rpm and then upload the relevant oua zip.
