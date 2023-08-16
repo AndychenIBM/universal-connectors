@@ -29,7 +29,7 @@ public class GuardSecuredConnection extends GuardAbstractConnection {
     public GuardSecuredConnection(String remoteAddress, int port) throws Exception {
         this.conn = new GuardNonSecuredConnection(remoteAddress, port);
         log.debug("GuardSecuredConnection with remoteAddress:" + remoteAddress + " port:" + port);
-        SSLContext context = SSLContext.getInstance("TLSv1.2");
+        SSLContext context = SSLContext.getInstance("TLSv1.3");
         TrustManagerFactory tmf =  InsightsTrustManager.getInstance();;
         if(tmf == null) {
             throw new CertificateException("failed to create trust manager for Certificate");
