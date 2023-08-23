@@ -38,6 +38,9 @@ ENV UC_ETC=${LOGSTASH_DIR}/config/ \
     THIRD_PARTY_PATH=${LOGSTASH_DIR}/third_party \
     OUA_BINARY_PATH=${LOGSTASH_DIR}/customer/binaries/oracle_unified_audit_oci_standalone
 
+ENV TROUBLESHOOT_OUTPUT=${UC_SCRIPTS}/troubleshooting_output.txt \
+    TROUBLESHOOTING="OK"
+
 COPY uc/. /uc/.
 COPY health/liveness.sh health/readiness.sh /usr/bin/
 

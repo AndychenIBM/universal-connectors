@@ -8,3 +8,7 @@ The specified log group does not exist.;5;The specified log group does not exist
 HTTPServerException;6;AWS domain not added in allowed domain list.
 The security token included in the request is invalid.;7;Check your AWS Secret Access Key and signing method.
 ERROR: file oracle_unified_audit_oci.cc;8;The rpm file is not uploaded or uploaded before the oua zip, make sure to first upload rpm and then upload the relevant oua zip.
+Aws::STS::Errors::AccessDenied;9;Please verify that you all role arn configuration steps in documentation have been done.
+ArgumentError: missing required parameter params;10;One of required parameters is missing.
+No configuration found in the configured sources;11;No configuration found
+

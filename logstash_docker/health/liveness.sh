@@ -14,10 +14,5 @@
 # deposited with the U.S. Copyright Office.
 #
 # **************************************************************
-
-logstash_pid=$(/usr/share/logstash/scripts/get_logstash_pid.sh)
-if [[ -z "$logstash_pid" ]]; then
-  exit 1
-else
-  exit 0
-fi
+# send errors to universal connector manager service
+${UC_SCRIPTS}/send_errors_to_kafka.sh

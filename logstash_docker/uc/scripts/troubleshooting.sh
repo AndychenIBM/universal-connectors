@@ -44,6 +44,10 @@ if [ $LAST_OCCURRENCE_LINE -ne 0 ]; then
 
 fi
 
+# remove sniffer error in case of GI - it's internal and should not be handled by ucm
+if [ "$GI_MODE" = "true" ]; then
+  sed -i "/ERROR GuardConnection;2;The connection to Guardium Sniffer is down. Please verify Sniffer is up./d" "$UC_SCRIPTS/troubleshooting_error_codes.txt"
+fi
 
 # Connection errors
 
@@ -58,7 +62,7 @@ done < "${UC_SCRIPTS}/troubleshooting_error_codes.txt"
 
 # Check the flag after the loop and print the appropriate message
 if ! $found_errors; then
-  echo "No errors found in the logs."
+  echo "OK"
 fi
 
 # Log messages with timestamps
