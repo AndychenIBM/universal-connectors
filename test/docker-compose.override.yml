@@ -14,13 +14,14 @@
 #
 # **************************************************************
 
-universal-connector-manager:
-  image: universal-connector:latest
-  ports:
-    - 44444:44444
-  environment:
-    - AUDIT_ENDPOINT=audit:33810
-    - CONFIGURATION_ENDPOINT=configuration:56623
-    - DEPLOYED_PORT=44444
-    - CONTROLLER_TEST_ENVIRONMENT=true
-    - GO_ENV=development
+services: 
+  universal-connector-manager:
+    image: universal-connector:latest
+    ports:
+      - 44444:44444
+    environment:
+      - AUDIT_ENDPOINT=audit:33810
+      - CONFIGURATION_ENDPOINT=configuration:56623
+      - DEPLOYED_PORT=44444
+      - CONTROLLER_TEST_ENVIRONMENT=true
+      - GO_ENV=development

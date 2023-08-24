@@ -19,8 +19,12 @@ env:
     - NAME=universal-connector LOGSTASH_VERSION_TAG=v8.9.0
 
 before_install:
-    - printf "machine github.ibm.com\n  login $GITHUB_TOKEN\n" > ~/.netrc
+    - printf "machine github.ibm.com\n login $GITHUB_TOKEN\n" > ~/.netrc
     - git config --global url."git@github.ibm.com:".insteadOf "https://github.ibm.com/"
+    - mkdir -p /home/travis/.docker/cli-plugins/
+    - curl -SL https://github.com/docker/compose/releases/download/v2.18.1/docker-compose-linux-x86_64 -o ~/.docker/cli-plugins/docker-compose
+    - chmod +x ~/.docker/cli-plugins/docker-compose
+    - docker compose version
 
 install:
     # Give execute permission to scripts
