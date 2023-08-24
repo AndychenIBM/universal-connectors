@@ -15,6 +15,10 @@
 #
 # **************************************************************
 
+# This script runs search for errors in the logs and if it finds an unrecoverable error it sends it to uc manager via kafka.
+# In case that logstash crashed it only prepares the new configuration pipeline and *does not* starting logstash again - starting logstash again is out of this scope.
+
+echo "start send_errors_to_kafka"
 logstash_pid=$(${UC_SCRIPTS}/get_logstash_pid.sh)
 
 IS_FAILED=${1:-false}
@@ -26,19 +30,16 @@ else
     output_file="${UC_SCRIPTS}/troubleshooting_output.txt"
 fi
 
-if [[ $IS_FAILED = "true" ]]; then
-  echo "Internal error" > $output_file
-else
-  # check that logstash log exists
-  if [[ ! -f "${LOG_GUC_DIR}uc-logstash.log" ]]; then
-    echo "${LOG_GUC_DIR}uc-logstash.log doesn't exist."
-    exit 0
-  fi
-  # run troubleshooting
-  ${UC_SCRIPTS}/troubleshooting.sh ${LOG_GUC_DIR}uc-logstash.log > $output_file
+# check that uc log exists
+if [[ ! -f "${LOG_GUC_DIR}uc-logstash.log" ]]; then
+  echo "${LOG_GUC_DIR}uc-logstash.log doesn't exist."
+  exit 0
 fi
+# run troubleshooting on uc-logstash.log
+${UC_SCRIPTS}/troubleshooting.sh ${LOG_GUC_DIR}uc-logstash.log $IS_FAILED > $output_file
 
 result=$(cat $output_file)
+echo "TROUBLESHOOTING script result: $result"
 
 # if there are errors then remove original configuration, replace it with new configuration for sending errors to ucm
 if [[  -n "$result" && "$result" != "OK" ]]; then
@@ -48,7 +49,9 @@ if [[  -n "$result" && "$result" != "OK" ]]; then
   echo "$result" > "${LOG_GUC_DIR}troubleshooting_output.txt"
   mv "${LOGSTASH_DIR}/pipeline/troubleshooting.conf" "${UC_ETC}/pipeline"
   echo "Starting new logstash pipeline for sending the error to kafka topic: 'data_flow'"
-  ${UC_SCRIPTS}/reload_logstash_conf.sh
+  if [[ $IS_FAILED = "false" ]]; then
+    ${UC_SCRIPTS}/reload_logstash_conf.sh
+  fi
 fi
 
 exit 0

@@ -51,16 +51,21 @@ if [[ -z "$logstash_pid" ]]; then
 
     # If no errors in initialization then start logstash
     if [[ -z "$TROUBLESHOOTING" ||  "$TROUBLESHOOTING" = "OK" ]]; then
-      logstash -l ${LOG_GUC_DIR} 2>&1 | tee
+      logstash -l ${LOG_GUC_DIR} 2>&1
       logstash_exit_code=$?
       echo "logstash exit code: $logstash_exit_code"
 
+      output_file=${LOG_GUC_DIR}troubleshooting_output.txt
       # Check the exit code and continue with the next line if needed
-      if [ "$logstash_exit_code" -ne 0 ]; then
-          # send errors to universal connector manager service, logstash has failed = true
-          ${UC_SCRIPTS}/send_errors_to_kafka.sh true
+      if [[ -e "$output_file" && -s "$output_file" ]]; then
+         echo "Universal connector ${INPUT_PLUGIN_ID} of tenant ${TENANT_ID} failed because of an error: $(cat $output_file)"
       else
-          echo "Universal connector ${INPUT_PLUGIN_ID} of tenant ${TENANT_ID} failed because of an error: $(cat ${LOG_GUC_DIR}troubleshooting_output.txt)"
+         # run troubleshooting and prepare new pipeline to send to ucm the error, logstash has failed = true
+         ${UC_SCRIPTS}/send_errors_to_kafka.sh true
+         echo "Universal connector ${INPUT_PLUGIN_ID} of tenant ${TENANT_ID} failed because of an error: $(cat $output_file)"
+         echo "Starting new logstash pipeline to send ucm the error message"
+         # start logstash again to send ucm the error message
+         logstash -l ${LOG_GUC_DIR} 2>&1
       fi
     fi
 

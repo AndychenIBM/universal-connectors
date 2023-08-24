@@ -3,6 +3,7 @@
 TROUBLESHOOTING_IS_GENERATED_MESSAGE="Troubleshooting script is generated"
 DEFAULT_ERR_LOG=${LOG_GUC_DIR}logstash_stdout_stderr.log
 ERR_LOG=${1:-$DEFAULT_ERR_LOG}
+LOGSTASH_FAILED=${2:-false}
 MAX_ERROR_LOGS_AMOUNT=1000
 LAST_OCCURRENCE_LINE=0
 
@@ -17,7 +18,7 @@ function returnKnownErrorCodes(){
 
 # Check if Logstash is up
 logstash_pid=$("${UC_SCRIPTS}"/get_logstash_pid.sh)
-if [[ -z "$logstash_pid" ]]; then
+if [[ $LOGSTASH_FAILED = "false"  && -z "$logstash_pid" ]]; then
   echo "logstash is down"
 fi
 

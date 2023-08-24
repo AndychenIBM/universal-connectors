@@ -15,4 +15,11 @@
 #
 # **************************************************************
 # send errors to universal connector manager service
+
+# if there is a troubleshooting output then the error is already being handled - no need to add.
+output_file="${UC_SCRIPTS}/troubleshooting_output.txt"
+if [[ -e "$output_file" && -s "$output_file" && $(cat "$output_file") != "OK" ]]; then
+    exit 0
+fi
+
 ${UC_SCRIPTS}/send_errors_to_kafka.sh
