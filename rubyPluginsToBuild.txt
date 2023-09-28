@@ -1,2 +1,0 @@
-filter-plugin/logstash-filter-pubsub-mysql-guardium
-filter-plugin/logstash-filter-pubsub-postgresql-guardium

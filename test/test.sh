@@ -3,38 +3,14 @@
 UC_IMAGE_NAME="universal-connector"
 UC_CONTAINER_NAME="Klaus"
 LOGSTASH_PLUGIN_LIST_FILE=logstash-plugin-list.txt
-MINIMUM_AMOUNT_OF_PLUGINS=15
-
-UC_PLUGIN_REPO_BRANCH=main
-UC_OPENSOURCE_ROOT_DIR=universal-connectors-${UC_PLUGIN_REPO_BRANCH}
+MINIMUM_AMOUNT_OF_PLUGINS=20
 
 function testMandatoryPluginExistence(){
-  if grep $1 ${LOGSTASH_PLUGIN_LIST_FILE}
+  if ! grep $1 ${LOGSTASH_PLUGIN_LIST_FILE}
   then
-    pluginInstalledVersion=$(grep "$1" ${LOGSTASH_PLUGIN_LIST_FILE} | cut -d ")" -f1 | cut -d "(" -f2 | xargs)
-    echo "$1 exists. Version: ${pluginInstalledVersion}"
-  else
     echo "Missing $1. Exiting..."
     exit 1
 fi
-}
-
-function testPluginExistence() {
-  pluginName=${1##*/}
-  pluginName=${pluginName%-*} # removed version
-
-  installedVersion=$(grep "${pluginName}" ${LOGSTASH_PLUGIN_LIST_FILE} | cut -d ")" -f1 | cut -d "(" -f2 | xargs)
-
-  parentDir="$(dirname "${UC_OPENSOURCE_ROOT_DIR}/$1")"
-  expectedVersion=$(cat ${parentDir}/VERSION | xargs)
-
-  if [ "$expectedVersion" = "$installedVersion" ]; then
-    echo "Plugin $pluginName exists in UC image. Version installed: $expectedVersion"
-  elif [ -z "$installedVersion" ]; then
-    echo "Warning: Plugin ${pluginName} is not installed in UC image"
-  else
-    echo "Warning: installed version of plugin $pluginName is $installedVersion and the version stated in Github ${parentDir}/VERSION file is $expectedVersion"
-  fi
 }
 
 # Check image status
@@ -63,10 +39,8 @@ fi
 testMandatoryPluginExistence "output-guardium"
 testMandatoryPluginExistence "input-cloudwatch_logs"
 
-# Test 3: check plugin existence and version in UC image
-grep -v '^#' defaultOfflinePackagePlugins.txt | while read -r line; do testPluginExistence "${line}"; done
-
-
-
+# End test with a list of installed plugins
+echo "Plugins installed:"
+cat ${LOGSTASH_PLUGIN_LIST_FILE}
 
 rm -rf ${LOGSTASH_PLUGIN_LIST_FILE}

@@ -24,14 +24,16 @@ ENV ETC=/etc \
 
     JAVA_HOME="/usr/share/logstash/jdk" \
     PATH="${JAVA_HOME}/bin:${PATH}" \
-	LOGSTASH_VERSION=logstash-oss-8.9.2-linux-x86_64 \
+	LOGSTASH_VERSION=logstash-oss-8.10.2-linux-x86_64 \
     LOGSTASH_DIR=/usr/share/logstash \
     LOG_DIR=/var/log/ \
     LOG_GUC_DIR=/var/log/uc/ \
     CERTS_PATH=/service/certs/ \
     SSL_DIR=/service/certs/universalconnector/ \
     CLIENT_CERTS_PATH=/service/certs/client/ \
-    RPM_DIR=/var/lib/rpm
+    RPM_DIR=/var/lib/rpm \
+    UC_OPENSOURCE_TAG=v1.5.0 \
+    UC_OPENSOURCE_OFFLINE_PACKAGE=uc_gi_offline_package.zip
 
 ENV UC_ETC=${LOGSTASH_DIR}/config/ \
     UC_SCRIPTS=${LOGSTASH_DIR}/scripts/ \
@@ -84,7 +86,10 @@ RUN curl https://artifacts.elastic.co/downloads/logstash/${LOGSTASH_VERSION}.tar
     --add-opens=java.base/javax.crypto=ALL-UNNAMED \
     --add-opens=java.management/sun.management=ALL-UNNAMED \
     --add-exports=java.base/sun.net.util=ALL-UNNAMED" >>${UC_ETC}/jvm.options && \
-# Install plugins
+# Install plugins from opensource repo
+    curl -L https://github.com/IBM/universal-connectors/releases/download/${UC_OPENSOURCE_TAG}/${UC_OPENSOURCE_OFFLINE_PACKAGE} -o ${UC_ETC}/${UC_OPENSOURCE_OFFLINE_PACKAGE} && \
+    ${LOGSTASH_DIR}/bin/logstash-plugin install file:///${UC_ETC}/${UC_OPENSOURCE_OFFLINE_PACKAGE} && \
+# Install internal plugins
     ${LOGSTASH_DIR}/bin/logstash-plugin install file:///${UC_ETC}/guardium_logstash-offline-plugins.zip && \
     ${LOGSTASH_DIR}/bin/logstash-plugin install file:///${UC_ETC}/logstash-filter-json_encode-3.0.3-java.zip && \
 # Make sure user can read,write and execute the scripts
