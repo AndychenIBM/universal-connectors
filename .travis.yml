@@ -16,7 +16,7 @@ services:
     - docker
 
 env:
-    - NAME=universal-connector LOGSTASH_VERSION_TAG=v8.10.3
+    - NAME=universal-connector LOGSTASH_VERSION_TAG=v8.10.4
 
 before_install:
     - printf "machine github.ibm.com\n login $GITHUB_TOKEN\n" > ~/.netrc
