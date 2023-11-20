@@ -1,32 +1,33 @@
 # Lines format:
 # ERROR_PATTERN;ERROR_CODE;ERROR_MESSAGE
-InvalidURIError: bad URI;1;InvalidURIError. Please verify credentials correctness and network access.
-ERROR GuardConnection;2;The connection to Guardium Sniffer is down. Please verify Sniffer is up.
-Your free trial has ended;3;The database free trial has ended.
-Check your AWS Secret Access Key and signing method.;4;Check your AWS Secret Access Key and signing method.
-The specified log group does not exist.;5;The specified log group does not exist.
-HTTPServerException;6;AWS domain not added in allowed domain list.
-The security token included in the request is invalid.;7;Check your AWS Secret Access Key and signing method.
-ERROR: file oracle_unified_audit_oci.cc;8;The rpm file is not uploaded or uploaded before the oua zip, make sure to first upload rpm and then upload the relevant oua zip.
-No configuration found in the configured sources;11;No configuration found
+InvalidURIError: bad URI;InvalidURIError. Please verify credentials correctness and network access.
+ERROR GuardConnection;The connection to Guardium Sniffer is down. Please verify Sniffer is up.
+Your free trial has ended;The database free trial has ended.
+Check your AWS Secret Access Key and signing method.;Check your AWS Secret Access Key and signing method.
+The specified log group does not exist.;The specified log group does not exist.
+HTTPServerException;AWS domain not added in allowed domain list.
+The security token included in the request is invalid.;Check your AWS Secret Access Key and signing method.
+ERROR: file oracle_unified_audit_oci.cc;The rpm file is not uploaded. Make sure to first upload rpm.
+The given configuration is invalid.;Something is wrong with your configuration.
+No configuration found in the configured sources;No configuration found
+ERROR;An error is found in the logs.
 # Errors that cause exception in logstash - system exit 0
-SQLServerException: The TCP/IP connection;12;Connection timed out. Verify the connection properties. Make sure that an instance of SQL Server is running on the host and accepting TCP/IP connections at the port. Make sure that TCP connections to the port are not blocked by a firewall.
-is not defined in a Logstash secret store or as an Environment entry and there is no default value given.;13;One of the fields is not defined in secret store or as an Environment entry.
-The given configuration is invalid. Reason: Unable to configure plugins: com.google.gson.JsonSyntaxException: com.google.gson.stream.MalformedJsonException:;14;Internal error: json syntax error.
-IOException: Error reading credentials from stream;15;Could not read credentials from stream.
-Aws::STS::Errors::AccessDenied;9;Please verify that you all role arn configuration steps in documentation have been done.
-ArgumentError: missing required;10;One of required parameters is missing.
-(PluginLoadingError) Couldn't find any;17;Internal error: plugin loading error.
-configuration is invalid. Reason: Expected one of;18;Internal error: invalid syntax.
-UNAUTHENTICATED: Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential.;19;Invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential.
-(DataSourceNotFound) No source of timezone data could be found.;20;Internal error: No source of timezone data could be found.
-you might need to reinstall the gem which depends on the missing jar or in case there is Jars.lock then resolve the jars with `lock_jars` command;21;Internal error: missing jar.
-Invalid setting;22;ConfigurationError: One of the fields values is wrong.
-Aws::CloudWatchLogs::Errors::AccessDeniedException;23;AWS credentials do not have the required permissions to perform a certain CloudWatch Logs operation.
-IllegalEntityException;24;Internal error: IllegalEntityException
-SnowflakeSQLException: SQL compilation error;25;SnowflakeSQLException: SQL compilation error
-Aws::CloudWatchLogs::Errors::InvalidSignatureException;26;Invalid signature error
-Logstash could not be started because there is already another instance using the configured data directory;27;Internal error: logstash already running.
-Errno::EACCES, :message=>"Permission denied;28;Internal error: Permission denied.
-ArgumentError: Path;29;Internal error: path doesn't exist or is not writable.
-
+SQLServerException: The TCP/IP connection;Connection timed out. Verify the connection properties. Make sure that an instance of SQL Server is running on the host and accepting TCP/IP connections at the port. Make sure that TCP connections to the port are not blocked by a firewall.
+is not defined in a Logstash secret store or as an Environment entry and there is no default value given.;One of the fields is not defined in secret store or as an Environment entry.
+The given configuration is invalid. Reason: Unable to configure plugins: com.google.gson.JsonSyntaxException: com.google.gson.stream.MalformedJsonException:;Internal error: json syntax error.
+IOException: Error reading credentials from stream;Could not read credentials from stream.
+Aws::STS::Errors::AccessDenied;Please verify that you all role arn configuration steps in documentation have been done.
+ArgumentError: missing required;One of required parameters is missing.
+(PluginLoadingError) Couldn't find any;Internal error: plugin loading error.
+configuration is invalid. Reason: Expected one of;Internal error: invalid syntax.
+UNAUTHENTICATED: Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential.;Invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential.
+(DataSourceNotFound) No source of timezone data could be found.;Internal error: No source of timezone data could be found.
+you might need to reinstall the gem which depends on the missing jar or in case there is Jars.lock then resolve the jars with `lock_jars` command;Internal error: missing jar.
+Invalid setting;ConfigurationError: One of the fields values is wrong.
+Aws::CloudWatchLogs::Errors::AccessDeniedException;AWS credentials do not have the required permissions to perform a certain CloudWatch Logs operation.
+IllegalEntityException;Internal error: IllegalEntityException
+SnowflakeSQLException: SQL compilation error;SnowflakeSQLException: SQL compilation error
+Aws::CloudWatchLogs::Errors::InvalidSignatureException;Invalid signature error
+Logstash could not be started because there is already another instance using the configured data directory;Internal error: logstash already running.
+Errno::EACCES, :message=>"Permission denied;Internal error: Permission denied.
+ArgumentError: Path;Internal error: path doesn't exist or is not writable.
