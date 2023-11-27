@@ -24,7 +24,7 @@ ENV ETC=/etc \
 
     JAVA_HOME="/usr/share/logstash/jdk" \
     PATH="${JAVA_HOME}/bin:${PATH}" \
-	LOGSTASH_VERSION=logstash-oss-8.10.4-linux-x86_64 \
+	LOGSTASH_VERSION=logstash-oss-8.11.1-linux-x86_64 \
     LOGSTASH_DIR=/usr/share/logstash \
     LOG_DIR=/var/log/ \
     LOG_GUC_DIR=/var/log/uc/ \
