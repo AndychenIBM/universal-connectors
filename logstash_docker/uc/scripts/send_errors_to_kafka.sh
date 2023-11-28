@@ -30,6 +30,11 @@ else
     output_file="${UC_SCRIPTS}/troubleshooting_output.txt"
 fi
 
+# Create the output file if it doesn't exist
+if [[ ! -e "$output_file" ]]; then
+    touch "$output_file"
+fi
+
 # check that uc log exists
 if [[ ! -f "${LOG_GUC_DIR}uc-logstash.log" ]]; then
   echo "${LOG_GUC_DIR}uc-logstash.log doesn't exist."

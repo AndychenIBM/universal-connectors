@@ -10,7 +10,6 @@ The security token included in the request is invalid.;Check your AWS Secret Acc
 ERROR: file oracle_unified_audit_oci.cc;The rpm file is not uploaded. Make sure to first upload rpm.
 The given configuration is invalid.;Something is wrong with your configuration.
 No configuration found in the configured sources;No configuration found
-ERROR;An error is found in the logs.
 # Errors that cause exception in logstash - system exit 0
 SQLServerException: The TCP/IP connection;Connection timed out. Verify the connection properties. Make sure that an instance of SQL Server is running on the host and accepting TCP/IP connections at the port. Make sure that TCP connections to the port are not blocked by a firewall.
 is not defined in a Logstash secret store or as an Environment entry and there is no default value given.;One of the fields is not defined in secret store or as an Environment entry.
