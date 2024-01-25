@@ -6,7 +6,7 @@
 #                                                                   */
 # 5737-L66                                                          */
 #                                                                   */
-# Copyright IBM Corp. 2019, 2023                                    */
+# Copyright IBM Corp. 2019, 2024                                    */
 #                                                                   */
 # The source code for this program is not published or otherwise    */
 # divested of its trade secrets, irrespective of what has been      */
@@ -15,10 +15,10 @@
 # ***************************************************************** */
 
 # docker image version
-ARG rhel_image_version=8.8-1072.1697626218
+ARG rhel_ubi_minimal_image_version=8.9-1108
 
 # Pull the UBI 8 docker base image based on provided version or default
-FROM registry.access.redhat.com/ubi8/ubi-minimal:${rhel_image_version}
+FROM registry.access.redhat.com/ubi8/ubi-minimal:${rhel_ubi_minimal_image_version}
 
 ENV ETC=/etc \
 

@@ -6,7 +6,7 @@
 #                                                                   */
 # 5737-L66                                                          */
 #                                                                   */
-# Copyright IBM Corp. 2019, 2023                                    */
+# Copyright IBM Corp. 2019, 2024                                    */
 #                                                                   */
 # The source code for this program is not published or otherwise    */
 # divested of its trade secrets, irrespective of what has been      */
@@ -15,10 +15,10 @@
 # ***************************************************************** */
 
 # docker image version
-ARG ibm_semeru_runtimes_ubi_minimal_image_jdk_version=open-11.0.20.1_1-jdk-focal_ubi-minimal-8.9-1029
+ARG ibm_semeru_runtime_open_jdk_image_version=11.0.21
 
-# Pull the UBI 8 docker base image based on provided version or default new repo
-FROM docker-na-public.artifactory.swg-devops.com/sec-guardium-next-gen-docker-local/ibm-semeru-runtimes-ubi-minimal:${ibm_semeru_runtimes_ubi_minimal_image_jdk_version}
+# Pull the UBI 11 docker base image based on provided version or default
+FROM docker-na-public.artifactory.swg-devops.com/sec-guardium-next-gen-docker-local/ibm/ibm-semeru-runtime-open-jdk-11-ubi-minimal:${ibm_semeru_runtime_open_jdk_image_version}
 
 ENV ETC=/etc \
     LOGSTASH_VERSION=logstash-oss-8.12.0-linux-x86_64 \
