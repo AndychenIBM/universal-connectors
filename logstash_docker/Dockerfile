@@ -102,7 +102,7 @@ RUN curl https://artifacts.elastic.co/downloads/logstash/${LOGSTASH_VERSION}.tar
     cd ${UC_ETC} && rm -f *.gem *.zip && \
 # Remove unnecessary heavy plugins
     cd ${LOGSTASH_DIR}/vendor/bundle/jruby/*.*.*/gems && \
-    rm -rf logstash-filter-geoip-* logstash-input-snmp-* logstash-input-http-* nokogiri-* \
+    rm -rf logstash-filter-geoip-* logstash-input-snmp-* logstash-input-http-* \
     backports-* snappy-* mail-* logstash-filter-jdbc_static-* snmp-* logstash-filter-useragent-* \
     logstash-output-elasticsearch-* logstash-output-s3-* logstash-output-cloudwatch-* logstash-output-http-* logstash-output-webhdfs-* && \
 # Clear cache
