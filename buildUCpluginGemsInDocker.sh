@@ -1,6 +1,6 @@
 #!/bin/bash
 
-UC_PLUGIN_REPO_BRANCH=release-v1.5.1
+UC_PLUGIN_REPO_BRANCH=release-v1.5.2
 UC_OPENSOURCE_ROOT_DIR=universal-connectors-${UC_PLUGIN_REPO_BRANCH}
 
 chmod -R 777 *
