@@ -3,7 +3,12 @@ source ${UC_SCRIPTS}/utils.sh
 source ${UC_SCRIPTS}/set_uc_log_level.sh
 source ${UC_SCRIPTS}/create_keystore.sh
 
-java -jar setup/uc-bootstrap.jar
+# Check if BOOTSTRAP_PATH is set
+if [[ -z "$BOOTSTRAP_PATH" ]]; then
+    BOOTSTRAP_PATH="setup/uc-bootstrap.jar"
+fi
+
+java -jar $BOOTSTRAP_PATH
 exit_code=$?
 
 if [[ $exit_code -eq 0 ]]; then

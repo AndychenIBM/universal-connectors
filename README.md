@@ -54,3 +54,24 @@ To run end to end tests, you'll need to startup the containers of this project, 
 ```bash
 $ make test_e2e
 ```
+
+### To test new uc-bootstrap
+If you developed new uc-bootstrap and want to test it please do the following: 
+
+Connect to Guardium Insights cli with oc login command
+
+run
+```bash
+$ oc get pods | grep universal-connector
+$ oc debug <universal-connector-pod-name-from-response>
+```
+There will be created a new pod with the same configuration for debug purposes, and it will terminate once you exit it.
+
+Inside this pod you can run the script that downloads new uc-bootstrap from artifactory and runs it. 
+
+arguments must include artifactory name and artifactory token
+
+optional arguments: version of uc bootstrap to download, -o means overwrite current bootstrap, id of the UC Connection that you want to get the setup for.
+```bash
+./scripts/get_custom_bootstrap.sh -u <uname> -token <pass> -v <version> -id <connection> -o 
+```

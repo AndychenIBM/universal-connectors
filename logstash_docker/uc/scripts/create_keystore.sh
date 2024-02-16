@@ -90,6 +90,12 @@ if [ ! -f ${INSIGHT_KEYSTORE} ]; then
     if [ ! -z "$REDIS_TLS_ENABLED" ]; then
         keytool -import -noprompt -keystore "${INSIGHT_KEYSTORE}" -file "$REDIS_TLS_CERT_CA" --trustcacerts -storepass "${keystore_pwd}" -alias "insights-redis-ca"
     fi
+
+    # add object storage cert to default Java keystore
+    if [ ! -z "$AWS_CA_BUNDLE" ] && [ $OBJECT_STORAGE_REGION == "noobaa" ]; then
+        keytool -import -noprompt -keystore "${INSIGHT_KEYSTORE}" -file "$AWS_CA_BUNDLE" --trustcacerts -storepass "${keystore_pwd}" -alias "insights-aws-ca"
+        echo "added ${AWS_CA_BUNDLE} to ${INSIGHT_KEYSTORE}"
+    fi
 fi
 
 export JAVA_KEYSTORE_PASSWORD=${keystore_pwd}
