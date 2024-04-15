@@ -21,8 +21,8 @@ ARG ibm_semeru_runtime_open_jdk_image_version=11.0.21
 FROM docker-na-public.artifactory.swg-devops.com/sec-guardium-next-gen-docker-local/ibm/ibm-semeru-runtime-open-jdk-11-ubi-minimal:${ibm_semeru_runtime_open_jdk_image_version}
 
 ENV ETC=/etc \
-    LOGSTASH_VERSION=logstash-oss-8.12.2-linux-x86_64 \
-    LOGSTASH_GIT_TAG=v8.12.2 \
+    LOGSTASH_VERSION=logstash-oss-8.13.2-linux-x86_64 \
+    LOGSTASH_GIT_TAG=v8.13.2 \
     JRUBY_VERSION=9.4.5.0 \
     LOGSTASH_DIR=/usr/share/logstash \
     LOGSTASH_SRC_DIR=/usr/share/logstashSRC \
