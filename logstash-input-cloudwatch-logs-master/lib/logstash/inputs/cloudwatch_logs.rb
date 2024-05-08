@@ -59,7 +59,7 @@ class LogStash::Inputs::CloudWatch_Logs < LogStash::Inputs::Base
   # srole arn
   config :role_arn, :default => nil
     # role session name.
-  config :role_session_name, :default => nil
+  config :role_session_name, :default => 'logstash'
   # def register
   public
   def register
@@ -71,10 +71,8 @@ class LogStash::Inputs::CloudWatch_Logs < LogStash::Inputs::Base
     check_start_position_validity
     options = aws_options_hash
     if role_arn != nil
-      sts = Aws::STS::Client.new(aws_options_hash)
-      session = @role_session_name || "session"
-      role_credentials = Aws::AssumeRoleCredentials.new(client: sts, role_arn: @role_arn, role_session_name: session)
-      @cloudwatch = Aws::CloudWatchLogs::Client.new(credentials: role_credentials, region: aws_options_hash[:region])
+      # aws_options_hash already assumes role thus creates credentials for the role arn and also sets the region
+      @cloudwatch = Aws::CloudWatchLogs::Client.new(options)
     else
       Aws::ConfigService::Client.new(options)
       @cloudwatch = Aws::CloudWatchLogs::Client.new(options)
