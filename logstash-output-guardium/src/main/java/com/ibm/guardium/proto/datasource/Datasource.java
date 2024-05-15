@@ -2715,6 +2715,10 @@ public final class Datasource {
        * <code>SNOWFLAKE = 1096;</code>
        */
       SNOWFLAKE(33, 1096),
+      /**
+       * <code>EL_SEARCH = 504;</code>
+       */
+      EL_SEARCH(34, 504),
       ;
 
       /**
@@ -2853,6 +2857,10 @@ public final class Datasource {
        * <code>SNOWFLAKE = 1096;</code>
        */
       public static final int SNOWFLAKE_VALUE = 1096;
+      /**
+       * <code>EL_SEARCH = 504;</code>
+       */
+      public static final int EL_SEARCH_VALUE = 504;
 
 
       public final int getNumber() { return value; }

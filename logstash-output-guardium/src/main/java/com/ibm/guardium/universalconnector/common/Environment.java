@@ -31,6 +31,8 @@ public class Environment {
     public static final String INSIGHT_KEYSTORE_PATH = getEnvOrDefault("INSIGHT_KEYSTORE_PATH",
             "/service/certs/universalconnector/insights.jks");
 
+    public static final String UC_TLS_VERSION = getEnvOrDefault("UC_TLS_VERSION", "TLSv1.2");
+
     public static final String UNIVERSAL_CONNECTOR_KEYSTORE_PASSWORD = getEnvOrDefault("UNIVERSAL_CONNECTOR_KEYSTORE_PASSWORD", "");
 
     //cipher

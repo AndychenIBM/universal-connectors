@@ -1,6 +1,7 @@
 package com.ibm.guardium.universalconnector.transmitter.socket;
 
 import com.ibm.guardium.universalconnector.common.InsightsTrustManager;
+import com.ibm.guardium.universalconnector.common.Environment;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import javax.net.ssl.*;
@@ -29,7 +30,7 @@ public class GuardSecuredConnection extends GuardAbstractConnection {
     public GuardSecuredConnection(String remoteAddress, int port) throws Exception {
         this.conn = new GuardNonSecuredConnection(remoteAddress, port);
         log.debug("GuardSecuredConnection with remoteAddress:" + remoteAddress + " port:" + port);
-        SSLContext context = SSLContext.getInstance("TLSv1.3");
+        SSLContext context = SSLContext.getInstance(Environment.UC_TLS_VERSION);
         TrustManagerFactory tmf =  InsightsTrustManager.getInstance();;
         if(tmf == null) {
             throw new CertificateException("failed to create trust manager for Certificate");

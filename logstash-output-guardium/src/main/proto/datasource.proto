@@ -104,6 +104,7 @@ message Application_data {
         REDIS        = 0x000001d8 ;
         COCKROACH    = 0x00000438 ;
         SNOWFLAKE    = 0x00000448 ;
+        EL_SEARCH    = 0x000001f8 ;
     }
 
     enum Datasource_type {

@@ -152,7 +152,7 @@ public class JsonRecordTransformer implements RecordTransformer {
 
         //Add Optional fields
         if (accessor!=null) {
-            trimAndSet(exceptionMsg::setDBPROTOCOL, accessor::getServerType);
+            trimAndSet(exceptionMsg::setDBPROTOCOL, accessor::getDbProtocol);
             trimAndSet(exceptionMsg::setDBUSER, accessor::getDbUser);
         }
         trimAndSetIfNotEmpty(exceptionMsg::setDESCRIPTION, recordException::getDescription); // description is optionals, other fields are not
@@ -421,15 +421,8 @@ public class JsonRecordTransformer implements RecordTransformer {
             builder.setApplicationUser(record.getAppUserName());
         }
 
-        Data rd = record.getData();
-        if(rd != null) {
-            if (shouldGuardiumParseSql(dataType)) {
-                trimAndSet(builder::setText, rd::getOriginalSqlCommand);
-            } else {
-                Datasource.GDM_construct gdmConstruct = buildConstruct(rd);
-                builder.setConstruct(gdmConstruct);
-            }
-        } else { // exception record also need to create construct with text/sql only
+        // exception record also need to create construct with text/sql only
+        if(record.isException()){
             ExceptionRecord ex = record.getException();
             if (shouldGuardiumParseSql(dataType)) {
                 trimAndSet(builder::setText, ex::getSqlString);
@@ -437,6 +430,16 @@ public class JsonRecordTransformer implements RecordTransformer {
                 Datasource.GDM_construct.Builder gdmConstructBuilder = Datasource.GDM_construct.newBuilder();
                 gdmConstructBuilder.setOriginalSql(ex.getSqlString());
                 builder.setConstruct(gdmConstructBuilder.build());
+            }
+        } else {
+            Data rd = record.getData();
+            if( rd!= null) {
+                if (shouldGuardiumParseSql(dataType)) {
+                    trimAndSet(builder::setText, rd::getOriginalSqlCommand);
+                } else {
+                    Datasource.GDM_construct gdmConstruct = buildConstruct(rd);
+                    builder.setConstruct(gdmConstruct);
+                }
             }
         }
         return builder.build();
