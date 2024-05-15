@@ -32,7 +32,7 @@ ENV ETC=/etc \
     SSL_DIR=/service/certs/universalconnector/ \
     CLIENT_CERTS_PATH=/service/certs/client/ \
     RPM_DIR=/var/lib/rpm \
-    UC_OPENSOURCE_TAG=v1.5.4 \
+    UC_OPENSOURCE_TAG=v1.5.5 \
     UC_OPENSOURCE_OFFLINE_PACKAGE=uc_gi_offline_package.zip
 
 ENV UC_ETC=${LOGSTASH_DIR}/config/ \
