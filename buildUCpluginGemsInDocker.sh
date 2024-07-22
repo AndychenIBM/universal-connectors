@@ -5,7 +5,7 @@ UC_OPENSOURCE_ROOT_DIR=universal-connectors-${UC_PLUGIN_REPO_BRANCH}
 
 chmod -R 777 *
 cd test
-docker build -t guc_dit:latest .
+docker build -qt guc_dit:latest .
 cd ..
 
 # Pull UC plugins from open-source repo- used for uc commons only

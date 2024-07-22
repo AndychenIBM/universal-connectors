@@ -18,4 +18,4 @@ chmod -R 755 **/gradlew
 docker exec Lio bash -c "./prepareUCDefaultOfflinePackageInDocker.sh"
 ./downloadUCBootstrapArtifact.sh
 cd logstash_docker
-docker build -t ${UC_IMAGE_NAME} .  2>&1
+docker build -qt ${UC_IMAGE_NAME} .
