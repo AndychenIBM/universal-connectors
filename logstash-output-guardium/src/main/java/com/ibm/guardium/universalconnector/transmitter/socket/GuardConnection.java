@@ -156,7 +156,7 @@ public class GuardConnection implements RecordTransmitter {
         ByteBuffer msg = new ServiceMessageBuilder(handshakeBytes, SERVICE_ID_HANDSHAKE).getMessage();
         commHandler.write(msg);
         if (log.isDebugEnabled()) {log.debug("Sent handshake.");}
-        transmitterStats.setLastMsgCreateTime(System.currentTimeMillis());
+        //transmitterStats.setLastMsgCreateTime(System.currentTimeMillis());
         status = Status.OPEN;
         writeStatus("OPEN","");
         lock.lock();

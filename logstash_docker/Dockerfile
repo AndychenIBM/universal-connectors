@@ -33,8 +33,8 @@ ENV ETC=/etc \
     CLIENT_CERTS_PATH=/service/certs/client/ \
     RPM_DIR=/var/lib/rpm \
     UC_OPENSOURCE_TAG=v1.5.7 \
-    UC_OPENSOURCE_OFFLINE_PACKAGE=uc_gi_offline_package.zip
-
+    UC_OPENSOURCE_OFFLINE_PACKAGE=uc_gi_offline_package.zip \
+    NO_DATA_THRESHOLD_IN_MS=3600000
 ENV UC_ETC=${LOGSTASH_DIR}/config/ \
     UC_SCRIPTS=${LOGSTASH_DIR}/scripts/ \
     THIRD_PARTY_PATH=${LOGSTASH_DIR}/third_party \

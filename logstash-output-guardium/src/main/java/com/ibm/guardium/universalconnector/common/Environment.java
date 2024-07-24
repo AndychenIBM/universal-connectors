@@ -87,4 +87,21 @@ public class Environment {
         String gEnv = getUcEtc();
         return gEnv+ File.separator+LOG42_CONF;
     }
+
+    public static long getNoDataThresholdInMs () {
+        // Declare the instance variable and set a default value.
+        long NoDataThresholdInMs;
+
+        // Get the environment variable
+        String envValue = System.getenv("NO_DATA_THRESHOLD_IN_MS");
+        // Parse the string value to a long (with a default value in case the environment variable is not set or is invalid)
+        try {
+            NoDataThresholdInMs = Long.parseLong(envValue);
+        } catch (NumberFormatException e) {
+            System.err.println("Invalid value for NO_DATA_THRESHOLD_IN_MS: " + envValue + ", setting 1 hour as a default value");
+            e.printStackTrace();
+            NoDataThresholdInMs=3600000;
+        }
+        return NoDataThresholdInMs;
+    }
 }

@@ -2,6 +2,7 @@ package com.ibm.guardium.universalconnector.agent;
 
 
 import com.google.protobuf.Message;
+import com.ibm.guardium.universalconnector.common.Environment;
 import com.ibm.guardium.universalconnector.config.ConnectionConfig;
 import com.ibm.guardium.universalconnector.status.AgentStatus;
 import com.ibm.guardium.universalconnector.status.AgentStatusGenerator;
@@ -44,13 +45,17 @@ public class Agent {
 //    private StatsTimer statsTimer;
     private Thread connThread = null;
     private String workerError;
+
+    private long noDataThresholdInMs;
     private final int CONSUMER_Q_SIZE = 1000;
     private int CONNECTION_RETRIES = 10;
 
     private Object agentUpdateStateLock = new Object();
 
-    public Agent(ConnectionConfig config ) {
+    public Agent(ConnectionConfig config) {
         this.config = config;
+        this.noDataThresholdInMs = Environment.getNoDataThresholdInMs();
+        log.debug("noDataThresholdInMs value is: " + this.noDataThresholdInMs + "ms");
         messageQueue = new ArrayBlockingQueue<>(CONSUMER_Q_SIZE);
         transmitterStatsCollector = new TransmitterStatsCollector();
         recordTransmitter = new GuardConnection(messageQueue, transmitterStatsCollector.getCurrent());
@@ -65,9 +70,8 @@ public class Agent {
             Thread.currentThread().setName(config.getId() + "-StatsTimer");
             transmitterStatsCollector.getCurrent().setRecordsInQ(messageQueue.size());
             transmitterStatsCollector.runCollectorTasks();
-
-            if ( transmitterStatsCollector.getCurrent().noDataForTooLongTime(config.getUcConfig().getNoDataThresholdInMs() )){
-                log.debug("It has been more then TIMELIMIT ("+config.getUcConfig().getNoDataThresholdInMs()+" in ms) since we last got data on this connection ("+config.getId()+"), stop sending pings");
+            if ( transmitterStatsCollector.getCurrent().noDataForTooLongTime(noDataThresholdInMs)){
+                log.debug("It has been more then TIMELIMIT ("+ noDataThresholdInMs +" in ms) since we last got data on this connection ("+config.getId()+"), stop sending pings");
                 stopAgent();
             }
         }
@@ -180,7 +184,7 @@ public class Agent {
             waitForMessageQueue();
             messageQueue.put(new QueuedMessage(msg));
             transmitterStatsCollector.getCurrent().setLastMsgCreateTime(System.currentTimeMillis());
-            if (log.isDebugEnabled()) {log.debug("Agent queue size ( proto message was added ): " + messageQueue.size()+" "+config.getId());}
+            if (log.isDebugEnabled()) {log.debug("queue size ( proto message was added ): " + messageQueue.size()+" "+config.getId()); }
         } catch (Exception e) {
             log.error(e);
         }
