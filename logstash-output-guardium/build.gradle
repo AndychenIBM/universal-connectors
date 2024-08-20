@@ -27,6 +27,9 @@ targetCompatibility = 1.8
 
 buildscript {
     repositories {
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
         mavenCentral()
         jcenter()
     }
@@ -82,7 +85,7 @@ tasks.withType(JavaCompile) {
 }
 //task setUTC(type: Test){
 //    //call gradlew setUTC -PUC_ETC=val
-//    
+//
 //    environment 'UC_ETC', UC_ETC
 //    test {
 //        useJUnitPlatform()

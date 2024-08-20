@@ -12,7 +12,7 @@ function addPluginToInstallationList() {
 cp logstash_docker/uc/config/*.gem /usr/share/logstash/config
 cd /usr/share/logstash/config
 
-addPluginToInstallationList ${UC_OPENSOURCE_ROOT_DIR}/filter-plugin/logstash-output-guardium/logstash-output-guardium-1.4.3.gem
+addPluginToInstallationList ${UC_OPENSOURCE_ROOT_DIR}/filter-plugin/logstash-output-guardium/logstash-output-guardium-1.5.1.gem
 addPluginToInstallationList logstash_docker/uc/config/logstash-input-cloudwatch_logs-1.0.5.gem
 
 echo "Installing packages on Logstash..."

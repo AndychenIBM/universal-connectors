@@ -2901,6 +2901,7 @@ public final class Datasource {
           case 472: return REDIS;
           case 1080: return COCKROACH;
           case 1096: return SNOWFLAKE;
+          case 504: return EL_SEARCH;
           default: return null;
         }
       }

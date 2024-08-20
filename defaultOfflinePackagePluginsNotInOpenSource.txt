@@ -1,2 +1,2 @@
-filter-plugin/logstash-output-guardium/logstash-output-guardium-1.5.0.gem
+filter-plugin/logstash-output-guardium/logstash-output-guardium-1.5.1.gem
 ../logstash-input-cloudwatch-logs-master/logstash-input-cloudwatch_logs-1.0.5.gem

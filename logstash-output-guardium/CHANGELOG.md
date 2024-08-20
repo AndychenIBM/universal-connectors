@@ -1,3 +1,6 @@
+## 1.5.1
+- Added support for records affected field in the GuardRecord
+
 ## 1.0.0
 - Updated for GA release of native support for Java plugins. Includes:
   - Improved Gradle task wrappers
