@@ -15,7 +15,7 @@
 # ***************************************************************** */
 
 # docker image version
-ARG rhel_ubi_minimal_image_version=8.10-1018
+ARG rhel_ubi_minimal_image_version=8.10-1052
 
 # Pull the UBI 8 docker base image based on provided version or default
 FROM registry.access.redhat.com/ubi8/ubi-minimal:${rhel_ubi_minimal_image_version}
