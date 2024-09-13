@@ -54,8 +54,8 @@ dependencies {
     implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: versions.dependencies.log4jCore
     implementation 'org.apache.commons:commons-lang3:' + versions.dependencies.commonsLang
     implementation 'com.google.code.gson:gson:' + versions.dependencies.gson
-    implementation fileTree(dir: LOGSTASH_CORE_PATH, include: "build/libs/logstash-core-*.*.*.jar")
-    implementation fileTree(dir: GUARDIUM_UNIVERSALCONNECTOR_COMMONS_PATH, include: "common-*.*.*.jar")
+    implementation fileTree(dir: LOGSTASH_CORE_PATH, include: "build/libs/logstash-core.jar")
+    implementation fileTree(dir: GUARDIUM_UNIVERSALCONNECTOR_COMMONS_PATH, include: "guardium-universalconnector-commons-*.*.*.jar")
     implementation group: 'org.parboiled', name: 'parboiled-java', version: versions.dependencies.parboiledJava
     implementation group: 'org.json', name: 'json', version: versions.dependencies.json
     implementation group: 'org.glassfish', name: 'javax.json', version: versions.dependencies.javaxJson
@@ -63,7 +63,7 @@ dependencies {
     testImplementation 'junit:junit:' + versions.dependencies.junit
     testImplementation 'org.jruby:jruby-complete:' + versions.dependencies.jrubyComplete
 
-    testImplementation fileTree(dir: GUARDIUM_UNIVERSALCONNECTOR_COMMONS_PATH, include: "common-*.*.*.jar")}
+    testImplementation fileTree(dir: GUARDIUM_UNIVERSALCONNECTOR_COMMONS_PATH, include: "guardium-universalconnector-commons-*.*.*.jar")}
 
 clean {
     delete "${projectDir}/Gemfile"

@@ -10,7 +10,9 @@ version "${file("VERSION").text.trim()}"
 // plugin info
 // ===========================================================================
 // ===========================================================================
-
+ext {
+    snakeYamlVersion = '2.2'
+}
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
