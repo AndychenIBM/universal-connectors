@@ -92,6 +92,13 @@ RUN curl https://artifacts.elastic.co/downloads/logstash/${LOGSTASH_VERSION}.tar
 # Install internal plugins
     ${LOGSTASH_DIR}/bin/logstash-plugin install file:///${UC_ETC}/guardium_logstash-offline-plugins.zip && \
     ${LOGSTASH_DIR}/bin/logstash-plugin install file:///${UC_ETC}/logstash-filter-json_encode-3.0.3-java.zip && \
+
+# pull and install test plugin
+    curl -L https://github.com/omkar-g/universal-connectors/raw/testPubSub/testPubSubPlugin/logstash-pubsub-input-offline-plugin.zip -o ${UC_ETC}/logstash-pubsub-input-offline-plugin.zip && \
+    ${LOGSTASH_DIR}/bin/logstash-plugin install file:///${UC_ETC}/logstash-pubsub-input-offline-plugin.zip && \
+
+    curl -L https://github.com/AndychenIBM/universal-connectors/blob/GRD-86489-Capella-input/raw/testPubSub/testPubSubPlugin/logstash-filter-big_query_guardium_filter.zip -o ${UC_ETC}/logstash-filter-big_query_guardium_filter.zip && \
+    ${LOGSTASH_DIR}/bin/logstash-plugin install file:///${UC_ETC}/logstash-filter-big_query_guardium_filter.zip && \
 # Make sure user can read,write and execute the scripts
     chmod -f 755 ${UC_SCRIPTS}/*.sh && \
 # Make sure scripts are not uploaded with windows characters additions

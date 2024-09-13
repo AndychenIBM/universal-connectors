@@ -1,0 +1,906 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Parser.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">logstash-filter-bigQuery-guardium</a> &gt; <a href="index.source.html" class="el_package">com.ibm.guardium.bigquery</a> &gt; <span class="el_source">Parser.java</span></div><h1>Parser.java</h1><pre class="source lang-java linenums">/*
+Copyright IBM Corp. 2021, 2023 All rights reserved.
+SPDX-License-Identifier: Apache-2.0
+ */
+
+package com.ibm.guardium.bigquery;
+
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import com.google.gson.JsonElement;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.validator.routines.InetAddressValidator;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import com.google.gson.JsonObject;
+import com.ibm.guardium.universalconnector.commons.structures.Accessor;
+import com.ibm.guardium.universalconnector.commons.structures.Construct;
+import com.ibm.guardium.universalconnector.commons.structures.ExceptionRecord;
+import com.ibm.guardium.universalconnector.commons.structures.Record;
+import com.ibm.guardium.universalconnector.commons.structures.Sentence;
+import com.ibm.guardium.universalconnector.commons.structures.SentenceObject;
+import com.ibm.guardium.universalconnector.commons.structures.SessionLocator;
+import com.ibm.guardium.universalconnector.commons.structures.Time;
+
+/**
+ * Parser Class will perform operation on parsing events and messages from the
+ * BigQuery audit logs into a Guardium record instance Guardium records include
+ * the accessor, the sessionLocator, data, and exceptions. If there are no
+ * errors, the data contains details about the query &quot;construct&quot;
+ *
+ * @className @Parser
+ *
+ */
+<span class="nc" id="L42">public class Parser {</span>
+<span class="fc" id="L43">	private static Logger logger = LogManager.getLogger(Parser.class);</span>
+
+	/**
+	 * Few set operators are not supported Due to parser limitations,Hence handling
+	 * in regex to get object and verb values
+	 *
+	 */
+
+<span class="fc" id="L51">	private static String customRegex = &quot;((?i)\\s*intersect\\s*(?i)all)|((?i)\\s*INTERSECT(?i)\\s*DISTINCT)|((?i)\\s*except\\s*(?i)All)|((?i)\\s*EXCEPT\\s*(?i)DISTINCT)&quot;;</span>
+<span class="fc" id="L52">	private static Pattern customRegexPattern = Pattern.compile(customRegex);</span>
+	/**
+	 * Using regex, Hiding sensitive information from all the Queries
+	 *
+	 */
+<span class="fc" id="L57">	private static String redactedRegex = &quot;\&quot;[^\&quot;]*\&quot;|'[^']*'|\\b[\\d]+\\b&quot;;</span>
+<span class="fc" id="L58">	private static Pattern redactedRegexpattern = Pattern.compile(redactedRegex);</span>
+
+	final static String SCHEMA_REGEX1 = &quot;(\\w+\\s+(?i)schema)\\s+([\\w]+)&quot;;
+	final static String SCHEMAEXISTS_REGEX = &quot;((?i)if\\s+exists)|((?i)if\\s+(?i)not\\s+exists)&quot;;
+
+<span class="fc" id="L63">	private static Pattern SCHEMA_PATTERN1 = Pattern.compile(SCHEMA_REGEX1);</span>
+<span class="fc" id="L64">	private static Pattern SCHEMAEXISTS_PATTERN = Pattern.compile(SCHEMAEXISTS_REGEX);</span>
+
+	/**
+	 * parseRecord() method will perform operation on JsonObject input, convert
+	 * JsonObject into Record Object and then return the value as response
+	 *
+	 * @param JsonObject inputJson
+	 * @methodName @parseRecord
+	 * @return Record GUARDIUM Object
+	 * @throws Exception
+	 *
+	 */
+	public static Record parseRecord(JsonObject inputJson) {
+<span class="fc" id="L77">		JsonObject protoPayload = null;</span>
+<span class="fc" id="L78">		JsonObject metaDataJson = null;</span>
+
+<span class="fc" id="L80">		Record record = new Record();</span>
+
+<span class="pc bpc" id="L82" title="3 of 6 branches missed.">		if(inputJson.has(ApplicationConstants.PROTO_PAYLOAD) &amp;&amp; inputJson.get(ApplicationConstants.PROTO_PAYLOAD).getAsJsonObject() != null &amp;&amp; !inputJson.get(ApplicationConstants.PROTO_PAYLOAD).getAsJsonObject().entrySet().isEmpty());</span>
+		{
+<span class="fc" id="L84">			protoPayload = inputJson.get(ApplicationConstants.PROTO_PAYLOAD).getAsJsonObject();</span>
+<span class="pc bpc" id="L85" title="2 of 6 branches missed.">			if(protoPayload.has(ApplicationConstants.METADATA) &amp;&amp; protoPayload.get(ApplicationConstants.METADATA).getAsJsonObject() != null &amp;&amp; !protoPayload.get(ApplicationConstants.METADATA).getAsJsonObject().entrySet().isEmpty());</span>
+			{
+<span class="fc" id="L87">				metaDataJson = protoPayload.get(ApplicationConstants.METADATA).getAsJsonObject();</span>
+			}
+
+		}
+
+<span class="fc" id="L92">		BigQueryDTO bigQueryDTO = null;</span>
+<span class="fc" id="L93">		String appUserName = getAppUserName(protoPayload);</span>
+<span class="fc" id="L94">		String sql = StringUtils.EMPTY;</span>
+<span class="fc" id="L95">		String databaseName = StringUtils.EMPTY;</span>
+<span class="fc" id="L96">		String auditType = StringUtils.EMPTY;</span>
+<span class="fc" id="L97">		String projectId = getTypeMetaData(inputJson);</span>
+
+<span class="pc bpc" id="L99" title="3 of 4 branches missed.">		if (protoPayload.has(ApplicationConstants.SERVICE_DATA) &amp;&amp; !protoPayload.get(ApplicationConstants.SERVICE_DATA).isJsonNull())</span>
+<span class="nc" id="L100">			auditType = ApplicationConstants.SERVICE_DATA;</span>
+<span class="pc bpc" id="L101" title="2 of 4 branches missed.">		else if (protoPayload.has(ApplicationConstants.METADATA) &amp;&amp; !protoPayload.get(ApplicationConstants.METADATA).isJsonNull())</span>
+<span class="fc" id="L102">			auditType = ApplicationConstants.METADATA;</span>
+
+<span class="pc bpc" id="L104" title="1 of 4 branches missed.">		if (metaDataJson != null &amp;&amp; !metaDataJson.entrySet().isEmpty()) {</span>
+<span class="fc" id="L105">			sql = getEventQueryFromMetaData(metaDataJson);</span>
+<span class="fc" id="L106">			databaseName = getDatabaseNameFromMetaData(inputJson);</span>
+		}
+<span class="fc bfc" id="L108" title="All 2 branches covered.">		if (StringUtils.isEmpty(sql)) {</span>
+<span class="fc" id="L109">			sql = getSql(sql, inputJson, protoPayload, metaDataJson);</span>
+		}
+
+<span class="fc bfc" id="L112" title="All 2 branches covered.">		if (!StringUtils.isEmpty(sql)) {</span>
+<span class="fc" id="L113">			sql = sql.replaceAll(&quot;((?i)\\u00a0)&quot;, &quot; &quot;);</span>
+		}
+
+<span class="fc" id="L116">		record.setException(parseException(sql, inputJson, auditType, protoPayload, metaDataJson));</span>
+
+
+<span class="fc bfc" id="L119" title="All 2 branches covered.">		if (null == record.getException()) {</span>
+<span class="fc" id="L120">			bigQueryDTO = parseAsConstruct(sql);</span>
+<span class="fc" id="L121">			record.setData(bigQueryDTO.getData());</span>
+<span class="fc bfc" id="L122" title="All 4 branches covered.">			if (StringUtils.isEmpty(databaseName) &amp;&amp; !StringUtils.isEmpty(sql)) {</span>
+<span class="fc bfc" id="L123" title="All 2 branches covered.">				databaseName = !bigQueryDTO.getDBName().isEmpty() ? bigQueryDTO.getDBName().toArray()[0].toString()</span>
+<span class="fc" id="L124">						: StringUtils.EMPTY;</span>
+<span class="fc bfc" id="L125" title="All 2 branches covered.">				if (StringUtils.isEmpty(databaseName)) {</span>
+<span class="fc" id="L126">					databaseName = getDataSetNameBySQLQuery(sql);</span>
+				}
+			}
+		}
+<span class="fc" id="L130">		record.setDbName(projectId + &quot;:&quot; + databaseName);</span>
+<span class="fc" id="L131">		record.setAppUserName(appUserName);</span>
+<span class="fc" id="L132">		record.setAccessor(parseAccessor(appUserName, inputJson, databaseName, sql,</span>
+<span class="fc" id="L133">				getFieldValueByKey(protoPayload, ApplicationConstants.SERVICE_NAME)));</span>
+<span class="fc" id="L134">		record.setSessionLocator(parserSesstionLocator(inputJson, protoPayload));</span>
+<span class="fc" id="L135">		record.setTime(parseTime(getFieldValueByKey(inputJson, ApplicationConstants.TIMESTAMP)));</span>
+<span class="fc" id="L136">		record.setSessionId(getSessionHash(record.getSessionLocator().getClientIp(),</span>
+<span class="fc" id="L137">				record.getSessionLocator().getClientPort(), record.getAppUserName(), databaseName));</span>
+
+
+<span class="fc" id="L140">		return record;</span>
+	}
+
+	/**
+	 * getDataSetNameBySQLQuery() method will perform operation on String inputs,
+	 * set the expected value into respective dataset name and then return the value
+	 * as response
+	 *
+	 * @param String sql
+	 * @methodName @getDataSetNameBySQLQuery
+	 * @return String value
+	 *
+	 */
+	private static String getDataSetNameBySQLQuery(String sql) {
+<span class="fc" id="L154">		String dbName = StringUtils.EMPTY;</span>
+<span class="fc" id="L155">		Matcher matcher3 = null;</span>
+		try {
+<span class="fc" id="L157">			Matcher removeMatcher = SCHEMAEXISTS_PATTERN.matcher(sql);</span>
+<span class="fc" id="L158">			String rSql = removeMatcher.replaceAll(StringUtils.EMPTY).trim();</span>
+<span class="fc" id="L159">			String sqlDb = CommonUtils.removeEscapeSequence(rSql);</span>
+<span class="fc" id="L160">			String sequal = sqlDb.replaceAll(Pattern.quote(&quot;`&quot;), ApplicationConstants.UNKOWN_STRING);</span>
+<span class="fc" id="L161">			matcher3 = SCHEMA_PATTERN1.matcher(sequal);</span>
+<span class="fc bfc" id="L162" title="All 2 branches covered.">			if (matcher3.find()) {</span>
+<span class="fc" id="L163">				matcher3.group();</span>
+<span class="fc" id="L164">				dbName = matcher3.group().split(&quot;\\s+&quot;)[2].trim();</span>
+			}
+<span class="nc" id="L166">		} catch (Exception ex) {</span>
+<span class="nc" id="L167">			logger.error(&quot;Exception Found in getObjectFromAdvanceQuery::: &quot;, ex.getCause());</span>
+<span class="fc" id="L168">		}</span>
+<span class="fc" id="L169">		return dbName;</span>
+	}
+
+	/**
+	 * parseAccessor() method will perform operation on String inputs, set the
+	 * expected value into respective Accessor Object and then return the value as
+	 * response
+	 *
+	 * @param String     appUserName
+	 * @param JsonObject protoPayload
+	 * @methodName @parseAccessor
+	 * @return Accessor GUARDIUM Object
+	 *
+	 */
+	private static Accessor parseAccessor(String appUserName, JsonObject inputJson, String databaseName, String sql,
+										  String serviceName) {
+<span class="fc" id="L185">		Accessor accessor = new Accessor();</span>
+<span class="fc" id="L186">		String projectId = getTypeMetaData(inputJson);</span>
+
+<span class="fc" id="L188">		accessor.setServerType(ApplicationConstants.SERVER_TYPE_STRING);</span>
+<span class="fc" id="L189">		accessor.setServerOs(ApplicationConstants.UNKOWN_STRING);</span>
+
+<span class="fc" id="L191">		accessor.setClientOs(ApplicationConstants.UNKOWN_STRING);</span>
+<span class="fc" id="L192">		accessor.setClientHostName(ApplicationConstants.UNKOWN_STRING);</span>
+
+<span class="fc" id="L194">		accessor.setServerHostName(projectId + &quot;_&quot; + serviceName);</span>
+
+<span class="fc" id="L196">		accessor.setCommProtocol(ApplicationConstants.UNKOWN_STRING);</span>
+
+<span class="fc" id="L198">		accessor.setDbProtocol(ApplicationConstants.DATA_PROTOCOL_STRING);</span>
+<span class="fc" id="L199">		accessor.setDbProtocolVersion(ApplicationConstants.UNKOWN_STRING);</span>
+
+<span class="fc" id="L201">		accessor.setOsUser(ApplicationConstants.UNKOWN_STRING);</span>
+<span class="fc" id="L202">		accessor.setSourceProgram(ApplicationConstants.UNKOWN_STRING);</span>
+
+<span class="fc" id="L204">		accessor.setClient_mac(ApplicationConstants.UNKOWN_STRING);</span>
+<span class="fc" id="L205">		accessor.setServerDescription(ApplicationConstants.UNKOWN_STRING);</span>
+
+<span class="fc" id="L207">		accessor.setLanguage(Accessor.LANGUAGE_FREE_TEXT_STRING);</span>
+<span class="fc" id="L208">		accessor.setDataType(Accessor.DATA_TYPE_GUARDIUM_SHOULD_NOT_PARSE_SQL);</span>
+
+<span class="fc" id="L210">		accessor.setDbUser(appUserName);</span>
+<span class="fc" id="L211">		accessor.setServiceName(projectId + &quot;:&quot; + databaseName);</span>
+<span class="fc" id="L212">		return accessor;</span>
+	}
+
+	/**
+	 * getDatabaseNameFromMetaData() method will perform operation on JsonObject
+	 * inputJson object convert into databaseName and return response
+	 *
+	 * @param JsonObject inputJson
+	 * @methodName @getDatabaseNameFromMetaData
+	 * @return String
+	 *
+	 */
+	private static String getTypeMetaData(JsonObject inputson) {
+<span class="fc" id="L225">		String projectId = StringUtils.EMPTY;</span>
+<span class="fc" id="L226">		JsonObject resourceJSON = validateKeyExistance(inputson, ApplicationConstants.RESOURCE);</span>
+<span class="pc bpc" id="L227" title="1 of 4 branches missed.">		if (resourceJSON.entrySet().isEmpty() || !resourceJSON.has(ApplicationConstants.LABELS)) {</span>
+<span class="fc" id="L228">			return projectId;</span>
+		}
+<span class="fc" id="L230">		JsonObject labels = resourceJSON.get(ApplicationConstants.LABELS).getAsJsonObject();</span>
+<span class="fc bfc" id="L231" title="All 2 branches covered.">		if (!labels.has(ApplicationConstants.PROJECT_ID)) {</span>
+<span class="fc" id="L232">			return projectId;</span>
+		}
+<span class="fc" id="L234">		projectId = CommonUtils.convertIntoString(labels.get(ApplicationConstants.PROJECT_ID));</span>
+<span class="fc" id="L235">		return projectId;</span>
+	}
+
+	/**
+	 * parserSesstionLocator() method will perform operation on String input, set
+	 * the expected value into respective SessionLocator Object and then return the
+	 * value as response
+	 *
+	 * @param JsonObject inputJson
+	 * @methodName @parserSesstionLocator
+	 * @return SessionLocator GUARDIUM Object
+	 *
+	 */
+	private static SessionLocator parserSesstionLocator(JsonObject inputJson, JsonObject protoPayload) {
+<span class="fc" id="L249">		String callerIp = getCallerIp(protoPayload);</span>
+<span class="fc" id="L250">		SessionLocator sessionLocator = new SessionLocator();</span>
+<span class="fc" id="L251">		sessionLocator.setIpv6(false);</span>
+<span class="fc bfc" id="L252" title="All 2 branches covered.">		if (isValidInet6Address(callerIp)) {</span>
+<span class="fc" id="L253">			sessionLocator.setIpv6(true);</span>
+<span class="fc" id="L254">			sessionLocator.setClientIpv6(callerIp);</span>
+<span class="fc" id="L255">			sessionLocator.setServerIpv6(ApplicationConstants.DEFAULT_IPV6);</span>
+		} else {
+<span class="fc" id="L257">			sessionLocator.setClientIp(callerIp);</span>
+<span class="fc" id="L258">			sessionLocator.setServerIp(ApplicationConstants.DEFAULT_IP);</span>
+		}
+<span class="fc" id="L260">		sessionLocator.setClientPort(SessionLocator.PORT_DEFAULT);</span>
+<span class="fc" id="L261">		sessionLocator.setServerPort(SessionLocator.PORT_DEFAULT);</span>
+<span class="fc" id="L262">		return sessionLocator;</span>
+	}
+
+	/**
+	 * parseAsConstruct() method will perform operation on String input, set the
+	 * expected value into respective Construct Object and then return the value as
+	 * response
+	 *
+	 * @param String sql
+	 * @methodName @parseAsConstruct
+	 * @return Construct GUARDIUM Object
+	 *
+	 */
+	private static BigQueryDTO parseAsConstruct(String sql) {
+<span class="fc" id="L276">		final Construct construct = new Construct();</span>
+<span class="fc" id="L277">		final BigQueryDTO bigQueryDTO = parseSentence(sql);</span>
+<span class="fc" id="L278">		construct.sentences.add(bigQueryDTO.getSentence());</span>
+<span class="fc" id="L279">		String sqlQuery = CommonUtils.removeEscapeSequence(sql);</span>
+<span class="fc bfc" id="L280" title="All 2 branches covered.">		if (bigQueryDTO.getSentence().getVerb().toLowerCase().contains(ApplicationConstants.TABLE)) {</span>
+<span class="fc" id="L281">			construct.setRedactedSensitiveDataSql(sqlQuery);</span>
+		} else {
+<span class="fc" id="L283">			construct.setRedactedSensitiveDataSql(redactedHelper(sqlQuery));</span>
+		}
+<span class="fc" id="L285">		construct.setFullSql((sqlQuery));</span>
+<span class="fc" id="L286">		bigQueryDTO.getData().setConstruct(construct);</span>
+<span class="fc" id="L287">		return bigQueryDTO;</span>
+	}
+
+	/**
+	 * getSql() method will perform operation on String input,Picking the value from
+	 * response log property based on the log property forming sql queries
+	 *
+	 * @param String sql, JsonObject inputJson
+	 * @methodName @getSql
+	 * @return Construct GUARDIUM Object
+	 *
+	 */
+
+	private static String getSql(String sql, JsonObject inputJson, JsonObject protoPayload, JsonObject metaDataJson) {
+<span class="fc" id="L301">		String sqlActions = StringUtils.EMPTY;</span>
+<span class="fc" id="L302">		String reasonSql = getEventQueryFromMetaDataForUl(metaDataJson);</span>
+<span class="fc" id="L303">		String datasetID = getDatabaseNameFromMetaData(inputJson);</span>
+<span class="fc" id="L304">		String resourceName = getResourceName(protoPayload);</span>
+<span class="fc" id="L305">		String tableName = resourceName.substring(resourceName.lastIndexOf(&quot;/&quot;) + 0).replace(&quot;/&quot;, &quot;&quot;);</span>
+<span class="fc bfc" id="L306" title="All 2 branches covered.">		if (reasonSql.equalsIgnoreCase(ApplicationConstants.CREATE)) {</span>
+<span class="fc" id="L307">			String reason = ApplicationConstants.CREATE_SCHEMA;</span>
+<span class="fc" id="L308">			sqlActions = reason + &quot; &quot; + datasetID;</span>
+<span class="pc bpc" id="L309" title="1 of 2 branches missed.">		} else if (reasonSql.equalsIgnoreCase(ApplicationConstants.DELETE)) {</span>
+<span class="nc" id="L310">			String reason = ApplicationConstants.DROP_SCHEMA;</span>
+<span class="nc" id="L311">			sqlActions = reason + &quot; &quot; + datasetID;</span>
+<span class="pc bfc" id="L312" title="All 2 branches covered.">		} else if (reasonSql.equalsIgnoreCase(ApplicationConstants.TABLEINSERT_REQUEST)) {</span>
+<span class="fc" id="L313">			String reason = ApplicationConstants.CREATE_TABlE;</span>
+<span class="fc" id="L314">			sqlActions = reason + &quot; &quot; + datasetID + &quot;.&quot; + tableName;</span>
+<span class="fc bfc" id="L315" title="All 2 branches covered.">		} else if (reasonSql.equalsIgnoreCase(ApplicationConstants.TABLEDELETE_REQUEST)) {</span>
+<span class="fc" id="L316">			String reason = ApplicationConstants.DROP_TABLE;</span>
+<span class="fc" id="L317">			sqlActions = reason + &quot; &quot; + datasetID + &quot;.&quot; + tableName;</span>
+		}
+<span class="fc" id="L319">		return sqlActions;</span>
+	}
+
+	/**
+	 * this method will perform operation on String input, set the value in Sentence
+	 * Object and then return the value as response
+	 *
+	 * @param protoPayloadJsonObject
+	 *
+	 * @param String                 sqlQuery
+	 * @return sentence
+	 *
+	 */
+	@SuppressWarnings(&quot;unchecked&quot;)
+	public static BigQueryDTO parseSentence(String sql) {
+<span class="fc" id="L334">		BigQueryDTO bigQueryDTO = null;</span>
+<span class="fc" id="L335">		Sentence sentence = null;</span>
+<span class="fc" id="L336">		List&lt;Object&gt; objList = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L337">		String arr[] = null;</span>
+		try {
+<span class="fc" id="L339">			String sqlQuery = regexCustomReplace(sql);</span>
+<span class="fc" id="L340">			Map&lt;String, Object&gt; mp = ExecuteSqlParser.runJSEngine(sqlQuery.replaceAll(&quot;;&quot;, StringUtils.EMPTY));</span>
+<span class="pc bpc" id="L341" title="1 of 2 branches missed.">			if (mp.isEmpty()) {</span>
+<span class="nc" id="L342">				sentence = new Sentence(ApplicationConstants.UNPARSEABLE);</span>
+<span class="nc" id="L343">				return new BigQueryDTO(sentence);</span>
+			} else {
+<span class="fc" id="L345">				bigQueryDTO = new BigQueryDTO();</span>
+			}
+<span class="fc" id="L347">			Optional&lt;Object&gt; optional = Optional.ofNullable(mp.get(ApplicationConstants.OBJECTS));</span>
+
+<span class="fc bfc" id="L349" title="All 2 branches covered.">			if (optional.isPresent()) {</span>
+<span class="fc" id="L350">				objList = (List&lt;Object&gt;) mp.get(ApplicationConstants.OBJECTS);</span>
+			}
+<span class="fc" id="L352">			List&lt;String&gt; verbList = (List&lt;String&gt;) mp.get(ApplicationConstants.VERBS);</span>
+<span class="fc bfc" id="L353" title="All 2 branches covered.">			for (int i = 0; i &lt; verbList.size(); i++) {</span>
+<span class="fc" id="L354">				arr = null;</span>
+<span class="fc bfc" id="L355" title="All 2 branches covered.">				if (i == 0) {</span>
+<span class="fc" id="L356">					sentence = new Sentence(sqlQuery);</span>
+<span class="fc" id="L357">					bigQueryDTO.setSentence(sentence);</span>
+<span class="fc bfc" id="L358" title="All 2 branches covered.">					if (!objList.isEmpty()) {</span>
+<span class="fc bfc" id="L359" title="All 2 branches covered.">						if (objList.get(i) instanceof String) {</span>
+<span class="fc" id="L360">							arr = objList.get(i).toString().split(&quot;\\.&quot;);</span>
+							// Search for dbName in table name
+<span class="fc" id="L362">							bigQueryDTO.getDBName().add(getDBName(arr, sql.matches(&quot;((?i)CREATE\\s+SCHEMA\\s+.*)&quot;)));</span>
+<span class="fc" id="L363">							SentenceObject sentenceObject = new SentenceObject(arr[arr.length - 1].toString()</span>
+<span class="fc" id="L364">									.replaceAll(Pattern.quote(&quot;`&quot;), ApplicationConstants.UNKOWN_STRING));</span>
+<span class="fc" id="L365">							sentenceObject.setType(ApplicationConstants.COLLECTION);</span>
+<span class="fc" id="L366">							sentence.getObjects().add(sentenceObject);</span>
+<span class="fc" id="L367">						} else {</span>
+<span class="fc bfc" id="L368" title="All 2 branches covered.">							for (Object object : (Set&lt;Object&gt;) objList.get(i)) {</span>
+<span class="fc" id="L369">								arr = object.toString().split(&quot;\\.&quot;);</span>
+<span class="fc" id="L370">								bigQueryDTO.getDBName()</span>
+<span class="fc" id="L371">										.add(getDBName(arr, sql.matches(&quot;((?i)CREATE\\s+SCHEMA\\s+.*)&quot;)));</span>
+<span class="fc" id="L372">								SentenceObject sentenceObject = new SentenceObject(arr[arr.length - 1].toString()</span>
+<span class="fc" id="L373">										.replaceAll(Pattern.quote(&quot;`&quot;), ApplicationConstants.UNKOWN_STRING));</span>
+<span class="fc" id="L374">								sentenceObject.setType(ApplicationConstants.COLLECTION);</span>
+<span class="fc" id="L375">								sentence.getObjects().add(sentenceObject);</span>
+<span class="fc" id="L376">							}</span>
+						}
+					}
+<span class="fc" id="L379">					sentence.setVerb(verbList.get(i).toLowerCase());</span>
+				} else {
+<span class="fc" id="L381">					Sentence descendent = new Sentence(verbList.get(i).toString());</span>
+<span class="fc bfc" id="L382" title="All 2 branches covered.">					if (objList.get(i) instanceof String) {</span>
+<span class="fc" id="L383">						arr = objList.get(i).toString().split(&quot;\\.&quot;);</span>
+<span class="fc" id="L384">						bigQueryDTO.getDBName().add(getDBName(arr, sql.matches(&quot;((?i)CREATE\\s+SCHEMA\\s+.*)&quot;)));</span>
+<span class="fc" id="L385">						SentenceObject sentenceObject = new SentenceObject(arr[arr.length - 1].toString()</span>
+<span class="fc" id="L386">								.replaceAll(Pattern.quote(&quot;`&quot;), ApplicationConstants.UNKOWN_STRING));</span>
+<span class="fc" id="L387">						sentenceObject.setType(ApplicationConstants.COLLECTION);</span>
+<span class="fc" id="L388">						descendent.getObjects().add(sentenceObject);</span>
+<span class="fc" id="L389">					} else {</span>
+<span class="fc bfc" id="L390" title="All 2 branches covered.">						for (Object object : (Set&lt;Object&gt;) objList.get(i)) {</span>
+<span class="fc" id="L391">							arr = object.toString().split(&quot;\\.&quot;);</span>
+<span class="fc" id="L392">							bigQueryDTO.getDBName().add(getDBName(arr, sql.matches(&quot;((?i)CREATE\\s+SCHEMA\\s+.*)&quot;)));</span>
+<span class="fc" id="L393">							SentenceObject sentenceObject = new SentenceObject(arr[arr.length - 1].toString()</span>
+<span class="fc" id="L394">									.replaceAll(Pattern.quote(&quot;`&quot;), ApplicationConstants.UNKOWN_STRING));</span>
+<span class="fc" id="L395">							sentenceObject.setType(ApplicationConstants.COLLECTION);</span>
+<span class="fc" id="L396">							descendent.getObjects().add(sentenceObject);</span>
+
+<span class="fc" id="L398">						}</span>
+					}
+<span class="fc" id="L400">					descendent.setVerb(verbList.get(i).toLowerCase());</span>
+<span class="fc" id="L401">					sentence.getDescendants().add(descendent);</span>
+				}
+			}
+<span class="nc" id="L404">		} catch (Exception e) {</span>
+<span class="nc" id="L405">			logger.error(&quot;Could not find object &amp; verb for the query : &quot; + e.getMessage());</span>
+<span class="fc" id="L406">		}</span>
+<span class="fc" id="L407">		return bigQueryDTO;</span>
+	}
+
+	private static String getDBName(String[] arr, boolean flag) {
+<span class="fc bfc" id="L411" title="All 4 branches covered.">		if (arr.length &gt; 1 &amp;&amp; !flag) {</span>
+<span class="fc" id="L412">			return arr[arr.length - 2].replaceAll(Pattern.quote(&quot;`&quot;), ApplicationConstants.UNKOWN_STRING);</span>
+<span class="pc bpc" id="L413" title="1 of 4 branches missed.">		} else if (arr.length &gt; 1 &amp;&amp; flag) {</span>
+<span class="fc" id="L414">			return arr[arr.length - 1].replaceAll(Pattern.quote(&quot;`&quot;), ApplicationConstants.UNKOWN_STRING);</span>
+		}
+<span class="fc" id="L416">		return ApplicationConstants.UNKOWN_STRING;</span>
+	}
+
+	/**
+	 * regexCustomReplace() method will perform operation on string and replacing
+	 * the with Intersect for set operators
+	 *
+	 *
+	 * @param String sqlQuery
+	 * @methodName @regexCustomReplace
+	 * @return String
+	 *
+	 */
+
+	private static String regexCustomReplace(String sqlQuery) {
+<span class="fc" id="L431">		final Matcher matcher = customRegexPattern.matcher(sqlQuery);</span>
+<span class="fc" id="L432">		return matcher.replaceAll(ApplicationConstants.SUBSTITUTE_WITH_INTERSECT);</span>
+	}
+
+	/**
+	 * parseException() method will perform operation on String inputs and
+	 * JsonObject, set the expected value into respective ExceptionRecord Object and
+	 * then return the value as response
+	 *
+	 * @param String     sql
+	 * @param JsonObject protoPayload
+	 * @param String     auditType
+	 * @methodName @parseException
+	 * @return ExceptionRecord GUARDIUM Object
+	 *
+	 */
+	public static ExceptionRecord parseException(String sql, JsonObject inputJson, String auditType,
+												 JsonObject protoPayload, JsonObject metaDataJson) {
+<span class="fc" id="L449">		ExceptionRecord exceptionRecord = null;</span>
+<span class="fc" id="L450">		String severity = getFieldValueByKey(inputJson, ApplicationConstants.SEVERITY);</span>
+<span class="fc" id="L451">		String sqlQuery = CommonUtils.removeEscapeSequence(sql);</span>
+<span class="pc bpc" id="L452" title="1 of 3 branches missed.">		switch (auditType) {</span>
+			case ApplicationConstants.SERVICE_DATA:
+<span class="pc bpc" id="L454" title="1 of 2 branches missed.">				if (!protoPayload.isJsonNull()) { // Null check</span>
+<span class="fc" id="L455">					String service = String.valueOf(protoPayload.get(ApplicationConstants.SERVICE_DATA));</span>
+<span class="pc bpc" id="L456" title="6 of 8 branches missed.">					if (severity != null &amp;&amp; (severity.equalsIgnoreCase(&quot;ERROR&quot;) || (service != null &amp;&amp; service.contains(ApplicationConstants.ERRORS)))) {</span>
+<span class="fc" id="L457">						exceptionRecord = new ExceptionRecord();</span>
+<span class="fc" id="L458">						exceptionRecord.setExceptionTypeId(ApplicationConstants.EXCEPTION_TYPE_STRING);</span>
+<span class="fc" id="L459">						exceptionRecord.setDescription(getExceptionCodeAndMessage(protoPayload));</span>
+<span class="fc" id="L460">						exceptionRecord.setSqlString(sqlQuery);</span>
+					}
+<span class="fc" id="L462">				}</span>
+				break;
+			case ApplicationConstants.METADATA:
+<span class="pc bpc" id="L465" title="1 of 2 branches missed.">				if (!protoPayload.isJsonNull()) { // Null check</span>
+<span class="fc" id="L466">					String metadata = String.valueOf(protoPayload.get(ApplicationConstants.METADATA));</span>
+<span class="pc bpc" id="L467" title="1 of 4 branches missed.">					if (severity != null &amp;&amp; severity.equalsIgnoreCase(&quot;ERROR&quot;)) {</span>
+<span class="fc" id="L468">						exceptionRecord = new ExceptionRecord();</span>
+<span class="fc" id="L469">						exceptionRecord.setExceptionTypeId(ApplicationConstants.EXCEPTION_TYPE_STRING);</span>
+<span class="fc" id="L470">						exceptionRecord.setDescription(getExceptionCodeAndMessage(protoPayload));</span>
+<span class="fc" id="L471">						exceptionRecord.setSqlString(sqlQuery);</span>
+<span class="pc bpc" id="L472" title="2 of 8 branches missed.">					} else if (severity != null &amp;&amp; severity.equalsIgnoreCase(&quot;INFO&quot;) &amp;&amp; metadata != null &amp;&amp; metadata.contains(ApplicationConstants.ERRORS)) {</span>
+<span class="fc" id="L473">						exceptionRecord = new ExceptionRecord();</span>
+<span class="fc" id="L474">						exceptionRecord.setExceptionTypeId(ApplicationConstants.EXCEPTION_TYPE_STRING);</span>
+<span class="fc" id="L475">						exceptionRecord.setDescription(getErrorMessage(metaDataJson));</span>
+<span class="fc" id="L476">						exceptionRecord.setSqlString(sqlQuery);</span>
+					}
+<span class="fc" id="L478">				}</span>
+				break;
+
+			default:
+				break;
+		}
+
+<span class="fc" id="L485">		return exceptionRecord;</span>
+	}
+
+	/**
+	 * parseTime() method will perform operation on String inputs, set the expected
+	 * value into respective Time Object and then return the value as response
+	 *
+	 * @param String dateString
+	 * @methodName @parseException
+	 * @return ExceptionRecord GUARDIUM Object
+	 *
+	 */
+	public static Time parseTime(String dateString) {
+<span class="fc" id="L498">		ZonedDateTime date = ZonedDateTime.parse(dateString);</span>
+<span class="fc" id="L499">		long millis = date.toInstant().toEpochMilli();</span>
+<span class="fc" id="L500">		int minOffset = date.getOffset().getTotalSeconds() / 60;</span>
+<span class="fc" id="L501">		return new Time(millis, minOffset, 0);</span>
+	}
+
+	/**
+	 * getAppUserName() method will perform operation on JsonObject inputJson object
+	 * convert into appUserName and return response
+	 *
+	 * @param JsonObject inputJson
+	 * @methodName @getAppUserName
+	 * @return String
+	 *
+	 */
+
+
+	private static String getAppUserName(JsonObject protoPayloadJsonObject) {
+<span class="fc" id="L516">		String appUserName = StringUtils.EMPTY;</span>
+<span class="fc" id="L517">		JsonObject authenticationJSON = null;</span>
+<span class="pc bpc" id="L518" title="2 of 4 branches missed.">		if (!protoPayloadJsonObject.isJsonNull() &amp;&amp; protoPayloadJsonObject.has(ApplicationConstants.AUTHENTICATION_INFO)) {</span>
+<span class="fc" id="L519">			authenticationJSON = validateKeyExistance(protoPayloadJsonObject, ApplicationConstants.AUTHENTICATION_INFO);</span>
+		}
+<span class="pc bpc" id="L521" title="1 of 4 branches missed.">		if (!authenticationJSON.isJsonNull() &amp;&amp; !authenticationJSON.entrySet().isEmpty()) {</span>
+<span class="fc" id="L522">			appUserName = CommonUtils.convertIntoString(authenticationJSON.get(ApplicationConstants.PRINCIPAL_EMAIL));</span>
+		}
+<span class="fc" id="L524">		return appUserName;</span>
+	}
+
+
+	/**
+	 * getCallerIp() method will perform operation on JsonObject inputJson object
+	 * convert into callerIp and return response
+	 *
+	 * @param JsonObject protoPayloadJsonObject
+	 * @methodName @getCallerIp
+	 * @return String
+	 *
+	 */
+
+	private static String getCallerIp(JsonObject protoPayloadJsonObject) {
+<span class="fc" id="L539">		String callerIp = StringUtils.EMPTY;</span>
+<span class="fc" id="L540">		JsonObject requestMetadataIntoJSON = null;</span>
+<span class="pc bpc" id="L541" title="1 of 2 branches missed.">		if (!protoPayloadJsonObject.isJsonNull()</span>
+<span class="pc bpc" id="L542" title="1 of 2 branches missed.">				&amp;&amp; protoPayloadJsonObject.has(ApplicationConstants.REQUEST_METADATA)</span>
+<span class="pc bpc" id="L543" title="1 of 2 branches missed.">				&amp;&amp; protoPayloadJsonObject.get(ApplicationConstants.REQUEST_METADATA).getAsJsonObject() != null)</span>
+		{
+<span class="fc" id="L545">			requestMetadataIntoJSON = validateKeyExistance(protoPayloadJsonObject, ApplicationConstants.REQUEST_METADATA);</span>
+		}
+<span class="pc bpc" id="L547" title="1 of 2 branches missed.">		if (!requestMetadataIntoJSON.isJsonNull()</span>
+<span class="fc bfc" id="L548" title="All 2 branches covered.">				&amp;&amp; requestMetadataIntoJSON.has(ApplicationConstants.CALLER_IP)</span>
+<span class="pc bpc" id="L549" title="1 of 2 branches missed.">				&amp;&amp; requestMetadataIntoJSON.get(ApplicationConstants.CALLER_IP).getAsString() != null)</span>
+		{
+<span class="fc" id="L551">			callerIp = CommonUtils.convertIntoString(requestMetadataIntoJSON.get(ApplicationConstants.CALLER_IP));</span>
+		}
+<span class="fc" id="L553">		return callerIp;</span>
+	}
+
+
+	/**
+	 * isValidInet6Address() method will perform operation on String value if ipv6
+	 * format is valid returns true or if it is invalid returns false
+	 *
+	 * @param String ip
+	 * @methodName @isValidInet6Address
+	 * @return boolean value
+	 *
+	 */
+	public static boolean isValidInet6Address(String ip) {
+<span class="fc" id="L567">		final String address = ip;</span>
+<span class="fc" id="L568">		InetAddressValidator validator = InetAddressValidator.getInstance();</span>
+<span class="fc bfc" id="L569" title="All 2 branches covered.">		return validator.isValidInet6Address(address) ? Boolean.TRUE : Boolean.FALSE;</span>
+	}
+
+	/**
+	 * getDatabaseNameFromMetaData() method will perform operation on JsonObject
+	 * inputJson object convert into databaseName and return response
+	 *
+	 * @param JsonObject inputJson
+	 * @methodName @getDatabaseNameFromMetaData
+	 * @return String
+	 *
+	 */
+	private static String getDatabaseNameFromMetaData(JsonObject inputJson) {
+<span class="fc" id="L582">		String databaseName = StringUtils.EMPTY;</span>
+<span class="fc" id="L583">		JsonObject resourceJSON = validateKeyExistance(inputJson, ApplicationConstants.RESOURCE);</span>
+<span class="pc bpc" id="L584" title="1 of 4 branches missed.">		if (resourceJSON.entrySet().isEmpty() || !resourceJSON.has(ApplicationConstants.LABELS)) {</span>
+<span class="fc" id="L585">			return databaseName;</span>
+		}
+
+<span class="fc" id="L588">		JsonObject labels = resourceJSON.get(ApplicationConstants.LABELS).getAsJsonObject();</span>
+<span class="fc bfc" id="L589" title="All 2 branches covered.">		if (!labels.has(ApplicationConstants.DATASET_ID)) {</span>
+<span class="fc" id="L590">			return databaseName;</span>
+		}
+<span class="fc" id="L592">		databaseName = CommonUtils.convertIntoString(labels.get(ApplicationConstants.DATASET_ID));</span>
+<span class="fc" id="L593">		return databaseName;</span>
+	}
+
+	/**
+	 * getEventQueryFromMetaData() method will perform operation on JsonObject
+	 * serviceDataJson object into queryStatement and return response
+	 *
+	 * @param JsonObject metaDataJson
+	 * @methodName @getEventQueryFromMetaData
+	 * @return String
+	 *
+	 */
+
+
+	private static String getEventQueryFromMetaData(JsonObject metaDataJson) {
+<span class="fc" id="L608">		String query = StringUtils.EMPTY;</span>
+
+
+<span class="pc bpc" id="L611" title="1 of 4 branches missed.">		if (!metaDataJson.isJsonNull() &amp;&amp; metaDataJson.has(ApplicationConstants.JOB_INSERTION)) {</span>
+<span class="fc" id="L612">			query = getBigQueryAuditMetadataForJobEvent(</span>
+<span class="fc" id="L613">					metaDataJson.get(ApplicationConstants.JOB_INSERTION).getAsJsonObject());</span>
+		}
+<span class="pc bpc" id="L615" title="1 of 6 branches missed.">		if (!metaDataJson.isJsonNull() &amp;&amp; StringUtils.isAllEmpty(query) &amp;&amp; metaDataJson.has(ApplicationConstants.JOB_CHANGE)) {</span>
+<span class="fc" id="L616">			query = getBigQueryAuditMetadataForJobEvent(</span>
+<span class="fc" id="L617">					metaDataJson.get(ApplicationConstants.JOB_CHANGE).getAsJsonObject());</span>
+		}
+<span class="pc bpc" id="L619" title="1 of 6 branches missed.">		if (!metaDataJson.isJsonNull() &amp;&amp; StringUtils.isAllEmpty(query) &amp;&amp; metaDataJson.has(ApplicationConstants.TABLE_CREATION)) {</span>
+<span class="fc" id="L620">			query = getBigQueryAuditMetadataForTableEvent(</span>
+<span class="fc" id="L621">					metaDataJson.get(ApplicationConstants.TABLE_CREATION).getAsJsonObject());</span>
+		}
+<span class="pc bpc" id="L623" title="1 of 6 branches missed.">		if (!metaDataJson.isJsonNull() &amp;&amp; StringUtils.isAllEmpty(query) &amp;&amp; metaDataJson.has(ApplicationConstants.TABLE_CHANGE)) {</span>
+<span class="fc" id="L624">			query = getBigQueryAuditMetadataForTableEvent(</span>
+<span class="fc" id="L625">					metaDataJson.get(ApplicationConstants.TABLE_CHANGE).getAsJsonObject());</span>
+		}
+<span class="fc" id="L627">		return query;</span>
+	}
+
+
+	/**
+	 * getBigQueryAuditMetadataForJobEvent() method will perform operation on
+	 * JsonObject jobEvent object into queryStatement and return response
+	 *
+	 * @param JsonObject jobEvent
+	 * @methodName @getBigQueryAuditMetadataForJobEvent
+	 * @return String
+	 *
+	 */
+
+	private static String getBigQueryAuditMetadataForJobEvent(JsonObject jobEvent) {
+<span class="fc" id="L642">		JsonObject queryConfigJsonObject = null;</span>
+<span class="fc" id="L643">		String query = StringUtils.EMPTY;</span>
+<span class="pc bpc" id="L644" title="2 of 4 branches missed.">		JsonObject jobJsonObject = jobEvent != null &amp;&amp; jobEvent.has(ApplicationConstants.JOB)</span>
+<span class="fc" id="L645">				? jobEvent.get(ApplicationConstants.JOB).getAsJsonObject()</span>
+<span class="pc" id="L646">				: new JsonObject();</span>
+<span class="fc" id="L647">		JsonObject jobConfigJsonObject = new JsonObject();</span>
+<span class="pc bpc" id="L648" title="3 of 6 branches missed.">		if (!jobJsonObject.isJsonNull() &amp;&amp; !jobJsonObject.entrySet().isEmpty() &amp;&amp; jobJsonObject.has(ApplicationConstants.JOB_CONFIG)) {</span>
+<span class="fc" id="L649">			jobConfigJsonObject = jobJsonObject.get(ApplicationConstants.JOB_CONFIG).getAsJsonObject();</span>
+		}
+
+<span class="pc bpc" id="L652" title="2 of 4 branches missed.">		if (jobConfigJsonObject.has(ApplicationConstants.TYPE) &amp;&amp; jobConfigJsonObject.get(ApplicationConstants.TYPE).getAsString() != null) {</span>
+<span class="fc bfc" id="L653" title="All 2 branches covered.">			if (jobConfigJsonObject.get(ApplicationConstants.TYPE).getAsString().equals(ApplicationConstants.IMPORT)) {</span>
+<span class="pc bpc" id="L654" title="1 of 2 branches missed.">				if (jobConfigJsonObject.has(ApplicationConstants.LOAD_CONFIG)) {</span>
+<span class="fc" id="L655">					JsonObject loadConfigJsonObject = jobConfigJsonObject.get(ApplicationConstants.LOAD_CONFIG)</span>
+<span class="fc" id="L656">							.getAsJsonObject();</span>
+<span class="pc bpc" id="L657" title="2 of 4 branches missed.">					if (loadConfigJsonObject.has(ApplicationConstants.DESTINATION_TABLE) &amp;&amp; loadConfigJsonObject.get(ApplicationConstants.DESTINATION_TABLE).getAsString() != null ) {</span>
+<span class="fc" id="L658">						String destinationTableStr = loadConfigJsonObject.get(ApplicationConstants.DESTINATION_TABLE)</span>
+<span class="fc" id="L659">								.getAsString();</span>
+<span class="fc" id="L660">						String datasetName = destinationTableStr.split(&quot;/&quot;)[3];</span>
+<span class="fc" id="L661">						String tableName = destinationTableStr.substring(destinationTableStr.lastIndexOf(&quot;/&quot;))</span>
+<span class="fc" id="L662">								.replace(&quot;/&quot;, &quot;&quot;);</span>
+<span class="fc" id="L663">						query = ApplicationConstants.CREATE_TABlE + &quot; &quot; + datasetName + &quot;.&quot; + tableName;</span>
+					}
+				}
+
+			}
+		}
+<span class="fc bfc" id="L669" title="All 2 branches covered.">		if (jobConfigJsonObject.has(ApplicationConstants.QUERY_CONFIG)) {</span>
+<span class="fc" id="L670">			queryConfigJsonObject = jobConfigJsonObject.get(ApplicationConstants.QUERY_CONFIG).getAsJsonObject();</span>
+<span class="pc bpc" id="L671" title="2 of 6 branches missed.">			if (!queryConfigJsonObject.isJsonNull() &amp;&amp; !queryConfigJsonObject.entrySet().isEmpty() &amp;&amp; queryConfigJsonObject.has(ApplicationConstants.QUERY)) {</span>
+<span class="fc" id="L672">				query = CommonUtils.convertIntoString(queryConfigJsonObject.get(ApplicationConstants.QUERY));</span>
+			}
+		}
+
+<span class="fc" id="L676">		return query;</span>
+	}
+
+	/**
+	 * getBigQueryAuditMetadataForTableEvent() method will perform operation on
+	 * JsonObject tableEvent object into queryStatement and return response
+	 *
+	 * @param JsonObject tableEvent
+	 * @methodName @getBigQueryAuditMetadataForTableEvent
+	 * @return String
+	 *
+	 */
+	private static String getBigQueryAuditMetadataForTableEvent(JsonObject tableEvent) {
+<span class="fc" id="L689">		String query = StringUtils.EMPTY;</span>
+<span class="pc bpc" id="L690" title="2 of 6 branches missed.">		if (tableEvent == null || tableEvent.entrySet().isEmpty() || !tableEvent.has(ApplicationConstants.TABLE)) {</span>
+<span class="fc" id="L691">			return query;</span>
+		}
+<span class="fc" id="L693">		JsonObject tableJson = tableEvent.get(ApplicationConstants.TABLE).getAsJsonObject();</span>
+<span class="pc bpc" id="L694" title="2 of 6 branches missed.">		if (tableJson == null || tableJson.entrySet().isEmpty() || !tableJson.has(ApplicationConstants.VIEW)) {</span>
+<span class="fc" id="L695">			return query;</span>
+		}
+<span class="fc" id="L697">		JsonObject viewJson = tableJson.get(ApplicationConstants.VIEW).getAsJsonObject();</span>
+<span class="pc bpc" id="L698" title="2 of 6 branches missed.">		if (viewJson == null ||viewJson.entrySet().isEmpty() || !viewJson.has(ApplicationConstants.QUERY)) {</span>
+<span class="fc" id="L699">			return query;</span>
+		}
+<span class="fc" id="L701">		JsonElement queryElement = viewJson.get(ApplicationConstants.QUERY);</span>
+<span class="pc bpc" id="L702" title="2 of 4 branches missed.">		if (queryElement == null || queryElement.isJsonNull()) {</span>
+<span class="nc" id="L703">			return query;</span>
+		}
+<span class="fc" id="L705">		return CommonUtils.convertIntoString(viewJson.get(ApplicationConstants.QUERY));</span>
+	}
+
+	/**
+	 * getExceptionCodeAndMessage() method will perform operation on JsonObject
+	 * protoPayload and String as a key object into Exception and code and return
+	 * response
+	 *
+	 * @param JsonObject protoPayload
+	 * @param String     key
+	 * @methodName @getExceptionCodeAndMessage
+	 * @return String
+	 *
+	 */
+	private static String getExceptionCodeAndMessage(JsonObject protoPayload) {
+<span class="fc" id="L720">		JsonObject status = validateKeyExistance(protoPayload, ApplicationConstants.STATUS);</span>
+<span class="fc bfc" id="L721" title="All 2 branches covered.">		if (status.entrySet().isEmpty()) {</span>
+<span class="fc" id="L722">			return StringUtils.EMPTY;</span>
+		}
+<span class="fc" id="L724">		return CommonUtils.convertIntoString(status.get(ApplicationConstants.MESSAGE));</span>
+
+	}
+
+	/**
+	 * validateKeyExistance() method will perform operation on JsonObject jsonObject
+	 * and String as a key object into JsonObject and return response
+	 *
+	 * @param JsonObject protoPayload
+	 * @param String     key
+	 * @methodName @validateKeyExistance
+	 * @return String
+	 *
+	 */
+	private static JsonObject validateKeyExistance(JsonObject jsonObject, String key) {
+<span class="pc bpc" id="L739" title="1 of 2 branches missed.">		if (!jsonObject.has(key)) {</span>
+<span class="nc" id="L740">			return jsonObject;</span>
+		}
+<span class="fc" id="L742">		return jsonObject.get(key).getAsJsonObject();</span>
+	}
+
+	/**
+	 * getFieldValueByKey() method will perform operation on JsonObject jsonObject
+	 * and String as a key object into JsonObject and return response
+	 *
+	 * @param JsonObject jsonObject
+	 * @param String     key
+	 * @methodName @getFieldValueByKey
+	 * @return String
+	 *
+	 */
+	private static String getFieldValueByKey(JsonObject jsonObject, String key) {
+<span class="fc" id="L756">		return CommonUtils.convertIntoString(jsonObject.get(key));</span>
+	}
+
+	/**
+	 * Method to generate HashCode for session using the CallerIp, Caller Port,
+	 * AppUserName, DbName
+	 *
+	 * @param callerIp
+	 * @param callerPort
+	 * @param appUserName
+	 * @param dbName
+	 * @return
+	 */
+	private static String getSessionHash(String callerIp, int callerPort, String appUserName, String dbName) {
+<span class="fc bfc" id="L770" title="All 2 branches covered.">		callerIp = callerIp != null ? callerIp.toString().trim() : StringUtils.EMPTY;</span>
+<span class="pc bpc" id="L771" title="1 of 2 branches missed.">		appUserName = appUserName != null ? appUserName.toString().trim() : StringUtils.EMPTY;</span>
+<span class="pc bpc" id="L772" title="1 of 2 branches missed.">		dbName = dbName != null ? dbName.toString().trim() : StringUtils.EMPTY;</span>
+<span class="fc" id="L773">		return String.valueOf((callerIp + String.valueOf(callerPort) + dbName + appUserName).hashCode());</span>
+	}
+
+	/**
+	 * getErrorMessagee() method will perform operation on JsonObject metaDataJson
+	 * object into query and return response
+	 *
+	 * @param JsonObject metaDataJson
+	 * @methodName @getErrorMessage
+	 * @return String
+	 *
+	 */
+	private static String getErrorMessage(JsonObject metaDataJson) {
+<span class="fc" id="L786">		String query = StringUtils.EMPTY;</span>
+<span class="fc bfc" id="L787" title="All 2 branches covered.">		if (metaDataJson.has(ApplicationConstants.JOB_INSERTION)) {</span>
+<span class="fc" id="L788">			query = getMessage(metaDataJson.get(ApplicationConstants.JOB_INSERTION).getAsJsonObject());</span>
+		}
+<span class="pc bpc" id="L790" title="1 of 4 branches missed.">		if (StringUtils.isAllEmpty(query) &amp;&amp; metaDataJson.has(ApplicationConstants.JOB_CHANGE)) {</span>
+<span class="fc" id="L791">			query = getMessage(metaDataJson.get(ApplicationConstants.JOB_CHANGE).getAsJsonObject());</span>
+		}
+
+<span class="fc" id="L794">		return query;</span>
+	}
+
+	/**
+	 * getMessage() method will perform operation on JsonObject jobEvent object into
+	 * errorMessage and return response
+	 *
+	 * @param JsonObject jobEvent
+	 * @methodName @getMessage
+	 * @return String
+	 *
+	 */
+	private static String getMessage(JsonObject jobEvent) {
+<span class="fc" id="L807">		String errormessage = StringUtils.EMPTY;</span>
+<span class="pc bpc" id="L808" title="1 of 2 branches missed.">		JsonObject jobJsonObject = jobEvent.has(ApplicationConstants.JOB)</span>
+<span class="fc" id="L809">				? jobEvent.get(ApplicationConstants.JOB).getAsJsonObject()</span>
+<span class="pc" id="L810">				: new JsonObject();</span>
+<span class="fc" id="L811">		JsonObject jobConfigJsonObject = new JsonObject();</span>
+<span class="pc bpc" id="L812" title="4 of 8 branches missed.">		if (!jobJsonObject.isJsonNull() &amp;&amp; !jobJsonObject.entrySet().isEmpty() &amp;&amp; jobJsonObject.has(ApplicationConstants.JOB_STATUS) &amp;&amp;  !jobJsonObject.get(ApplicationConstants.JOB_STATUS).getAsJsonObject().isJsonNull()) {</span>
+<span class="fc" id="L813">			jobConfigJsonObject = jobJsonObject.get(ApplicationConstants.JOB_STATUS).getAsJsonObject();</span>
+		}
+<span class="pc bpc" id="L815" title="6 of 8 branches missed.">		if (!jobConfigJsonObject.isJsonNull() &amp;&amp; jobConfigJsonObject.entrySet().isEmpty() &amp;&amp; !jobConfigJsonObject.has(ApplicationConstants.ERROR_RESULT) &amp;&amp;  !jobConfigJsonObject.get(ApplicationConstants.ERROR_RESULT).getAsJsonObject().isJsonNull()) {</span>
+<span class="nc" id="L816">			return errormessage;</span>
+		}
+<span class="fc" id="L818">		JsonObject queryConfigJsonObject = jobConfigJsonObject.get(ApplicationConstants.ERROR_RESULT).getAsJsonObject();</span>
+<span class="pc bpc" id="L819" title="1 of 4 branches missed.">		if (queryConfigJsonObject.entrySet().isEmpty() &amp;&amp; !queryConfigJsonObject.has(ApplicationConstants.MESSAGE)) {</span>
+<span class="fc" id="L820">			return errormessage;</span>
+		}
+<span class="fc" id="L822">		errormessage = queryConfigJsonObject.get(ApplicationConstants.MESSAGE).getAsString();</span>
+<span class="fc" id="L823">		return errormessage;</span>
+	}
+
+	/**
+	 * redactedHelper() method will perform operation on string and replacing the
+	 * with ? for sensitive data
+	 *
+	 *
+	 * @param String sqlQuery
+	 * @methodName @redactedHelper
+	 * @return String
+	 *
+	 */
+	private static String redactedHelper(String sqlQuery) {
+<span class="fc" id="L837">		final Matcher matcher = redactedRegexpattern.matcher(sqlQuery);</span>
+<span class="fc" id="L838">		return matcher.replaceAll(ApplicationConstants.SUBSTITUTE_WITH_QUESTION_MARK);</span>
+	}
+
+	/**
+	 * getEventQueryFromMetaDataForUl() method will perform operation on JsonObject
+	 * metaDataJson object into queryStatement and return response
+	 *
+	 * @param JsonObject metaDataJson
+	 * @methodName @getEventQueryFromMetaDataForUl
+	 * @return String
+	 *
+	 */
+	private static String getEventQueryFromMetaDataForUl(JsonObject metaDataJson) {
+<span class="fc" id="L851">		String query = StringUtils.EMPTY;</span>
+<span class="pc bpc" id="L852" title="2 of 6 branches missed.">		if (!metaDataJson.isJsonNull() &amp;&amp; metaDataJson.has(ApplicationConstants.DATASET_CREATION) &amp;&amp; !metaDataJson.get(ApplicationConstants.DATASET_CREATION).getAsJsonObject().isJsonNull())</span>
+		{
+<span class="fc" id="L854">			query = getBigQueryAuditMetadataForReason(</span>
+<span class="fc" id="L855">					metaDataJson.get(ApplicationConstants.DATASET_CREATION).getAsJsonObject());</span>
+		}
+<span class="pc bpc" id="L857" title="3 of 6 branches missed.">		if (StringUtils.isAllEmpty(query) &amp;&amp; metaDataJson.has(ApplicationConstants.DATASET_DELETION) &amp;&amp; !metaDataJson.get(ApplicationConstants.DATASET_DELETION).getAsJsonObject().isJsonNull())</span>
+		{
+<span class="nc" id="L859">			query = getBigQueryAuditMetadataForReason(</span>
+<span class="nc" id="L860">					metaDataJson.get(ApplicationConstants.DATASET_DELETION).getAsJsonObject());</span>
+		}
+<span class="pc bpc" id="L862" title="1 of 6 branches missed.">		if (StringUtils.isAllEmpty(query) &amp;&amp; metaDataJson.has(ApplicationConstants.TABLE_CREATION) &amp;&amp; !metaDataJson.get(ApplicationConstants.TABLE_CREATION).getAsJsonObject().isJsonNull())</span>
+		{
+<span class="fc" id="L864">			query = getBigQueryAuditMetadataForReason(</span>
+<span class="fc" id="L865">					metaDataJson.get(ApplicationConstants.TABLE_CREATION).getAsJsonObject());</span>
+		}
+<span class="pc bpc" id="L867" title="1 of 6 branches missed.">		if (StringUtils.isAllEmpty(query) &amp;&amp; metaDataJson.has(ApplicationConstants.TABLE_DELETION) &amp;&amp; !metaDataJson.get(ApplicationConstants.TABLE_DELETION).getAsJsonObject().isJsonNull())</span>
+		{
+<span class="fc" id="L869">			query = getBigQueryAuditMetadataForReason(</span>
+<span class="fc" id="L870">					metaDataJson.get(ApplicationConstants.TABLE_DELETION).getAsJsonObject());</span>
+		}
+<span class="fc" id="L872">		return query;</span>
+	}
+
+	/**
+	 * getBigQueryAuditMetadataForReason() method will perform operation on
+	 * JsonObject metadatajson object into queryStatement and return response
+	 *
+	 * @param JsonObject metadatajson
+	 * @methodName @getBigQueryAuditMetadataForReason
+	 * @return String
+	 *
+	 */
+	private static String getBigQueryAuditMetadataForReason(JsonObject metadatajson) {
+<span class="fc" id="L885">		String uireason = StringUtils.EMPTY;</span>
+<span class="fc" id="L886">		uireason = CommonUtils.convertIntoString(metadatajson.get(ApplicationConstants.REASON));</span>
+<span class="fc" id="L887">		return uireason;</span>
+	}
+
+	/**
+	 * getResourceName() method will perform operation on JsonObject inputJson
+	 * object convert into appUserName and return response
+	 *
+	 * @param JsonObject protoPayloadJsonObject
+	 * @methodName @getResourceName
+	 * @return String
+	 *
+	 */
+	private static String getResourceName(JsonObject protoPayloadJsonObject) {
+<span class="fc" id="L900">		String resourceName = StringUtils.EMPTY;</span>
+<span class="fc" id="L901">		resourceName = CommonUtils.convertIntoString(protoPayloadJsonObject.get(ApplicationConstants.RESOURCE_NAME));</span>
+<span class="fc" id="L902">		return resourceName;</span>
+	}
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.4.201905082037</span></div></body></html>

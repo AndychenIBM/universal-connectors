@@ -1,0 +1,456 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>HdfsGuardiumFilter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">logstash-filter-hdfs-guardium</a> &gt; <a href="index.source.html" class="el_package">com.ibm.guardium.hdfs</a> &gt; <span class="el_source">HdfsGuardiumFilter.java</span></div><h1>HdfsGuardiumFilter.java</h1><pre class="source lang-java linenums">/*
+ *
+ * Copyright 2020-2021 IBM Inc. All rights reserved
+ * SPDX-License-Identifier: Apache2.0
+ *
+ */
+package com.ibm.guardium.hdfs;
+
+import co.elastic.logstash.api.Configuration;
+import co.elastic.logstash.api.Context;
+import co.elastic.logstash.api.Event;
+import co.elastic.logstash.api.Filter;
+import co.elastic.logstash.api.FilterMatchListener;
+import co.elastic.logstash.api.LogstashPlugin;
+import co.elastic.logstash.api.PluginConfigSpec;
+import com.google.gson.*;
+import com.ibm.guardium.universalconnector.commons.GuardConstants;
+import com.ibm.guardium.universalconnector.commons.Util;
+import com.ibm.guardium.universalconnector.commons.structures.*;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.LoggerContext;
+
+import java.io.File;
+import java.util.*;
+import java.text.ParseException;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.security.MessageDigest;
+import java.nio.ByteBuffer;
+
+// class name must match plugin name
+@LogstashPlugin(name = &quot;hdfs_guardium_filter&quot;)
+public class HdfsGuardiumFilter implements Filter {
+
+<span class="fc" id="L40">    private static Logger log = null;</span>
+
+<span class="fc" id="L42">    public static final PluginConfigSpec&lt;String&gt; SOURCE_CONFIG =</span>
+<span class="fc" id="L43">            PluginConfigSpec.stringSetting(&quot;source&quot;, &quot;message&quot;);</span>
+    public static final String LOGSTASH_TAG_SKIP_NOT_HDFS = &quot;_hdfsguardium_skip_not_hdfs&quot;;
+    public static final String LOGSTASH_TAG_PARSE_ERROR = &quot;_hdfsguardium_parse_error&quot;;
+    
+    private String id;
+
+	public static final String HDFS_AUDIT_MARK_STRING = &quot;FSNamesystem.audit&quot;;
+    public static final String DATA_PROTOCOL_STRING = &quot;HDFS native audit&quot;;
+    public static final String UNKNOWN_STRING = &quot;&quot;;
+    public static final String SERVER_TYPE_STRING = &quot;HDFS&quot;;
+	public static final String APP_NAME_STRING = &quot;HADOOP CLIENT PROGRAM&quot;;
+	public static final String NULL_STRING = &quot;null&quot;;
+	public static final String TRUE_STRING = &quot;true&quot;;
+	public static final String FALSE_STRING = &quot;false&quot;;
+	public static final String ALLOW_TAG_STRING = &quot;allowed&quot;;
+	public static final String CMD_TAG_STRING = &quot;cmd&quot;;
+	public static final String SRC_TAG_STRING = &quot;src&quot;;
+	public static final String DST_TAG_STRING = &quot;dst&quot;;
+	public static final String PERM_TAG_STRING = &quot;perm&quot;;
+	public static final String IP_TAG_STRING = &quot;ip&quot;;
+	public static final String USER_TAG_STRING = &quot;ugi&quot;;
+	public static final String TIME_TAG_STRING = &quot;timestamp&quot;;
+	public static final String HOSTNAME_TAG_STRING = &quot;hostname&quot;;
+	public static final String EVENT_TAG_STRING = &quot;event&quot;;
+	public static final String TIMEZONE_TAG_STRING = &quot;timezone&quot;;
+	public static final String SPACE_STRING = &quot; &quot;;
+	public static final String EQUAL_STRING = &quot;=&quot;;
+	public static final String KERBEROS_MARK_STRING = &quot; (auth:KERBEROS)&quot;;
+	public static final String VIA_MARK_STRING = &quot; via &quot;;
+	public static final String PROXY_MARK_STRING = &quot; (auth:PROXY)&quot;;
+    public static final String EXCEPTION_TYPE_AUTHORIZATION_STRING = &quot;SQL_ERROR&quot;;
+	public static final String EXCEPTION_DESCRIPTION_STRING = &quot;Operation not allowed&quot;;
+	public static final String HOST_INFO_TAG_STRING = &quot;host&quot;;
+
+	// 2020-08-15 17:04:03,741
+<span class="fc" id="L78">    private static String AUDIT_DATE_FORMAT = &quot;yyyy-MM-dd HH:mm:ss,SSS&quot;;</span>
+<span class="fc" id="L79">    private static final DateTimeFormatterBuilder dateTimeFormatterBuilder = new DateTimeFormatterBuilder()</span>
+<span class="fc" id="L80">            .append(DateTimeFormatter.ofPattern(AUDIT_DATE_FORMAT));</span>
+<span class="fc" id="L81">    private static final DateTimeFormatter DATE_TIME_FORMATTER = dateTimeFormatterBuilder.toFormatter();</span>
+
+<span class="fc" id="L83">    public HdfsGuardiumFilter(String id, Configuration config, Context context) {</span>
+        // constructors should validate configuration options
+<span class="fc" id="L85">        this.id = id;</span>
+<span class="fc" id="L86">    }</span>
+
+    @Override
+    public Collection&lt;Event&gt; filter(Collection&lt;Event&gt; events, FilterMatchListener matchListener) {
+<span class="fc bfc" id="L90" title="All 2 branches covered.">		if (log == null) {</span>
+<span class="fc" id="L91">			log = LogManager.getLogger(HdfsGuardiumFilter.class);</span>
+<span class="fc" id="L92">			log.error(&quot;Got logger at filter instantiation&quot;);</span>
+		}
+<span class="fc" id="L94">        ArrayList&lt;Event&gt; skippedEvents = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L95" title="All 2 branches covered.">        for (Event e : events) {</span>
+<span class="fc" id="L96">            log.debug(&quot;Event: &quot; + logEvent(e));</span>
+<span class="pc bpc" id="L97" title="1 of 2 branches missed.">			if (e.getField(&quot;message&quot;) instanceof String) {</span>
+				// String msg_string = e.getField(&quot;message&quot;).toString();
+<span class="pc bpc" id="L99" title="1 of 2 branches missed.">				if (e.getField(&quot;message&quot;).toString().contains(HdfsGuardiumFilter.HDFS_AUDIT_MARK_STRING)) {</span>
+					try {
+<span class="fc" id="L101">            			Record record = HdfsGuardiumFilter.parseRecord(e);</span>
+
+<span class="fc" id="L103">            			final GsonBuilder builder = new GsonBuilder();</span>
+<span class="fc" id="L104">            			builder.serializeNulls();</span>
+<span class="fc" id="L105">            			final Gson gson = builder.create();</span>
+<span class="fc" id="L106">            			e.setField(GuardConstants.GUARDIUM_RECORD_FIELD_NAME, gson.toJson(record));</span>
+
+<span class="fc" id="L108">            			log.debug(&quot;Record Event: &quot;+logEvent(e));</span>
+<span class="fc" id="L109">            			matchListener.filterMatched(e); // Flag OK for filter input/parsing/out</span>
+<span class="nc" id="L110">            		} catch (Exception exception) {</span>
+<span class="nc" id="L111">            		    log.error(&quot;Error parsing HDFS event &quot; + logEvent(e), exception);</span>
+<span class="nc" id="L112">            		    e.tag(LOGSTASH_TAG_PARSE_ERROR);</span>
+<span class="pc" id="L113">            		}</span>
+				} else {
+<span class="nc" id="L115">            		e.tag(LOGSTASH_TAG_SKIP_NOT_HDFS);</span>
+				}
+			}
+<span class="fc" id="L118">        }</span>
+
+        // Remove skipped mongodb events from reaching output
+<span class="fc" id="L121">        events.removeAll(skippedEvents);</span>
+<span class="fc" id="L122">        return events;</span>
+    }
+
+    private static String logEvent(Event event){
+        try {
+<span class="fc" id="L127">            StringBuffer sb = new StringBuffer();</span>
+<span class="fc" id="L128">            sb.append(&quot;{ &quot;);</span>
+<span class="fc" id="L129">            boolean first = true;</span>
+<span class="fc bfc" id="L130" title="All 2 branches covered.">            for (Map.Entry&lt;String, Object&gt; stringObjectEntry : event.getData().entrySet()) {</span>
+<span class="fc bfc" id="L131" title="All 2 branches covered.">                if (!first){</span>
+<span class="fc" id="L132">                    sb.append(&quot;,&quot;);</span>
+                }
+<span class="fc" id="L134">                sb.append(&quot;\&quot;&quot;+stringObjectEntry.getKey()+&quot;\&quot; : \&quot;&quot;+stringObjectEntry.getValue()+&quot;\&quot;&quot;);</span>
+<span class="fc" id="L135">                first = false;</span>
+<span class="fc" id="L136">            }</span>
+<span class="fc" id="L137">            sb.append(&quot; }&quot;);</span>
+<span class="fc" id="L138">            return sb.toString();</span>
+<span class="nc" id="L139">        } catch (Exception e){</span>
+<span class="nc" id="L140">            log.error(&quot;Failed to create event log string&quot;, e);</span>
+<span class="nc" id="L141">            return null;</span>
+        }
+    }
+
+    @Override
+    public Collection&lt;PluginConfigSpec&lt;?&gt;&gt; configSchema() {
+        // should return a list of all configuration options for this plugin
+<span class="nc" id="L148">        return Collections.singletonList(SOURCE_CONFIG);</span>
+    }
+
+    @Override
+    public String getId() {
+<span class="nc" id="L153">        return this.id;</span>
+    }
+    
+	public static Record parseRecord(final Event event) throws ParseException {
+<span class="fc" id="L157">        Record record = new Record();</span>
+
+<span class="fc" id="L159">        record.setSessionId(HdfsGuardiumFilter.UNKNOWN_STRING);</span>
+<span class="fc" id="L160">        record.setDbName(HdfsGuardiumFilter.UNKNOWN_STRING);</span>
+		// should be first user of a PROXY ugi
+<span class="pc bpc" id="L162" title="1 of 2 branches missed.">		if (event.getField(HdfsGuardiumFilter.USER_TAG_STRING) instanceof String) {</span>
+<span class="fc" id="L163">        	record.setAppUserName(parseAppUserName(event.getField(HdfsGuardiumFilter.USER_TAG_STRING).toString()));</span>
+		} else {
+<span class="nc" id="L165">        	record.setAppUserName(HdfsGuardiumFilter.UNKNOWN_STRING);</span>
+		}
+        
+<span class="fc" id="L168">		record.setSessionLocator(HdfsGuardiumFilter.parseSessionLocator(event));</span>
+<span class="fc" id="L169">        record.setAccessor(HdfsGuardiumFilter.parseAccessor(event));</span>
+        
+<span class="pc bpc" id="L171" title="1 of 2 branches missed.">		if (event.getField(HdfsGuardiumFilter.ALLOW_TAG_STRING) instanceof String) {</span>
+<span class="pc bpc" id="L172" title="1 of 2 branches missed.">			if (event.getField(HdfsGuardiumFilter.ALLOW_TAG_STRING).equals(HdfsGuardiumFilter.TRUE_STRING)) {</span>
+<span class="fc" id="L173">				record.setData(HdfsGuardiumFilter.parseData(event));</span>
+			} else {
+<span class="nc" id="L175">				record.setException(HdfsGuardiumFilter.parseException(event));</span>
+			}
+		}
+ 
+<span class="fc" id="L179">		record.getSessionLocator().setClientPort(HdfsGuardiumFilter.getSessionHash(record.getAppUserName(), record.getAccessor().getDbUser(), record.getSessionLocator().getClientIp()));</span>
+<span class="fc" id="L180">		record.getAccessor().setServiceName(HdfsGuardiumFilter.UNKNOWN_STRING);</span>
+
+<span class="fc" id="L182">        record.setTime(HdfsGuardiumFilter.getTime(event));</span>
+
+<span class="fc" id="L184">        return record;</span>
+    }
+
+	public static short getSessionHash(String app_user, String user, String client_ip) {
+<span class="fc" id="L188">		StringBuilder sb = new StringBuilder();</span>
+<span class="fc" id="L189">		short hash_id = 0;</span>
+		try {
+<span class="fc" id="L191">			MessageDigest msg_digest = MessageDigest.getInstance(&quot;SHA-256&quot;);</span>
+
+<span class="fc" id="L193">			sb.append(app_user).append(user).append(client_ip);</span>
+
+<span class="fc" id="L195">			byte[] digest = msg_digest.digest(sb.toString().getBytes());</span>
+
+<span class="fc" id="L197">			ByteBuffer bb = ByteBuffer.wrap(digest);</span>
+
+<span class="fc" id="L199">			hash_id = bb.getShort();</span>
+
+<span class="fc bfc" id="L201" title="All 2 branches covered.">			if (hash_id &lt; 0) {</span>
+<span class="fc" id="L202">				hash_id *= -1;</span>
+			}
+<span class="nc" id="L204">		} catch (Exception e) {</span>
+<span class="fc" id="L205">		}</span>
+
+<span class="fc" id="L207">		return hash_id;</span>
+	}
+
+	public static String parseAppUserName(String ugi) {
+<span class="fc" id="L211">		String result = HdfsGuardiumFilter.UNKNOWN_STRING;</span>
+<span class="fc" id="L212">		String[] str_parts = ugi.split(HdfsGuardiumFilter.VIA_MARK_STRING);</span>
+
+<span class="fc bfc" id="L214" title="All 2 branches covered.">		if (str_parts.length &gt; 1) {</span>
+<span class="fc" id="L215">			result = str_parts[0];</span>
+		}
+
+<span class="fc" id="L218">		return trimUserAuth(result);</span>
+	}
+
+	public static String parseDbUser(String ugi) {
+<span class="fc" id="L222">		String result = HdfsGuardiumFilter.UNKNOWN_STRING;</span>
+<span class="fc" id="L223">		String[] str_parts = ugi.split(HdfsGuardiumFilter.VIA_MARK_STRING);</span>
+
+<span class="fc bfc" id="L225" title="All 2 branches covered.">		if (str_parts.length &gt; 1) {</span>
+<span class="fc" id="L226">			result = str_parts[1];</span>
+		} else {
+<span class="fc" id="L228">			result = str_parts[0];</span>
+		}
+
+<span class="fc" id="L231">		return trimUserAuth(result);</span>
+	}
+
+	private static String trimUserAuth(String user) {
+<span class="fc bfc" id="L235" title="All 2 branches covered.">		if (user.contains(HdfsGuardiumFilter.KERBEROS_MARK_STRING)) {</span>
+<span class="fc" id="L236">			user = user.substring(0, user.length() - HdfsGuardiumFilter.KERBEROS_MARK_STRING.length());</span>
+<span class="fc bfc" id="L237" title="All 2 branches covered.">		} else if (user.contains(HdfsGuardiumFilter.PROXY_MARK_STRING)) {</span>
+<span class="fc" id="L238">			user = user.substring(0, user.length() - HdfsGuardiumFilter.PROXY_MARK_STRING.length());</span>
+		}
+
+<span class="fc" id="L241">		return user;</span>
+	}
+
+    private static SessionLocator parseSessionLocator(Event event) {
+<span class="fc" id="L245">        SessionLocator sessionLocator = new SessionLocator();</span>
+<span class="fc" id="L246">        sessionLocator.setIpv6(false);</span>
+
+<span class="fc" id="L248">        sessionLocator.setClientIp(HdfsGuardiumFilter.UNKNOWN_STRING);</span>
+<span class="fc" id="L249">        sessionLocator.setClientIpv6(HdfsGuardiumFilter.UNKNOWN_STRING);</span>
+<span class="fc" id="L250">        sessionLocator.setServerIp(HdfsGuardiumFilter.UNKNOWN_STRING);</span>
+<span class="fc" id="L251">        sessionLocator.setServerIpv6(HdfsGuardiumFilter.UNKNOWN_STRING);</span>
+
+<span class="pc bpc" id="L253" title="1 of 2 branches missed.">		if (event.getField(HdfsGuardiumFilter.IP_TAG_STRING) instanceof String) {</span>
+<span class="fc" id="L254">			String address = event.getField(HdfsGuardiumFilter.IP_TAG_STRING).toString();</span>
+<span class="pc bpc" id="L255" title="1 of 2 branches missed.">			if (Util.isIPv6(address)) {</span>
+<span class="nc" id="L256">				sessionLocator.setIpv6(true);</span>
+<span class="nc" id="L257">        		sessionLocator.setClientIpv6(address);</span>
+			} else {
+<span class="fc" id="L259">        		sessionLocator.setClientIp(address);</span>
+			}
+		}
+<span class="pc bpc" id="L262" title="1 of 2 branches missed.">		if (event.getField(HdfsGuardiumFilter.HOST_INFO_TAG_STRING) instanceof HashMap) {</span>
+<span class="nc" id="L263">			String address = &quot;&quot;;</span>
+<span class="nc" id="L264">			ArrayList&lt;String&gt; ip_list = ((ArrayList&lt;String&gt;)((HashMap&lt;String, Object&gt;)event.getField(HdfsGuardiumFilter.HOST_INFO_TAG_STRING)).get(HdfsGuardiumFilter.IP_TAG_STRING));</span>
+<span class="nc bnc" id="L265" title="All 2 branches missed.">			if (!ip_list.isEmpty()) {</span>
+<span class="nc" id="L266">				address = ip_list.get(ip_list.size() - 1);</span>
+			}
+<span class="nc bnc" id="L268" title="All 2 branches missed.">			if (!address.isEmpty()) {</span>
+<span class="nc bnc" id="L269" title="All 2 branches missed.">				if (Util.isIPv6(address)) {</span>
+<span class="nc" id="L270">					sessionLocator.setIpv6(true);</span>
+<span class="nc" id="L271">        			sessionLocator.setServerIpv6(address);</span>
+				} else {
+<span class="nc" id="L273">        			sessionLocator.setServerIp(address);</span>
+				}
+			}
+		}
+
+<span class="fc" id="L278">        return sessionLocator;</span>
+    }
+ 
+	private static Accessor parseAccessor(Event event) {
+<span class="fc" id="L282">        Accessor accessor = new Accessor();</span>
+
+<span class="fc" id="L284">        accessor.setDbProtocol(HdfsGuardiumFilter.DATA_PROTOCOL_STRING);</span>
+<span class="fc" id="L285">        accessor.setServerType(HdfsGuardiumFilter.SERVER_TYPE_STRING);</span>
+
+<span class="pc bpc" id="L287" title="1 of 2 branches missed.">		if (event.getField(HdfsGuardiumFilter.USER_TAG_STRING) instanceof String) {</span>
+			// should be username without any auth info
+<span class="fc" id="L289">			accessor.setDbUser(parseDbUser(event.getField(HdfsGuardiumFilter.USER_TAG_STRING).toString()));</span>
+		} else {
+<span class="nc" id="L291">			accessor.setDbUser(HdfsGuardiumFilter.UNKNOWN_STRING);</span>
+		}
+
+<span class="pc bpc" id="L294" title="1 of 2 branches missed.">		if (event.getField(HdfsGuardiumFilter.HOST_INFO_TAG_STRING) instanceof HashMap) {</span>
+<span class="nc" id="L295">			accessor.setServerHostName((String)((HashMap&lt;String, Object&gt;)event.getField(HdfsGuardiumFilter.HOST_INFO_TAG_STRING)).get(HdfsGuardiumFilter.HOSTNAME_TAG_STRING));</span>
+		} else {
+<span class="fc" id="L297">        	accessor.setServerHostName(HdfsGuardiumFilter.UNKNOWN_STRING);</span>
+		}
+<span class="fc" id="L299">        accessor.setSourceProgram(HdfsGuardiumFilter.APP_NAME_STRING);</span>
+
+<span class="fc" id="L301">        accessor.setLanguage(Accessor.LANGUAGE_FREE_TEXT_STRING);</span>
+<span class="fc" id="L302">        accessor.setDataType(Accessor.DATA_TYPE_GUARDIUM_SHOULD_NOT_PARSE_SQL);</span>
+
+<span class="fc" id="L304">        accessor.setClient_mac(HdfsGuardiumFilter.UNKNOWN_STRING);</span>
+<span class="pc bpc" id="L305" title="1 of 2 branches missed.">		if (event.getField(HdfsGuardiumFilter.HOSTNAME_TAG_STRING) instanceof String) {</span>
+<span class="nc" id="L306">        	accessor.setClientHostName(event.getField(HdfsGuardiumFilter.HOSTNAME_TAG_STRING).toString());</span>
+		} else {
+<span class="fc" id="L308">        	accessor.setClientHostName(HdfsGuardiumFilter.UNKNOWN_STRING);</span>
+		}
+<span class="fc" id="L310">        accessor.setClientOs(HdfsGuardiumFilter.UNKNOWN_STRING);</span>
+<span class="fc" id="L311">        accessor.setCommProtocol(HdfsGuardiumFilter.UNKNOWN_STRING);</span>
+<span class="fc" id="L312">        accessor.setDbProtocolVersion(HdfsGuardiumFilter.UNKNOWN_STRING);</span>
+<span class="fc" id="L313">        accessor.setOsUser(HdfsGuardiumFilter.UNKNOWN_STRING);</span>
+<span class="fc" id="L314">        accessor.setServerDescription(HdfsGuardiumFilter.UNKNOWN_STRING);</span>
+<span class="fc" id="L315">        accessor.setServerOs(HdfsGuardiumFilter.UNKNOWN_STRING);</span>
+<span class="fc" id="L316">        accessor.setServiceName(HdfsGuardiumFilter.UNKNOWN_STRING);</span>
+
+<span class="fc" id="L318">        return accessor;</span>
+    }
+
+	private static Time getTime(final Event event) {
+<span class="fc" id="L322">		String audit_date_string = null;</span>
+
+<span class="pc bpc" id="L324" title="1 of 2 branches missed.">	 	if (event.getField(HdfsGuardiumFilter.TIME_TAG_STRING) instanceof String) {</span>
+<span class="fc" id="L325">			audit_date_string = event.getField(HdfsGuardiumFilter.TIME_TAG_STRING).toString();</span>
+		} else {
+<span class="nc" id="L327">			log.error(&quot;Unable to get timestamp from event&quot;);</span>
+<span class="nc" id="L328">			return new Time(0, 0, 0);</span>
+		}
+		
+<span class="pc bpc" id="L331" title="1 of 2 branches missed.">		if (event.getField(HdfsGuardiumFilter.EVENT_TAG_STRING) instanceof HashMap) {</span>
+<span class="nc" id="L332">			String timezone = ((HashMap&lt;String, String&gt;)event.getField(HdfsGuardiumFilter.EVENT_TAG_STRING)).get(HdfsGuardiumFilter.TIMEZONE_TAG_STRING);</span>
+<span class="nc" id="L333">			ZonedDateTime date = LocalDateTime.parse(audit_date_string, DATE_TIME_FORMATTER).atZone(ZoneId.of(timezone));</span>
+<span class="nc" id="L334">			long millis = date.toInstant().toEpochMilli();</span>
+<span class="nc" id="L335">			int  minOffset = date.getOffset().getTotalSeconds()/60;</span>
+<span class="nc" id="L336">			return new Time(millis, minOffset, 0);</span>
+		} else {
+<span class="fc" id="L338">			log.error(&quot;Unable to get timezone from event, using local timezone&quot;);</span>
+<span class="fc" id="L339">			ZonedDateTime date = LocalDateTime.parse(audit_date_string, DATE_TIME_FORMATTER).atZone(ZoneId.systemDefault());</span>
+<span class="fc" id="L340">			long millis = date.toInstant().toEpochMilli();</span>
+<span class="fc" id="L341">			int  minOffset = date.getOffset().getTotalSeconds()/60;</span>
+<span class="fc" id="L342">			return new Time(millis, minOffset, 0);</span>
+		}
+	}
+ 
+	private static Data parseData(Event event) {
+<span class="fc" id="L347">        Data data = new Data();</span>
+        try {
+<span class="fc" id="L349">            Construct construct = HdfsGuardiumFilter.ParseAsConstruct(event);</span>
+<span class="pc bpc" id="L350" title="1 of 2 branches missed.">            if (construct != null) {</span>
+<span class="fc" id="L351">                data.setConstruct(construct);</span>
+
+				// if (event.getField(HdfsGuardiumFilter.CMD_TAG_STRING) instanceof String) {
+				// 	StringBuilder orig_sql_bld = new StringBuilder();
+				// 	orig_sql_bld.append(HdfsGuardiumFilter.CMD_TAG_STRING);
+				// 	orig_sql_bld.append(HdfsGuardiumFilter.EQUAL_STRING);
+				// 	orig_sql_bld.append(event.getField(HdfsGuardiumFilter.CMD_TAG_STRING));
+        		// 	data.setFullSql(orig_sql_bld.toString());
+				// } else {
+                //     construct.setFullSql(HdfsGuardiumFilter.UNKNOWN_STRING);
+				// }
+            }
+<span class="nc" id="L363">        } catch (Exception e) {</span>
+<span class="nc" id="L364">            throw e;</span>
+<span class="fc" id="L365">        }</span>
+<span class="fc" id="L366">        return data;</span>
+    }
+ 
+	private static Construct ParseAsConstruct(final Event event) {
+        try {
+<span class="fc" id="L371">            final Sentence sentence = HdfsGuardiumFilter.parseSentence(event);</span>
+            
+<span class="fc" id="L373">            final Construct construct = new Construct();</span>
+<span class="fc" id="L374">            construct.sentences.add(sentence);</span>
+ 
+<span class="fc" id="L376">			construct.setFullSql(buildSqlString(event));</span>
+<span class="fc" id="L377">			construct.setRedactedSensitiveDataSql(construct.getFullSql());</span>
+<span class="fc" id="L378">            return construct;</span>
+<span class="nc" id="L379">        } catch (final Exception e) {</span>
+<span class="nc" id="L380">            throw e;</span>
+        }
+    }
+
+	public static String buildSqlString(final Event event) {
+<span class="fc" id="L385">		StringBuilder full_sql_bld = new StringBuilder();</span>
+<span class="pc bpc" id="L386" title="1 of 2 branches missed.">		if (event.getField(HdfsGuardiumFilter.CMD_TAG_STRING) instanceof String) {</span>
+<span class="fc" id="L387">			full_sql_bld.append(HdfsGuardiumFilter.CMD_TAG_STRING);</span>
+<span class="fc" id="L388">			full_sql_bld.append(HdfsGuardiumFilter.EQUAL_STRING);</span>
+<span class="fc" id="L389">			full_sql_bld.append(event.getField(HdfsGuardiumFilter.CMD_TAG_STRING));</span>
+		}
+<span class="pc bpc" id="L391" title="1 of 2 branches missed.">		if (event.getField(HdfsGuardiumFilter.SRC_TAG_STRING) instanceof String &amp;&amp;</span>
+<span class="pc bpc" id="L392" title="1 of 2 branches missed.">				!event.getField(HdfsGuardiumFilter.SRC_TAG_STRING).toString().equals(HdfsGuardiumFilter.NULL_STRING)) {</span>
+<span class="fc" id="L393">			full_sql_bld.append(HdfsGuardiumFilter.SPACE_STRING);</span>
+<span class="fc" id="L394">			full_sql_bld.append(HdfsGuardiumFilter.SRC_TAG_STRING);</span>
+<span class="fc" id="L395">			full_sql_bld.append(HdfsGuardiumFilter.EQUAL_STRING);</span>
+<span class="fc" id="L396">			full_sql_bld.append(event.getField(HdfsGuardiumFilter.SRC_TAG_STRING));</span>
+		}
+<span class="pc bpc" id="L398" title="1 of 2 branches missed.">		if (event.getField(HdfsGuardiumFilter.DST_TAG_STRING) instanceof String &amp;&amp;</span>
+<span class="fc bfc" id="L399" title="All 2 branches covered.">				!event.getField(HdfsGuardiumFilter.DST_TAG_STRING).toString().equals(HdfsGuardiumFilter.NULL_STRING)) {</span>
+<span class="fc" id="L400">			full_sql_bld.append(HdfsGuardiumFilter.SPACE_STRING);</span>
+<span class="fc" id="L401">			full_sql_bld.append(HdfsGuardiumFilter.DST_TAG_STRING);</span>
+<span class="fc" id="L402">			full_sql_bld.append(HdfsGuardiumFilter.EQUAL_STRING);</span>
+<span class="fc" id="L403">			full_sql_bld.append(event.getField(HdfsGuardiumFilter.DST_TAG_STRING));</span>
+		}
+<span class="pc bpc" id="L405" title="1 of 2 branches missed.">		if (event.getField(HdfsGuardiumFilter.PERM_TAG_STRING) instanceof String &amp;&amp;</span>
+<span class="fc bfc" id="L406" title="All 2 branches covered.">				!event.getField(HdfsGuardiumFilter.PERM_TAG_STRING).toString().equals(HdfsGuardiumFilter.NULL_STRING)) {</span>
+<span class="fc" id="L407">			full_sql_bld.append(HdfsGuardiumFilter.SPACE_STRING);</span>
+<span class="fc" id="L408">			full_sql_bld.append(HdfsGuardiumFilter.PERM_TAG_STRING);</span>
+<span class="fc" id="L409">			full_sql_bld.append(HdfsGuardiumFilter.EQUAL_STRING);</span>
+<span class="fc" id="L410">			full_sql_bld.append(event.getField(HdfsGuardiumFilter.PERM_TAG_STRING));</span>
+		}
+<span class="fc" id="L412">		return full_sql_bld.toString();</span>
+	}
+ 
+    private static Sentence parseSentence(final Event event) {
+<span class="fc" id="L416">        Sentence sentence = null;</span>
+
+<span class="pc bpc" id="L418" title="1 of 2 branches missed.">		if (event.getField(HdfsGuardiumFilter.CMD_TAG_STRING) instanceof String) {</span>
+<span class="fc" id="L419">			sentence = new Sentence(event.getField(HdfsGuardiumFilter.CMD_TAG_STRING).toString());</span>
+		} else {
+<span class="nc" id="L421">			sentence = new Sentence(HdfsGuardiumFilter.UNKNOWN_STRING);</span>
+		}
+
+<span class="pc bpc" id="L424" title="1 of 2 branches missed.">		if (event.getField(HdfsGuardiumFilter.SRC_TAG_STRING) instanceof String &amp;&amp;</span>
+<span class="pc bpc" id="L425" title="1 of 2 branches missed.">				!event.getField(HdfsGuardiumFilter.SRC_TAG_STRING).toString().equals(HdfsGuardiumFilter.NULL_STRING)) {</span>
+<span class="fc" id="L426">			SentenceObject src_object = new SentenceObject(event.getField(HdfsGuardiumFilter.SRC_TAG_STRING).toString());</span>
+<span class="fc" id="L427">			src_object.setType(HdfsGuardiumFilter.SRC_TAG_STRING);</span>
+<span class="fc" id="L428">			sentence.getObjects().add(src_object);</span>
+		}
+
+<span class="pc bpc" id="L431" title="1 of 2 branches missed.">		if (event.getField(HdfsGuardiumFilter.DST_TAG_STRING) instanceof String &amp;&amp;</span>
+<span class="fc bfc" id="L432" title="All 2 branches covered.">				!event.getField(HdfsGuardiumFilter.DST_TAG_STRING).toString().equals(HdfsGuardiumFilter.NULL_STRING)) {</span>
+<span class="fc" id="L433">			SentenceObject dst_object = new SentenceObject(event.getField(HdfsGuardiumFilter.DST_TAG_STRING).toString());</span>
+<span class="fc" id="L434">			dst_object.setType(HdfsGuardiumFilter.DST_TAG_STRING);</span>
+<span class="fc" id="L435">			sentence.getObjects().add(dst_object);</span>
+		}
+
+<span class="pc bpc" id="L438" title="1 of 2 branches missed.">		if (event.getField(HdfsGuardiumFilter.PERM_TAG_STRING) instanceof String &amp;&amp;</span>
+<span class="fc bfc" id="L439" title="All 2 branches covered.">				!event.getField(HdfsGuardiumFilter.PERM_TAG_STRING).toString().equals(HdfsGuardiumFilter.NULL_STRING)) {</span>
+<span class="fc" id="L440">			SentenceObject perm_object = new SentenceObject(event.getField(HdfsGuardiumFilter.PERM_TAG_STRING).toString());</span>
+<span class="fc" id="L441">			perm_object.setType(HdfsGuardiumFilter.PERM_TAG_STRING);</span>
+<span class="fc" id="L442">			sentence.getObjects().add(perm_object);</span>
+		}
+
+<span class="fc" id="L445">        return sentence;</span>
+    }
+
+	private static ExceptionRecord parseException(final Event event) {
+<span class="nc" id="L449">		ExceptionRecord exception_record = new ExceptionRecord();</span>
+<span class="nc" id="L450">		exception_record.setExceptionTypeId(HdfsGuardiumFilter.EXCEPTION_TYPE_AUTHORIZATION_STRING);</span>
+<span class="nc" id="L451">		exception_record.setDescription(HdfsGuardiumFilter.EXCEPTION_DESCRIPTION_STRING);</span>
+<span class="nc" id="L452">		exception_record.setSqlString(buildSqlString(event));</span>
+<span class="nc" id="L453">		return exception_record;</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.4.201905082037</span></div></body></html>

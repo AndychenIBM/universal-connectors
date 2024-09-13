@@ -1,0 +1,507 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ExecuteSqlParser.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">logstash-filter-bigQuery-guardium</a> &gt; <a href="index.source.html" class="el_package">com.ibm.guardium.bigquery</a> &gt; <span class="el_source">ExecuteSqlParser.java</span></div><h1>ExecuteSqlParser.java</h1><pre class="source lang-java linenums">/*
+Copyright IBM Corp. 2021, 2023 All rights reserved.
+SPDX-License-Identifier: Apache-2.0
+ */
+
+package com.ibm.guardium.bigquery;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Stack;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
+import org.parboiled.parserunners.ParseRunner;
+import org.parboiled.support.ParseTreeUtils;
+import org.parboiled.support.ParsingResult;
+import org.parboiled.util.ParseUtils;
+
+<span class="nc" id="L28">public class ExecuteSqlParser {</span>
+
+<span class="fc" id="L30">	private static Map&lt;String, String&gt; VERB_LABEL_MAPPING = PegBigQueryParser.getVerbLabels();</span>
+<span class="fc" id="L31">	private static List&lt;String&gt; OBJECT_LABELS = PegBigQueryParser.getObjectLabels();</span>
+
+	/**
+	 * DDL queries are not supported Due to parser limitations,Hence handling in
+	 * regex to get object and verb values
+         * For Example
+	 * Create Table -
+	 *	Query -	CREATE TABLE Example ( x INT64, y STRING);
+	 *	Output - Object -&gt; Example
+    	 *		 Verb   -&gt; CREATE TABLE
+	 *  Create Function -
+	 *	Query - CREATE FUNCTION `bigdataset.other_function`(x INT64, y INT64)  AS (x * y * 2);
+	 *	Output - Object -&gt; other_function
+    	 *	 	Verb    -&gt; CREATE FUNCTION
+	 *  Create View -
+	 *	Query - CREATE VIEW `mydataset.new_view` AS WITH RECURSIVE T1 AS (SELECT 1 AS n UNION ALL SELECT n + 1 FROM T1 WHERE n &lt; 3) SELECT * FROM T1
+	 *	Output - Object -&gt; new_view
+    	 *		 Verb   -&gt; CREATE VIEW
+	 *  Create View -
+	 *	Query -	CREATE PROCEDURE mdataset.SelectFromTablesAndAppend(target_date DATE, OUT rows_added INT64) BEGIN .....
+	 *	Output - Object -&gt; SelectFromTablesAndAppend
+    	 *		 Verb   -&gt; CREATE PROCEDURE
+	 * 
+	 */
+	final static String customDDlRegex = &quot;(\\w+\\s+(?i)table)\\s+([\\w-]+\\s*\\.\\s*[\\w-]+\\s*\\.\\s*[\\w-]+)|(\\w+\\s+(?i)table)\\s+([\\w-]+\\s*\\.\\s*[\\w-]+)|(\\w+\\s+(?i)function)\\s+([\\w-]+\\s*\\.\\s*[\\w-]+\\s*\\.\\s*[\\w-]+)|(\\w+\\s+(?i)function)\\s+([\\w-]+\\s*\\.\\s*[\\w-]+)|(\\w+\\s+(?i)snapshot\\s+table)\\s+([\\w-]+\\s*\\.\\s*[\\w-]+\\s*\\.\\s*[\\w-]+)|(\\w+\\s+(?i)snapshot\\s+table)\\s+([\\w-]+\\s*\\.\\s*[\\w-]+)|(\\w+\\s+(?i)MATERIALIZED\\s+VIEW)\\s+([\\w-]+\\s*\\.\\s*[\\w-]+\\s*\\.\\s*[\\w-]+)|(\\w+\\s+(?i)MATERIALIZED\\s+VIEW)\\s+([\\w-]+\\s*\\.\\s*[\\w-]+)|(\\w+\\s+(?i)VIEW)\\s+([\\w-]+\\s*\\.\\s*[\\w-]+\\s*\\.\\s*[\\w-]+)|(\\w+\\s+(?i)VIEW)\\s+([\\w-]+\\s*\\.\\s*[\\w-]+)|(\\w+\\s+(?i)procedure)\\s+([\\w-]+\\s*\\.\\s*[\\w-]+\\s*\\.\\s*[\\w-]+)|(\\w+\\s+(?i)procedure)\\s+([\\w-]+\\s*\\.\\s*[\\w-]+)|(\\w+\\s+(?i)schema)\\s+([\\w-]+\\s*\\.\\s*[\\w-]+\\s*\\.\\s*[\\w-]+)|(\\w+\\s+(?i)schema)\\s+([\\w-]+\\s*\\.\\s*[\\w-]+)|(\\w+\\s+(?i)search\\s+index)\\s+([\\w-]+[\\w-]+)|(\\w+\\s+(?i)table\\s+function)\\s+([\\w-]+\\s*\\.\\s*[\\w-]+\\s*\\.\\s*[\\w-]+)|(\\w+\\s+(?i)table\\s+function)\\s+([\\w-]+\\s*\\.\\s*[\\w-]+)|(\\w+\\s+(?i)external\\s+table)\\s+([\\w-]+\\s*\\.\\s*[\\w-]+\\s*\\.\\s*[\\w-]+)|(\\w+\\s+(?i)external\\s+table)\\s+([\\w-]+\\s*\\.\\s*[\\w-]+)|(\\w+\\s+(?i)capacity)\\s+([\\w-]+\\s*\\.\\s*[\\w-]+\\s*\\.\\s*[\\w-]+)|(\\w+\\s+(?i)capacity)\\s+([\\w-]+\\s*\\.\\s*[\\w-]+)|(\\w+\\s+(?i)ASSIGNMENT)\\s+([\\w-]+\\s*\\.\\s*[\\w-]+\\s*\\.\\s*[\\w-]+)|(\\w+\\s+(?i)ASSIGNMENT)\\s+([\\w-]+\\s*\\.\\s*[\\w-]+)|(\\w+\\s+(?i)RESERVATION)\\s+([\\w-]+\\s*\\.\\s*[\\w-]+\\s*\\.\\s*[\\w-]+)|(\\w+\\s+(?i)RESERVATION)\\s+([\\w-]+\\s*\\.\\s*[\\w-]+)|(\\w+\\s+(?i)schema)\\s+([\\w]+)|(\\w+\\s+(?i)OR\\s+REPLACE\\s+TABLE)\\s+([\\w-]+\\s*\\.\\s*[\\w-]+\\s*\\.\\s*[\\w-]+)|(\\w+\\s+(?i)OR\\s+REPLACE\\s+TABLE)\\s+([\\w-]+\\s*\\.\\s*[\\w-]+)|(\\w+\\s+(?i)OR\\s+REPLACE\\s+VIEW)\\s+([\\w-]+\\s*\\.\\s*[\\w-]+\\s*\\.\\s*[\\w-]+)|(\\w+\\s+(?i)OR\\s+REPLACE\\s+VIEW)\\s+([\\w-]+\\s*\\.\\s*[\\w-]+)|(\\w+\\s+(?i)OR\\s+REPLACE\\s+MATERIALIZED\\s+view)\\s+([\\w-]+\\s*\\.\\s*[\\w-]+\\s*\\.\\s*[\\w-]+)|(\\w+\\s+(?i)OR\\s+REPLACE\\s+MATERIALIZED\\s+view)\\s+([\\w-]+\\s*\\.\\s*[\\w-]+)|(\\w+\\s+(?i)OR\\s+REPLACE\\s+TABLE\\s+FUNCTION)\\s+([\\w-]+\\s*\\.\\s*[\\w-]+\\s*\\.\\s*[\\w-]+)|(\\w+\\s+(?i)OR\\s+REPLACE\\s+TABLE\\s+FUNCTION)\\s+([\\w-]+\\s*\\.\\s*[\\w-]+)|(\\w+\\s+(?i)OR\\s+REPLACE\\s+FUNCTION)\\s+([\\w-]+\\s*\\.\\s*[\\w-]+\\s*\\.\\s*[\\w-]+)|(\\w+\\s+(?i)OR\\s+REPLACE\\s+FUNCTION)\\s+([\\w-]+\\s*\\.\\s*[\\w-]+)|(\\w+\\s+(?i)OR\\s+REPLACE\\s+PROCEDURE)\\s+([\\w-]+\\s*\\.\\s*[\\w-]+\\s*\\.\\s*[\\w-]+)|(\\w+\\s+(?i)OR\\s+REPLACE\\s+PROCEDURE)\\s+([\\w-]+\\s*\\.\\s*[\\w-]+)|(\\w+\\s+(?i)OR\\s+REPLACE\\s+EXTERNAL\\s+TABLE)\\s+([\\w-]+\\s*\\.\\s*[\\w-]+\\s*\\.\\s*[\\w-]+)|(\\w+\\s+(?i)OR\\s+REPLACE\\s+EXTERNAL\\s+TABLE)\\s+([\\w-]+\\s*\\.\\s*[\\w-]+)|(\\w+\\s+(?i)TEMP\\s+TABLE)\\s+([\\w-]+\\s*\\.\\s*[\\w-]+\\s*\\.\\s*[\\w-]+)|(\\w+\\s+(?i)TEMP\\s+TABLE)\\s+([\\w-]+\\s*\\.\\s*[\\w-]+)|(\\w+\\s+(?i)TEMP\\s+FUNCTION)\\s+([\\w-]+\\s*\\.\\s*[\\w-]+\\s*\\.\\s*[\\w-]+)|(\\w+\\s+(?i)TEMP\\s+FUNCTION)\\s+([\\w-]+\\s*\\.\\s*[\\w-]+)|(\\w+\\s+(?i)TEMPORARY\\s+TABLE)\\s+([\\w-]+\\s*\\.\\s*[\\w-]+\\s*\\.\\s*[\\w-]+)|(\\w+\\s+(?i)TEMPORARY\\s+TABLE)\\s+([\\w-]+\\s*\\.\\s*[\\w-]+)|(\\w+\\s+(?i)TEMPORARY\\s+FUNCTION)\\s+([\\w-]+\\s*\\.\\s*[\\w-]+\\s*\\.\\s*[\\w-]+)|(\\w+\\s+(?i)TEMPORARY\\s+FUNCTION)\\s+([\\w-]+\\s*\\.\\s*[\\w-]+)|(\\w+\\s+(?i)TEMP\\s+TABLE)\\s+([\\w-]+)|(\\w+\\s+(?i)TEMPORARY\\s+TABLE)\\s+([\\w-]+)|(\\w+\\s+(?i)OR\\s+REPLACE\\s+TEMP\\s+TABLE)\\s+([\\w-]+)|(\\w+\\s+(?i)OR\\s+REPLACE\\s+TEMPORARY\\s+TABLE)\\s+([\\w-]+)|(\\w+\\s+(?i)TEMP\\s+FUNCTION)\\s+([\\w-]+)|(\\w+\\s+(?i)TEMPORARY\\s+FUNCTION)\\s+([\\w-]+)|(\\w+\\s+(?i)OR\\s+REPLACE\\s+TEMP\\s+FUNCTION)\\s+([\\w-]+)|(\\w+\\s+(?i)OR\\s+REPLACE\\s+TEMPORARY\\s+FUNCTION)\\s+([\\w-]+)|(^WITH\\s+)(\\w+[a-zA-Z0-9.]*\\s+)(?:AS\\s*\\()(\\s*\\w+\\s+)(?:.*\\s+)(?:FROM\\s+)(\\w+[a-zA-Z0-9.]*)&quot;;
+
+<span class="fc" id="L57">	final static Pattern customDDlRegexPattern = Pattern.compile(customDDlRegex);</span>
+	/**
+	 * DCL queries are not supported Due to parser limitations,Hence handling in
+	 * regex to get object and verb values
+	 * 
+	 */
+	final static String grantRevokeRegex = &quot;((?i)grant)\\s+(\\w+\\/\\w+\\.?\\w+\\s+\\w+\\s+\\w+)\\s+([\\w-]+\\s*\\.\\s*[\\w-]+\\s*\\.\\s*[\\w-]+)|((?i)revoke)\\s+(\\w+\\/\\w+\\.?\\w+\\s+\\w+\\s+\\w+)\\s+([\\w-]+\\s*\\.\\s*[\\w-]+\\s*\\.\\s*[\\w-]+)|((?i)GRANT)\\s+(\\w+\\/\\w+\\.?\\w+\\s+\\w+\\s+\\w+)\\s+((\\w+\\-\\w+\\s*\\.)?\\s*\\w+)|((?i)GRANT)\\s+(\\w+\\/\\w+\\.?\\w+\\s+\\w+\\s+\\w+)\\s+((\\w+\\s*\\.)?\\s*\\w+)|((?i)REVOKE)\\s+(\\w+\\/\\w+\\.?\\w+\\s+\\w+\\s+\\w+)\\s+((\\w+\\-\\w+\\s*\\.)?\\s*\\w+)|((?i)REVOKE)\\s+(\\w+\\/\\w+\\.?\\w+\\s+\\w+\\s+\\w+)\\s+((\\w+\\s*\\.)?\\s*\\w+)&quot;;
+<span class="fc" id="L64">	final static Pattern customGrantRevokeRegex = Pattern.compile(grantRevokeRegex);</span>
+	
+	/**
+	 * To ignore TIMESTAMP and UNNEST from object map as these are keywords in SQL.
+	 * 
+	 */
+	//(?i)FROM\s*(?!(?i)\s+(\bTIMESTAMP\b\s*|\bUNNEST\b))\s+(\w+)
+	final static String customSelectRegex = &quot;(?i)FROM\\s*(?!(?i)\\s+(\\bTIMESTAMP\\b\\s*|\\bUNNEST\\b))\\s+([a-zA-z0-9.-]*)&quot;;
+<span class="fc" id="L72">	final static Pattern customSelectRegexPattern = Pattern.compile(customSelectRegex);</span>
+	/**
+	 * For all DDL queries, If exists and if not exist are optional,Hence handling
+	 * regex to replace with an empty string is necessary
+	 * 
+	 */
+	final static String testRegex = &quot;((?i)if\\s+exists)|((?i)if\\s+(?i)not\\s+exists)&quot;;
+<span class="fc" id="L79">	final static Pattern customTestPattern = Pattern.compile(testRegex);</span>
+
+	/**
+	 * MERGE queries are not supported Due to parser limitations,Hence handling in
+	 * regex to get object and verb values
+	 * 
+	 */
+	final static String mergeregex = &quot;(?i)(MERGE)\\s+(?:INTO)?\\s*((?:\\S+\\s*\\.)?(?:\\s*\\S+\\s*\\.)?\\s*\\w+)\\s+(?:AS)?\\s*(?:\\w+\\s+)?USING\\s+((?:\\S+\\s*\\.)?(?:\\s*\\S+\\s*\\.)?\\s*\\w+|[(]\\s*SELECT)|(^WITH\\s+)(\\w+\\s+)(?:AS\\s*)|(\\s*SELECT\\s+)(?:.*FROM)(\\s+\\w+)&quot;;
+<span class="fc" id="L87">	final static Pattern customMergeRegex = Pattern.compile(mergeregex);</span>
+
+	/**
+	 * Method to initiate parsing of SQL queries. This method will be using parser
+	 * and regular expression to fetch object and verb from a SQL query.
+	 * 
+	 * @param sql
+	 * @return
+	 */
+	@SuppressWarnings(&quot;unchecked&quot;)
+	public static Map&lt;String, Object&gt; runJSEngine(String sql) {
+<span class="fc" id="L98">		Map&lt;String, Object&gt; map = new HashMap&lt;&gt;();</span>
+		List&lt;String&gt; objVerbLst;
+		try {
+			// Check for merge query.
+<span class="fc bfc" id="L102" title="All 2 branches covered.">			if (sql.toUpperCase().contains(ApplicationConstants.MERGE)) {</span>
+<span class="fc" id="L103">				map = customMergeParser(sql);</span>
+<span class="fc" id="L104">				return map;</span>
+<span class="fc bfc" id="L105" title="All 2 branches covered.">			} else if (sql.toUpperCase().contains(ApplicationConstants.GRANT) // Checking Grand/Revoke query</span>
+<span class="fc bfc" id="L106" title="All 2 branches covered.">					|| sql.toUpperCase().contains(ApplicationConstants.REVOKE)) {</span>
+<span class="fc" id="L107">				map = customGrantRevokeParser(sql);</span>
+<span class="fc" id="L108">				return map;</span>
+			} else {
+				// Replacing RECURSIVE keyword with space as this is optional in with query.
+<span class="fc bfc" id="L111" title="All 4 branches covered.">				if ( !sql.isEmpty() &amp;&amp; sql.matches(&quot;((?i)WITH\\s+RECURSIVE[\\s\\n\\r\\S]*)&quot;)) {</span>
+<span class="fc" id="L112">					sql = sql.replaceAll(&quot;((?i)RECURSIVE)&quot;, &quot; &quot;);</span>
+				}
+<span class="fc" id="L114">				map = parseSQL(sql);</span>
+<span class="pc bpc" id="L115" title="2 of 6 branches missed.">				if (map.isEmpty() || (map.get(&quot;objects&quot;) != null &amp;&amp; map.get(&quot;objects&quot;).toString().isEmpty())</span>
+<span class="fc bfc" id="L116" title="All 2 branches covered.">						|| sql.matches(&quot;((?i)CREATE\\s+TABLE\\s+.*)&quot;)) {</span>
+<span class="fc" id="L117">					objVerbLst = ddLParser(sql);</span>
+<span class="pc bpc" id="L118" title="1 of 2 branches missed.">					map = objVerbLst.isEmpty() ? getMap(sql) : getObjectVerb(objVerbLst);</span>
+				} else {
+<span class="fc" id="L120">					map.put(&quot;objects&quot;, (List&lt;HashSet&lt;String&gt;&gt;) map.get(&quot;objects&quot;));</span>
+				}
+			}
+<span class="fc" id="L123">			return map;</span>
+<span class="fc" id="L124">		} catch (Exception ex) {</span>
+			// In case of parser failure we are checking with DDL regular expression.
+<span class="fc" id="L126">			objVerbLst = ddLParser(sql);</span>
+<span class="fc bfc" id="L127" title="All 2 branches covered.">			return map = objVerbLst.isEmpty() ? getMap(sql) : getObjectVerb(objVerbLst);</span>
+		}
+	}
+
+	/**
+	 * Utility method to prepare final map having object and verb.
+	 * 
+	 * @param sql
+	 * @return
+	 */
+	private static Map&lt;String, Object&gt; getMap(final String sql) {
+<span class="fc" id="L138">		final Map&lt;String, Object&gt; map = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L139">		final List&lt;String&gt; actionLst = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L140">		final List&lt;String&gt; objList = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L141">		String obj = customSelectParser(sql);</span>
+<span class="pc bpc" id="L142" title="1 of 2 branches missed.">		if (!obj.isEmpty()) {</span>
+<span class="nc" id="L143">			objList.add(customSelectParser(sql));</span>
+<span class="nc" id="L144">			map.put(ApplicationConstants.OBJECTS, objList);</span>
+		}
+<span class="fc" id="L146">		actionLst.add(ApplicationConstants.SELECT);</span>
+<span class="fc" id="L147">		map.put(ApplicationConstants.VERBS, actionLst);</span>
+<span class="fc" id="L148">		return map;</span>
+
+	}
+
+	/**
+	 * Method to parse Grant/Revoke queries using regular expression..
+	 * 
+	 * @param sql
+	 * @return
+	 */
+	private static Map&lt;String, Object&gt; customGrantRevokeParser(String sql) {
+<span class="fc" id="L159">		String sqlQuery = sql.replaceAll(Pattern.quote(&quot;`&quot;), &quot;&quot;);</span>
+<span class="fc" id="L160">		sqlQuery = CommonUtils.removeEscapeSequence(sqlQuery);</span>
+<span class="fc" id="L161">		Map&lt;String, Object&gt; map = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L162">		List&lt;String&gt; verbLst = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L163">		List&lt;String&gt; objLst = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L164">		final Matcher matcher = customGrantRevokeRegex.matcher(sqlQuery);</span>
+<span class="fc bfc" id="L165" title="All 2 branches covered.">		while (matcher.find()) {</span>
+<span class="fc" id="L166">			matcher.group(0).toString();</span>
+<span class="pc bpc" id="L167" title="1 of 2 branches missed.">			for (int i = 1; i &lt;= matcher.groupCount(); i++) {</span>
+<span class="fc bfc" id="L168" title="All 2 branches covered.">					if (matcher.group(i) != null) {</span>
+<span class="fc" id="L169">						verbLst.add(matcher.group(i));</span>
+<span class="fc" id="L170">						objLst.add(matcher.group(i + 2).trim());</span>
+<span class="fc" id="L171">						break;</span>
+					}
+			}
+<span class="fc" id="L174">			map.put(ApplicationConstants.VERBS, verbLst);</span>
+<span class="fc" id="L175">			map.put(ApplicationConstants.OBJECTS, objLst);</span>
+		}
+<span class="fc" id="L177">		return map;</span>
+	}
+
+	/**
+	 * Method to parse Merge queries using regular expression.
+	 * 
+	 * @param sql
+	 * @return
+	 */
+	private static Map&lt;String, Object&gt; customMergeParser(String sql) {
+<span class="fc" id="L187">		String sqlQuery1 = sql.replaceAll(Pattern.quote(&quot;`&quot;), &quot;&quot;);</span>
+<span class="fc" id="L188">		String sqlQuery = CommonUtils.removeEscapeSequence(sqlQuery1);</span>
+<span class="fc" id="L189">		String commonInputs = &quot;INSERT,UPDATE,DELETE&quot;;</span>
+<span class="fc" id="L190">		Map&lt;String, Object&gt; map = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L191">		List&lt;String&gt; verbLst = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L192">		List&lt;String&gt; objLst = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L193">		final Matcher matcher = customMergeRegex.matcher(sqlQuery);</span>
+<span class="fc bfc" id="L194" title="All 2 branches covered.">		while (matcher.find()) {</span>
+<span class="fc" id="L195">			matcher.group(0).toString();</span>
+<span class="pc bpc" id="L196" title="1 of 2 branches missed.">			for (int i = 1; i &lt;= matcher.groupCount(); i++) {</span>
+<span class="pc bpc" id="L197" title="1 of 2 branches missed.">				if (i % 10 != 0) {</span>
+<span class="pc bpc" id="L198" title="1 of 2 branches missed.">					if (matcher.group(i) != null) {</span>
+<span class="fc" id="L199">						String group = matcher.group(i + 1);</span>
+<span class="pc bpc" id="L200" title="1 of 2 branches missed.">						if(matcher.groupCount()&lt;i+2) {</span>
+<span class="nc" id="L201">							break;</span>
+						}
+<span class="fc" id="L203">						String group1 = matcher.group(i + 2);</span>
+<span class="fc" id="L204">						List&lt;String&gt; collect = Arrays.asList(StringUtils.split(commonInputs, &quot;,&quot;)).stream()</span>
+<span class="fc" id="L205">								.filter(s -&gt; StringUtils.containsIgnoreCase(sqlQuery, s)).collect(Collectors.toList());</span>
+<span class="fc bfc" id="L206" title="All 4 branches covered.">						if (matcher.group(i + 2).contains(ApplicationConstants.OPENB) &amp;&amp; collect.isEmpty()) {</span>
+<span class="fc" id="L207">							verbLst.add(matcher.group(i));</span>
+<span class="fc" id="L208">							objLst.add(group.trim());</span>
+<span class="fc bfc" id="L209" title="All 2 branches covered.">						} else if (collect.isEmpty()) {</span>
+<span class="fc" id="L210">							verbLst.add(matcher.group(i));</span>
+<span class="fc" id="L211">							verbLst.add(matcher.group(i));</span>
+<span class="fc" id="L212">							objLst.add(group.trim());</span>
+<span class="fc" id="L213">							objLst.add(group1.trim());</span>
+<span class="fc bfc" id="L214" title="All 2 branches covered.">						} else if (matcher.group(i + 2).contains(ApplicationConstants.OPENB)) {</span>
+<span class="fc" id="L215">							verbLst.add(matcher.group(i));</span>
+<span class="fc" id="L216">							verbLst.addAll(collect);</span>
+<span class="fc" id="L217">							objLst.add(group.trim());</span>
+<span class="fc" id="L218">							collect.stream().forEach(v -&gt; objLst.add(group.trim()));</span>
+						} else {
+<span class="fc" id="L220">							verbLst.add(matcher.group(i));</span>
+<span class="fc" id="L221">							verbLst.add(matcher.group(i));</span>
+<span class="fc" id="L222">							verbLst.addAll(collect);</span>
+<span class="fc" id="L223">							objLst.add(group.trim());</span>
+<span class="fc" id="L224">							objLst.add(group1.trim());</span>
+<span class="fc" id="L225">							collect.stream().forEach(v -&gt; objLst.add(group.trim()));</span>
+						}
+<span class="fc" id="L227">						break;</span>
+					}
+				}
+			}
+<span class="fc" id="L231">			map.put(ApplicationConstants.VERBS, verbLst);</span>
+<span class="fc" id="L232">			map.put(ApplicationConstants.OBJECTS, objLst);</span>
+		}
+<span class="fc" id="L234">		return map;</span>
+	}
+
+	/**
+	 * Method to prepare map of object and verb.
+	 * 
+	 * @param objVerbLst
+	 * @return
+	 */
+	private static Map&lt;String, Object&gt; getObjectVerb(List&lt;String&gt; objVerbLst) {
+<span class="fc" id="L244">		Map&lt;String, Object&gt; map = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L245">		List&lt;String&gt; actionLst = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L246">		List&lt;String&gt; objList = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L247" title="All 2 branches covered.">		for (int i = 0; i &lt; objVerbLst.size(); i++) {</span>
+<span class="fc bfc" id="L248" title="All 2 branches covered.">			if (i % 2 != 0) {</span>
+<span class="fc" id="L249">				objList.add(objVerbLst.get(i).toString().trim());</span>
+			} else {
+<span class="fc" id="L251">				actionLst.add(objVerbLst.get(i).replaceAll(&quot;\\s+&quot;, &quot; &quot;));</span>
+			}
+		}
+<span class="fc" id="L254">		map.put(ApplicationConstants.VERBS, actionLst);</span>
+<span class="fc" id="L255">		map.put(ApplicationConstants.OBJECTS, objList);</span>
+<span class="fc" id="L256">		return map;</span>
+	}
+
+	/**
+	 * Method to ignore Timestamp and UNNEST selection as object using regular
+	 * expression..
+	 * 
+	 * @param sql
+	 * @return
+	 */
+	private static String customSelectParser(String sql) {
+<span class="fc" id="L267">		String object = StringUtils.EMPTY;</span>
+<span class="fc" id="L268">		final Matcher matcher = customSelectRegexPattern.matcher(sql);</span>
+<span class="fc bfc" id="L269" title="All 2 branches covered.">		while (matcher.find()) {</span>
+<span class="fc" id="L270">			object = matcher.group(2).toString();</span>
+		}
+<span class="fc" id="L272">		return object;</span>
+	}
+
+	/**
+	 * Method to parse DDL queries using regular expression.
+	 * 
+	 * @param sqlQuery
+	 * @return
+	 */
+	private static List&lt;String&gt; ddLParser(String sqlQuery) {
+<span class="fc" id="L282">		String sql = sqlQuery.replaceAll(Pattern.quote(&quot;`&quot;), &quot;&quot;);</span>
+<span class="fc" id="L283">		sql = CommonUtils.removeEscapeSequence(sql);</span>
+<span class="fc" id="L284">		final Matcher matcher2 = customTestPattern.matcher(sql);</span>
+<span class="fc" id="L285">		sql = matcher2.replaceAll(StringUtils.EMPTY).trim();</span>
+<span class="fc" id="L286">		final Matcher matcher = customDDlRegexPattern.matcher(sql);</span>
+<span class="fc" id="L287">		List&lt;String&gt; lst = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L288" title="All 2 branches covered.">		while (matcher.find()) {</span>
+<span class="fc bfc" id="L289" title="All 2 branches covered.">			for (int i = 1; i &lt;= matcher.groupCount(); i++) {</span>
+<span class="fc bfc" id="L290" title="All 2 branches covered.">				if (matcher.group(i) != null) {</span>
+<span class="fc" id="L291">					lst.add(matcher.group(i));</span>
+				}
+			}
+		}
+<span class="fc" id="L295">		return lst;</span>
+	}
+
+	/**
+	 * Method to parse SQL using bigquery parser.
+	 * 
+	 * @param sql
+	 * @return
+	 * @throws Exception
+	 */
+	@SuppressWarnings(&quot;unchecked&quot;)
+	public static Map&lt;String, Object&gt; parseSQL(String sql) throws Exception {
+
+<span class="fc" id="L308">		sql = handleSQLComment(sql);</span>
+
+<span class="fc" id="L310">		sql = CommonUtils.replaceNewLineChars(sql);</span>
+<span class="fc" id="L311">		ParseRunner&lt;?&gt; runner = ParseUtils.createParseRunner(false, PegBigQueryParser.class);</span>
+<span class="fc" id="L312">		ParsingResult&lt;?&gt; result = runner.run(sql);</span>
+<span class="fc" id="L313">		Map&lt;String, Object&gt; objVerbMap = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L314">		List&lt;Object&gt; actionLst = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L315">		List&lt;Object&gt; objList = new ArrayList&lt;&gt;();</span>
+		Object objectcheck;
+		Object verbcheck;
+<span class="pc bpc" id="L318" title="1 of 2 branches missed.">		if (result.parseErrors.size() == 0) {</span>
+<span class="fc" id="L319">			Map&lt;?, ?&gt; verbObjectMap = prepareVerbObjectMap(result);</span>
+<span class="fc" id="L320">			verbObjectMap = cleanVerbs(verbObjectMap);</span>
+<span class="pc bpc" id="L321" title="1 of 2 branches missed.">			if (!verbObjectMap.isEmpty()) {</span>
+<span class="fc" id="L322">				verbcheck = verbObjectMap.get(&quot;verb&quot;);</span>
+<span class="pc bpc" id="L323" title="1 of 2 branches missed.">				verbcheck = verbcheck != null ? verbcheck : StringUtils.EMPTY;</span>
+<span class="pc bpc" id="L324" title="1 of 2 branches missed.">				if (verbcheck.toString().equalsIgnoreCase(ApplicationConstants.CREATE)</span>
+<span class="fc bfc" id="L325" title="All 2 branches covered.">						|| verbcheck.toString().equalsIgnoreCase(ApplicationConstants.DROP)</span>
+<span class="pc bpc" id="L326" title="1 of 2 branches missed.">						|| verbcheck.toString().equalsIgnoreCase(ApplicationConstants.ALTER)) {</span>
+<span class="fc" id="L327">					return objVerbMap;</span>
+				}
+<span class="fc" id="L329">				actionLst.add(verbcheck);</span>
+<span class="fc" id="L330">				objectcheck = verbObjectMap.get(&quot;objects&quot;);</span>
+<span class="pc bpc" id="L331" title="1 of 2 branches missed.">				objList.add(objectcheck != null ? ((HashSet&lt;Object&gt;) objectcheck) : new HashSet&lt;&gt;());</span>
+<span class="fc bfc" id="L332" title="All 2 branches covered.">				if (verbObjectMap.get(&quot;descs&quot;) != null) {</span>
+<span class="fc" id="L333">					recursiveDesendentheck(actionLst, objList, (LinkedList&lt;Object&gt;) verbObjectMap.get(&quot;descs&quot;));</span>
+				}
+<span class="fc" id="L335">				objVerbMap.put(ApplicationConstants.VERBS, actionLst);</span>
+<span class="fc" id="L336">				objVerbMap.put(ApplicationConstants.OBJECTS, objList);</span>
+			}
+<span class="fc" id="L338">		} else {</span>
+<span class="nc" id="L339">			throw new RuntimeException(&quot;not matched : &quot; + sql);</span>
+		}
+<span class="fc" id="L341">		return objVerbMap;</span>
+	}
+
+	/**
+	 * Method to handle comment '--' in sql string by adding new line '\n\ char in
+	 * it.
+	 * 
+	 * @param sql
+	 * @return
+	 */
+	private static String handleSQLComment(String sql) {
+<span class="fc bfc" id="L352" title="All 2 branches covered.">		if (sql.contains(&quot;--&quot;)) {</span>
+<span class="fc" id="L353">			char[] ch = sql.toCharArray();</span>
+<span class="fc" id="L354">			StringBuilder result = new StringBuilder();</span>
+<span class="fc bfc" id="L355" title="All 2 branches covered.">			for (int i = 0; i &lt; ch.length; i++) {</span>
+<span class="fc bfc" id="L356" title="All 2 branches covered.">				if (ch[i] == '\\') {</span>
+<span class="pc bpc" id="L357" title="1 of 2 branches missed.">					if (i + 1 &lt; ch.length) {</span>
+<span class="pc bpc" id="L358" title="3 of 6 branches missed.">						if (ch[i + 1] == 'n' || ch[i + 1] == 'r' || ch[i + 1] == 't') {</span>
+<span class="fc" id="L359">							result.append('\n');</span>
+<span class="fc" id="L360">							i++;</span>
+						}
+					} else
+<span class="nc" id="L363">						result.append(' ');</span>
+
+				} else
+<span class="fc" id="L366">					result.append(ch[i]);</span>
+			}
+<span class="fc" id="L368">			sql = result.toString();</span>
+		}
+<span class="fc" id="L370">		return sql;</span>
+	}
+
+	/**
+	 * Method to check Object and Verb recursively .
+	 * 
+	 * @param actionLst - List having parent verb.
+	 * @param objList   - List is having parent object.
+	 */
+	@SuppressWarnings(&quot;unchecked&quot;)
+	private static void recursiveDesendentheck(List&lt;Object&gt; actionLst, List&lt;Object&gt; objList,
+			LinkedList&lt;Object&gt; argDecendenttList) {
+<span class="pc bpc" id="L382" title="1 of 2 branches missed.">		if (argDecendenttList != null) {</span>
+<span class="fc bfc" id="L383" title="All 2 branches covered.">			for (Object object : argDecendenttList) {</span>
+<span class="fc" id="L384">				Map&lt;String, Object&gt; map = (Map&lt;String, Object&gt;) object;</span>
+<span class="pc bpc" id="L385" title="1 of 2 branches missed.">				actionLst.add(map.get(&quot;verb&quot;) != null ? map.get(&quot;verb&quot;) : StringUtils.EMPTY);</span>
+<span class="pc bpc" id="L386" title="1 of 2 branches missed.">				objList.add(map.get(&quot;objects&quot;) != null ? ((HashSet&lt;Object&gt;) map.get(&quot;objects&quot;)) : new HashSet&lt;&gt;());</span>
+<span class="fc bfc" id="L387" title="All 2 branches covered.">				if (map.get(&quot;descs&quot;) != null) {</span>
+<span class="fc" id="L388">					recursiveDesendentheck(actionLst, objList, (LinkedList&lt;Object&gt;) (map.get(&quot;descs&quot;)));</span>
+				}
+<span class="fc" id="L390">			}</span>
+		}
+<span class="fc" id="L392">	}</span>
+
+	/**
+	 * Method to clean verbs for which objects are not available in parsed result.
+	 * 
+	 * @param verbObjectMap
+	 * @return
+	 */
+	@SuppressWarnings(&quot;unchecked&quot;)
+	private static Map&lt;?, ?&gt; cleanVerbs(Map&lt;?, ?&gt; verbObjectMap) {
+
+<span class="fc" id="L403">		List&lt;Map&lt;?, ?&gt;&gt; descMapList = (List&lt;Map&lt;?, ?&gt;&gt;) verbObjectMap.get(&quot;descs&quot;);</span>
+<span class="fc bfc" id="L404" title="All 2 branches covered.">		if (descMapList != null) {</span>
+<span class="fc bfc" id="L405" title="All 2 branches covered.">			for (Iterator&lt;?&gt; iterator = descMapList.iterator(); iterator.hasNext();) {</span>
+<span class="fc" id="L406">				Map&lt;?, ?&gt; descMap = (Map&lt;?, ?&gt;) iterator.next();</span>
+
+<span class="fc" id="L408">				descMap = cleanVerbs(descMap);</span>
+<span class="fc bfc" id="L409" title="All 2 branches covered.">				if (descMap == null) {</span>
+<span class="fc" id="L410">					iterator.remove();</span>
+				}
+
+<span class="fc" id="L413">			}</span>
+		}
+<span class="fc bfc" id="L415" title="All 4 branches covered.">		if (descMapList == null || descMapList.isEmpty()) {</span>
+<span class="fc" id="L416">			verbObjectMap.remove(&quot;descs&quot;);</span>
+<span class="fc" id="L417">			Set&lt;String&gt; objectList = (Set&lt;String&gt;) verbObjectMap.get(&quot;objects&quot;);</span>
+<span class="fc bfc" id="L418" title="All 2 branches covered.">			if (objectList == null) {</span>
+<span class="fc" id="L419">				return null;</span>
+			}
+		}
+
+<span class="fc" id="L423">		return verbObjectMap;</span>
+
+	}
+
+	/**
+	 * Method to prepare object and verb from parsed tree.
+	 * 
+	 * @param result
+	 * @return
+	 */
+	@SuppressWarnings(&quot;unchecked&quot;)
+	private static Map&lt;String, Object&gt; prepareVerbObjectMap(ParsingResult&lt;?&gt; result) {
+
+<span class="fc" id="L436">		Map&lt;String, Object&gt; verbObjectMap = new HashMap&lt;&gt;();</span>
+
+<span class="fc" id="L438">		Stack&lt;Map&lt;String, Object&gt;&gt; verbObjectMapStack = new Stack&lt;&gt;();</span>
+<span class="fc" id="L439">		Stack&lt;Integer&gt; verbLevelStack = new Stack&lt;&gt;();</span>
+
+<span class="fc" id="L441">		ParseUtils.visitTree(result.parseTreeRoot, (node, level) -&gt; {</span>
+
+<span class="fc" id="L443">			String label = node.getLabel();</span>
+<span class="fc" id="L444">			String verb = VERB_LABEL_MAPPING.get(label);</span>
+
+<span class="fc bfc" id="L446" title="All 2 branches covered.">			if (verb != null) {</span>
+<span class="fc bfc" id="L447" title="All 2 branches covered.">				if (verbLevelStack.size() == 0) {</span>
+<span class="fc" id="L448">					verbObjectMap.put(&quot;verb&quot;, verb);</span>
+<span class="fc" id="L449">					verbObjectMapStack.push(verbObjectMap);</span>
+				} else {
+<span class="fc" id="L451">					Map&lt;String, Object&gt; parentVerbObjectMap = getParentMap(level, verbLevelStack, verbObjectMapStack);</span>
+<span class="fc" id="L452">					List&lt;Map&lt;?, ?&gt;&gt; descMapList = (List&lt;Map&lt;?, ?&gt;&gt;) parentVerbObjectMap.get(&quot;descs&quot;);</span>
+<span class="fc bfc" id="L453" title="All 2 branches covered.">					if (descMapList == null) {</span>
+<span class="fc" id="L454">						descMapList = new LinkedList&lt;&gt;();</span>
+<span class="fc" id="L455">						parentVerbObjectMap.put(&quot;descs&quot;, descMapList);</span>
+					}
+<span class="fc" id="L457">					Map&lt;String, Object&gt; descMap = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L458">					descMap.put(&quot;verb&quot;, verb);</span>
+<span class="fc" id="L459">					verbObjectMapStack.push(descMap);</span>
+<span class="fc" id="L460">					descMapList.add(descMap);</span>
+				}
+<span class="fc" id="L462">				verbLevelStack.push(level);</span>
+
+<span class="fc bfc" id="L464" title="All 2 branches covered.">			} else if (OBJECT_LABELS.contains(label)) {</span>
+<span class="fc" id="L465">				String object = ParseTreeUtils.getNodeText(node, result.inputBuffer);</span>
+
+<span class="fc" id="L467">				Map&lt;String, Object&gt; parentVerbObjectMap = getParentMap(level, verbLevelStack, verbObjectMapStack);</span>
+<span class="fc" id="L468">				Set&lt;String&gt; objectList = (Set&lt;String&gt;) parentVerbObjectMap.get(&quot;objects&quot;);</span>
+<span class="fc bfc" id="L469" title="All 2 branches covered.">				if (objectList == null) {</span>
+<span class="fc" id="L470">					objectList = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L471">					parentVerbObjectMap.put(&quot;objects&quot;, objectList);</span>
+				}
+<span class="fc" id="L473">				objectList.add(object);</span>
+
+			}
+<span class="fc" id="L476">			return true;</span>
+		});
+<span class="fc" id="L478">		return verbObjectMap;</span>
+	}
+	   
+
+	/**
+	 * Method to prepare Parent and descendant relationship in the map. 
+	 * This method use stack for maintaining nested descendant.
+	 * @param level
+	 * @param verbLevelStack
+	 * @param verbObjectMapStack
+	 * @return
+	 */
+	private static Map&lt;String, Object&gt; getParentMap(Integer level, Stack&lt;Integer&gt; verbLevelStack,
+			Stack&lt;Map&lt;String, Object&gt;&gt; verbObjectMapStack) {
+<span class="fc" id="L492">		int parentVerbLevel = verbLevelStack.peek();</span>
+<span class="fc" id="L493">		Map&lt;String, Object&gt; parentVerbObjectMap = verbObjectMapStack.peek();</span>
+
+<span class="fc bfc" id="L495" title="All 2 branches covered.">		if (level &lt; parentVerbLevel) {</span>
+<span class="fc bfc" id="L496" title="All 2 branches covered.">			while (level &lt; parentVerbLevel) {</span>
+<span class="fc" id="L497">				parentVerbLevel = verbLevelStack.pop();</span>
+<span class="fc" id="L498">				parentVerbObjectMap = verbObjectMapStack.pop();</span>
+			}
+<span class="fc" id="L500">			verbLevelStack.push(parentVerbLevel);</span>
+<span class="fc" id="L501">			verbObjectMapStack.push(parentVerbObjectMap);</span>
+		}
+<span class="fc" id="L503">		return parentVerbObjectMap;</span>
+	}
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.4.201905082037</span></div></body></html>

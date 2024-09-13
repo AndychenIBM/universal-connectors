@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.ibm.guardium.hdfs.HdfsGuardiumFilterTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2024-07-29T19:57:05" hostname="andychens-mbp.war.can.ibm.com" time="5.386">
+  <properties/>
+  <testcase name="testParseRename" classname="com.ibm.guardium.hdfs.HdfsGuardiumFilterTest" time="5.375"/>
+  <testcase name="testParseOpen" classname="com.ibm.guardium.hdfs.HdfsGuardiumFilterTest" time="0.005"/>
+  <testcase name="testParseUserProxy" classname="com.ibm.guardium.hdfs.HdfsGuardiumFilterTest" time="0.006"/>
+  <system-out><![CDATA[[ERROR] 2024-07-29 15:57:10.825 [Test worker] HdfsGuardiumFilter - Got logger at filter instantiation
+[ERROR] 2024-07-29 15:57:10.841 [Test worker] HdfsGuardiumFilter - Unable to get timezone from event, using local timezone
+[ERROR] 2024-07-29 15:57:10.902 [Test worker] HdfsGuardiumFilter - Unable to get timezone from event, using local timezone
+[ERROR] 2024-07-29 15:57:10.908 [Test worker] HdfsGuardiumFilter - Unable to get timezone from event, using local timezone
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

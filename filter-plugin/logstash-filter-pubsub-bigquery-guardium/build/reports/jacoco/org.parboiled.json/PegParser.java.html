@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PegParser.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">logstash-filter-bigQuery-guardium</a> &gt; <a href="index.source.html" class="el_package">org.parboiled.json</a> &gt; <span class="el_source">PegParser.java</span></div><h1>PegParser.java</h1><pre class="source lang-java linenums">/*
+Copyright IBM Corp. 2021, 2022 All rights reserved.
+SPDX-License-Identifier: Apache-2.0
+ */
+
+package org.parboiled.json;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.json.JsonArray;
+import javax.json.JsonObject;
+import javax.json.JsonString;
+import javax.json.JsonValue;
+
+import org.parboiled.Rule;
+import org.parboiled.annotations.DontLabel;
+import org.parboiled.matchers.ProxyMatcher;
+
+<span class="fc" id="L20">public abstract class PegParser extends BaseJsonParser {</span>
+
+	protected Rule start(String start, JsonObject json) {
+<span class="fc" id="L23">		parseRules(json.getJsonArray(&quot;rules&quot;));</span>
+<span class="fc" id="L24">		Rule startRule = RULE_CACHE.get(start);</span>
+<span class="fc" id="L25">		initProxies();</span>
+<span class="fc" id="L26">		return startRule;</span>
+	}
+
+	protected Rule[] parseRules(JsonArray jsonArr) {
+<span class="fc" id="L30">		Rule[] childRules = new Rule[jsonArr.size()];</span>
+<span class="fc bfc" id="L31" title="All 2 branches covered.">		for (int i = 0; i &lt; jsonArr.size(); i++) {</span>
+<span class="fc" id="L32">			JsonValue jsonItem = jsonArr.get(i);</span>
+<span class="fc" id="L33">			childRules[i] = parseRule((JsonObject) jsonItem);</span>
+		}
+<span class="fc" id="L35">		return childRules;</span>
+	}
+
+	@DontLabel
+	protected Rule parseRule(JsonObject jsonObj) {
+
+<span class="fc" id="L41">		Rule rule = null;</span>
+
+<span class="fc" id="L43">		String type = jsonObj.getString(&quot;type&quot;);</span>
+<span class="fc bfc" id="L44" title="All 2 branches covered.">		if (&quot;rule&quot;.equals(type)) {</span>
+
+<span class="fc" id="L46">			String name = jsonObj.getString(&quot;name&quot;);</span>
+<span class="fc" id="L47">			JsonObject expr = jsonObj.getJsonObject(&quot;expression&quot;);</span>
+<span class="fc" id="L48">			rule = parseRule(expr);</span>
+<span class="fc" id="L49">			rule.label(name);</span>
+<span class="fc" id="L50">			RULE_CACHE.put(name, rule);</span>
+
+<span class="fc bfc" id="L52" title="All 2 branches covered.">		} else if (&quot;sequence&quot;.equals(type)) {</span>
+
+<span class="fc" id="L54">			JsonArray elems = jsonObj.getJsonArray(&quot;elements&quot;);</span>
+<span class="fc" id="L55">			rule = Sequence(parseRules(elems));</span>
+
+<span class="fc bfc" id="L57" title="All 2 branches covered.">		} else if (&quot;choice&quot;.equals(type)) {</span>
+
+<span class="fc" id="L59">			JsonArray alts = jsonObj.getJsonArray(&quot;alternatives&quot;);</span>
+<span class="fc" id="L60">			rule = FirstOf(parseRules(alts));</span>
+
+<span class="fc bfc" id="L62" title="All 2 branches covered.">		} else if (&quot;labeled&quot;.equals(type)) {</span>
+
+<span class="fc" id="L64">			JsonObject expr = jsonObj.getJsonObject(&quot;expression&quot;);</span>
+<span class="fc" id="L65">			rule = parseRule(expr);</span>
+
+<span class="fc bfc" id="L67" title="All 2 branches covered.">		} else if (&quot;rule_ref&quot;.equals(type)) {</span>
+
+<span class="fc" id="L69">			String proxyName = jsonObj.getString(&quot;name&quot;);</span>
+<span class="fc" id="L70">			ProxyMatcher proxy = new ProxyMatcher();</span>
+<span class="fc" id="L71">			List&lt;ProxyMatcher&gt; proxies = PROXY_CACHE.get(proxyName);</span>
+<span class="fc bfc" id="L72" title="All 2 branches covered.">			if (proxies == null) {</span>
+<span class="fc" id="L73">				proxies = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L74">				PROXY_CACHE.put(proxyName, proxies);</span>
+			}
+<span class="fc" id="L76">			proxies.add(proxy);</span>
+<span class="fc" id="L77">			rule = proxy;</span>
+
+<span class="fc bfc" id="L79" title="All 2 branches covered.">		} else if (&quot;optional&quot;.equals(type)) {</span>
+
+<span class="fc" id="L81">			JsonObject expr = jsonObj.getJsonObject(&quot;expression&quot;);</span>
+<span class="fc" id="L82">			Rule childRule = parseRule(expr);</span>
+<span class="fc" id="L83">			rule = Optional(childRule).skipNode();</span>
+
+<span class="fc bfc" id="L85" title="All 4 branches covered.">		} else if (&quot;semantic_and&quot;.equals(type) || &quot;semantic_not&quot;.equals(type)) {</span>
+<span class="fc" id="L86">			rule = EMPTY;</span>
+<span class="fc bfc" id="L87" title="All 2 branches covered.">		} else if (&quot;simple_not&quot;.equals(type)) {</span>
+
+<span class="fc" id="L89">			JsonObject expr = jsonObj.getJsonObject(&quot;expression&quot;);</span>
+<span class="fc" id="L90">			rule = TestNot(parseRule(expr)).skipNode();</span>
+
+<span class="fc bfc" id="L92" title="All 2 branches covered.">		} else if (&quot;zero_or_more&quot;.equals(type)) {</span>
+
+<span class="fc" id="L94">			JsonObject expr = jsonObj.getJsonObject(&quot;expression&quot;);</span>
+<span class="fc" id="L95">			Rule childRule = parseRule(expr);</span>
+<span class="fc" id="L96">			rule = ZeroOrMore(childRule).skipNode();</span>
+
+<span class="fc bfc" id="L98" title="All 2 branches covered.">		} else if (&quot;one_or_more&quot;.equals(type)) {</span>
+
+<span class="fc" id="L100">			JsonObject expr = jsonObj.getJsonObject(&quot;expression&quot;);</span>
+<span class="fc" id="L101">			Rule childRule = parseRule(expr);</span>
+<span class="fc" id="L102">			rule = OneOrMore(childRule);</span>
+
+<span class="fc bfc" id="L104" title="All 2 branches covered.">		} else if (&quot;group&quot;.equals(type)) {</span>
+
+<span class="fc" id="L106">			JsonObject expr = jsonObj.getJsonObject(&quot;expression&quot;);</span>
+<span class="fc" id="L107">			rule = parseRule(expr).skipNode();</span>
+
+<span class="fc bfc" id="L109" title="All 2 branches covered.">		} else if (&quot;action&quot;.equals(type)) {</span>
+
+<span class="fc" id="L111">			JsonObject expr = jsonObj.getJsonObject(&quot;expression&quot;);</span>
+<span class="fc" id="L112">			rule = parseRule(expr);</span>
+
+<span class="fc bfc" id="L114" title="All 2 branches covered.">		} else if (&quot;literal&quot;.equals(type)) {</span>
+
+<span class="fc" id="L116">			String value = jsonObj.getString(&quot;value&quot;);</span>
+<span class="fc" id="L117">			boolean ic = jsonObj.getBoolean(&quot;ignoreCase&quot;);</span>
+<span class="fc bfc" id="L118" title="All 2 branches covered.">			if (ic) {</span>
+<span class="fc" id="L119">				rule = IgnoreCase(value);</span>
+			} else {
+<span class="fc" id="L121">				rule = String(value);</span>
+			}
+
+<span class="fc bfc" id="L124" title="All 2 branches covered.">		} else if (&quot;class&quot;.equals(type)) {</span>
+
+<span class="fc" id="L126">			JsonArray parts = jsonObj.getJsonArray(&quot;parts&quot;);</span>
+<span class="fc" id="L127">			StringBuilder chars = new StringBuilder();</span>
+
+<span class="fc bfc" id="L129" title="All 2 branches covered.">			for (int i = 0; i &lt; parts.size(); i++) {</span>
+<span class="fc" id="L130">				JsonValue jsonItem = parts.get(i);</span>
+<span class="fc bfc" id="L131" title="All 2 branches covered.">				if (jsonItem instanceof JsonString) {</span>
+<span class="fc" id="L132">					chars.append(((JsonString) jsonItem).getChars().charAt(0));</span>
+				} else {
+<span class="fc" id="L134">					JsonArray range = (JsonArray) jsonItem;</span>
+<span class="fc" id="L135">					char start = ((JsonString) range.get(0)).getChars().charAt(0);</span>
+<span class="fc" id="L136">					char end = ((JsonString) range.get(1)).getChars().charAt(0);</span>
+<span class="fc bfc" id="L137" title="All 2 branches covered.">					for (char j = start; j &lt;= end; j++) {</span>
+<span class="fc" id="L138">						chars.append(j);</span>
+					}
+				}
+			}
+
+<span class="fc" id="L143">			boolean inverted = jsonObj.getBoolean(&quot;inverted&quot;);</span>
+<span class="fc bfc" id="L144" title="All 2 branches covered.">			if (inverted) {</span>
+<span class="fc" id="L145">				rule = NoneOf(chars.toString());</span>
+			} else {
+<span class="fc" id="L147">				rule = AnyOf(chars.toString());</span>
+			}
+
+<span class="pc bpc" id="L150" title="1 of 2 branches missed.">		} else if (&quot;any&quot;.equals(type)) {</span>
+<span class="fc" id="L151">			rule = ANY;</span>
+
+		} else {
+<span class="nc" id="L154">			throw new RuntimeException(&quot;not handled : &quot; + type + &quot; : &quot; + jsonObj);</span>
+		}
+
+<span class="fc" id="L157">		return rule;</span>
+
+	}
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.4.201905082037</span></div></body></html>

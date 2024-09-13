@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Parser.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">logstash-filter-aurora-mysql-guardium</a> &gt; <a href="index.source.html" class="el_package">com.ibm.guardium.auroramysql</a> &gt; <span class="el_source">Parser.java</span></div><h1>Parser.java</h1><pre class="source lang-java linenums">package com.ibm.guardium.auroramysql;
+
+import com.google.gson.JsonObject;
+import com.ibm.guardium.universalconnector.commons.structures.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.text.ParseException;
+
+<span class="fc" id="L10">public class Parser {</span>
+
+<span class="fc" id="L12">	private static Logger log = LogManager.getLogger(Parser.class);</span>
+
+	public static Record parseRecord(final JsonObject data) throws ParseException {
+<span class="fc" id="L15">		Record record = new Record();</span>
+
+<span class="pc bpc" id="L17" title="1 of 2 branches missed.">		if (data != null) {</span>
+<span class="pc bpc" id="L18" title="2 of 4 branches missed.">			if (data.has(Constants.SESSION_ID) &amp;&amp; !data.get(Constants.SESSION_ID).isJsonNull()) {</span>
+<span class="fc" id="L19">				record.setSessionId(data.get(Constants.SESSION_ID).getAsString());</span>
+			} else
+<span class="nc" id="L21">				record.setSessionId(Constants.NOT_AVAILABLE);</span>
+
+<span class="pc bpc" id="L23" title="1 of 4 branches missed.">			if (data.has(Constants.SERVER_INSTANCE) &amp;&amp; !data.get(Constants.SERVER_INSTANCE).isJsonNull()) {</span>
+<span class="pc bpc" id="L24" title="2 of 4 branches missed.">				if (data.has(Constants.DB_NAME) &amp;&amp; !data.get(Constants.DB_NAME).isJsonNull())</span>
+<span class="fc" id="L25">					record.setDbName(data.get(Constants.SERVER_INSTANCE).getAsString() + &quot;:&quot;</span>
+<span class="fc" id="L26">							+ data.get(Constants.DB_NAME).getAsString());</span>
+				else
+<span class="nc" id="L28">					record.setDbName(</span>
+<span class="nc" id="L29">							data.get(Constants.SERVER_INSTANCE).getAsString() + &quot;:&quot; + Constants.UNKNOWN_STRING);</span>
+			}
+
+<span class="fc" id="L32">			long dateString = Parser.parseTimestamp(data);</span>
+<span class="fc" id="L33">			Time time = Parser.getTime(dateString);</span>
+<span class="pc bpc" id="L34" title="1 of 2 branches missed.">			if (time != null)</span>
+<span class="fc" id="L35">				record.setTime(time);</span>
+
+<span class="fc" id="L37">			record.setSessionLocator(Parser.parseSessionLocator(data));</span>
+<span class="fc" id="L38">			record.setAccessor(Parser.parseAccessor(data));</span>
+<span class="fc" id="L39">			record.setAppUserName(Constants.APP_USER);</span>
+
+<span class="pc bpc" id="L41" title="1 of 4 branches missed.">			if (data.has(Constants.ACTION_STATUS) &amp;&amp; data.get(Constants.ACTION_STATUS).getAsInt() != 0) {</span>
+<span class="fc" id="L42">				record.setException(Parser.parseException(data));</span>
+			} else {
+<span class="fc" id="L44">				record.setData(Parser.parseData(data));</span>
+			}
+		}
+<span class="fc" id="L47">		return record;</span>
+	}
+
+	// ----------- TIME
+
+	public static long parseTimestamp(final JsonObject data) {
+<span class="fc" id="L53">		long dateString = 0;</span>
+<span class="fc" id="L54">		dateString = data.get(Constants.TIMESTAMP).getAsLong();</span>
+<span class="fc" id="L55">		return dateString;</span>
+	}
+
+	public static Time getTime(Long dateString) {
+
+<span class="fc" id="L60">		long millis = dateString / 1000;</span>
+<span class="fc" id="L61">		return new Time(millis, 0, 0);</span>
+
+	}
+
+	// ----------- Session Locator
+
+	private static SessionLocator parseSessionLocator(JsonObject data) {
+<span class="fc" id="L68">		SessionLocator sessionLocator = new SessionLocator();</span>
+<span class="fc" id="L69">		sessionLocator.setIpv6(false);</span>
+<span class="fc" id="L70">		sessionLocator.setServerPort(Constants.PORT);</span>
+<span class="fc" id="L71">		sessionLocator.setClientPort(Constants.PORT);</span>
+<span class="fc" id="L72">		sessionLocator.setServerIp(Constants.IP);</span>
+<span class="fc" id="L73">		sessionLocator.setClientIpv6(Constants.UNKNOWN_STRING);</span>
+<span class="fc" id="L74">		sessionLocator.setServerIpv6(Constants.UNKNOWN_STRING);</span>
+
+<span class="pc bpc" id="L76" title="2 of 4 branches missed.">		if (data.has(Constants.CLIENT_IP) &amp;&amp; !data.get(Constants.CLIENT_IP).isJsonNull())</span>
+
+		{
+<span class="fc" id="L79">			String clientAdd = data.get(Constants.CLIENT_IP).getAsString();</span>
+<span class="pc bpc" id="L80" title="1 of 4 branches missed.">			if (clientAdd.equalsIgnoreCase(&quot;localhost&quot;) || clientAdd.equals(&quot;%&quot;)) {</span>
+<span class="fc" id="L81">				sessionLocator.setClientIp(Constants.IP); // Set the appropriate IP for localhost</span>
+			} else {
+				try {
+					// Check if the CLIENT_IP is an IPv6 address
+<span class="fc" id="L85">					boolean isIPv6 = isIPv6Address(clientAdd);</span>
+<span class="fc" id="L86">					sessionLocator.setIpv6(isIPv6);</span>
+<span class="fc bfc" id="L87" title="All 2 branches covered.">					if (isIPv6) {</span>
+<span class="fc" id="L88">						sessionLocator.setClientIpv6(clientAdd);</span>
+<span class="fc" id="L89">						sessionLocator.setClientIp(Constants.IP);</span>
+					} else {
+<span class="fc" id="L91">						sessionLocator.setClientIp(clientAdd);</span>
+					}
+<span class="nc" id="L93">				} catch (Exception e) {</span>
+					// Set a default IP or handle the error in a way that makes sense for your application
+<span class="nc" id="L95">					sessionLocator.setClientIp(Constants.IP);</span>
+<span class="fc" id="L96">				}</span>
+			}
+<span class="fc" id="L98">		}</span>
+		else {
+<span class="nc" id="L100">			sessionLocator.setClientIp(Constants.IP);</span>
+		}
+<span class="fc" id="L102">		return sessionLocator;</span>
+	}
+
+	// Function to check if the given IP address is IPv6
+	private static boolean isIPv6Address(String ipAddress) {
+<span class="fc" id="L107">		return ipAddress.contains(&quot;:&quot;);</span>
+	}
+
+	// ---------- Accessor
+
+	public static Accessor parseAccessor(JsonObject data) {
+<span class="fc" id="L113">		Accessor accessor = new Accessor();</span>
+
+<span class="fc" id="L115">		accessor.setDbProtocol(Constants.DB_PROTOCOL);</span>
+<span class="fc" id="L116">		accessor.setServerType(Constants.SERVER_TYPE);</span>
+<span class="fc" id="L117">		accessor.setServerHostName(data.get(Constants.SERVERHOSTNAME).getAsString());</span>
+
+<span class="pc bpc" id="L119" title="1 of 4 branches missed.">		if (data.has(Constants.SERVER_INSTANCE) &amp;&amp; !data.get(Constants.SERVER_INSTANCE).isJsonNull()) {</span>
+<span class="pc bpc" id="L120" title="2 of 4 branches missed.">			if (data.has(Constants.DB_NAME) &amp;&amp; !data.get(Constants.DB_NAME).isJsonNull())</span>
+<span class="fc" id="L121">				accessor.setServiceName(data.get(Constants.SERVER_INSTANCE).getAsString() + &quot;:&quot;</span>
+<span class="fc" id="L122">						+ data.get(Constants.DB_NAME).getAsString());</span>
+			else
+<span class="nc" id="L124">				accessor.setServiceName(</span>
+<span class="nc" id="L125">						data.get(Constants.SERVER_INSTANCE).getAsString() + &quot;:&quot; + Constants.UNKNOWN_STRING);</span>
+		}
+
+<span class="fc" id="L128">		accessor.setClientHostName(Constants.UNKNOWN_STRING);</span>
+
+<span class="pc bpc" id="L130" title="2 of 4 branches missed.">		if (data.has(Constants.DB_USER) &amp;&amp; !data.get(Constants.DB_USER).isJsonNull())</span>
+<span class="fc" id="L131">			accessor.setDbUser(data.get(Constants.DB_USER).getAsString());</span>
+		else
+<span class="nc" id="L133">			accessor.setDbUser(Constants.NOT_AVAILABLE);</span>
+
+<span class="fc" id="L135">		accessor.setLanguage(Constants.Language);</span>
+<span class="fc" id="L136">		accessor.setDataType(Accessor.DATA_TYPE_GUARDIUM_SHOULD_PARSE_SQL);</span>
+<span class="fc" id="L137">		accessor.setClient_mac(Constants.UNKNOWN_STRING);</span>
+<span class="fc" id="L138">		accessor.setClientOs(Constants.UNKNOWN_STRING);</span>
+<span class="fc" id="L139">		accessor.setCommProtocol(Constants.UNKNOWN_STRING);</span>
+<span class="fc" id="L140">		accessor.setDbProtocolVersion(Constants.UNKNOWN_STRING);</span>
+<span class="fc" id="L141">		accessor.setOsUser(Constants.UNKNOWN_STRING);</span>
+<span class="fc" id="L142">		accessor.setServerDescription(Constants.UNKNOWN_STRING);</span>
+<span class="fc" id="L143">		accessor.setServerOs(Constants.UNKNOWN_STRING);</span>
+
+<span class="fc" id="L145">		return accessor;</span>
+	}
+
+	// ------ Parse Data
+
+	public static Data parseData(JsonObject inputJSON) {
+<span class="fc" id="L151">		Data data = new Data();</span>
+		String sql;
+		try {
+<span class="pc bpc" id="L154" title="2 of 4 branches missed.">			if (inputJSON.has(Constants.EXEC_STATEMENT) &amp;&amp; !inputJSON.get(Constants.EXEC_STATEMENT).isJsonNull()) {</span>
+<span class="fc" id="L155">				sql = inputJSON.get(Constants.EXEC_STATEMENT).getAsString();</span>
+<span class="fc" id="L156">				data.setOriginalSqlCommand(sql.substring(1, sql.length() - 1));</span>
+			} else {
+<span class="nc" id="L158">                        data.setOriginalSqlCommand(inputJSON.get(Constants.AUDIT_ACTION).getAsString());</span>
+			}
+
+<span class="nc" id="L161">		} catch (Exception e) {</span>
+<span class="nc" id="L162">			log.error(&quot;Aurora-Mysql filter: Error parsing JSON &quot; + inputJSON, e);</span>
+<span class="nc" id="L163">			throw e;</span>
+<span class="fc" id="L164">		}</span>
+<span class="fc" id="L165">		return data;</span>
+	}
+
+	// ------ Error
+
+	private static ExceptionRecord parseException(JsonObject data) {
+
+<span class="fc" id="L172">		ExceptionRecord exceptionRecord = new ExceptionRecord();</span>
+<span class="pc bpc" id="L173" title="3 of 4 branches missed.">		if (data.has(Constants.EXEC_STATEMENT)  &amp;&amp; !data.get(Constants.EXEC_STATEMENT).isJsonNull()) {</span>
+<span class="nc" id="L174">			exceptionRecord.setSqlString(data.get(Constants.EXEC_STATEMENT).getAsString());</span>
+<span class="nc" id="L175">			exceptionRecord.setDescription(&quot;ERROR Code=&quot; + data.get(Constants.ACTION_STATUS).getAsString());</span>
+<span class="nc" id="L176">			exceptionRecord.setExceptionTypeId(Constants.SQL_ERROR);</span>
+
+		} else {
+<span class="fc" id="L179">			exceptionRecord.setSqlString(Constants.UNKNOWN_STRING);</span>
+<span class="fc" id="L180">			exceptionRecord.setDescription(data.get(Constants.AUDIT_ACTION).getAsString());</span>
+<span class="fc" id="L181">			exceptionRecord.setExceptionTypeId(Constants.LOGIN_FAILED);</span>
+
+		}
+
+<span class="fc" id="L185">		return exceptionRecord;</span>
+	}
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.4.201905082037</span></div></body></html>

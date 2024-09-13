@@ -1,0 +1,13 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+logstash-filter-bigQuery-guardium,org.parboiled.util,ParseUtils,10,45,1,3,2,12,2,4,1,3
+logstash-filter-bigQuery-guardium,org.parboiled.json,PegParser,16,387,1,45,1,84,1,26,0,4
+logstash-filter-bigQuery-guardium,org.parboiled.json,DeclParser,415,0,40,0,81,0,32,0,12,0
+logstash-filter-bigQuery-guardium,org.parboiled.json,BaseJsonParser,0,49,0,0,0,10,0,4,0,4
+logstash-filter-bigQuery-guardium,com.ibm.guardium.bigquery,Parser,95,1659,83,192,15,351,78,91,1,30
+logstash-filter-bigQuery-guardium,com.ibm.guardium.bigquery,ExceptionEnum,42,0,0,0,7,0,3,0,3,0
+logstash-filter-bigQuery-guardium,com.ibm.guardium.bigquery,BigQueryDTO,31,26,0,0,10,9,5,5,5,5
+logstash-filter-bigQuery-guardium,com.ibm.guardium.bigquery,ExecuteSqlParser,51,986,22,104,6,217,22,60,1,18
+logstash-filter-bigQuery-guardium,com.ibm.guardium.bigquery,ApplicationConstants,5,0,0,0,2,0,1,0,1,0
+logstash-filter-bigQuery-guardium,com.ibm.guardium.bigquery,BigQueryGuardiumFilter,21,107,3,7,6,29,3,7,0,5
+logstash-filter-bigQuery-guardium,com.ibm.guardium.bigquery,PegBigQueryParser,0,650,0,18,0,156,0,16,0,7
+logstash-filter-bigQuery-guardium,com.ibm.guardium.bigquery,CommonUtils,0,61,4,4,0,15,4,5,0,5

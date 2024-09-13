@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BigQueryGuardiumFilter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">logstash-filter-bigQuery-guardium</a> &gt; <a href="index.source.html" class="el_package">com.ibm.guardium.bigquery</a> &gt; <span class="el_source">BigQueryGuardiumFilter.java</span></div><h1>BigQueryGuardiumFilter.java</h1><pre class="source lang-java linenums">/*
+Copyright IBM Corp. 2021, 2023 All rights reserved.
+SPDX-License-Identifier: Apache-2.0
+ */
+
+package com.ibm.guardium.bigquery;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.ibm.guardium.universalconnector.commons.GuardConstants;
+import com.ibm.guardium.universalconnector.commons.structures.Record;
+
+import co.elastic.logstash.api.Configuration;
+import co.elastic.logstash.api.Context;
+import co.elastic.logstash.api.Event;
+import co.elastic.logstash.api.Filter;
+import co.elastic.logstash.api.FilterMatchListener;
+import co.elastic.logstash.api.LogstashPlugin;
+import co.elastic.logstash.api.PluginConfigSpec;
+
+@LogstashPlugin(name = &quot;big_query_guardium_filter&quot;)
+public class BigQueryGuardiumFilter implements Filter {
+
+<span class="fc" id="L32">	private static Logger logger = LogManager.getLogger(BigQueryGuardiumFilter.class);</span>
+
+<span class="fc" id="L34">	public static final PluginConfigSpec&lt;String&gt; SOURCE_CONFIG = PluginConfigSpec.stringSetting(&quot;source&quot;, &quot;message&quot;);</span>
+
+	private String id;
+	private String sourceField;
+
+	/**
+	 * BigQueryFilterConnector() method used to set SOURCE_CONFIG and context for
+	 * Events
+	 * 
+	 * @param config
+	 * @param context
+	 * @methodName SpannerFilterConnector
+	 * @return
+	 */
+<span class="fc" id="L48">	public BigQueryGuardiumFilter(String id, Configuration config, Context context) {</span>
+<span class="fc" id="L49">		this.id = id;</span>
+<span class="fc" id="L50">		this.sourceField = config.get(SOURCE_CONFIG);</span>
+<span class="fc" id="L51">	}</span>
+
+	/**
+	 * configSchema() method will get the iD
+	 * 
+	 * @methodName @configSchema
+	 * @return Collection&lt;PluginConfigSpec&lt;?&gt;&gt;
+	 */
+	@Override
+	public Collection&lt;PluginConfigSpec&lt;?&gt;&gt; configSchema() {
+<span class="fc" id="L61">		return Collections.singletonList(SOURCE_CONFIG);</span>
+	}
+
+	/**
+	 * getId() method will get the iD
+	 * 
+	 * @methodName @getId
+	 * @return String
+	 */
+	@Override
+	public String getId() {
+<span class="fc" id="L72">		return this.id;</span>
+	}
+
+	/**
+	 * filter() method will perform operation on input, get data and some
+	 * validations performed to check the input parameter and then call method which
+	 * convert the input as a JSON and and convert json object into Map for Guardium
+	 * Object and return response as per the requirement.
+	 * 
+	 * @param Collection&lt;Event&gt;   events
+	 * @param filterMatchListener
+	 * @methodName @filter
+	 * @return Collection&lt;Event&gt;
+	 */
+	@Override
+	public Collection&lt;Event&gt; filter(Collection&lt;Event&gt; events, FilterMatchListener filterMatchListener) {
+<span class="fc" id="L88">		ArrayList&lt;Event&gt; skippedEvents = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L89" title="All 2 branches covered.">		for (Event e : events) {</span>
+<span class="pc bpc" id="L90" title="1 of 2 branches missed.">			if(logger.isDebugEnabled()){</span>
+<span class="nc" id="L91">				logger.debug(&quot;Event Now: {}&quot;, e.getData());</span>
+			}
+<span class="pc bpc" id="L93" title="1 of 2 branches missed.">			if (e.getField(ApplicationConstants.MESSAGE) instanceof String</span>
+<span class="fc" id="L94">					&amp;&amp; String.valueOf(e.getField(ApplicationConstants.MESSAGE))</span>
+<span class="pc bpc" id="L95" title="1 of 2 branches missed.">							.contains(ApplicationConstants.MESSAGE_CONTAINS)) {</span>
+<span class="fc" id="L96">				String messageString = e.getField(ApplicationConstants.MESSAGE).toString();</span>
+<span class="fc bfc" id="L97" title="All 2 branches covered.">				if (!CommonUtils.isJSONValid(messageString)) {</span>
+<span class="fc" id="L98">					e.tag(ApplicationConstants.LOGSTASH_TAG_SKIP_NOT_GCP);</span>
+<span class="fc" id="L99">					skippedEvents.add(e);</span>
+<span class="fc" id="L100">					continue;</span>
+				}
+				try {
+<span class="fc" id="L103">					JsonObject inputJSON = new Gson().fromJson(messageString, JsonObject.class);</span>
+<span class="fc" id="L104">					Record record = Parser.parseRecord(inputJSON);</span>
+<span class="fc" id="L105">					final Gson gson = new GsonBuilder().disableHtmlEscaping().serializeNulls().create();</span>
+<span class="fc" id="L106">					e.setField(GuardConstants.GUARDIUM_RECORD_FIELD_NAME, gson.toJson(record));</span>
+<span class="fc" id="L107">					filterMatchListener.filterMatched(e);</span>
+<span class="nc" id="L108">				} catch (Exception ex) {</span>
+<span class="nc" id="L109">					logger.error(&quot;found exception in parsing json&quot;, ex);</span>
+<span class="nc" id="L110">					logger.error(&quot;Event that caused exception: {}&quot;, e.getData());</span>
+<span class="nc" id="L111">					e.tag(ApplicationConstants.LOGSTASH_TAG_JSON_PARSE_ERROR);</span>
+<span class="fc" id="L112">				}</span>
+<span class="fc" id="L113">			} else {</span>
+<span class="nc" id="L114">				e.tag(ApplicationConstants.LOGSTASH_TAG_SKIP_NOT_GCP);</span>
+			}
+<span class="fc" id="L116">		}</span>
+<span class="fc" id="L117">		events.removeAll(skippedEvents);</span>
+<span class="fc" id="L118">		return events;</span>
+
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.4.201905082037</span></div></body></html>

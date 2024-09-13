@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PegBigQueryParser.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">logstash-filter-bigQuery-guardium</a> &gt; <a href="index.source.html" class="el_package">com.ibm.guardium.bigquery</a> &gt; <span class="el_source">PegBigQueryParser.java</span></div><h1>PegBigQueryParser.java</h1><pre class="source lang-java linenums">/*
+Copyright IBM Corp. 2021, 2023 All rights reserved.
+SPDX-License-Identifier: Apache-2.0
+ */
+
+package com.ibm.guardium.bigquery;
+
+import java.io.InputStream;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.json.Json;
+import javax.json.JsonObject;
+
+import org.parboiled.Action;
+import org.parboiled.Rule;
+import org.parboiled.annotations.BuildParseTree;
+import org.parboiled.annotations.DontLabel;
+import org.parboiled.json.PegParser;
+
+@BuildParseTree
+<span class="fc" id="L27">public class PegBigQueryParser extends PegParser {</span>
+<span class="fc" id="L28">	final static Set&lt;String&gt; KEYWORDS = new HashSet&lt;&gt;();</span>
+	static {
+
+<span class="fc" id="L31">		KEYWORDS.add(&quot;ARRAY&quot;);</span>
+<span class="fc" id="L32">		KEYWORDS.add(&quot;ALTER&quot;);</span>
+<span class="fc" id="L33">		KEYWORDS.add(&quot;ALL&quot;);</span>
+<span class="fc" id="L34">		KEYWORDS.add(&quot;ADD&quot;);</span>
+<span class="fc" id="L35">		KEYWORDS.add(&quot;AND&quot;);</span>
+<span class="fc" id="L36">		KEYWORDS.add(&quot;AS&quot;);</span>
+<span class="fc" id="L37">		KEYWORDS.add(&quot;ASC&quot;);</span>
+<span class="fc" id="L38">		KEYWORDS.add(&quot;BETWEEN&quot;);</span>
+<span class="fc" id="L39">		KEYWORDS.add(&quot;BY&quot;);</span>
+<span class="fc" id="L40">		KEYWORDS.add(&quot;CALL&quot;);</span>
+<span class="fc" id="L41">		KEYWORDS.add(&quot;CASE&quot;);</span>
+<span class="fc" id="L42">		KEYWORDS.add(&quot;CREATE&quot;);</span>
+<span class="fc" id="L43">		KEYWORDS.add(&quot;CROSS&quot;);</span>
+<span class="fc" id="L44">		KEYWORDS.add(&quot;CONTAINS&quot;);</span>
+<span class="fc" id="L45">		KEYWORDS.add(&quot;CURRENT_DATE&quot;);</span>
+<span class="fc" id="L46">		KEYWORDS.add(&quot;CURRENT_TIME&quot;);</span>
+<span class="fc" id="L47">		KEYWORDS.add(&quot;CURRENT_TIMESTAMP&quot;);</span>
+<span class="fc" id="L48">		KEYWORDS.add(&quot;CURRENT_USER&quot;);</span>
+<span class="fc" id="L49">		KEYWORDS.add(&quot;DELETE&quot;);</span>
+<span class="fc" id="L50">		KEYWORDS.add(&quot;DESC&quot;);</span>
+<span class="fc" id="L51">		KEYWORDS.add(&quot;DISTINCT&quot;);</span>
+<span class="fc" id="L52">		KEYWORDS.add(&quot;DROP&quot;);</span>
+<span class="fc" id="L53">		KEYWORDS.add(&quot;ELSE&quot;);</span>
+<span class="fc" id="L54">		KEYWORDS.add(&quot;END&quot;);</span>
+<span class="fc" id="L55">		KEYWORDS.add(&quot;EXCEPT&quot;);</span>
+<span class="fc" id="L56">		KEYWORDS.add(&quot;EXISTS&quot;);</span>
+<span class="fc" id="L57">		KEYWORDS.add(&quot;EXPLAIN&quot;);</span>
+<span class="fc" id="L58">		KEYWORDS.add(&quot;FALSE&quot;);</span>
+<span class="fc" id="L59">		KEYWORDS.add(&quot;FROM&quot;);</span>
+<span class="fc" id="L60">		KEYWORDS.add(&quot;FULL&quot;);</span>
+<span class="fc" id="L61">		KEYWORDS.add(&quot;FOR&quot;);</span>
+<span class="fc" id="L62">		KEYWORDS.add(&quot;GROUP&quot;);</span>
+<span class="fc" id="L63">		KEYWORDS.add(&quot;HAVING&quot;);</span>
+<span class="fc" id="L64">		KEYWORDS.add(&quot;IN&quot;);</span>
+<span class="fc" id="L65">		KEYWORDS.add(&quot;INNER&quot;);</span>
+<span class="fc" id="L66">		KEYWORDS.add(&quot;INSERT&quot;);</span>
+<span class="fc" id="L67">		KEYWORDS.add(&quot;INTO&quot;);</span>
+<span class="fc" id="L68">		KEYWORDS.add(&quot;INTERSECT&quot;);</span>
+<span class="fc" id="L69">		KEYWORDS.add(&quot;IS&quot;);</span>
+<span class="fc" id="L70">		KEYWORDS.add(&quot;JOIN&quot;);</span>
+<span class="fc" id="L71">		KEYWORDS.add(&quot;JSON&quot;);</span>
+<span class="fc" id="L72">		KEYWORDS.add(&quot;KEY&quot;);</span>
+<span class="fc" id="L73">		KEYWORDS.add(&quot;LEFT&quot;);</span>
+<span class="fc" id="L74">		KEYWORDS.add(&quot;LIKE&quot;);</span>
+<span class="fc" id="L75">		KEYWORDS.add(&quot;LIMIT&quot;);</span>
+<span class="fc" id="L76">		KEYWORDS.add(&quot;LOW_PRIORITY&quot;);</span>
+<span class="fc" id="L77">		KEYWORDS.add(&quot;NOT&quot;);</span>
+<span class="fc" id="L78">		KEYWORDS.add(&quot;NULL&quot;);</span>
+<span class="fc" id="L79">		KEYWORDS.add(&quot;ON&quot;);</span>
+<span class="fc" id="L80">		KEYWORDS.add(&quot;OR&quot;);</span>
+<span class="fc" id="L81">		KEYWORDS.add(&quot;ORDER&quot;);</span>
+<span class="fc" id="L82">		KEYWORDS.add(&quot;OUTER&quot;);</span>
+<span class="fc" id="L83">		KEYWORDS.add(&quot;PARTITION&quot;);</span>
+<span class="fc" id="L84">		KEYWORDS.add(&quot;PIVOT&quot;);</span>
+<span class="fc" id="L85">		KEYWORDS.add(&quot;RECURSIVE&quot;);</span>
+<span class="fc" id="L86">		KEYWORDS.add(&quot;RENAME&quot;);</span>
+<span class="fc" id="L87">		KEYWORDS.add(&quot;READ&quot;);</span>
+<span class="fc" id="L88">		KEYWORDS.add(&quot;RIGHT&quot;);</span>
+<span class="fc" id="L89">		KEYWORDS.add(&quot;SELECT&quot;);</span>
+<span class="fc" id="L90">		KEYWORDS.add(&quot;SESSION_USER&quot;);</span>
+<span class="fc" id="L91">		KEYWORDS.add(&quot;SET&quot;);</span>
+<span class="fc" id="L92">		KEYWORDS.add(&quot;SHOW&quot;);</span>
+<span class="fc" id="L93">		KEYWORDS.add(&quot;SYSTEM_USER&quot;);</span>
+<span class="fc" id="L94">		KEYWORDS.add(&quot;TABLE&quot;);</span>
+<span class="fc" id="L95">		KEYWORDS.add(&quot;THEN&quot;);</span>
+<span class="fc" id="L96">		KEYWORDS.add(&quot;TRUE&quot;);</span>
+<span class="fc" id="L97">		KEYWORDS.add(&quot;TRUNCATE&quot;);</span>
+<span class="fc" id="L98">		KEYWORDS.add(&quot;TYPE&quot;);</span>
+<span class="fc" id="L99">		KEYWORDS.add(&quot;UNION&quot;);</span>
+<span class="fc" id="L100">		KEYWORDS.add(&quot;UPDATE&quot;);</span>
+<span class="fc" id="L101">		KEYWORDS.add(&quot;USING&quot;);</span>
+<span class="fc" id="L102">		KEYWORDS.add(&quot;VALUES&quot;);</span>
+<span class="fc" id="L103">		KEYWORDS.add(&quot;WINDOW&quot;);</span>
+<span class="fc" id="L104">		KEYWORDS.add(&quot;WITH&quot;);</span>
+<span class="fc" id="L105">		KEYWORDS.add(&quot;WHEN&quot;);</span>
+<span class="fc" id="L106">		KEYWORDS.add(&quot;WHERE&quot;);</span>
+<span class="fc" id="L107">		KEYWORDS.add(&quot;WRITE&quot;);</span>
+<span class="fc" id="L108">		KEYWORDS.add(&quot;GLOBAL&quot;);</span>
+<span class="fc" id="L109">		KEYWORDS.add(&quot;SESSION&quot;);</span>
+<span class="fc" id="L110">		KEYWORDS.add(&quot;LOCAL&quot;);</span>
+<span class="fc" id="L111">		KEYWORDS.add(&quot;PERSIST&quot;);</span>
+<span class="fc" id="L112">		KEYWORDS.add(&quot;PERSIST_ONLY&quot;);</span>
+<span class="fc" id="L113">		KEYWORDS.add(&quot;UNNEST&quot;);</span>
+
+		// DATA TYPES
+<span class="fc" id="L116">		KEYWORDS.add(&quot;BOOL&quot;);</span>
+<span class="fc" id="L117">		KEYWORDS.add(&quot;BYTE&quot;);</span>
+<span class="fc" id="L118">		KEYWORDS.add(&quot;DATE&quot;);</span>
+<span class="fc" id="L119">		KEYWORDS.add(&quot;DATETIME&quot;);</span>
+<span class="fc" id="L120">		KEYWORDS.add(&quot;FLOAT64&quot;);</span>
+<span class="fc" id="L121">		KEYWORDS.add(&quot;INT64&quot;);</span>
+<span class="fc" id="L122">		KEYWORDS.add(&quot;NUMERIC&quot;);</span>
+<span class="fc" id="L123">		KEYWORDS.add(&quot;STRING&quot;);</span>
+<span class="fc" id="L124">		KEYWORDS.add(&quot;TIME&quot;);</span>
+<span class="fc" id="L125">		KEYWORDS.add(&quot;TIMESTAMP&quot;);</span>
+<span class="fc" id="L126">		KEYWORDS.add(&quot;ARRAY&quot;);</span>
+<span class="fc" id="L127">		KEYWORDS.add(&quot;STRUCT&quot;);</span>
+	}
+
+<span class="fc" id="L130">	private static Map&lt;String, String&gt; VERB_LABELS_MAP = new HashMap&lt;&gt;();</span>
+	static {
+
+<span class="fc" id="L133">		VERB_LABELS_MAP.put(&quot;with_clause&quot;, &quot;WITH&quot;);</span>
+<span class="fc" id="L134">		VERB_LABELS_MAP.put(&quot;select_stmt_nake&quot;, &quot;SELECT&quot;);</span>
+<span class="fc" id="L135">		VERB_LABELS_MAP.put(&quot;update_stmt&quot;, &quot;UPDATE&quot;);</span>
+<span class="fc" id="L136">		VERB_LABELS_MAP.put(&quot;delete_stmt&quot;, &quot;DELETE&quot;);</span>
+
+<span class="fc" id="L138">		VERB_LABELS_MAP.put(&quot;replace_insert_stmt&quot;, &quot;INSERT&quot;);</span>
+<span class="fc" id="L139">		VERB_LABELS_MAP.put(&quot;insert_no_columns_stmt&quot;, &quot;INSERT&quot;);</span>
+<span class="fc" id="L140">		VERB_LABELS_MAP.put(&quot;insert_into_set&quot;, &quot;INSERT&quot;);</span>
+
+<span class="fc" id="L142">		VERB_LABELS_MAP.put(&quot;analyze_stmt&quot;, &quot;ANALYZE&quot;);</span>
+<span class="fc" id="L143">		VERB_LABELS_MAP.put(&quot;attach_stmt&quot;, &quot;ATTACH DATABASE&quot;);</span>
+<span class="fc" id="L144">		VERB_LABELS_MAP.put(&quot;drop_stmt&quot;, &quot;DROP&quot;);</span>
+<span class="fc" id="L145">		VERB_LABELS_MAP.put(&quot;truncate_stmt&quot;, &quot;TRUNCATE&quot;);</span>
+<span class="fc" id="L146">		VERB_LABELS_MAP.put(&quot;rename_stmt&quot;, &quot;RENAME&quot;);</span>
+<span class="fc" id="L147">		VERB_LABELS_MAP.put(&quot;use_stmt&quot;, &quot;USE&quot;);</span>
+
+<span class="fc" id="L149">		VERB_LABELS_MAP.put(&quot;create_table_stmt&quot;, &quot;CREATE TABLE&quot;);</span>
+<span class="fc" id="L150">		VERB_LABELS_MAP.put(&quot;alter_table_stmt&quot;, &quot;ALTER TABLE&quot;);</span>
+<span class="fc" id="L151">		VERB_LABELS_MAP.put(&quot;lock_table&quot;, &quot;LOCK TABLE&quot;);</span>
+
+<span class="fc" id="L153">		VERB_LABELS_MAP.put(&quot;create_db_stmt&quot;, &quot;CREATE SCHEMA&quot;);</span>
+
+	}
+
+<span class="fc" id="L157">	private static List&lt;String&gt; OBJECT_LABELS = new LinkedList&lt;&gt;();</span>
+	static {
+<span class="fc" id="L159">		OBJECT_LABELS.add(&quot;table_name&quot;);</span>
+<span class="fc" id="L160">		OBJECT_LABELS.add(&quot;cte_name&quot;);</span>
+	}
+
+	public static Map&lt;String, String&gt; getVerbLabels() {
+<span class="fc" id="L164">		return Collections.unmodifiableMap(VERB_LABELS_MAP);</span>
+	}
+
+	public static List&lt;String&gt; getObjectLabels() {
+<span class="fc" id="L168">		return Collections.unmodifiableList(OBJECT_LABELS);</span>
+	}
+
+<span class="fc" id="L171">	private static List&lt;String&gt; SUPRESS_LABELS = new LinkedList&lt;&gt;();</span>
+	static {
+<span class="fc" id="L173">		SUPRESS_LABELS.add(&quot;__&quot;);</span>
+<span class="fc" id="L174">		SUPRESS_LABELS.add(&quot;___&quot;);</span>
+<span class="fc" id="L175">		SUPRESS_LABELS.add(&quot;ident_start&quot;);</span>
+<span class="fc" id="L176">		SUPRESS_LABELS.add(&quot;ident_part&quot;);</span>
+<span class="fc" id="L177">		SUPRESS_LABELS.add(&quot;column_start&quot;);</span>
+<span class="fc" id="L178">		SUPRESS_LABELS.add(&quot;column_part&quot;);</span>
+<span class="fc" id="L179">		SUPRESS_LABELS.add(&quot;digit&quot;);</span>
+	}
+
+<span class="fc" id="L182">	private static List&lt;String&gt; SUPRESS_SUB_LABELS = new LinkedList&lt;&gt;();</span>
+	static {
+<span class="fc" id="L184">		SUPRESS_SUB_LABELS.add(&quot;literal_string&quot;);</span>
+<span class="fc" id="L185">		SUPRESS_SUB_LABELS.add(&quot;single_quoted_ident&quot;);</span>
+<span class="fc" id="L186">		SUPRESS_SUB_LABELS.add(&quot;backticks_quoted_ident&quot;);</span>
+<span class="fc" id="L187">		SUPRESS_SUB_LABELS.add(&quot;double_quoted_ident&quot;);</span>
+<span class="fc" id="L188">		SUPRESS_SUB_LABELS.add(&quot;table_name&quot;);</span>
+<span class="fc" id="L189">		SUPRESS_SUB_LABELS.add(&quot;column_name&quot;);</span>
+<span class="fc" id="L190">	}</span>
+
+	static Rule startRule;
+
+	public Rule start() {
+<span class="fc bfc" id="L195" title="All 2 branches covered.">		if (startRule == null) {</span>
+<span class="fc" id="L196">			InputStream resourceAsStream = PegBigQueryParser.class.getClassLoader()</span>
+<span class="fc" id="L197">					.getResourceAsStream(&quot;bigquery.peg.json&quot;);</span>
+<span class="fc" id="L198">			JsonObject json = Json.createReader(resourceAsStream).readObject();</span>
+<span class="fc" id="L199">			startRule = super.start(&quot;start&quot;, json);</span>
+		}
+<span class="fc" id="L201">		return startRule;</span>
+	}
+
+	@DontLabel
+	protected Rule parseRule(JsonObject jsonObj) {
+
+<span class="fc" id="L207">		Rule rule = super.parseRule(jsonObj);</span>
+
+<span class="fc" id="L209">		String type = jsonObj.getString(&quot;type&quot;);</span>
+<span class="fc bfc" id="L210" title="All 2 branches covered.">		if (&quot;rule&quot;.equals(type)) {</span>
+
+<span class="fc" id="L212">			String name = jsonObj.getString(&quot;name&quot;);</span>
+<span class="fc bfc" id="L213" title="All 4 branches covered.">			if (&quot;ident_name&quot;.equals(name) || &quot;column_name&quot;.equals(name)) {</span>
+<span class="fc bfc" id="L214" title="All 2 branches covered.">				rule = Sequence(rule, (Action&lt;?&gt;) context -&gt; !KEYWORDS.contains(context.getMatch().toUpperCase()));</span>
+<span class="fc" id="L215">				RULE_CACHE.put(name, rule);</span>
+			}
+
+<span class="fc bfc" id="L218" title="All 2 branches covered.">		} else if (&quot;rule_ref&quot;.equals(type)) {</span>
+
+<span class="fc" id="L220">			String name = jsonObj.getString(&quot;name&quot;);</span>
+<span class="fc bfc" id="L221" title="All 2 branches covered.">			if (SUPRESS_LABELS.contains(name)) {</span>
+<span class="fc" id="L222">				rule.suppressNode();</span>
+<span class="fc bfc" id="L223" title="All 4 branches covered.">			} else if (name.startsWith(&quot;KW&quot;) || SUPRESS_SUB_LABELS.contains(name)) {</span>
+<span class="fc" id="L224">				rule.suppressSubnodes();</span>
+			}
+
+		}
+
+<span class="fc" id="L229">		return rule;</span>
+	}
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.4.201905082037</span></div></body></html>

@@ -1,0 +1,4 @@
+f[ERROR] 2024-07-29 15:57:10.825 [Test worker] HdfsGuardiumFilter - Got logger at filter instantiation
+{[ERROR] 2024-07-29 15:57:10.841 [Test worker] HdfsGuardiumFilter - Unable to get timezone from event, using local timezone
+{[ERROR] 2024-07-29 15:57:10.902 [Test worker] HdfsGuardiumFilter - Unable to get timezone from event, using local timezone
+{[ERROR] 2024-07-29 15:57:10.908 [Test worker] HdfsGuardiumFilter - Unable to get timezone from event, using local timezone

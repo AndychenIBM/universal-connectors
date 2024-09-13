@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BaseJsonParser.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">logstash-filter-bigQuery-guardium</a> &gt; <a href="index.source.html" class="el_package">org.parboiled.json</a> &gt; <span class="el_source">BaseJsonParser.java</span></div><h1>BaseJsonParser.java</h1><pre class="source lang-java linenums">/*
+Copyright IBM Corp. 2021, 2022 All rights reserved.
+SPDX-License-Identifier: Apache-2.0
+ */
+
+package org.parboiled.json;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.parboiled.BaseParser;
+import org.parboiled.Rule;
+import org.parboiled.matchers.Matcher;
+import org.parboiled.matchers.ProxyMatcher;
+
+<span class="fc" id="L17">public abstract class BaseJsonParser extends BaseParser&lt;Object&gt; {</span>
+
+<span class="fc" id="L19">	protected Map&lt;String, Rule&gt; RULE_CACHE = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L20">	protected Map&lt;String, List&lt;ProxyMatcher&gt;&gt; PROXY_CACHE = new HashMap&lt;&gt;();</span>
+
+	protected void initProxies() {
+<span class="fc" id="L23">		PROXY_CACHE.entrySet().forEach(e -&gt; e.getValue().forEach(p -&gt; {</span>
+<span class="fc" id="L24">			p.label(e.getKey());</span>
+<span class="fc" id="L25">			p.arm((Matcher) RULE_CACHE.get(e.getKey()));</span>
+<span class="fc" id="L26">		}));</span>
+<span class="fc" id="L27">		PROXY_CACHE.clear();</span>
+<span class="fc" id="L28">		RULE_CACHE.clear();</span>
+<span class="fc" id="L29">	}</span>
+
+	public abstract Rule start();
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.4.201905082037</span></div></body></html>

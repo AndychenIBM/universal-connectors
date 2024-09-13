@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Parser.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">logstash-filter-azure-postgresql-guardium</a> &gt; <a href="index.source.html" class="el_package">com.ibm.guardium.azurepostgresql</a> &gt; <span class="el_source">Parser.java</span></div><h1>Parser.java</h1><pre class="source lang-java linenums">/*
+#Copyright 2020-2021 IBM Inc. All rights reserved
+#SPDX-License-Identifier: Apache-2.0
+#*/
+package com.ibm.guardium.azurepostgresql;
+
+import java.text.SimpleDateFormat;
+
+import org.apache.logging.log4j.LogManager;
+
+import org.apache.logging.log4j.Logger;
+
+import java.util.Date;
+
+import java.text.ParseException;
+
+import com.ibm.guardium.universalconnector.commons.structures.Accessor;
+
+import com.ibm.guardium.universalconnector.commons.structures.Data;
+
+import com.ibm.guardium.universalconnector.commons.structures.ExceptionRecord;
+
+import com.ibm.guardium.universalconnector.commons.structures.Record;
+
+import com.ibm.guardium.universalconnector.commons.structures.SessionLocator;
+
+import com.ibm.guardium.universalconnector.commons.structures.Time;
+
+import co.elastic.logstash.api.Event;
+
+<span class="fc" id="L31">public class Parser {</span>
+
+<span class="fc" id="L33">	private static Logger log = LogManager.getLogger(Parser.class);</span>
+
+	public static Record parseRecord(final Event e) throws ParseException {
+
+<span class="fc" id="L37">		Record record = new Record();</span>
+
+<span class="fc" id="L39">		String dbname = Constants.NA;</span>
+<span class="pc bpc" id="L40" title="1 of 2 branches missed.">		if (e.getField(Constants.DATABASE_NAME) != null) {</span>
+<span class="fc" id="L41">			dbname = e.getField(Constants.DATABASE_NAME).toString();</span>
+
+		}
+<span class="fc" id="L44">		record.setDbName(dbname);</span>
+
+<span class="fc" id="L46">		record.setAppUserName(Constants.APP_USER_NAME);</span>
+
+<span class="fc" id="L48">		record.setTime(Parser.parseTimestamp(e));</span>
+
+<span class="fc" id="L50">		record.setSessionLocator(Parser.parseSessionLocator(e));</span>
+
+<span class="fc" id="L52">		record.setAccessor(Parser.parseAccessor(e));</span>
+
+<span class="fc" id="L54">		parseSessionId(e, record);</span>
+
+<span class="fc bfc" id="L56" title="All 2 branches covered.">		if (e.getField(Constants.SUCCEEDED).toString().contains(&quot;LOG&quot;)) {</span>
+
+<span class="fc" id="L58">			Data data = new Data();</span>
+
+<span class="pc bpc" id="L60" title="1 of 2 branches missed.">			if (e.getField(Constants.STATEMENT) != null) {</span>
+<span class="fc" id="L61">				data.setOriginalSqlCommand(e.getField(Constants.STATEMENT).toString());</span>
+			} else {
+<span class="nc" id="L63">				data.setOriginalSqlCommand(Constants.NA);</span>
+			}
+<span class="fc" id="L65">			record.setData(data);</span>
+
+<span class="fc" id="L67">		} else {</span>
+<span class="fc bfc" id="L68" title="All 2 branches covered.">			if (e.getField(Constants.SUCCEEDED).toString().contains(&quot;FATAL&quot;)</span>
+<span class="pc bpc" id="L69" title="1 of 2 branches missed.">					&amp;&amp; (e.getField(Constants.PREFIX).toString().contains(&quot;28P01&quot;))) {</span>
+
+<span class="fc" id="L71">				ExceptionRecord exceptionRecord = new ExceptionRecord();</span>
+<span class="fc" id="L72">				exceptionRecord.setExceptionTypeId(Constants.LOGIN_ERROR);</span>
+<span class="fc" id="L73">				exceptionRecord.setDescription(e.getField(Constants.MESSAGE).toString());</span>
+<span class="fc" id="L74">				exceptionRecord.setSqlString(Constants.NA);</span>
+<span class="fc" id="L75">				record.setException(exceptionRecord);</span>
+<span class="fc" id="L76">			} else {</span>
+
+<span class="fc" id="L78">				ExceptionRecord exceptionRecord = new ExceptionRecord();</span>
+<span class="fc" id="L79">				exceptionRecord.setExceptionTypeId(Constants.SQL_ERROR);</span>
+<span class="fc" id="L80">				exceptionRecord.setDescription(e.getField(Constants.MESSAGE).toString());</span>
+<span class="fc" id="L81">				exceptionRecord.setSqlString(Constants.NA);</span>
+<span class="fc" id="L82">				record.setException(exceptionRecord);</span>
+			}
+		}
+
+<span class="fc" id="L86">		return record;</span>
+	}
+
+	public static Time parseTimestamp(final Event e) {
+
+<span class="fc" id="L91">		long millis = 0;</span>
+		try {
+
+<span class="fc" id="L94">			String dateString = e.getField(Constants.TIMESTAMP).toString();</span>
+<span class="fc" id="L95">			SimpleDateFormat sdf = new SimpleDateFormat(&quot;yyyy-MM-dd HH:mm:ss&quot;);</span>
+<span class="fc" id="L96">			Date date = (sdf.parse(dateString));</span>
+<span class="fc" id="L97">			millis = date.getTime();</span>
+<span class="nc" id="L98">		} catch (Exception exe) {</span>
+<span class="nc" id="L99">			exe.printStackTrace();</span>
+<span class="fc" id="L100">		}</span>
+<span class="fc" id="L101">		return new Time(millis, 0, 0);</span>
+	}
+
+	public static void parseSessionId(final Event e, final Record record) {
+
+<span class="pc bpc" id="L106" title="1 of 2 branches missed.">		if (e.getField(Constants.SESSION_ID) != null) {</span>
+<span class="fc" id="L107">			record.setSessionId(e.getField(Constants.SESSION_ID).toString());</span>
+		} else {
+<span class="nc" id="L109">			Integer hashCode = (record.getSessionLocator().getClientIp() + record.getSessionLocator().getClientPort()</span>
+<span class="nc" id="L110">					+ record.getDbName()).hashCode();</span>
+<span class="nc" id="L111">			record.setSessionId(hashCode.toString());</span>
+		}
+
+<span class="fc" id="L114">	}</span>
+
+	public static SessionLocator parseSessionLocator(final Event e) {
+
+<span class="fc" id="L118">		SessionLocator sessionLocator = new SessionLocator();</span>
+
+<span class="fc" id="L120">		String clientIp = Constants.DEFAULT_IP;</span>
+<span class="pc bpc" id="L121" title="1 of 2 branches missed.">		if (e.getField(Constants.CLIENT_IP) != null) {</span>
+<span class="fc" id="L122">			clientIp = (e.getField(Constants.CLIENT_IP).toString());</span>
+		}
+<span class="fc" id="L124">		sessionLocator.setClientIp(clientIp);</span>
+
+<span class="fc" id="L126">		int clientPort = 0;</span>
+<span class="fc bfc" id="L127" title="All 2 branches covered.">		if (e.getField(Constants.CLIENT_PORT) != null) {</span>
+<span class="fc" id="L128">			clientPort = Parser.parseClientPort(e);</span>
+		}
+<span class="fc" id="L130">		sessionLocator.setClientPort(clientPort);</span>
+
+<span class="fc" id="L132">		sessionLocator.setServerIp(Constants.DEFAULT_IP);</span>
+<span class="fc" id="L133">		sessionLocator.setServerPort(Constants.DEFAULT_PORT);</span>
+<span class="fc" id="L134">		sessionLocator.setIpv6(false);</span>
+<span class="fc" id="L135">		sessionLocator.setClientIpv6(Constants.UNKNOWN_STRING);</span>
+<span class="fc" id="L136">		sessionLocator.setServerIpv6(Constants.UNKNOWN_STRING);</span>
+
+<span class="fc" id="L138">		return sessionLocator;</span>
+	}
+
+	public static int parseClientPort(final Event e) {
+
+<span class="fc" id="L143">		int i = 0;</span>
+		try {
+<span class="fc" id="L145">			String s = e.getField(Constants.CLIENT_PORT).toString();</span>
+<span class="fc" id="L146">			i = Integer.valueOf(s);</span>
+<span class="nc" id="L147">		} catch (Exception exec) {</span>
+<span class="nc" id="L148">			exec.printStackTrace();</span>
+<span class="fc" id="L149">		}</span>
+<span class="fc" id="L150">		return i;</span>
+	}
+
+	public static Accessor parseAccessor(final Event e) {
+
+<span class="fc" id="L155">		Accessor accessor = new Accessor();</span>
+<span class="fc" id="L156">		accessor.setDataType(Accessor.DATA_TYPE_GUARDIUM_SHOULD_PARSE_SQL);</span>
+<span class="fc" id="L157">		accessor.setLanguage(Constants.LANGUAGE);</span>
+<span class="fc" id="L158">		accessor.setClientHostName(Constants.UNKNOWN_STRING);</span>
+<span class="fc" id="L159">		accessor.setClientOs(Constants.UNKNOWN_STRING);</span>
+
+<span class="fc" id="L161">		String DbUser = Constants.NA;</span>
+<span class="pc bpc" id="L162" title="1 of 2 branches missed.">		if (e.getField(Constants.USER_NAME) != null) {</span>
+<span class="fc" id="L163">			DbUser = e.getField(Constants.USER_NAME).toString();</span>
+		}
+<span class="fc" id="L165">		accessor.setDbUser(DbUser);</span>
+
+<span class="fc" id="L167">		accessor.setServerType(Constants.SERVER_TYPE_STRING);</span>
+<span class="fc" id="L168">		accessor.setCommProtocol(Constants.COMM_PROTOCOL);</span>
+<span class="fc" id="L169">		accessor.setDbProtocol(Constants.DATA_PROTOCOL_STRING);</span>
+<span class="fc" id="L170">		accessor.setDbProtocolVersion(Constants.UNKNOWN_STRING);</span>
+<span class="fc" id="L171">		accessor.setClient_mac(Constants.UNKNOWN_STRING);</span>
+<span class="fc" id="L172">		accessor.setServerDescription(Constants.UNKNOWN_STRING);</span>
+<span class="fc" id="L173">		accessor.setServiceName(Constants.UNKNOWN_STRING);</span>
+<span class="fc" id="L174">		accessor.setServerOs(Constants.UNKNOWN_STRING);</span>
+<span class="fc" id="L175">		String ServerHostName = Constants.UNKNOWN_STRING;</span>
+<span class="pc bpc" id="L176" title="1 of 2 branches missed.">		if (e.getField(Constants.SERVER_HOSTNAME) != null) {</span>
+<span class="fc" id="L177">			ServerHostName = e.getField(Constants.SERVER_HOSTNAME).toString();</span>
+		}
+
+<span class="fc" id="L180">		accessor.setServerHostName(ServerHostName);</span>
+
+<span class="fc" id="L182">		String sourceProgram = Constants.NA;</span>
+<span class="pc bpc" id="L183" title="1 of 2 branches missed.">		if (e.getField(Constants.APPLICATION_NAME) != null) {</span>
+
+<span class="pc bpc" id="L185" title="1 of 2 branches missed.">			if (e.getField(Constants.APPLICATION_NAME).toString().contains(&quot;[unknown]&quot;)) {</span>
+<span class="nc" id="L186">				sourceProgram = Constants.UNKNOWN_STRING;</span>
+			} else {
+<span class="fc" id="L188">				sourceProgram = (e.getField(Constants.APPLICATION_NAME).toString());</span>
+			}
+		}
+<span class="fc" id="L191">		accessor.setSourceProgram(sourceProgram);</span>
+
+<span class="fc" id="L193">		String OsUser = Constants.UNKNOWN_STRING;</span>
+<span class="pc bpc" id="L194" title="1 of 2 branches missed.">		if (e.getField(Constants.USER_NAME) != null) {</span>
+<span class="fc" id="L195">			OsUser = (e.getField(Constants.USER_NAME).toString());</span>
+		}
+<span class="fc" id="L197">		accessor.setOsUser(OsUser);</span>
+<span class="fc" id="L198">		return accessor;</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.4.201905082037</span></div></body></html>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.ibm.guardium.azurepostgresql.AzurePostgresqlGuardiumPluginFilterTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2024-07-29T20:06:30" hostname="andychens-mbp.war.can.ibm.com" time="0.073">
+  <properties/>
+  <testcase name="testGuardRecord" classname="com.ibm.guardium.azurepostgresql.AzurePostgresqlGuardiumPluginFilterTest" time="0.073"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ApplicationConstants.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">logstash-filter-bigQuery-guardium</a> &gt; <a href="index.source.html" class="el_package">com.ibm.guardium.bigquery</a> &gt; <span class="el_source">ApplicationConstants.java</span></div><h1>ApplicationConstants.java</h1><pre class="source lang-java linenums">/*
+Copyright IBM Corp. 2021, 2023 All rights reserved.
+SPDX-License-Identifier: Apache-2.0
+ */
+package com.ibm.guardium.bigquery;
+
+import org.apache.commons.lang3.StringUtils;
+
+public class ApplicationConstants {
+
+	public static final String LOGSTASH_TAG_SKIP_NOT_GCP = &quot;_GCPguardium_skip_not_GCP&quot;;
+	public static final String LOGSTASH_TAG_JSON_PARSE_ERROR = &quot;_bigqueryguardium_json_parse_error&quot;;
+	public static final String DATA_PROTOCOL_STRING = &quot;BigQuery(GCP)&quot;;
+	public static final String SERVER_TYPE_STRING = &quot;BigQuery&quot;;
+	public static final String UNKOWN_STRING = StringUtils.EMPTY;
+	public static final String COMPOUND_OBJECT_STRING = &quot;[json-object]&quot;;
+	public static final String EXCEPTION_TYPE_STRING = &quot;SQL_ERROR&quot;;
+
+	public static final String DEFAULT_IPV6 = &quot;0000:0000:0000:0000:0000:FFFF:0000:0000&quot;;
+	public static final String MESSAGE_CONTAINS = &quot;bigquery.googleapis.com&quot;;
+	public static final String SERVER_HOST_NAME_STRING = &quot;serverHostname&quot;;
+	public static final String STATEMENT_TYPE = &quot;statementType&quot;;
+	public static final String COLLECTION = &quot;collection&quot;;
+	public static final String UNPARSEABLE = &quot;unparseable&quot;;
+	public static final String EVENT_MESSAGE = &quot;message&quot;;
+	public static final String PROTO_PAYLOAD = &quot;protoPayload&quot;;
+
+	public static final String METADATA = &quot;metadata&quot;;
+	public static final String REQUEST_METADATA = &quot;requestMetadata&quot;;
+	public static final String CALLER_IP = &quot;callerIp&quot;;
+
+	public static final String SERVICE_NAME = &quot;serviceName&quot;;
+	public static final String AT_TYPE = &quot;@type&quot;;
+	public static final String REQUEST = &quot;request&quot;;
+	public static final String DATABASE = &quot;database&quot;;
+
+	public static final String RESPONSE = &quot;response&quot;;
+
+	public static final String AUTHENTICATION_INFO = &quot;authenticationInfo&quot;;
+	public static final String PRINCIPAL_EMAIL = &quot;principalEmail&quot;;
+
+	public static final String SEVERITY = &quot;severity&quot;;
+	public static final String TIMESTAMP = &quot;timestamp&quot;;
+	public static final String INSERTID = &quot;insertId&quot;;
+
+	public static final String CREATE_STATEMENT = &quot;createStatement&quot;;
+	public static final String STATEMENTS = &quot;statements&quot;;
+	public static final String SQL = &quot;sql&quot;;
+
+	public static final String ERROR = &quot;error&quot;;
+	public static final String ERRORS = &quot;errors&quot;;
+	public static final String CODE = &quot;code&quot;;
+	public static final String MESSAGE = &quot;message&quot;;
+	public static final String ERROR_RESULT = &quot;errorResult&quot;;
+
+	public static final String SERVICE_DATA = &quot;serviceData&quot;;
+
+	public static final String JOB_INSERT_REQUEST = &quot;jobInsertRequest&quot;;
+	public static final String RESOURCE = &quot;resource&quot;;
+
+	public static final String JOB_CONFIGURATION = &quot;jobConfiguration&quot;;
+	public static final String QUERY = &quot;query&quot;;
+
+	public static final String JOB_INSERT_RESPONSE = &quot;jobInsertResponse&quot;;
+
+	public static final String STATUS = &quot;status&quot;;
+	public static final String JOB_STATUS = &quot;jobStatus&quot;;
+	public static final String JOB_COMPLETED_EVENT = &quot;jobCompletedEvent&quot;;
+	public static final String JOB = &quot;job&quot;;
+
+	public static final String JOB_QUERY_RESPONSE = &quot;jobQueryResponse&quot;;
+	public static final String JOB_GET_QUERY_RESULT_REQUEST = &quot;jobGetQueryResultsRequest&quot;;
+	public static final String JOB_GET_QUERY_RESULT_RESPONSE = &quot;jobGetQueryResultsResponse&quot;;
+	public static final String JOB_QUERY_DONE_RESPONSE = &quot;jobQueryDoneResponse&quot;;
+
+	public static final String HTTP_REQUEST = &quot;httpRequest&quot;;
+	public static final String SERVER_IP = &quot;serverIp&quot;;
+	public static final String DEFAULT_IP = &quot;0.0.0.0&quot;;
+	public static final String TABLE_CREATION = &quot;tableCreation&quot;;
+	public static final String TABLE_CHANGE = &quot;tableChange&quot;;
+	public static final String TABLE_DATA_READ = &quot;tableDataRead&quot;;
+
+	public static final String TABLE = &quot;table&quot;;
+	public static final String TABLE_NAME = &quot;tableName&quot;;
+	public static final String SCHEMA_JSON = &quot;schemaJson&quot;;
+	public static final String FIELDS = &quot;fields&quot;;
+	public static final String PROJECT_ID = &quot;project_id&quot;;
+
+	public static final String NAME = &quot;name&quot;;
+	public static final String TYPE = &quot;type&quot;;
+
+	public static final String JOB_INSERTION = &quot;jobInsertion&quot;;
+	public static final String JOB_CHANGE = &quot;jobChange&quot;;
+	public static final String JOB_CONFIG = &quot;jobConfig&quot;;
+	public static final String QUERY_CONFIG = &quot;queryConfig&quot;;
+
+	public static final String VIEW = &quot;view&quot;;
+
+	public static final String TABLE_INSERT_REQUEST = &quot;tableInsertRequest&quot;;
+	public static final String TABLE_UPDATE_REQUEST = &quot;tableUpdateRequest&quot;;
+	public static final String TABLE_INSERT_RESPONSE = &quot;tableInsertResponse&quot;;
+	public static final String TABLE_UPDATE_RESPONSE = &quot;tableUpdateResponse&quot;;
+
+	public static final String LABELS = &quot;labels&quot;;
+	public static final String DATASET_ID = &quot;dataset_id&quot;;
+
+	public static final String DATASETID = &quot;datasetId&quot;;
+
+	public static final String DATA_TYPE = &quot;MYSQL&quot;;
+
+	public static final String VERBS = &quot;verbs&quot;;
+	public static final String OBJECTS = &quot;objects&quot;;
+	public static final String CREATE = &quot;create&quot;;
+	public static final String TRUNCATE = &quot;truncate&quot;;
+	public static final String AST = &quot;ast&quot;;
+<span class="nc" id="L116">	public static final Object KEYWORD = &quot;keyword&quot;;</span>
+<span class="nc" id="L117">	public static final Object TYPE_BIGQUERY = &quot;bigquery&quot;;</span>
+	public static final String SELECT = &quot;select&quot;;
+	public static final String PARSE = &quot;parse&quot;;
+	public static final String TABLE_LIST = &quot;tableList&quot;;
+	public static final String DROP = &quot;drop&quot;;
+	public static final String ALTER = &quot;alter&quot;;
+	public static final String FUCNTION = &quot;function&quot;;
+	public static final String PROCEDURE = &quot;procedure&quot;;
+	public static final String COLUMN_LIST = &quot;columnList&quot;;
+	public static final String SUBSTITUTE_WITH_QUESTION_MARK = &quot;?&quot;;
+	public static final String SUBSTITUTE_WITH_INTERSECT = &quot; INTERSECT&quot;;
+	public static final String DELETE = &quot;delete&quot;;
+	public static final String FROM_DELETE = &quot;FROM,DELETE&quot;;
+	public static final String INTO_INSERT = &quot;INTO,INSERT&quot;;
+	public static final String INSERT = &quot;insert&quot;;
+	public static final String UPDATE = &quot;update&quot;;
+	public static final String UNNEST = &quot;unnest&quot;;
+	public static final String BRACKET = &quot;(&quot;;
+	public static final String SPACE = &quot; &quot;;
+	public static final String DOT = &quot;.&quot;;
+	public static final String CSV = &quot;,&quot;;
+	public static final String BACKTICK = &quot;`&quot;;
+	public static final String ALL_DDL = &quot;ASSIGNMENT,CAPACITY,RESERVATION,VIEW,PROCEDURE,FUNCTION,MATERIALIZED VIEW,SNAPSHOT TABLE,SCHEMA,ON,TABLE&quot;;
+	public static final String DATASET_CREATION = &quot;datasetCreation&quot;;
+	public static final String DATASET_DELETION = &quot;datasetDeletion&quot;;
+	public static final String TABLE_DELETION = &quot;tableDeletion&quot;;
+	public static final String REASON = &quot;reason&quot;;
+	
+	public static final String OPENB = &quot;(&quot;;
+	public static final String GRANT = &quot;GRANT&quot;;
+	public static final String REVOKE = &quot;REVOKE&quot;;
+	public static final String MERGE = &quot;MERGE&quot;;
+	
+	public static final String CREATE_SCHEMA = &quot;create schema&quot;;
+	public static final String CREATE_TABlE = &quot;create table&quot;;
+	public static final String DROP_SCHEMA = &quot;drop schema&quot;;
+	public static final String DROP_TABLE = &quot;drop table&quot;;
+	public static final String TABLEINSERT_REQUEST = &quot;table_insert_request&quot;;
+	public static final String TABLEDELETE_REQUEST = &quot;table_delete_request&quot;;
+	public static final String RESOURCE_NAME = &quot;resourceName&quot;;
+	public static final String IMPORT = &quot;IMPORT&quot;;
+	public static final String LOAD_CONFIG = &quot;loadConfig&quot;;
+	public static final String DESTINATION_TABLE = &quot;destinationTable&quot;;
+	public static final String PEG_PARSER = &quot;PegParser&quot;;
+	
+	
+	
+	private ApplicationConstants() {
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.4.201905082037</span></div></body></html>

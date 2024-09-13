@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.ibm.guardium.bigquery.BigQueryGuardiumFilterTest" tests="50" skipped="0" failures="0" errors="0" timestamp="2024-09-11T19:05:50" hostname="andychens-mbp.war.can.ibm.com" time="7.379">
+  <properties/>
+  <testcase name="testParseRecordMetaDataWithSchema()" classname="com.ibm.guardium.bigquery.BigQueryGuardiumFilterTest" time="6.889"/>
+  <testcase name="filterOuterProtoPayloadDataTest()" classname="com.ibm.guardium.bigquery.BigQueryGuardiumFilterTest" time="0.009"/>
+  <testcase name="parseNullResourceJsonForMetaDataTest()" classname="com.ibm.guardium.bigquery.BigQueryGuardiumFilterTest" time="0.033"/>
+  <testcase name="testParseRecordSelectObjectVerbBlank()" classname="com.ibm.guardium.bigquery.BigQueryGuardiumFilterTest" time="0.003"/>
+  <testcase name="testParseRecordMetaDataWithTable()" classname="com.ibm.guardium.bigquery.BigQueryGuardiumFilterTest" time="0.035"/>
+  <testcase name="filterProtoPayloadErrorTEST()" classname="com.ibm.guardium.bigquery.BigQueryGuardiumFilterTest" time="0.016"/>
+  <testcase name="configSchemaTest()" classname="com.ibm.guardium.bigquery.BigQueryGuardiumFilterTest" time="0.001"/>
+  <testcase name="testParseRecordMetaDataWithNot()" classname="com.ibm.guardium.bigquery.BigQueryGuardiumFilterTest" time="0.011"/>
+  <testcase name="commonUtilsTest()" classname="com.ibm.guardium.bigquery.BigQueryGuardiumFilterTest" time="0.0"/>
+  <testcase name="filterProtoPayloadErrorwithoutDescriptionTEST()" classname="com.ibm.guardium.bigquery.BigQueryGuardiumFilterTest" time="0.007"/>
+  <testcase name="filterHTTPPrototypeTest()" classname="com.ibm.guardium.bigquery.BigQueryGuardiumFilterTest" time="0.019"/>
+  <testcase name="commonUtilsCatchTest()" classname="com.ibm.guardium.bigquery.BigQueryGuardiumFilterTest" time="0.001"/>
+  <testcase name="testfilterDataConstruct()" classname="com.ibm.guardium.bigquery.BigQueryGuardiumFilterTest" time="0.013"/>
+  <testcase name="testParseRecordMetaDataWithUnionAll()" classname="com.ibm.guardium.bigquery.BigQueryGuardiumFilterTest" time="0.002"/>
+  <testcase name="testParseRecordUploadCsvCreateTableLog()" classname="com.ibm.guardium.bigquery.BigQueryGuardiumFilterTest" time="0.009"/>
+  <testcase name="testParseRecordMetaDataWithMaterialized()" classname="com.ibm.guardium.bigquery.BigQueryGuardiumFilterTest" time="0.016"/>
+  <testcase name="testSpecialChars()" classname="com.ibm.guardium.bigquery.BigQueryGuardiumFilterTest" time="0.001"/>
+  <testcase name="testParseRecordMetaDataWithSnapshot()" classname="com.ibm.guardium.bigquery.BigQueryGuardiumFilterTest" time="0.009"/>
+  <testcase name="testParseRecordMetaDataWithOperators()" classname="com.ibm.guardium.bigquery.BigQueryGuardiumFilterTest" time="0.012"/>
+  <testcase name="filterProtoPayloadEmptyMetadataTest()" classname="com.ibm.guardium.bigquery.BigQueryGuardiumFilterTest" time="0.005"/>
+  <testcase name="testfilterSessionLocator()" classname="com.ibm.guardium.bigquery.BigQueryGuardiumFilterTest" time="0.008"/>
+  <testcase name="event()" classname="com.ibm.guardium.bigquery.BigQueryGuardiumFilterTest" time="0.008"/>
+  <testcase name="testParseRecordMetaDataWithUnionDistinct()" classname="com.ibm.guardium.bigquery.BigQueryGuardiumFilterTest" time="0.002"/>
+  <testcase name="testParseRecordMetaDataWithTableInsertrequest()" classname="com.ibm.guardium.bigquery.BigQueryGuardiumFilterTest" time="0.007"/>
+  <testcase name="testfilterSessionLocatorwithIpv6()" classname="com.ibm.guardium.bigquery.BigQueryGuardiumFilterTest" time="0.02"/>
+  <testcase name="getIdTest()" classname="com.ibm.guardium.bigquery.BigQueryGuardiumFilterTest" time="0.0"/>
+  <testcase name="testParseRecordMetaDataWithIntersectDistinct()" classname="com.ibm.guardium.bigquery.BigQueryGuardiumFilterTest" time="0.019"/>
+  <testcase name="filterProtoPayloadDbNameTest()" classname="com.ibm.guardium.bigquery.BigQueryGuardiumFilterTest" time="0.009"/>
+  <testcase name="eventObjectAndVerb1Test()" classname="com.ibm.guardium.bigquery.BigQueryGuardiumFilterTest" time="0.001"/>
+  <testcase name="parseJobTest()" classname="com.ibm.guardium.bigquery.BigQueryGuardiumFilterTest" time="0.011"/>
+  <testcase name="filterFieldsForTableCreationTest()" classname="com.ibm.guardium.bigquery.BigQueryGuardiumFilterTest" time="0.013"/>
+  <testcase name="testParseRecordMetaDataWithFunction()" classname="com.ibm.guardium.bigquery.BigQueryGuardiumFilterTest" time="0.012"/>
+  <testcase name="eventObjectAndVerbTest()" classname="com.ibm.guardium.bigquery.BigQueryGuardiumFilterTest" time="0.008"/>
+  <testcase name="filterCreateSchemaTest()" classname="com.ibm.guardium.bigquery.BigQueryGuardiumFilterTest" time="0.002"/>
+  <testcase name="testParseRecordUNNEST()" classname="com.ibm.guardium.bigquery.BigQueryGuardiumFilterTest" time="0.029"/>
+  <testcase name="filterProtoPayloadJobChangeRequestTest()" classname="com.ibm.guardium.bigquery.BigQueryGuardiumFilterTest" time="0.0"/>
+  <testcase name="filterProtoPayloadErrorwithDescriptionTEST()" classname="com.ibm.guardium.bigquery.BigQueryGuardiumFilterTest" time="0.002"/>
+  <testcase name="testParseRecordMetaDataWithTruncate()" classname="com.ibm.guardium.bigquery.BigQueryGuardiumFilterTest" time="0.005"/>
+  <testcase name="testParseRecordMetaDataWithProcedure()" classname="com.ibm.guardium.bigquery.BigQueryGuardiumFilterTest" time="0.011"/>
+  <testcase name="testParseRecordMetaDataWith()" classname="com.ibm.guardium.bigquery.BigQueryGuardiumFilterTest" time="0.007"/>
+  <testcase name="testParseRecordCreateSchema()" classname="com.ibm.guardium.bigquery.BigQueryGuardiumFilterTest" time="0.009"/>
+  <testcase name="filterProtoPayloadTableChangeTest()" classname="com.ibm.guardium.bigquery.BigQueryGuardiumFilterTest" time="0.005"/>
+  <testcase name="testParseRecordMetaDataWithJoin()" classname="com.ibm.guardium.bigquery.BigQueryGuardiumFilterTest" time="0.017"/>
+  <testcase name="testParseRecordMetaDataWithView()" classname="com.ibm.guardium.bigquery.BigQueryGuardiumFilterTest" time="0.009"/>
+  <testcase name="testfilterAccessor()" classname="com.ibm.guardium.bigquery.BigQueryGuardiumFilterTest" time="0.005"/>
+  <testcase name="testfilterTimstamp()" classname="com.ibm.guardium.bigquery.BigQueryGuardiumFilterTest" time="0.009"/>
+  <testcase name="testParseRecordMetaDataWithDeleteTableRequest()" classname="com.ibm.guardium.bigquery.BigQueryGuardiumFilterTest" time="0.008"/>
+  <testcase name="filterSQLWithSlashTest()" classname="com.ibm.guardium.bigquery.BigQueryGuardiumFilterTest" time="0.003"/>
+  <testcase name="eventObjectAndVerbCreateTest()" classname="com.ibm.guardium.bigquery.BigQueryGuardiumFilterTest" time="0.009"/>
+  <testcase name="testParseRecordMetaDataWithAlterMaterialized()" classname="com.ibm.guardium.bigquery.BigQueryGuardiumFilterTest" time="0.008"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

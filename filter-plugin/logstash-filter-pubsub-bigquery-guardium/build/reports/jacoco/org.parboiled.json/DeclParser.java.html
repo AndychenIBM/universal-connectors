@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DeclParser.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">logstash-filter-bigQuery-guardium</a> &gt; <a href="index.source.html" class="el_package">org.parboiled.json</a> &gt; <span class="el_source">DeclParser.java</span></div><h1>DeclParser.java</h1><pre class="source lang-java linenums">/*
+Copyright IBM Corp. 2021, 2022 All rights reserved.
+SPDX-License-Identifier: Apache-2.0
+ */
+
+package org.parboiled.json;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import javax.json.JsonArray;
+import javax.json.JsonObject;
+import javax.json.JsonString;
+import javax.json.JsonValue;
+
+import org.parboiled.Action;
+import org.parboiled.Rule;
+import org.parboiled.annotations.DontLabel;
+import org.parboiled.annotations.SkipNode;
+import org.parboiled.matchers.ProxyMatcher;
+
+<span class="nc" id="L25">public abstract class DeclParser extends BaseJsonParser {</span>
+
+<span class="nc" id="L27">	protected Rule __ = _0n(AnyOf(&quot; \t\r\n&quot;)).suppressNode();</span>
+<span class="nc" id="L28">	protected Rule _d = _1n(CharRange('0', '9')).suppressSubnodes();</span>
+<span class="nc" id="L29">	protected Rule _w = _1n(_1of(CharRange('a', 'z'), CharRange('A', 'Z'), CharRange('0', '9'))).suppressSubnodes();</span>
+<span class="nc" id="L30">	protected Rule _l = _1of(seq(&quot;'&quot;, _0n(CharRange('a', 'z')), &quot;'&quot;), seq(&quot;\&quot;&quot;, _0n(CharRange('a', 'z')), &quot;\&quot;&quot;), _d)</span>
+<span class="nc" id="L31">			.suppressSubnodes();</span>
+
+	@DontLabel
+	protected Rule i(String string) {
+<span class="nc" id="L35">		return IgnoreCase(string);</span>
+	}
+
+	@SkipNode
+	protected Rule _01(Object obj) {
+<span class="nc" id="L40">		return Optional(obj);</span>
+	}
+
+	@SkipNode
+	protected Rule _0n(Object obj) {
+<span class="nc" id="L45">		return ZeroOrMore(obj);</span>
+	}
+
+	protected Rule _1n(Object rule) {
+<span class="nc" id="L49">		return OneOrMore(rule);</span>
+	}
+
+	protected Rule seq(Object rule1, Object rule2, Object... rules) {
+<span class="nc" id="L53">		return Sequence(rule1, rule2, rules);</span>
+	}
+
+	@SkipNode
+	protected Rule _1of(Object rule1, Object rule2, Object... rules) {
+<span class="nc" id="L58">		return FirstOf(rule1, rule2, rules);</span>
+	}
+
+<span class="nc" id="L61">	protected static Map&lt;String, Rule&gt; LEXER = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L62">	protected Map&lt;String, Action&lt;?&gt;&gt; ACTIONS = new HashMap&lt;&gt;();</span>
+
+	protected void initLexer() {
+<span class="nc" id="L65">		LEXER.put(&quot;__&quot;, __);</span>
+<span class="nc" id="L66">		LEXER.put(&quot;_d&quot;, _d);</span>
+<span class="nc" id="L67">		LEXER.put(&quot;_l&quot;, _l);</span>
+<span class="nc" id="L68">		LEXER.put(&quot;_w&quot;, _w);</span>
+<span class="nc" id="L69">	}</span>
+
+	protected void initActions() {
+<span class="nc" id="L72">	}</span>
+
+	public Rule start(String start, JsonObject json) {
+<span class="nc" id="L75">		initLexer();</span>
+<span class="nc" id="L76">		initActions();</span>
+<span class="nc" id="L77">		parseRule(null, json);</span>
+<span class="nc" id="L78">		Rule startRule = RULE_CACHE.get(start);</span>
+<span class="nc" id="L79">		initProxies();</span>
+<span class="nc" id="L80">		return startRule;</span>
+	}
+
+	@DontLabel
+	protected Rule parseRule(String key, JsonValue jsonVal) {
+
+<span class="nc" id="L86">		Rule rule = null;</span>
+
+		// Object
+<span class="nc bnc" id="L89" title="All 2 branches missed.">		if (jsonVal instanceof JsonObject) {</span>
+<span class="nc" id="L90">			JsonObject jsonObj = (JsonObject) jsonVal;</span>
+
+<span class="nc bnc" id="L92" title="All 2 branches missed.">			for (Entry&lt;String, JsonValue&gt; entry : jsonObj.entrySet()) {</span>
+
+<span class="nc" id="L94">				Rule childRule = parseRule(entry.getKey(), entry.getValue());</span>
+
+<span class="nc bnc" id="L96" title="All 2 branches missed.">				if (&quot;_0n&quot;.equalsIgnoreCase(key)) {</span>
+<span class="nc" id="L97">					rule = _0n(childRule);</span>
+<span class="nc bnc" id="L98" title="All 2 branches missed.">				} else if (&quot;_1n&quot;.equalsIgnoreCase(key)) {</span>
+<span class="nc" id="L99">					rule = _1n(childRule);</span>
+<span class="nc bnc" id="L100" title="All 2 branches missed.">				} else if (&quot;_01&quot;.equalsIgnoreCase(key)) {</span>
+<span class="nc" id="L101">					rule = _01(childRule);</span>
+				} else {
+<span class="nc" id="L103">					rule = childRule; // Default</span>
+<span class="nc bnc" id="L104" title="All 2 branches missed.">					if (null != key) {</span>
+<span class="nc" id="L105">						RULE_CACHE.put(key, rule);</span>
+					}
+				}
+<span class="nc" id="L108">			}</span>
+
+			// Array
+<span class="nc bnc" id="L111" title="All 2 branches missed.">		} else if (jsonVal instanceof JsonArray) {</span>
+
+<span class="nc" id="L113">			JsonArray jsonArr = (JsonArray) jsonVal;</span>
+<span class="nc" id="L114">			Object[] childRules = new Object[jsonArr.size()];</span>
+
+<span class="nc bnc" id="L116" title="All 2 branches missed.">			for (int i = 0; i &lt; jsonArr.size(); i++) {</span>
+<span class="nc" id="L117">				JsonValue jsonItem = jsonArr.get(i);</span>
+
+<span class="nc" id="L119">				Action&lt;?&gt; action = null;</span>
+<span class="nc bnc" id="L120" title="All 2 branches missed.">				if (jsonItem instanceof JsonString) {</span>
+<span class="nc" id="L121">					String value = ((JsonString) jsonItem).getString();</span>
+<span class="nc" id="L122">					action = ACTIONS.get(value);</span>
+				}
+
+<span class="nc bnc" id="L125" title="All 2 branches missed.">				if (action != null) {</span>
+<span class="nc" id="L126">					childRules[i] = action;</span>
+				} else {
+<span class="nc" id="L128">					childRules[i] = parseRule(null, jsonItem);</span>
+				}
+			}
+
+<span class="nc bnc" id="L132" title="All 2 branches missed.">			if (&quot;seq&quot;.equalsIgnoreCase(key)) {</span>
+<span class="nc" id="L133">				rule = Sequence(childRules);</span>
+<span class="nc bnc" id="L134" title="All 2 branches missed.">			} else if (&quot;_1of&quot;.equalsIgnoreCase(key)) {</span>
+<span class="nc" id="L135">				rule = FirstOf(childRules);</span>
+			}
+<span class="nc" id="L137">				rule = rule.label(key);</span>
+			// String
+<span class="nc bnc" id="L139" title="All 2 branches missed.">		} else if (jsonVal instanceof JsonString) {</span>
+
+<span class="nc" id="L141">			String value = ((JsonString) jsonVal).getString();</span>
+
+<span class="nc" id="L143">			Rule lexerRule = LEXER.get(value);</span>
+<span class="nc bnc" id="L144" title="All 2 branches missed.">			if (lexerRule != null) {</span>
+<span class="nc" id="L145">				rule = lexerRule;</span>
+<span class="nc bnc" id="L146" title="All 2 branches missed.">			} else if (&quot;AnyOf&quot;.equalsIgnoreCase(key)) {</span>
+<span class="nc" id="L147">				rule = AnyOf(value);</span>
+<span class="nc bnc" id="L148" title="All 2 branches missed.">			} else if (&quot;i&quot;.equalsIgnoreCase(key)) {</span>
+<span class="nc" id="L149">				rule = i(value);</span>
+<span class="nc bnc" id="L150" title="All 4 branches missed.">			} else if (value.startsWith(&quot;%&quot;) &amp;&amp; value.endsWith(&quot;%&quot;)) {</span>
+<span class="nc" id="L151">				ProxyMatcher proxy = new ProxyMatcher();</span>
+<span class="nc" id="L152">				String proxyName = value.substring(1, value.length() - 1);</span>
+<span class="nc" id="L153">				List&lt;ProxyMatcher&gt; proxies = PROXY_CACHE.get(proxyName);</span>
+<span class="nc bnc" id="L154" title="All 2 branches missed.">				if (proxies == null) {</span>
+<span class="nc" id="L155">					proxies = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L156">					PROXY_CACHE.put(proxyName, proxies);</span>
+				}
+<span class="nc" id="L158">				proxies.add(proxy);</span>
+<span class="nc" id="L159">				rule = proxy;</span>
+<span class="nc" id="L160">			} else {</span>
+<span class="nc" id="L161">				rule = String(value); // Default String</span>
+			}
+
+		}
+
+<span class="nc bnc" id="L166" title="All 2 branches missed.">		if (rule == null) {</span>
+<span class="nc" id="L167">			throw new RuntimeException(&quot;not handled : &quot; + key + &quot; : &quot; + jsonVal);</span>
+		}
+
+<span class="nc" id="L170">		return rule;</span>
+	}
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.4.201905082037</span></div></body></html>
