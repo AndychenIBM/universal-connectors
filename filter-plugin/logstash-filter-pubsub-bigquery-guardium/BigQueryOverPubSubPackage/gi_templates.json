@@ -22,7 +22,7 @@
       },
       "type": {
         "type": "text",
-        "default": "pubsub",
+        "default": "bigQuery",
         "hidden": true
       },
       "private_id": {
