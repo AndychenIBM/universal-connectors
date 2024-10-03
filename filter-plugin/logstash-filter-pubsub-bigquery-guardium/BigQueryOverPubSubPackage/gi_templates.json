@@ -1,7 +1,7 @@
 {
   "plugin_name": "BigQueryFilterPlugin",
   "help_link": "https://github.com/IBM/universal-connectors/blob/main/filter-plugin/logstash-filter-pubsub-bigquery-guardium/README.md",
-  "input_name": "Google_PubSub_Input",
+  "input_name": "Google_PubSub",
   "input_parameters": [
     {
       "project_id": {
@@ -45,5 +45,5 @@
       }
     }
   ],
-  "supported_platforms": ["on-permise"]
+  "supported_platforms": ["Google Cloud"]
 }
