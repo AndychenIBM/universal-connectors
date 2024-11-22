@@ -42,7 +42,7 @@ filter-plugin/logstash-filter-pubsub-spanner-guardium/gi-pubsub-spanner-package;
 filter-plugin/logstash-filter-pubsub-firebase-realtime-guardium/gi-pubsub-firebase-package;PubSubFirebaseFilterPluginGIPackage.zip
 filter-plugin/logstash-filter-pubsub-firestore-guardium/gi-pubsub-firestore-package;firestoreFilterPluginGIPackage.zip
 filter-plugin/logstash-filter-pubsub-mysql-guardium/gi-pubsub-mysql-package;mysqlFilterPluginGIPackage.zip
-filter-plugin/logstash-filter-pubsub-bigquery-guardium/gi-pubsub-bigquery-package;logstash-filter-big_query_guardium_filter.zip.zip
+filter-plugin/logstash-filter-pubsub-bigquery-guardium/gi-pubsub-bigquery-package;logstash-filter-big_query_guardium_filter.zip
 filter-plugin/logstash-filter-pubsub-apachesolr-guardium/gi-pubsub-apachesolr-package;apachesolrFilterPluginGIPackage.zip
 filter-plugin/logstash-filter-pubsub-bigtable-guardium/gi-pubsub-bigtable-package;bigTableFilterPluginGIPackage.zip
 #Syslog plug-ins
